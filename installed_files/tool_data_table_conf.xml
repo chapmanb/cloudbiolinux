@@ -32,7 +32,7 @@
     </table>
     <!-- liftOver files -->
     <table name="lift_over">
-        <columns> dbkey1, dbkey2, value</columns>
+        <columns>dbkey1, dbkey2, value</columns>
         <file path="tool-data/liftOver.loc" />
     </table>
 </tables>

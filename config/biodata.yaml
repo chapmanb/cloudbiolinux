@@ -11,9 +11,9 @@
 #    dbkey   - globally unique identifier for the genome (e.g., hg19)
 #    name    - descriptive name for the given genome (to be displayed in Galaxy, e.g., Hsapiens)
 #  Optional genome fields (corresponding to Galaxy's tool_data_table_conf.xml columns):
-#    build_id, formats, species, dbkey1, dbkey2
+#    formats, species, dbkey1, dbkey2, value, path, index
 #  Additional genome fields specific to data deployment: 
-#    indexes - list of tool indexes specific to the associated genome (overrides global 'indexes')
+#    genome_indexes - list of tool indexes specific to the associated genome (overrides global 'genome_indexes')
 genomes:
   - dbkey: phix
     name: phiX174

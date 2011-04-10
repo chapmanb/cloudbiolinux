@@ -14,6 +14,7 @@ import operator
 import socket
 import glob
 from contextlib import contextmanager
+from xml.etree import ElementTree
 
 import yaml
 
@@ -349,29 +350,69 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
     with cd(work_dir):
         for idx in genome_indexes:
             indexes[idx] = INDEX_FNS[idx](ref_file)
-    for ref_index_file, cur_index, prefix, new_style in [
-          ("sam_fa_indices.loc", indexes.get("seq", None), "index", False),
-          ("alignseq.loc", indexes.get("ucsc", None), "seq", False),
-          ("twobit.loc", indexes.get("ucsc", None), "", False),
-          ("bowtie_indices.loc", indexes.get("bowtie", None), "", True),
-          ("bwa_index.loc", indexes.get("bwa", None), "", True)]:
+    for ref_index_file, cur_index, prefix, new_style, tool_name in [
+          ("sam_fa_indices.loc", indexes.get("seq", None), "index", False, 'sam'),
+          ("alignseq.loc", indexes.get("ucsc", None), "seq", False, 'alignseq'),
+          ("twobit.loc", indexes.get("ucsc", None), "", False, 'twobit'),
+          ("bowtie_indices.loc", indexes.get("bowtie", None), "", True, 'bowtie'),
+          ("bwa_index.loc", indexes.get("bwa", None), "", True, 'bwa')]:
         if cur_index:
             str_parts = _build_galaxy_loc_line(gid, os.path.join(work_dir, cur_index),
-                                               config, prefix, new_style)
+                                               config, prefix, new_style, tool_name)
             _update_loc_file(ref_index_file, str_parts)
 
-def _build_galaxy_loc_line(dbkey, file_path, config, prefix, new_style):
+class LocCols(object):
+    # Hold all possible .loc file column fields making sure the local 
+    # variable names match column names in Galaxy's tool_data_table_conf.xml
+    def __init__(self, config, dbkey, file_path):
+        self.dbkey = dbkey
+        self.path = file_path
+        self.value = config.get("value", dbkey)
+        self.name = config.get("name", dbkey)
+        self.species = config.get('species', '')
+        self.index = config.get('index', 'index')
+        self.formats = config.get('index', 'fastqsanger')
+        self.dbkey1 = config.get('index', dbkey)
+        self.dbkey2 = config.get('index', dbkey)
+    
+
+def _build_galaxy_loc_line(dbkey, file_path, config, prefix, new_style, tool_name):
     """Prepare genome information to write to a Galaxy *.loc config file.
     """
-    build_id = config.get("build_id", dbkey)
-    display_name = config.get("name", dbkey)
     if new_style:
-        str_parts = [build_id, dbkey, display_name, file_path]
+        str_parts = []
+        tool_conf = _get_tool_conf(tool_name)
+        loc_cols = LocCols(config, dbkey, file_path)
+        # Compose the .loc file line as str_parts list by looking for column values
+        # from the retrieved tool_conf (as defined in tool_data_table_conf.xml). 
+        # Any column values required but missing in the the tool_conf are 
+        # supplemented by the defaults defined in LocCols class
+        for col in tool_conf.get('columns', []):
+            str_parts.append(config.get(col, getattr(loc_cols, col)))
+        # print "manufact str_parts: %s" % str_parts
+        # str_parts = [loc_cols.value, dbkey, loc_cols.name, file_path]
+        # print "original str_parts: %s" % str_parts
     else:
         str_parts = [dbkey, file_path]
     if prefix:
         str_parts.insert(0, prefix)
     return str_parts
+
+def _get_tool_conf(tool_name):
+    """
+    Parse the tool_data_table_conf.xml from installed_files subfolder and extract
+    values for the 'columns' tag and 'path' parameter for the 'file' tag, returning 
+    those as a dict.
+    """
+    tool_conf = {}
+    conf_file = 'tool_data_table_conf.xml'
+    tdtc = ElementTree.parse(os.path.join("installed_files", conf_file))
+    tables = tdtc.getiterator('table')
+    for t in tables:
+        if tool_name in t.attrib.get('name', ''):
+            tool_conf['columns'] = t.find('columns').text.replace(' ', '').split(',')
+            tool_conf['file'] = t.find('file').attrib.get('path', '')
+    return tool_conf
 
 def _clean_genome_directory():
     """Remove any existing sequence information in the current directory.
@@ -564,7 +605,7 @@ def _download_genomes(genomes, genome_indexes):
             with cd(org_dir):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
-                    run("wget %s" % url)
+                    run("wget --no-check-certificate %s" % url)
                     run("tar -xJvpf %s" % os.path.basename(url))
                     run("rm -f %s" % os.path.basename(url))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
