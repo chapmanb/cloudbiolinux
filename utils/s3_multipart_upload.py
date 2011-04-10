@@ -11,10 +11,9 @@ Usage:
     if <s3_key_name> is not specified, the filename will be used.
 
     --norr -- Do not use reduced redundancy storage.
-    --nopublic -- Do not make files public.
+    --public -- Make uploaded files public.
 
-    Files are stored at cheaper reduced redundancy storage and made public by
-    default.
+    Files are stored at cheaper reduced redundancy storage by default.
 """
 import os
 import sys
@@ -125,8 +124,8 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-r", "--norr", dest="use_rr",
                       action="store_false", default=True)
-    parser.add_option("-p", "--nopublic", dest="make_public",
-                      action="store_false", default=True)
+    parser.add_option("-p", "--public", dest="make_public",
+                      action="store_true", default=False)
     (options, args) = parser.parse_args()
     if len(args) < 2:
         print __doc__
