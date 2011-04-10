@@ -103,7 +103,7 @@ class UCSCGenome(_DownloadHelper):
                 run("find . -name '*.fa'%s -exec mv {} . \;" % ignore_random)
                 run("find . -type d -a \! -name '\.' | xargs rm -rf")
             result = run("find . -name '*.fa'%s" % ignore_random)
-            result = result.split("\n")
+            result = [x.strip() for x in result.split("\n")]
             result.sort()
             run("cat %s > %s" % (" ".join(result), tmp_file))
             run("rm -f *.fa")
@@ -237,11 +237,11 @@ def install_data(config_file=CONFIG_FILE):
     """
     _check_version()
     setup_environment()
-    _data_uniref()
     genomes, genome_indexes = _get_genomes(config_file)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
     _data_liftover(lift_over_genomes)
+    _data_uniref()
 
 def install_data_s3(config_file=CONFIG_FILE):
     """Install data using pre-existing genomes present on Amazon s3.
@@ -317,7 +317,7 @@ def _data_ngs_genomes(genomes, genome_indexes):
     """
     genome_dir = os.path.join(env.data_files, "genomes")
     if not exists(genome_dir):
-        run('mkdir %s' % genome_dir)
+        run('mkdir -p %s' % genome_dir)
     for organism, genome, manager in genomes:
         cur_dir = os.path.join(genome_dir, organism, genome)
         if not exists(cur_dir):
