@@ -49,7 +49,7 @@ Galaxy configuration files. This makes it useful for installing data
 to a local or [cloud-based][bd3] Galaxy server.
 
 [bd1]: http://s3.amazonaws.com/biodata
-[bd2]: https://github.com/chapmanb/bcbb/blob/master/ec2/biolinux/config/biodata.yaml
+[bd2]: https://github.com/chapmanb/cloudbiolinux/blob/master/config/biodata.yaml
 [bd3]: https://bitbucket.org/galaxy/galaxy-central/wiki/cloud
 
 ## VirtualBox with vagrant
@@ -96,7 +96,7 @@ Vagrant and VirtualBox:
 
 Run the fabfile, building CloudBioLinux:
 
-        fab -H vagrant -f /path/to/bcbb/ec2/biolinux/fabfile.py install_biolinux
+        fab -H vagrant -f /path/to/cloudbiolinux/fabfile.py install_biolinux
 
 Then build the box, renaming package.box to `cloudbiolinux_date` and
 move it to a public webserver, like Amazon S3:
@@ -106,7 +106,7 @@ move it to a public webserver, like Amazon S3:
         s3cmd put --acl-public --guess-mime-type biolinux_20110122.box
               s3://chapmanb/biolinux_20110122.box
 
-[1]: http://cloudbiolinux.com/
+[1]: http://cloudbiolinux.org/
 [2]: https://console.aws.amazon.com/ec2/home
 [3]: http://fabfile.org/
 [4]: http://alestic.com/
