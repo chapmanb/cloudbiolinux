@@ -606,7 +606,7 @@ def _download_genomes(genomes, genome_indexes):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
                     run("wget --no-check-certificate %s" % url)
-                    run("tar -xJvpf %s" % os.path.basename(url))
+                    run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
                     run("rm -f %s" % os.path.basename(url))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
         assert exists(ref_file), ref_file

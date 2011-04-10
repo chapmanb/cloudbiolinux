@@ -39,6 +39,8 @@ programming:
     - zziplib-devel
     - bzip2
     - bzip2-devel
+    - xz
+    - xz-devel
     - gtk2
     - gtk2-devel
     - ncurses-devel

@@ -65,6 +65,8 @@ programming:
     - libc6-dev
     - libzip-dev
     - libbz2-dev
+    - xz-utils
+    - liblzma-dev
     - libgtk2.0-dev
     - libncurses5-dev
     - zlib1g-dev

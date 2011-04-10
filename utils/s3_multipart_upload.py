@@ -97,7 +97,8 @@ def _multipart_upload(bucket, s3_key_name, tarball, mb_size, use_rr=True):
 
     mp = bucket.initiate_multipart_upload(s3_key_name, reduced_redundancy=use_rr)
     with multimap(cores) as pmap:
-        for _ in pmap(transfer_part, ((mp.id, mp.key_name, mp.bucket_name, i, part) for (i, part) in
+        for _ in pmap(transfer_part, ((mp.id, mp.key_name, mp.bucket_name, i, part)
+                                      for (i, part) in
                                       enumerate(split_file(tarball, mb_size, cores)))):
             pass
     mp.complete_upload()
