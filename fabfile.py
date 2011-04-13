@@ -65,7 +65,6 @@ def _setup_ubuntu():
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
 
-
 def _setup_centos():
     env.python_version_ext = "2.6"
     if not env.has_key("java_home"):
@@ -422,7 +421,8 @@ def _yum_packages(to_install):
     """Install rpm packages available via yum.
     """
     pkg_config = os.path.join(env.config_dir, "packages-yum.yaml")
-    sudo("yum check-update")
+    with settings(warn_only=True):
+        sudo("yum check-update")
     sudo("yum -y upgrade")
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
@@ -444,7 +444,8 @@ def _setup_yum_sources():
     """
     repos = ["http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm"]
     for repo in repos:
-        sudo("rpm -Uvh %s" % repo)
+        with settings(warn_only=True):
+            sudo("rpm -Uvh %s" % repo)
 
 # ### CloudBioLinux specific scripts
 
