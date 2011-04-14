@@ -3,6 +3,7 @@
 # using gem install (avoiding the distribution package manager)
 gems:
   - addressable
+  - cake
   - cheat
   - fastercsv
   - hpricot
