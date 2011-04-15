@@ -27,6 +27,9 @@ pypi:
   - cython
   - Pyrex
   - virtualenv
+  # concurrency/web
+  - tornado
+  - Twisted
   # science
   - biopython
   - bx-python
@@ -40,6 +43,7 @@ pypi:
   - pysparse
   - rpy2
   - rpy2-bioconductor-extensions
+  - scikits.learn
   - scipy
   - sympy
   # databases

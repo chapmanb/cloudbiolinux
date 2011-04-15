@@ -315,7 +315,7 @@ def _perl_library_installer(config):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
-        run("cpanm --sudo --skip-installed %s < /dev/null" % (lib))
+        run("cpanm --sudo --skip-installed --notest %s < /dev/null" % (lib))
 
 def _clojure_library_installer(config):
     """Install clojure libraries using cljr.
@@ -365,7 +365,7 @@ def _add_apt_gpg_keys():
         "http://archive.cloudera.com/debian/archive.key",
         "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
     keyserver = [
-        ("subkeys.pgp.net", "7F0CEB10"),
+        ("keyserver.ubuntu.com", "7F0CEB10"),
         ("keyserver.ubuntu.com", "E084DAB9"),
         ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
     ]

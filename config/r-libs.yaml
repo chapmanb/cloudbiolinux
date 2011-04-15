@@ -97,12 +97,12 @@ bioc:
  - biomaRt
  - Biostrings
  - BSgenome
- - BSgenome.Athaliana.TAIR.TAIR9
- - BSgenome.Celegans.UCSC.ce6
- - BSgenome.Dmelanogaster.UCSC.dm3
- - BSgenome.Hsapiens.UCSC.hg19
- - BSgenome.Mmusculus.UCSC.mm9
- - BSgenome.Scerevisiae.UCSC.sacCer2
+ #- BSgenome.Athaliana.TAIR.TAIR9
+ #- BSgenome.Celegans.UCSC.ce6
+ #- BSgenome.Dmelanogaster.UCSC.dm3
+ #- BSgenome.Hsapiens.UCSC.hg19
+ #- BSgenome.Mmusculus.UCSC.mm9
+ #- BSgenome.Scerevisiae.UCSC.sacCer2
  - ChIPpeakAnno
  - chipseq
  - ChIPseqR
@@ -139,13 +139,13 @@ bioc:
  - multtest
  - MotIV
  - oneChannelGUI
- - org.At.tair.db
- - org.Ce.eg.db
- - org.Dm.eg.db
- - org.Hs.eg.db
- - org.Mm.eg.db
- - org.Sc.sgd.db
- - org.Xl.eg.db
+ #- org.At.tair.db
+ #- org.Ce.eg.db
+ #- org.Dm.eg.db
+ #- org.Hs.eg.db
+ #- org.Mm.eg.db
+ #- org.Sc.sgd.db
+ #- org.Xl.eg.db
  - preprocessCore
  - PICS
  - rGADEM
