@@ -302,3 +302,9 @@ is just a packaging example with one of the images, further automation should be
         euca-bundle-image -i $IMAGE --kernel $EKI --ramdisk $ERI
         euca-upload-bundle -b cloudbiolinux -m /tmp/`basename ${KERNEL}`.manifest.xml
         euca-register cloudbiolinux/`basename ${KERNEL}`.manifest.xml
+
+# LICENSE
+
+The code is freely available under the [MIT license][1].
+
+[l1]: http://www.opensource.org/licenses/mit-license.html

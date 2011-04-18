@@ -362,7 +362,9 @@ phylogeny:
     - bio-linux-treeview
   needs_64bit:
     - bio-linux-fasttree
-#
+# To do -- in Deb Med but not propogated
+# squizz
+# biomaj
 #
 # To Add -- need packages
 # from bioperl-max:
