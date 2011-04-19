@@ -250,7 +250,7 @@ def install_cufflinks(env):
 @_if_not_installed("ABYSS")
 def install_abyss(env):
     # XXX check for no sparehash on non-ubuntu systems
-    version = "1.2.6"
+    version = "1.2.7"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 

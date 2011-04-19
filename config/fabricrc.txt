@@ -9,10 +9,16 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # details about the operating system
+## Ubuntu
 distribution = ubuntu
 dist_name = maverick
-dist_version = 10.10
+## Centos
 #distribution = centos
+## Debian
+#distribution = debian
+#dist_name = squeeze
+
+## Specify username on image to use
 user = ubuntu
 
 # details for biological data files and Galaxy

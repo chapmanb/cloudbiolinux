@@ -1,0 +1,10 @@
+---
+# Debian packages use the standard packages.yaml list with naming substitutions
+# specified in this file.
+ec2-ami-tools: ""
+ec2-api-tools: ""
+python-vm-builder-ec2: ""
+firefox: iceweasel
+freenx: ""
+bio-linux-arb: ""
+

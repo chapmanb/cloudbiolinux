@@ -15,7 +15,7 @@ def install_cljr(env):
     """
     run("wget http://incanter.org/downloads/cljr-installer.jar")
     run("java -jar cljr-installer.jar")
-    sudo("ln -s ~/.cljr/bin/cljr /usr/bin")
+    sudo("ln -s .cljr/bin/cljr /usr/bin")
     run("rm cljr-installer.jar")
 
 @_if_not_installed("lein")

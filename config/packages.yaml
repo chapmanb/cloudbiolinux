@@ -137,9 +137,9 @@ distributed:
   - hadoop-0.20-source
 amazon:
   - s3cmd
+  - euca2ools
   - ec2-ami-tools
   - ec2-api-tools
-  - euca2ools
   - python-vm-builder-ec2
 python:
   meta:
@@ -228,7 +228,7 @@ databases:
     - sqlite3
   document:
     - libdb-dev
-    - mongodb-stable
+    - mongodb-10gen
     - couchdb
     - tokyocabinet-bin
     - libtokyocabinet8
@@ -279,7 +279,7 @@ bio_alignment:
   - mummer
   - probcons
   - t-coffee
-  - seaview
+  - bio-linux-seaview
   - bio-linux-clustal
   - bio-linux-dotter
   - bio-linux-jalview

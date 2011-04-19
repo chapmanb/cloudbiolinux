@@ -34,14 +34,16 @@ def _setup_environment():
         _setup_ubuntu()
     elif env.distribution == "centos":
         _setup_centos()
+    elif env.distribution == "debian":
+        _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _expand_paths()
 
 def _setup_ubuntu():
+    shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
-    env.sources_file = "/etc/apt/sources.list"
-    version = (env.dist_name, env.dist_version)
+    version = env.dist_name
     sources = [
       "deb http://us.archive.ubuntu.com/ubuntu/ %s universe",
       "deb-src http://us.archive.ubuntu.com/ubuntu/ %s universe",
@@ -51,19 +53,39 @@ def _setup_ubuntu():
       "deb-src http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "ppa:sun-java-community-team/sun-java6", # sun-java
-      "deb http://downloads.mongodb.org/distros/ubuntu % s 10gen", # mongodb
+      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
-      "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
       "deb http://archive.cloudera.com/debian %s-cdh3 contrib", # Hadoop
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
-      "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
-    ]
+      "ppa:sun-java-community-team/sun-java6", # sun-java
+    ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
+
+def _setup_debian():
+    shared_sources = _setup_deb_general()
+    version = env.dist_name
+    sources = [
+      "deb http://ftp.us.debian.org/debian/ %s main contrib non-free",
+      "deb http://ftp.us.debian.org/debian/ %s-updates main contrib non-free",
+      "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
+      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # lastest R versions
+      "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
+    ] + shared_sources
+    env.std_sources = _add_source_versions(version, sources)
+
+def _setup_deb_general():
+    """Shared parameters for different debian based architectures.
+    """
+    env.sources_file = "/etc/apt/sources.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
+    shared_sources = [
+      "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
+      "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
+    ]
+    return shared_sources
 
 def _setup_centos():
     env.python_version_ext = "2.6"
@@ -112,13 +134,11 @@ def _setup_vagrant_environment():
     env.key_filename = ssh_config["IdentityFile"]
 
 def _add_source_versions(version, sources):
-    name, num = version
+    name = version
     final = []
     for s in sources:
         if s.find("%s") > 0:
             s = s % name
-        elif s.find("% s") > 0:
-            s = s % num
         final.append(s)
     return final
 
@@ -131,7 +151,7 @@ def install_biolinux(target=None):
     _setup_environment()
     pkg_install, lib_install = _read_main_config()
     if target is None or target == "packages":
-        if env.distribution in ["ubuntu"]:
+        if env.distribution in ["ubuntu", "debian"]:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
@@ -185,7 +205,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
                 % (p, pkg_to_group[p]))
     fn(env)
 
-def _yaml_to_packages(yaml_file, to_install):
+def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     """Read a list of packages from a nested YAML configuration file.
     """
     # allow us to check for packages only available on 64bit machines
@@ -193,6 +213,11 @@ def _yaml_to_packages(yaml_file, to_install):
     is_64bit = machine.find("_64") > 0
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
+    if subs_yaml_file is not None:
+        with open(subs_yaml_file) as in_handle:
+            subs = yaml.load(in_handle)
+    else:
+        subs = {}
     # filter the data based on what we have configured to install
     data = [(k, v) for (k,v) in full_data.iteritems()
             if to_install is None or k in to_install]
@@ -203,7 +228,7 @@ def _yaml_to_packages(yaml_file, to_install):
         cur_key, cur_info = data.pop(0)
         if cur_info:
             if isinstance(cur_info, (list, tuple)):
-                packages.extend(sorted(cur_info))
+                packages.extend(_filter_subs_packages(cur_info, subs))
                 for p in cur_info:
                     pkg_to_group[p] = cur_key
             elif isinstance(cur_info, dict):
@@ -214,6 +239,19 @@ def _yaml_to_packages(yaml_file, to_install):
             else:
                 raise ValueError(cur_info)
     return packages, pkg_to_group
+
+def _filter_subs_packages(initial, subs):
+    """Rename and filter package list with subsitutions; for similar systems.
+    """
+    final = []
+    for p in initial:
+        try:
+            new_p = subs[p]
+        except KeyError:
+            new_p = p
+        if new_p:
+            final.append(new_p)
+    return sorted(final)
 
 def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
@@ -351,10 +389,14 @@ def _apt_packages(to_install):
     """Install packages available via apt-get.
     """
     pkg_config = os.path.join(env.config_dir, "packages.yaml")
+    subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
+                                   env.distribution)
+    if not os.path.exists(subs_pkg_config): subs_pkg_config = None
     sudo("apt-get update")
     sudo("apt-get -y --force-yes upgrade")
     # Retrieve packages to get and install each of them
-    (packages, _) = _yaml_to_packages(pkg_config, to_install)
+    (packages, _) = _yaml_to_packages(pkg_config, to_install,
+                                      subs_pkg_config)
     for package in packages:
         sudo("apt-get -y --force-yes install %s" % package)
 
