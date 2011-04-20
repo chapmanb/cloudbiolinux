@@ -84,14 +84,13 @@ as the base, then install CloudBioLinux on it:
 
 ## VirtualBox with vagrant
 
-Add a base image and boot it up. Ideally this will eventually be a
-64-bit Maverick box, but those aren't available for the latest
-Vagrant and VirtualBox:
+Add a base image and boot it up; community Vagrants boxes are available from
+[http://vagrantbox.es][v3]:
 
-        vagrant box add lucid32 http://files.vagrantup.com/lucid32.box
+        vagrant box add box_name http://path_to_the_image.box
         mkdir tmp/biolinux
         cd tmp/biolinux
-        vagrant init lucid32
+        vagrant init box_name
         vagrant up
 
 Run the fabfile, building CloudBioLinux:
@@ -112,6 +111,7 @@ move it to a public webserver, like Amazon S3:
 [4]: http://alestic.com/
 [v1]: http://vagrantup.com/
 [v2]: http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/
+[v3]: http://vagrantbox.es/
 
 # Technical details for using build scripts
 
