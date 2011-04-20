@@ -84,7 +84,7 @@ as the base, then install CloudBioLinux on it:
 
 ## VirtualBox with vagrant
 
-Add a base image and boot it up; community Vagrants boxes are available from
+Add a base image and boot it up; community Vagrant boxes are available from
 [http://vagrantbox.es][v3]:
 
         vagrant box add box_name http://path_to_the_image.box
