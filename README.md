@@ -305,6 +305,6 @@ is just a packaging example with one of the images, further automation should be
 
 # LICENSE
 
-The code is freely available under the [MIT license][1].
+The code is freely available under the [MIT license][l1].
 
 [l1]: http://www.opensource.org/licenses/mit-license.html
