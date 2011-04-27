@@ -297,9 +297,9 @@ bio_sequencing:
   - bio-linux-lucy
   - bio-linux-mira
   - bio-linux-mira-3rd-party
-  - bio-linux-msatfinder
   - bio-linux-staden
   - bio-linux-stars
+  # Install problems with emboss: - bio-linux-msatfinder
 bio_annotation:
   - mcl
   - tigr-glimmer

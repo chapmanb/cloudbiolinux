@@ -188,11 +188,11 @@ def install_custom(p, automated=False, pkg_to_group=None):
     fab install_custom_package:package_name
     """
     if not automated:
+        if not env.has_key("system_install"):
+            _add_defaults()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
         sys.path.append(os.path.split(__file__)[0])
-        if not env.has_key("system_install"):
-            _add_defaults()
     try:
         mod = __import__("custom.%s" % pkg_to_group[p], fromlist=["custom"])
     except ImportError:

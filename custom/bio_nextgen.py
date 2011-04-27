@@ -157,6 +157,24 @@ def install_picard(env):
                 with cd(os.path.splitext(os.path.basename(url))[0]):
                     sudo("mv *.jar %s" % install_dir)
 
+@_if_not_installed("fastqc")
+def install_fastqc(env):
+    version = "0.9.1"
+    url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
+          "fastqc_v%s.zip" % version
+    executable = "fastqc"
+    install_dir = _symlinked_java_version_dir("fastqc", version)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % (url))
+                run("unzip %s" % os.path.basename(url))
+                with cd("FastQC"):
+                    sudo("chmod a+rwx %s" % executable)
+                    sudo("mv * %s" % install_dir)
+                sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
+                                                env.system_install, executable))
+
 def install_gatk(env):
     version = "1.0.5506"
     ext = ".tar.bz2"

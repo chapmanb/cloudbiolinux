@@ -13,6 +13,7 @@ bio_nextgen:
   analysis:
     - bedtools
     - cufflinks
+    - fastqc
     - fastx_toolkit
     - freebayes
     - gatk
