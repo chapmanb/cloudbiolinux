@@ -399,6 +399,7 @@ def _apt_packages(to_install):
                                       subs_pkg_config)
     for package in packages:
         sudo("apt-get -y --force-yes install %s" % package)
+    sudo("apt-get clean")
 
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
@@ -513,6 +514,7 @@ def _cleanup():
     sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")
     sudo("rm -f $HOME/.nx_setup_done")
+    sudo("rm -rf $HOME/.cpanm")
     # RabbitMQ fails to start if its database is embedded into the image
     # because it saves the current IP address or host name so delete it now.
     # When starting up, RabbitMQ will recreate that directory.

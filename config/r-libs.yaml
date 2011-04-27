@@ -123,7 +123,7 @@ bioc:
  - GGBase
  - GGtools
  - globaltest
- - GO.db
+ #- GO.db
  - goseq
  - GOstats
  - GSEABase

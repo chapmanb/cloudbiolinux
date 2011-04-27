@@ -310,13 +310,13 @@ bio_annotation:
   - bio-linux-estscan
   - bio-linux-glimmer3
   - bio-linux-partigene
-  - bio-linux-priam
   - bio-linux-prot4est
   - bio-linux-rbs-finder
   - bio-linux-transterm-hp
   - bio-linux-trnascan
-# Package broken: - bio-linux-yamap
   - bio-linux-tetra
+  # 500Mb of disk: - bio-linux-priam
+  # Package broken: - bio-linux-yamap
 bio_microarray:
   - bio-linux-ocount
   - bio-linux-oligoarray
