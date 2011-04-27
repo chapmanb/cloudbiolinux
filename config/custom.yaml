@@ -35,7 +35,7 @@ distributed:
   - pydoop
 java:
   - leinengin
-  - cljr
+  #- cljr
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

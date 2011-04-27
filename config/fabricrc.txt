@@ -1,13 +1,6 @@
 # Configuration file for Fabric specifying filesystem information
 # This can be adjusted and passed to fab on the commandline as '-c'
 
-# Global installation directory for packages and standard programs
-system_install = /usr
-# Local install directory for versioned software that will not                                                                       
-# be included in the path by default
-local_install = ~/install
-shell_config = ~/.bashrc
-shell = /bin/bash -l -c
 # details about the operating system
 ## Ubuntu
 distribution = ubuntu
@@ -17,6 +10,14 @@ dist_name = maverick
 ## Debian
 #distribution = debian
 #dist_name = squeeze
+
+# Global installation directory for packages and standard programs
+system_install = /usr
+# Local install directory for versioned software that will not                                                                       
+# be included in the path by default
+local_install = ~/install
+shell_config = ~/.bashrc
+shell = /bin/bash -l -c
 
 # details for biological data files and Galaxy
 data_files = /mnt/biodata
