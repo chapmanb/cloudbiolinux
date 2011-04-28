@@ -86,10 +86,11 @@ connect to it with:
 
         vagrant ssh
 
-no passwords needed. Through vagrant,
+no passwords needed. Through Vagrant
 additional facilities are available, such as a shared network drive.
-It is possible to tweak the image (e.g. RAM/CPU settings) by firing up
-virtualbox itself.
+It is also possible to tweak the image (e.g. RAM/CPU settings) by firing up
+virtualbox itself. For more information, see the Vagrant
+[documentation][v1].
 
 # Building an image from scratch using CloudBioLinux
 
