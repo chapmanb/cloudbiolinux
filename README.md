@@ -95,8 +95,9 @@ no passwords needed! Get root with
         
 Through Vagrant additional facilities are available, such as a shared
 network drive.  It is also possible to tweak the image (e.g. RAM/CPU
-settings) by firing up virtualbox itself. For more information, see
-the Vagrant [documentation][v1].
+settings, and getting the all important guest additions) by firing up
+virtualbox itself. For more information, see the Vagrant
+[documentation][v1].
 
 # Building an image from scratch using CloudBioLinux
 
