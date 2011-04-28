@@ -77,20 +77,26 @@ CloudLinux VirtualBox images (32-bits and 64-bits available) and start it up:
         mkdir tmp/biolinux
         cd tmp/biolinux
         vagrant init biolinux_version
-        vagrant up
 
 (note with vagrant you need disk space - at least 3x the image size).
+The created ./Vagrantfile can be edited to get a full GUI, extra RAM, and
+a local IP address. Next, fire up the image with
 
-Once you have a running virtual machine with CloudBioLinux, and can
+        vagrant up
+
+Once you have a running virtual machine with CloudBioLinux, 
 connect to it with:
 
         vagrant ssh
 
-no passwords needed. Through Vagrant
-additional facilities are available, such as a shared network drive.
-It is also possible to tweak the image (e.g. RAM/CPU settings) by firing up
-virtualbox itself. For more information, see the Vagrant
-[documentation][v1].
+no passwords needed! Get root with
+
+        sudo bash
+        
+Through Vagrant additional facilities are available, such as a shared
+network drive.  It is also possible to tweak the image (e.g. RAM/CPU
+settings) by firing up virtualbox itself. For more information, see
+the Vagrant [documentation][v1].
 
 # Building an image from scratch using CloudBioLinux
 
