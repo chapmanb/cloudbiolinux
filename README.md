@@ -74,10 +74,15 @@ CloudLinux VirtualBox images (32-bits and 64-bits available) and start it up:
         vagrant init biolinux_version
         vagrant up
 
-You now have a running virtual machine with CloudBioLinux, and can
+(note with vagrant you need disk space - at least 3x the image size).
+
+Once you have a running virtual machine with CloudBioLinux, and can
 connect to it with:
 
         vagrant ssh
+
+no passwords needed. Through vagrant,
+additional facilities are available, such as a shared network drive.
 
 # Building an image from scratch using CloudBioLinux
 
