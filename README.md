@@ -4,15 +4,20 @@ the Fabric system, written in Python. There is little need to
 understand Python, though, as most configuration is done through
 configuration files. Other scripting languages can be added too.
 
-CloudBioLinux provides a [Fabric build file][3] which installs a
-large selection of Bioinformatics and machine learning libraries on a
-bare virtual machine (VM) image, or freshly installed PC.
-CloudBioLinux is designed for VMs on the desktop, such as VirtualBox,
-or cloud providers, such as Amazon EC2, where you start with a bare
-bones system and bootstrap to a ready to go instance. Included
-software packages are fully customizable. By default CloudBioLinux
-includes a large suite of bioinformatics tools and libraries, largely
-pulled from the package management system provided by the image.
+CloudBioLinux provides a [Fabric build file][3] which installs a large
+selection of Bioinformatics and machine learning libraries on a bare
+virtual machine (VM) image, or freshly installed PC. CloudBioLinux is
+designed for VMs on the desktop, such as VirtualBox, or cloud
+providers, such as Amazon EC2, where you start with a bare bones
+system and bootstrap a running instance. CloudBioLinux included software
+packages are fully customizable, and different flavours of
+CloudBioLinux can be configured. By default CloudBioLinux includes a
+large suite of bioinformatics tools and libraries, largely pulled from
+the package management system provided by the image. In addition
+CloudBioLinux installs packages through other mechanisms, such as
+native installers and libraries for Perl, R, Python, JAVA and Ruby, as
+well as installers for special data resources. Package selection is
+through YAML files in the ./config directory.
 
 # Using an instance
 
@@ -83,6 +88,8 @@ connect to it with:
 
 no passwords needed. Through vagrant,
 additional facilities are available, such as a shared network drive.
+It is possible to tweak the image (e.g. RAM/CPU settings) by firing up
+virtualbox itself.
 
 # Building an image from scratch using CloudBioLinux
 
