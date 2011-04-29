@@ -13,6 +13,7 @@ import os
 import operator
 import socket
 import glob
+import subprocess
 from contextlib import contextmanager
 from xml.etree import ElementTree
 
@@ -241,7 +242,7 @@ def install_data(config_file=CONFIG_FILE):
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
     _data_liftover(lift_over_genomes)
-    _data_uniref()
+    #_data_uniref()
 
 def install_data_s3(config_file=CONFIG_FILE):
     """Install data using pre-existing genomes present on Amazon s3.
@@ -631,36 +632,13 @@ def _upload_genomes(genomes, genome_indexes):
 def _upload_to_s3(tarball, bucket):
     """Upload the genome tarball to s3.
     """
+    upload_script = os.path.join(os.path.dirname(__file__), "utils", "s3_multipart_upload.py")
     s3_key_name = os.path.join("genomes", os.path.basename(tarball))
     if not bucket.get_key(s3_key_name):
         gb_size = int(run("du -sm %s" % tarball).split()[0]) / 1000.0
         print "Uploading %s %.1fGb" % (s3_key_name, gb_size)
-        if gb_size < 4.9:
-            s3_key = bucket.new_key(s3_key_name)
-            s3_key.set_contents_from_filename(tarball, reduced_redundancy=True)
-            s3_key.set_acl("public-read")
-        else:
-            _large_file_upload(bucket, s3_key_name, tarball)
-            s3_key = bucket.get_key(s3_key_name)
-            s3_key.set_acl("public-read")
-
-def _large_file_upload(bucket, s3_key_name, tarball):
-    """Upload large files using Amazon's multipart upload functionality.
-    """
-    def split_file(in_file):
-        prefix = os.path.join(os.path.dirname(in_file),
-                              "S3PART%s" % (os.path.basename(s3_key_name).split(".")[0]))
-        if not exists("%saa" % prefix):
-            run("split -b250m %s %s" % (in_file, prefix))
-        return sorted(glob.glob("%s*" % prefix))
-
-    mp = bucket.initiate_multipart_upload(s3_key_name)
-    for i, part in enumerate(split_file(tarball)):
-        print "Transferring", part
-        with open(part) as t_handle:
-            mp.upload_part_from_file(t_handle, i+1)
-        os.remove(part)
-    mp.complete_upload()
+        cl = ["python2.6", upload_script, tarball, bucket.name, s3_key_name, "--public"]
+        subprocess.check_call(cl)
 
 def _tar_directory(dir, tar_name):
     """Create a tarball of the directory.
@@ -669,7 +647,8 @@ def _tar_directory(dir, tar_name):
     tarball = os.path.join(base_dir, "%s.tar.xz" % tar_name)
     if not exists(tarball):
         with cd(base_dir):
-            run("tar -cJvpf %s %s" % (os.path.basename(tarball), tar_dir))
+            run("tar -cvpf - %s | xz -zc - > %s" % (tar_dir,
+                                                    os.path.basename(tarball)))
     return tarball
 
 def _clean_directory(dir, gid):
