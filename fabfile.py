@@ -510,11 +510,11 @@ def _freenx_scripts():
 def _cleanup():
     """Clean up any extra files after building.
     """
-    run("rm -f $HOME/.bash_history")
+    run("rm -f .bash_history")
     sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")
-    sudo("rm -f $HOME/.nx_setup_done")
-    sudo("rm -rf $HOME/.cpanm")
+    sudo("rm -f .nx_setup_done")
+    sudo("rm -rf .cpanm")
     # RabbitMQ fails to start if its database is embedded into the image
     # because it saves the current IP address or host name so delete it now.
     # When starting up, RabbitMQ will recreate that directory.

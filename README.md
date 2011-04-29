@@ -1,9 +1,24 @@
-CloudBioLinux provides a [Fabric build file][3] which will install a
-large selection of Bioinformatics and machine learning libraries on a
-bare machine. This is ideally designed for Amazon EC2 or VirtualBox,
-where you start with a bare bones system and bootstrap to a ready to
-go instance. Packages to install are fully customizable, and by
-default include a large suite of bioinformatics tools and libraries.
+CloudBioLinux is a build and deployment system which installs 
+a large selection of Bioinformatics and machine learning libraries 
+on a bare virtual machine (VM) image, freshly installed PC, 
+or in the cloud. By default CloudBioLinux includes a
+large suite of tools and libraries, largely pulled from
+the package management system provided by the image. In addition
+CloudBioLinux installs packages through other mechanisms, such as
+native installers and libraries for Perl, R, Python, JAVA and Ruby, as
+well as installers for special data resources. 
+
+CloudBioLinux is designed for VMs on the desktop, such as [VirtualBox][v2], or 
+cloud providers, such as [Amazon EC2][0], where you start with a bare bones
+system and bootstrap a running instance. CloudBioLinux included software
+packages are fully customizable, and different flavours of
+CloudBioLinux can be configured. 
+
+CloudBioLinux provides a [Fabric build file][3], written in Python.
+There is little need to understand Python, though, as most configuration
+is done through configuration files. Other scripting languages can be 
+added too. Package selection is through YAML files in the ./config 
+directory.
 
 # Using an instance
 
@@ -15,10 +30,11 @@ version for users familiar with Amazon is:
 
 * Login to the [Amazon EC2 console][2].
 * Click Launch Instance, and choose the latest CloudBioLinux AMI from
-  the [website][1] in the community AMI section.
-* After finishing the configuration wizard, find the host details of
+  the [website][1] in the community AMI section (search for
+  'biolinux').
+* After launching the instance, find the host details of
   your running instance from the Instances section.
-* Connect to your machine via ssh or VNC.
+* Connect to your machine via ssh or VNC (using the Amazon PEM keys)
 
 ## Biological data
 
@@ -54,23 +70,44 @@ to a local or [cloud-based][bd3] Galaxy server.
 
 ## VirtualBox with vagrant
 
+Vagrant allows easy deploying and connecting to VirtualBox images.
 Install [VirtualBox 4.0][v2] and [vagrant][v1]. Then add the pre-built
-VirtualBox and start it up:
+CloudLinux VirtualBox images and start it up:
 
         vagrant box add biolinux_version https://s3.amazonaws.com/chapmanb/biolinux_version.box
         mkdir tmp/biolinux
         cd tmp/biolinux
         vagrant init biolinux_version
+
+(note with vagrant you need disk space - at least 3x the image size).
+The created ./Vagrantfile can be edited to get a full GUI, extra RAM, and
+a local IP address. Next, fire up the image with
+
         vagrant up
 
-You now have a running virtual machine with CloudBioLinux, and can
+Once you have a running virtual machine with CloudBioLinux, 
 connect to it with:
 
         vagrant ssh
 
-# Building an image from scratch
+no passwords needed! Get root with
+
+        sudo bash
+        
+Through Vagrant additional facilities are available, such as a shared
+network drive.  It is also possible to tweak the image (e.g. RAM/CPU
+settings, and getting the all important guest additions) by firing up
+virtualbox itself. For more information, see the Vagrant
+[documentation][v1].
+
+# Building an image from scratch using CloudBioLinux
 
 ## Amazon
+
+Basically a bare Linux image is configured from another machine, e.g.
+your local desktop, using ssh and Fabric tools, after launching the
+image in the Cloud. Multiple distributions are supported,
+including Ubuntu, Debian Linux and CentOS. 
 
 1. On your local machine, install [Fabric][3]:
 
@@ -96,7 +133,8 @@ connect to it with:
 
         fab -f fabfile.py -H hostname -u username -i private_key_file install_biolinux
 
-6. When finished, use the [Amazon console][2] to create an AMI.
+6. When finished, use the [Amazon console][2] to create an AMI. Make
+   it public to share it with others.
 
 ## VirtualBox with vagrant
 
@@ -114,13 +152,14 @@ Run the fabfile, building CloudBioLinux:
         fab -H vagrant -f /path/to/cloudbiolinux/fabfile.py install_biolinux
 
 Then build the box, renaming package.box to `cloudbiolinux_date` and
-move it to a public webserver, like Amazon S3:
+move it to a public webserver, such as Amazon S3:
 
         vagrant package
         mv package.box biolinux_20110122.box
         s3cmd put --acl-public --guess-mime-type biolinux_20110122.box
               s3://chapmanb/biolinux_20110122.box
 
+[0]: http://aws.amazon.com/ec2/
 [1]: http://cloudbiolinux.org/
 [2]: https://console.aws.amazon.com/ec2/home
 [3]: http://fabfile.org/
