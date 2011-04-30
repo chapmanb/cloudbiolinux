@@ -150,10 +150,17 @@ def _add_source_versions(version, sources):
 
 def install_biolinux(target=None):
     """Main entry point for installing Biolinux on a remote server.
+
+    target is supplied on the fab CLI. Special targets are:
+
+      - packages     Install distro packages (default)
+      - custom
+      - libraries
+      - finalize     Setup freenx
     """
-    _check_version()
+    _check_fabric_version()
     _setup_distribution_environment()
-    pkg_install, lib_install = _read_main_config()
+    pkg_install, lib_install = _read_main_config()  # read main.yaml
     if target is None or target == "packages":
         if env.distribution in ["ubuntu", "debian"]:
             _setup_apt_sources()
@@ -172,7 +179,7 @@ def install_biolinux(target=None):
         _freenx_scripts()
         _cleanup()
 
-def _check_version():
+def _check_fabric_version():
     """Checks for fabric version installed
     """
     version = env.version
@@ -261,6 +268,8 @@ def _filter_subs_packages(initial, subs):
 
 def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
+
+    Reads 'main.yaml' and returns packages and libraries
     """
     yaml_file = os.path.join(env.config_dir, "main.yaml")
     with open(yaml_file) as in_handle:
@@ -378,7 +387,7 @@ lib_installers = {
 def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
-    _check_version()
+    _check_fabric_version()
     _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 
