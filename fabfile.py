@@ -44,6 +44,7 @@ def _setup_distribution_environment():
     """Setup distribution environment
     """
     _add_defaults()
+    logger.info("distribution=%s" % env.distribution)
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -59,6 +60,7 @@ def _setup_distribution_environment():
     _expand_paths()
 
 def _setup_ubuntu():
+    logger.info("Ubuntu setup")
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
@@ -79,6 +81,7 @@ def _setup_ubuntu():
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_debian():
+    logger.info("Debian setup")
     shared_sources = _setup_deb_general()
     version = env.dist_name
     sources = [
@@ -93,6 +96,7 @@ def _setup_debian():
 def _setup_deb_general():
     """Shared parameters for different debian based architectures.
     """
+    logger.debug("/etc/apt/sources.list")
     env.sources_file = "/etc/apt/sources.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
@@ -106,6 +110,7 @@ def _setup_deb_general():
     return shared_sources
 
 def _setup_centos():
+    logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
@@ -124,6 +129,7 @@ def _add_defaults():
 def _expand_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
+    logger.debug("Expand paths")
     if env.has_key("local_install"):
         if not exists(env.local_install):
             run("mkdir -p %s" % env.local_install)
@@ -154,6 +160,7 @@ def _setup_vagrant_environment():
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
     env.key_filename = ssh_config["IdentityFile"]
+    logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):
     name = version
