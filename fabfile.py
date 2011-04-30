@@ -59,6 +59,20 @@ def _setup_distribution_environment():
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _expand_paths()
 
+def _validate_target_distribution():
+    """Check target matches environment setting (for sanity)
+    """
+    if env.distribution == "debian":
+        tag = run("cat /proc/version")
+        if tag.find('ebian') == -1:
+           raise ValueError("Debian does not match target")
+    if env.distribution == "ubuntu":
+        tag = run("cat /proc/version")
+        if tag.find('buntu') == -1:
+           raise ValueError("Ubuntu does not match target")
+    else:
+        logger.debug("Unknown target distro")
+
 def _setup_ubuntu():
     logger.info("Ubuntu setup")
     shared_sources = _setup_deb_general()
@@ -186,6 +200,7 @@ def install_biolinux(target=None):
     _check_fabric_version()
     _setup_distribution_environment()
     pkg_install, lib_install = _read_main_config()  # read main.yaml
+    _validate_target_distribution()
     if target is None or target == "packages":
         if env.distribution in ["ubuntu", "debian"]:
             _setup_apt_sources()
