@@ -21,6 +21,20 @@ from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 
@@ -100,9 +114,12 @@ def _add_defaults():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     if not env.has_key("distribution"):
+        logger.info("Reading fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
             env.update(load_settings(config_file))
+    else:
+        logger.warn("Skipping fabricrc.txt as distribution is already defined")
 
 def _expand_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
@@ -128,6 +145,7 @@ def _setup_vagrant_environment():
     """Use vagrant commands to get connection information.
     https://gist.github.com/1d4f7c3e98efdf860b7e
     """
+    logger.info("Get vagrant environment")
     raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
