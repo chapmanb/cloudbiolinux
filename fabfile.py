@@ -65,11 +65,11 @@ def _validate_target_distribution():
     if env.distribution == "debian":
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
-           raise ValueError("Debian does not match target")
+           raise ValueError("Debian does not match target, using correct fabconfig?")
     if env.distribution == "ubuntu":
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
-           raise ValueError("Ubuntu does not match target")
+           raise ValueError("Ubuntu does not match target, using correct fabconfig?")
     else:
         logger.debug("Unknown target distro")
 
