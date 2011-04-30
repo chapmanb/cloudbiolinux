@@ -7,6 +7,8 @@ Amazon EC2 instances.
 Usage:
     fab -H hostname -i private_key_file install_biolinux
 
+which will call into the 'install_biolinux' method below.
+
 Requires:
     Fabric http://docs.fabfile.org
     PyYAML http://pyyaml.org/wiki/PyYAMLDocumentation
@@ -24,7 +26,9 @@ env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 
 # ### Configuration details for different server types
 
-def _setup_environment():
+def _setup_distribution_environment():
+    """Setup distribution environment
+    """
     _add_defaults()
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
@@ -148,7 +152,7 @@ def install_biolinux(target=None):
     """Main entry point for installing Biolinux on a remote server.
     """
     _check_version()
-    _setup_environment()
+    _setup_distribution_environment()
     pkg_install, lib_install = _read_main_config()
     if target is None or target == "packages":
         if env.distribution in ["ubuntu", "debian"]:
@@ -169,9 +173,11 @@ def install_biolinux(target=None):
         _cleanup()
 
 def _check_version():
+    """Checks for fabric version installed
+    """
     version = env.version
     if int(version.split(".")[0]) < 1:
-        raise NotImplementedError("Please install fabric version 1 or better")
+        raise NotImplementedError("Please install fabric version 1 or higher")
 
 def _custom_installs(to_install):
     if not exists(env.local_install):
@@ -373,7 +379,7 @@ def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
     _check_version()
-    _setup_environment()
+    _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
