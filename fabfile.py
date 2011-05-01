@@ -43,7 +43,7 @@ env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 def _setup_distribution_environment():
     """Setup distribution environment
     """
-    _add_defaults()
+    _parse_fabricrc()
     logger.info("distribution=%s" % env.distribution)
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
@@ -62,14 +62,15 @@ def _setup_distribution_environment():
 def _validate_target_distribution():
     """Check target matches environment setting (for sanity)
     """
+    logger.debug(env.distribution)
     if env.distribution == "debian":
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
-           raise ValueError("Debian does not match target, using correct fabconfig?")
+           raise ValueError("Debian does not match target, are you using correct fabconfig?")
     if env.distribution == "ubuntu":
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
-           raise ValueError("Ubuntu does not match target, using correct fabconfig?")
+           raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
     else:
         logger.debug("Unknown target distro")
 
@@ -129,11 +130,11 @@ def _setup_centos():
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
-def _add_defaults():
+def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     if not env.has_key("distribution"):
-        logger.info("Reading fabricrc.txt")
+        logger.info("Reading default fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
             env.update(load_settings(config_file))
@@ -242,7 +243,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
     """
     if not automated:
         if not env.has_key("system_install"):
-            _add_defaults()
+            _parse_fabricrc()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
         sys.path.append(os.path.split(__file__)[0])
