@@ -510,11 +510,13 @@ def _add_apt_gpg_keys():
     standalone = [
         "http://archive.cloudera.com/debian/archive.key",
         "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
-    keyserver = [
-        ("keyserver.ubuntu.com", "7F0CEB10"),
-        ("keyserver.ubuntu.com", "E084DAB9"),
-        ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
-    ]
+    keyserver = []
+    if not env.bionode: # FIXME: should really be: if env.ubuntu:
+        keyserver = [
+            ("keyserver.ubuntu.com", "7F0CEB10"),
+            ("keyserver.ubuntu.com", "E084DAB9"),
+            ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
+        ]
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     for key in standalone:
