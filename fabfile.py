@@ -159,6 +159,7 @@ def _expand_shell_paths():
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
     """
+    logger.info("Get local environment")
     if not env.has_key("user"):
         env.user = os.environ["USER"]
     if not env.has_key("java_home"):
@@ -207,6 +208,7 @@ def install_biolinux(target=None):
     _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config()  # read main.yaml
     _validate_target_distribution()
+    logger.info("Target=%s" % target)
     if target is None or target == "packages":
         if env.distribution in ["ubuntu", "debian"]:
             _setup_apt_sources()
@@ -244,8 +246,12 @@ def _custom_installs(to_install):
 def install_custom(p, automated=False, pkg_to_group=None):
     """Install a single custom package by name.
 
+    This method fetches names from custom.yaml that delegate to a method
+    in the custom/name.py program.
+
     fab install_custom_package:package_name
     """
+    logger.info("Install custom software packages")
     if not automated:
         if not env.has_key("system_install"):
             _parse_fabricrc()
@@ -253,6 +259,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
         sys.path.append(os.path.split(__file__)[0])
     try:
+        logger.debug("Import %s" % p)
         mod = __import__("custom.%s" % pkg_to_group[p], fromlist=["custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
@@ -270,6 +277,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     # allow us to check for packages only available on 64bit machines
     machine = run("uname -m")
     is_64bit = machine.find("_64") > 0
+    logger.info("Reading %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     if subs_yaml_file is not None:
@@ -449,6 +457,7 @@ def _do_library_installs(to_install):
 def _apt_packages(to_install):
     """Install packages available via apt-get.
     """
+    logger.info("Update and install all packages")
     pkg_config = os.path.join(env.config_dir, "packages.yaml")
     subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
                                    env.distribution)
@@ -465,6 +474,7 @@ def _apt_packages(to_install):
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
+    logger.info("Update GPG keys for repositories")
     standalone = [
         "http://archive.cloudera.com/debian/archive.key",
         "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
@@ -579,6 +589,7 @@ def _freenx_scripts():
 def _cleanup():
     """Clean up any extra files after building.
     """
+    logger.info("Cleaning up")
     run("rm -f .bash_history")
     sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")
