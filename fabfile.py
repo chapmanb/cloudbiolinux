@@ -23,7 +23,6 @@ from fabric.contrib.files import *
 import yaml
 import logging
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -37,8 +36,14 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-env.target_edition = 'biolinux'   # default
-env.target_version = '0.60'
+if not env.get('target_edition'):
+  env.target_edition = 'biolinux'
+  env.target_version = '0.60'
+# specialization booleans, simplifying logic (somewhat)
+env.debian = False       # is it pure Debian?
+env.ubuntu = False       # is it pure Ubuntu?
+env.deb_derived = False  # is it Debian derived?
+env.bionode = False      # is it a bionode?
 
 # ### Configuration details for different server types
 
@@ -47,7 +52,17 @@ def _setup_distribution_environment():
     """
     _parse_fabricrc()
     logger.info("Edition %s %s" % (env.target_edition,env.target_version))
+    if env.target_edition == 'bionode':
+        env.bionode = True
+    if env.bionode:
+        logger.info("Note: this is a BioNode specialization!")
     logger.info("Distribution %s" % env.distribution)
+    if env.distribution == 'debian':
+      env.debian = True
+      env.deb_derived = True
+    if env.distribution == 'ubuntu':
+      env.ubuntu = True
+      env.deb_derived = True
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -68,11 +83,11 @@ def _validate_target_distribution():
     Throws exception on error
     """
     logger.debug("Checking target distribution %s",env.distribution)
-    if env.distribution == "debian":
+    if env.debian:
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
            raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    elif env.distribution == "ubuntu":
+    elif env.ubuntu:
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
            raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
@@ -81,6 +96,8 @@ def _validate_target_distribution():
 
 def _setup_ubuntu():
     logger.info("Ubuntu setup")
+    if not env.ubuntu:
+       raise ValueError("Target is not Ubuntu")
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
@@ -102,6 +119,8 @@ def _setup_ubuntu():
 
 def _setup_debian():
     logger.info("Debian setup")
+    if not env.debian:
+       raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
     version = env.dist_name
     if not env.get('debian_repository'):
@@ -113,7 +132,7 @@ def _setup_debian():
       "deb {repo} %s main contrib non-free".format(repo=main_repository),
       "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
       "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # lastest R versions
+      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
       "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
     ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
@@ -129,9 +148,11 @@ def _setup_deb_general():
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
       "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
     ]
+    if not env.bionode:
+        # this arguably belongs in _setup_ubuntu:
+        shared_sources += "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
     return shared_sources
 
 def _setup_centos():
