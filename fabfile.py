@@ -7,6 +7,8 @@ Amazon EC2 instances.
 Usage:
     fab -H hostname -i private_key_file install_biolinux
 
+which will call into the 'install_biolinux' method below.
+
 Requires:
     Fabric http://docs.fabfile.org
     PyYAML http://pyyaml.org/wiki/PyYAMLDocumentation
@@ -19,13 +21,30 @@ from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
+# add formatter to ch
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 
 # ### Configuration details for different server types
 
-def _setup_environment():
-    _add_defaults()
+def _setup_distribution_environment():
+    """Setup distribution environment
+    """
+    _parse_fabricrc()
+    logger.info("distribution=%s" % env.distribution)
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -38,9 +57,27 @@ def _setup_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _expand_paths()
+    _expand_shell_paths()
+
+def _validate_target_distribution():
+    """Check target matches environment setting (for sanity)
+
+    Throws exception on error
+    """
+    logger.debug(env.distribution)
+    if env.distribution == "debian":
+        tag = run("cat /proc/version")
+        if tag.find('ebian') == -1:
+           raise ValueError("Debian does not match target, are you using correct fabconfig?")
+    if env.distribution == "ubuntu":
+        tag = run("cat /proc/version")
+        if tag.find('buntu') == -1:
+           raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
+    else:
+        logger.debug("Unknown target distro")
 
 def _setup_ubuntu():
+    logger.info("Ubuntu setup")
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
@@ -61,11 +98,17 @@ def _setup_ubuntu():
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_debian():
+    logger.info("Debian setup")
     shared_sources = _setup_deb_general()
     version = env.dist_name
+    if not env.get('debian_repository'):
+      main_repository = 'http://ftp.us.debian.org/debian/'
+    else:
+      main_repository = env.debian_repository
+
     sources = [
-      "deb http://ftp.us.debian.org/debian/ %s main contrib non-free",
-      "deb http://ftp.us.debian.org/debian/ %s-updates main contrib non-free",
+      "deb {repo} %s main contrib non-free".format(repo=main_repository),
+      "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
       "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # lastest R versions
       "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
@@ -73,8 +116,9 @@ def _setup_debian():
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_deb_general():
-    """Shared parameters for different debian based architectures.
+    """Shared settings for different debian based/derived distributions.
     """
+    logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
@@ -88,21 +132,26 @@ def _setup_deb_general():
     return shared_sources
 
 def _setup_centos():
+    logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
-def _add_defaults():
+def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     if not env.has_key("distribution"):
+        logger.info("Reading default fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
             env.update(load_settings(config_file))
+    else:
+        logger.warn("Skipping fabricrc.txt as distribution is already defined")
 
-def _expand_paths():
+def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
+    logger.debug("Expand paths")
     if env.has_key("local_install"):
         if not exists(env.local_install):
             run("mkdir -p %s" % env.local_install)
@@ -115,6 +164,7 @@ def _expand_paths():
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
     """
+    logger.info("Get local environment")
     if not env.has_key("user"):
         env.user = os.environ["USER"]
     if not env.has_key("java_home"):
@@ -124,6 +174,7 @@ def _setup_vagrant_environment():
     """Use vagrant commands to get connection information.
     https://gist.github.com/1d4f7c3e98efdf860b7e
     """
+    logger.info("Get vagrant environment")
     raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
@@ -132,9 +183,13 @@ def _setup_vagrant_environment():
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
     env.key_filename = ssh_config["IdentityFile"]
+    logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):
+    """Patch package source strings for version, e.g. Debian 'stable'
+    """
     name = version
+    logger.debug("Set source=%s" % name)
     final = []
     for s in sources:
         if s.find("%s") > 0:
@@ -146,10 +201,19 @@ def _add_source_versions(version, sources):
 
 def install_biolinux(target=None):
     """Main entry point for installing Biolinux on a remote server.
+
+    target is supplied on the fab CLI. Special targets are:
+
+      - packages     Install distro packages (default)
+      - custom
+      - libraries
+      - finalize     Setup freenx
     """
-    _check_version()
-    _setup_environment()
-    pkg_install, lib_install = _read_main_config()
+    _check_fabric_version()
+    _setup_distribution_environment() # get parameters for distro, packages etc.
+    pkg_install, lib_install = _read_main_config()  # read main.yaml
+    _validate_target_distribution()
+    logger.info("Target=%s" % target)
     if target is None or target == "packages":
         if env.distribution in ["ubuntu", "debian"]:
             _setup_apt_sources()
@@ -168,10 +232,12 @@ def install_biolinux(target=None):
         _freenx_scripts()
         _cleanup()
 
-def _check_version():
+def _check_fabric_version():
+    """Checks for fabric version installed
+    """
     version = env.version
     if int(version.split(".")[0]) < 1:
-        raise NotImplementedError("Please install fabric version 1 or better")
+        raise NotImplementedError("Please install fabric version 1 or higher")
 
 def _custom_installs(to_install):
     if not exists(env.local_install):
@@ -185,15 +251,20 @@ def _custom_installs(to_install):
 def install_custom(p, automated=False, pkg_to_group=None):
     """Install a single custom package by name.
 
+    This method fetches names from custom.yaml that delegate to a method
+    in the custom/name.py program.
+
     fab install_custom_package:package_name
     """
+    logger.info("Install custom software packages")
     if not automated:
         if not env.has_key("system_install"):
-            _add_defaults()
+            _parse_fabricrc()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
         sys.path.append(os.path.split(__file__)[0])
     try:
+        logger.debug("Import %s" % p)
         mod = __import__("custom.%s" % pkg_to_group[p], fromlist=["custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
@@ -211,6 +282,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     # allow us to check for packages only available on 64bit machines
     machine = run("uname -m")
     is_64bit = machine.find("_64") > 0
+    logger.info("Reading %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     if subs_yaml_file is not None:
@@ -255,6 +327,8 @@ def _filter_subs_packages(initial, subs):
 
 def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
+
+    Reads 'main.yaml' and returns packages and libraries
     """
     yaml_file = os.path.join(env.config_dir, "main.yaml")
     with open(yaml_file) as in_handle:
@@ -372,8 +446,8 @@ lib_installers = {
 def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
-    _check_version()
-    _setup_environment()
+    _check_fabric_version()
+    _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
@@ -388,6 +462,7 @@ def _do_library_installs(to_install):
 def _apt_packages(to_install):
     """Install packages available via apt-get.
     """
+    logger.info("Update and install all packages")
     pkg_config = os.path.join(env.config_dir, "packages.yaml")
     subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
                                    env.distribution)
@@ -404,6 +479,7 @@ def _apt_packages(to_install):
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
+    logger.info("Update GPG keys for repositories")
     standalone = [
         "http://archive.cloudera.com/debian/archive.key",
         "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
@@ -449,10 +525,18 @@ def _setup_apt_automation():
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
-       Using add-apt-repository allows processing PPAs
+       Using add-apt-repository allows processing PPAs (on Ubuntu)
+
+       This method modifies the apt sources file.
+
+       Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
+    # now remove sources, just to be sure
+    sudo("cat /dev/null > %s" % env.sources_file)
+    comment(env.sources_file, "This file was modified for BioLinux", use_sudo=True)
     for source in env.std_sources:
+        logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
             sudo("add-apt-repository '%s'" % source)
         elif not contains(env.sources_file, source):
@@ -510,6 +594,7 @@ def _freenx_scripts():
 def _cleanup():
     """Clean up any extra files after building.
     """
+    logger.info("Cleaning up")
     run("rm -f .bash_history")
     sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")

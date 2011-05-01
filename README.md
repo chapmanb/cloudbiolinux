@@ -1,23 +1,23 @@
-CloudBioLinux is a build and deployment system which installs 
-a large selection of Bioinformatics and machine learning libraries 
-on a bare virtual machine (VM) image, freshly installed PC, 
+CloudBioLinux is a build and deployment system which installs
+a large selection of Bioinformatics and machine learning libraries
+on a bare virtual machine (VM) image, freshly installed PC,
 or in the cloud. By default CloudBioLinux includes a
 large suite of tools and libraries, largely pulled from
 the package management system provided by the image. In addition
 CloudBioLinux installs packages through other mechanisms, such as
 native installers and libraries for Perl, R, Python, JAVA and Ruby, as
-well as installers for special data resources. 
+well as installers for special data resources.
 
-CloudBioLinux is designed for VMs on the desktop, such as [VirtualBox][v2], or 
+CloudBioLinux is designed for VMs on the desktop, such as [VirtualBox][v2], or
 cloud providers, such as [Amazon EC2][0], where you start with a bare bones
 system and bootstrap a running instance. CloudBioLinux included software
 packages are fully customizable, and different flavours of
-CloudBioLinux can be configured. 
+CloudBioLinux can be configured.
 
 CloudBioLinux provides a [Fabric build file][3], written in Python.
 There is little need to understand Python, though, as most configuration
-is done through configuration files. Other scripting languages can be 
-added too. Package selection is through YAML files in the ./config 
+is done through configuration files. Other scripting languages can be
+added too. Package selection is through YAML files in the ./config
 directory.
 
 # Using an instance
@@ -85,7 +85,7 @@ a local IP address. Next, fire up the image with
 
         vagrant up
 
-Once you have a running virtual machine with CloudBioLinux, 
+Once you have a running virtual machine with CloudBioLinux,
 connect to it with:
 
         vagrant ssh
@@ -93,7 +93,7 @@ connect to it with:
 no passwords needed! Get root with
 
         sudo bash
-        
+
 Through Vagrant additional facilities are available, such as a shared
 network drive.  It is also possible to tweak the image (e.g. RAM/CPU
 settings, and getting the all important guest additions) by firing up
@@ -107,12 +107,12 @@ virtualbox itself. For more information, see the Vagrant
 Basically a bare Linux image is configured from another machine, e.g.
 your local desktop, using ssh and Fabric tools, after launching the
 image in the Cloud. Multiple distributions are supported,
-including Ubuntu, Debian Linux and CentOS. 
+including Ubuntu, Debian Linux and CentOS.
 
 1. On your local machine, install [Fabric][3]:
 
         sudo apt-get install python-setuptools
-        sudo easy_install fabric
+        sudo easy_install fabric pyyaml
 
 2. Retrieve the cloudbiolinux code base:
 
