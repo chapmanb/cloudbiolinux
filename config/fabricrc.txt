@@ -26,3 +26,4 @@ shell = /bin/bash -l -c
 # details for biological data files and Galaxy
 data_files = /mnt/biodata
 galaxy_base = /mnt/biodata/galaxy
+

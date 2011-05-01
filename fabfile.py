@@ -101,9 +101,14 @@ def _setup_debian():
     logger.info("Debian setup")
     shared_sources = _setup_deb_general()
     version = env.dist_name
+    if not env.get('debian_repository'):
+      main_repository = 'http://ftp.us.debian.org/debian/'
+    else:
+      main_repository = env.debian_repository
+
     sources = [
-      "deb http://ftp.us.debian.org/debian/ %s main contrib non-free",
-      "deb http://ftp.us.debian.org/debian/ %s-updates main contrib non-free",
+      "deb {repo} %s main contrib non-free".format(repo=main_repository),
+      "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
       "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # lastest R versions
       "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
