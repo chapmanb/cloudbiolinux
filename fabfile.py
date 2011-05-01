@@ -111,9 +111,9 @@ def _setup_debian():
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_deb_general():
-    """Shared parameters for different debian based architectures.
+    """Shared settings for different debian based/derived distributions.
     """
-    logger.debug("/etc/apt/sources.list")
+    logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
@@ -204,7 +204,7 @@ def install_biolinux(target=None):
       - finalize     Setup freenx
     """
     _check_fabric_version()
-    _setup_distribution_environment()
+    _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config()  # read main.yaml
     _validate_target_distribution()
     if target is None or target == "packages":
@@ -510,10 +510,18 @@ def _setup_apt_automation():
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
-       Using add-apt-repository allows processing PPAs
+       Using add-apt-repository allows processing PPAs (on Ubuntu)
+
+       This method modifies the apt sources file.
+
+       Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
+    # now remove sources, just to be sure
+    sudo("cat /dev/null > %s" % env.sources_file)
+    comment(env.sources_file, "This file was modified for BioLinux", use_sudo=True)
     for source in env.std_sources:
+        logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
             sudo("add-apt-repository '%s'" % source)
         elif not contains(env.sources_file, source):
