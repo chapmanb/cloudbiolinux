@@ -61,6 +61,8 @@ def _setup_distribution_environment():
 
 def _validate_target_distribution():
     """Check target matches environment setting (for sanity)
+
+    Throws exception on error
     """
     logger.debug(env.distribution)
     if env.distribution == "debian":
@@ -178,7 +180,10 @@ def _setup_vagrant_environment():
     logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):
+    """Patch package source strings for version, e.g. Debian 'stable'
+    """
     name = version
+    logger.debug("Set source=%s" % name)
     final = []
     for s in sources:
         if s.find("%s") > 0:
