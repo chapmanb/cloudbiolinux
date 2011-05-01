@@ -1,4 +1,4 @@
-"""Main Fabric deployment file for BioLinux distribution.
+"""Main Fabric deployment file for BioLinux distributionrepo=.
 
 This installs a standard set of useful biological applications on a remote
 server. It is designed for bootstrapping a machine from scratch, as with new
@@ -37,6 +37,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
+env.target_edition = 'biolinux'   # default
+env.target_version = '0.60'
 
 # ### Configuration details for different server types
 
@@ -44,7 +46,8 @@ def _setup_distribution_environment():
     """Setup distribution environment
     """
     _parse_fabricrc()
-    logger.info("distribution=%s" % env.distribution)
+    logger.info("Edition %s %s" % (env.target_edition,env.target_version))
+    logger.info("Distribution %s" % env.distribution)
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -64,12 +67,12 @@ def _validate_target_distribution():
 
     Throws exception on error
     """
-    logger.debug(env.distribution)
+    logger.debug("Checking target distribution %s",env.distribution)
     if env.distribution == "debian":
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
            raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    if env.distribution == "ubuntu":
+    elif env.distribution == "ubuntu":
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
            raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
@@ -189,7 +192,7 @@ def _add_source_versions(version, sources):
     """Patch package source strings for version, e.g. Debian 'stable'
     """
     name = version
-    logger.debug("Set source=%s" % name)
+    logger.debug("Source=%s" % name)
     final = []
     for s in sources:
         if s.find("%s") > 0:

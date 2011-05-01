@@ -1,6 +1,6 @@
 # BioNode configuration file for Fabric specifying filesystem information
 #
-# For example, to configure BioNode with vagrant:
+# For example, to configure BioNode with vagrant (for VirtualBox)
 #
 #  fab -H vagrant -f $source/fabfile.py install_biolinux -c $source/contrib/bionode/fabricrc_bionode.txt
 #
@@ -8,6 +8,8 @@
 #
 
 ## BioNode is Debian
+target_edition = bionode
+target_version = 0.91
 distribution = debian
 dist_name = squeeze
 
