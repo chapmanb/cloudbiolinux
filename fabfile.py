@@ -57,7 +57,7 @@ def _setup_distribution_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _expand_paths()
+    _expand_shell_paths()
 
 def _validate_target_distribution():
     """Check target matches environment setting (for sanity)
@@ -141,7 +141,7 @@ def _parse_fabricrc():
     else:
         logger.warn("Skipping fabricrc.txt as distribution is already defined")
 
-def _expand_paths():
+def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
     logger.debug("Expand paths")
