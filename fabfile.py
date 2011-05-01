@@ -42,6 +42,7 @@ if not env.get('target_edition'):
 # specialization booleans, simplifying logic (somewhat)
 env.debian = False       # is it pure Debian?
 env.ubuntu = False       # is it pure Ubuntu?
+env.centos = False       # is it pure CentOS?
 env.deb_derived = False  # is it Debian derived?
 env.bionode = False      # is it a bionode?
 
@@ -63,6 +64,8 @@ def _setup_distribution_environment():
     if env.distribution == 'ubuntu':
       env.ubuntu = True
       env.deb_derived = True
+    if env.distribution == 'centos':
+      env.centos = True
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -239,12 +242,12 @@ def install_biolinux(target=None):
     _validate_target_distribution()
     logger.info("Target=%s" % target)
     if target is None or target == "packages":
-        if env.distribution in ["ubuntu", "debian"]:
+        if env.deb_derived:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
             _apt_packages(pkg_install)
-        elif env.distribution in ["centos"]:
+        elif env.centos:
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
