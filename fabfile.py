@@ -561,6 +561,10 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
+    if env.bionode:
+      # remove sources, just to be sure
+      sudo("cat /dev/null > %s" % env.sources_file)
+
     comment = "This file was modified for BioLinux"
     if not contains(env.sources_file, comment, use_sudo=True):
         comment(env.sources_file, comment, use_sudo=True)
