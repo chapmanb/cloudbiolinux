@@ -532,9 +532,9 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    comment = "This file was modified for BioLinux"
-    if not contains(env.sources_file, comment, use_sudo=True):
-        comment(env.sources_file, comment, use_sudo=True)
+    comment = "# This file was modified for BioLinux"
+    if not contains(env.sources_file, comment):
+        append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
         logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
