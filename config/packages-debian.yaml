@@ -7,4 +7,8 @@ python-vm-builder-ec2: ""
 firefox: iceweasel
 freenx: ""
 bio-linux-arb: ""
+# emboss-data is broken in Squeeze
+emboss: ""
+emboss-data: ""
+emboss-lib: ""
 
