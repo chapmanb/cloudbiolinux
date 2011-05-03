@@ -472,8 +472,15 @@ def _apt_packages(to_install):
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install,
                                       subs_pkg_config)
-    for package in packages:
-        sudo("apt-get -y --force-yes install %s" % package)
+    # for package in packages:
+    #     sudo("apt-get -y --force-yes install %s" % package)
+    # A single line install is much faster - note that there is a max
+    # for the command line size, so we do 30 at a time
+    i = 0
+    while i < len(packages):
+      list = packages[i:i+30]
+      sudo("apt-get -y --force-yes install %s" % " ".join(list))
+      i += 30
     sudo("apt-get clean")
 
 def _add_apt_gpg_keys():
@@ -520,8 +527,12 @@ def _setup_apt_automation():
             "grub-pc grub-pc/install_devices_empty boolean true",
             "acroread acroread/default-viewer boolean false",
             ]
+    cmd = ""
     for l in package_info:
-        sudo("echo %s | /usr/bin/debconf-set-selections" % l)
+        #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
+        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+
+    sudo(cmd)
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
