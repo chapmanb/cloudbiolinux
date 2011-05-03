@@ -151,9 +151,10 @@ def _setup_deb_general():
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-      "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
     ]
     if not env.bionode:
+        # virtualbox (non-free, bionode uses virtualbox-ose instead)
+        shared_sources += "deb http://download.virtualbox.org/virtualbox/debian %s contrib",
         # this arguably belongs in _setup_ubuntu:
         shared_sources += "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
     return shared_sources
@@ -565,9 +566,9 @@ def _setup_apt_sources():
       # remove sources, just to be sure
       sudo("cat /dev/null > %s" % env.sources_file)
 
-    comment = "This file was modified for BioLinux"
-    if not contains(env.sources_file, comment, use_sudo=True):
-        comment(env.sources_file, comment, use_sudo=True)
+    comment = "# This file was modified for BioLinux"
+    if not contains(env.sources_file, comment):
+        append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
         logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
