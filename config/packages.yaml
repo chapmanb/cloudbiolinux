@@ -254,13 +254,13 @@ web:
   - apache2
   - nginx
 bio_general:
-  - emboss
-  - emboss-data
-  - emboss-lib
   - primer3
   - readseq
   - bio-linux-taverna
   - bio-linux-xcut
+  - emboss 
+  - emboss-data
+  - emboss-lib
 bio_search:
   - blast2
   - hmmer
