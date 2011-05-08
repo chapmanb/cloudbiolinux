@@ -8,8 +8,8 @@
 #
 
 ## BioNode is Debian
-target_edition = bionode
-target_version = 0.91
+edition = bionode
+edition_version = 0.91
 distribution = debian
 dist_name = squeeze
 

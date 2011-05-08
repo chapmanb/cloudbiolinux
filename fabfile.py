@@ -5,6 +5,7 @@ server. It is designed for bootstrapping a machine from scratch, as with new
 Amazon EC2 instances.
 
 Usage:
+
     fab -H hostname -i private_key_file install_biolinux
 
 which will call into the 'install_biolinux' method below.
@@ -36,10 +37,13 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-if not env.get('target_edition'):
-  env.target_edition = 'biolinux'
-  env.target_version = '0.60'
+if not env.get('edition'):
+  # default values for edition (when missing in fabricrc)
+  env.edition = 'biolinux'
+  env.edition_version = '0.60'
 # specialization booleans, simplifying logic (somewhat)
+# these are the only 'special' boolean switches allowed, they can
+# also be moved into the 'edition' logic:
 env.debian = False       # is it pure Debian?
 env.ubuntu = False       # is it pure Ubuntu?
 env.centos = False       # is it pure CentOS?
@@ -52,8 +56,8 @@ def _setup_distribution_environment():
     """Setup distribution environment
     """
     _parse_fabricrc()
-    logger.info("Edition %s %s" % (env.target_edition,env.target_version))
-    if env.target_edition == 'bionode':
+    logger.info("Edition %s %s" % (env.edition,env.edition_version))
+    if env.edition == 'bionode':
         env.bionode = True
     if env.bionode:
         logger.info("Note: this is a BioNode specialization!")
