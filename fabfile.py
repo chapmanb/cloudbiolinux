@@ -1,10 +1,11 @@
-"""Main Fabric deployment file for BioLinux distribution.
+"""Main Fabric deployment file for BioLinux distributionrepo=.
 
 This installs a standard set of useful biological applications on a remote
 server. It is designed for bootstrapping a machine from scratch, as with new
 Amazon EC2 instances.
 
 Usage:
+
     fab -H hostname -i private_key_file install_biolinux
 
 which will call into the 'install_biolinux' method below.
@@ -23,7 +24,6 @@ from fabric.contrib.files import *
 import yaml
 import logging
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -36,15 +36,52 @@ ch.setFormatter(formatter)
 
 logger.addHandler(ch)
 
+# ---- Support for BioLinux editions. An edition is a basic 'specialization',
+#      with its own overrides of the Edition class.
+
+from edition import *
+
+edition = Edition(env)  # default is empty Edition
+
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
+if not env.get('edition'):
+  # default values for edition (when missing in fabricrc)
+  env.edition = 'biolinux'
+  env.edition_version = '0.60'
+# specialization booleans, simplifying logic (somewhat)
+# these are the only 'special' boolean switches allowed, they can
+# also be moved into the 'edition' logic:
+env.debian = False       # is it pure Debian?
+env.ubuntu = False       # is it pure Ubuntu?
+env.centos = False       # is it pure CentOS?
+env.deb_derived = False  # is it Debian derived?
 
 # ### Configuration details for different server types
+from contrib.edition.bionode import *
+
+def _setup_edition():
+    """Setup one of the BioLinux editions (which are derived from
+       the Edition base class)
+    """
+    global edition
+    logger.debug("Edition %s %s" % (env.edition,env.edition_version))
+    if env.edition == 'bionode':
+        env.bionode = True
+        edition = BioNode(env)
+    logger.info("This is a %s" % edition.name)
 
 def _setup_distribution_environment():
     """Setup distribution environment
     """
-    _parse_fabricrc()
-    logger.info("distribution=%s" % env.distribution)
+    logger.info("Distribution %s" % env.distribution)
+    if env.distribution == 'debian':
+      env.debian = True
+      env.deb_derived = True
+    if env.distribution == 'ubuntu':
+      env.ubuntu = True
+      env.deb_derived = True
+    if env.distribution == 'centos':
+      env.centos = True
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
@@ -64,12 +101,12 @@ def _validate_target_distribution():
 
     Throws exception on error
     """
-    logger.debug(env.distribution)
-    if env.distribution == "debian":
+    logger.debug("Checking target distribution %s",env.distribution)
+    if env.debian:
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
            raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    if env.distribution == "ubuntu":
+    elif env.ubuntu:
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
            raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
@@ -78,6 +115,8 @@ def _validate_target_distribution():
 
 def _setup_ubuntu():
     logger.info("Ubuntu setup")
+    if not env.ubuntu:
+       raise ValueError("Target is not Ubuntu")
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
@@ -99,6 +138,8 @@ def _setup_ubuntu():
 
 def _setup_debian():
     logger.info("Debian setup")
+    if not env.debian:
+       raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
     version = env.dist_name
     if not env.get('debian_repository'):
@@ -110,7 +151,7 @@ def _setup_debian():
       "deb {repo} %s main contrib non-free".format(repo=main_repository),
       "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
       "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # lastest R versions
+      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
       "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
     ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
@@ -126,9 +167,13 @@ def _setup_deb_general():
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
-      "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
     ]
+    if edition.include_oracle_virtualbox:
+        # virtualbox (non-free, otherwise use virtualbox-ose instead)
+        shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
+    if edition.include_freenx:
+        # this arguably belongs in _setup_ubuntu:
+        shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
 
 def _setup_centos():
@@ -189,7 +234,7 @@ def _add_source_versions(version, sources):
     """Patch package source strings for version, e.g. Debian 'stable'
     """
     name = version
-    logger.debug("Set source=%s" % name)
+    logger.debug("Source=%s" % name)
     final = []
     for s in sources:
         if s.find("%s") > 0:
@@ -210,17 +255,19 @@ def install_biolinux(target=None):
       - finalize     Setup freenx
     """
     _check_fabric_version()
+    _parse_fabricrc()
+    _setup_edition()
     _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config()  # read main.yaml
     _validate_target_distribution()
     logger.info("Target=%s" % target)
     if target is None or target == "packages":
-        if env.distribution in ["ubuntu", "debian"]:
+        if env.deb_derived:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
             _apt_packages(pkg_install)
-        elif env.distribution in ["centos"]:
+        elif env.centos:
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
@@ -447,6 +494,8 @@ def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
     _check_fabric_version()
+    _parse_fabricrc()
+    _setup_edition()
     _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 
@@ -488,13 +537,17 @@ def _add_apt_gpg_keys():
     """
     logger.info("Update GPG keys for repositories")
     standalone = [
-        "http://archive.cloudera.com/debian/archive.key",
-        "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
-    keyserver = [
-        ("keyserver.ubuntu.com", "7F0CEB10"),
-        ("keyserver.ubuntu.com", "E084DAB9"),
-        ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
+        "http://archive.cloudera.com/debian/archive.key"
     ]
+    if edition.include_oracle_virtualbox:
+        standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
+    keyserver = []
+    if env.ubuntu:
+        keyserver = [
+            ("keyserver.ubuntu.com", "7F0CEB10"),
+            ("keyserver.ubuntu.com", "E084DAB9"),
+            ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
+        ]
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     for key in standalone:
@@ -543,7 +596,9 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    comment = "# This file was modified for BioLinux"
+    edition.check_packages_source()
+
+    comment = "# This file was modified for "+edition.name
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
