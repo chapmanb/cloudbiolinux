@@ -36,6 +36,13 @@ ch.setFormatter(formatter)
 
 logger.addHandler(ch)
 
+# ---- Support for BioLinux editions. An edition is a basic 'specialization',
+#      with its own overrides of the Edition class.
+
+from edition import *
+
+edition = Edition()
+
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 if not env.get('edition'):
   # default values for edition (when missing in fabricrc)
