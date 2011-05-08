@@ -41,7 +41,7 @@ logger.addHandler(ch)
 
 from edition import *
 
-edition = Edition()
+edition = Edition(env)  # default is empty Edition
 
 env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 if not env.get('edition'):
@@ -55,19 +55,24 @@ env.debian = False       # is it pure Debian?
 env.ubuntu = False       # is it pure Ubuntu?
 env.centos = False       # is it pure CentOS?
 env.deb_derived = False  # is it Debian derived?
-env.bionode = False      # is it a bionode?
 
 # ### Configuration details for different server types
+from contrib.edition.bionode import *
+
+def _setup_edition():
+    """Setup one of the BioLinux editions (which are derived from
+       the Edition base class)
+    """
+    global edition
+    logger.debug("Edition %s %s" % (env.edition,env.edition_version))
+    if env.edition == 'bionode':
+        env.bionode = True
+        edition = BioNode(env)
+    logger.info("This is a %s" % edition.name)
 
 def _setup_distribution_environment():
     """Setup distribution environment
     """
-    _parse_fabricrc()
-    logger.info("Edition %s %s" % (env.edition,env.edition_version))
-    if env.edition == 'bionode':
-        env.bionode = True
-    if env.bionode:
-        logger.info("Note: this is a BioNode specialization!")
     logger.info("Distribution %s" % env.distribution)
     if env.distribution == 'debian':
       env.debian = True
@@ -163,11 +168,12 @@ def _setup_deb_general():
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
     ]
-    if not env.bionode:
-        # virtualbox (non-free, bionode uses virtualbox-ose instead)
-        shared_sources += "deb http://download.virtualbox.org/virtualbox/debian %s contrib",
+    if edition.include_oracle_virtualbox:
+        # virtualbox (non-free, otherwise use virtualbox-ose instead)
+        shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
+    if edition.include_freenx:
         # this arguably belongs in _setup_ubuntu:
-        shared_sources += "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # FreeNX PPA
+        shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
 
 def _setup_centos():
@@ -249,6 +255,8 @@ def install_biolinux(target=None):
       - finalize     Setup freenx
     """
     _check_fabric_version()
+    _parse_fabricrc()
+    _setup_edition()
     _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config()  # read main.yaml
     _validate_target_distribution()
@@ -486,6 +494,8 @@ def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
     _check_fabric_version()
+    _parse_fabricrc()
+    _setup_edition()
     _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 
@@ -527,10 +537,12 @@ def _add_apt_gpg_keys():
     """
     logger.info("Update GPG keys for repositories")
     standalone = [
-        "http://archive.cloudera.com/debian/archive.key",
-        "http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc"]
+        "http://archive.cloudera.com/debian/archive.key"
+    ]
+    if edition.include_oracle_virtualbox:
+        standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
-    if not env.bionode: # FIXME: should really be: if env.ubuntu:
+    if env.ubuntu:
         keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
@@ -584,11 +596,9 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    if env.bionode:
-      # remove sources, just to be sure
-      sudo("cat /dev/null > %s" % env.sources_file)
+    edition.check_packages_source()
 
-    comment = "# This file was modified for BioLinux"
+    comment = "# This file was modified for "+edition.name
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
