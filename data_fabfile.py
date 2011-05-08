@@ -610,6 +610,8 @@ def _download_genomes(genomes, genome_indexes):
                     run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
                     run("rm -f %s" % os.path.basename(url))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
+        if not exists(ref_file):
+            ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)
         assert exists(ref_file), ref_file
         cur_indexes = manager.config.get("indexes", genome_indexes)
         _index_to_galaxy(org_dir, ref_file, gid, cur_indexes, manager.config)
