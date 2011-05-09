@@ -24,17 +24,18 @@ from fabric.contrib.files import *
 import yaml
 import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+def _setup_logging():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
 
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-# create formatter
-formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-# add formatter to ch
-ch.setFormatter(formatter)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    # create formatter
+    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
+    # add formatter to ch
+    ch.setFormatter(formatter)
 
-logger.addHandler(ch)
+    logger.addHandler(ch)
 
 # ---- Support for BioLinux editions. An edition is a basic 'specialization',
 #      with its own overrides of the Edition class.
@@ -254,6 +255,7 @@ def install_biolinux(target=None):
       - libraries
       - finalize     Setup freenx
     """
+    _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition()
@@ -303,6 +305,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
 
     fab install_custom_package:package_name
     """
+    _setup_logging()
     logger.info("Install custom software packages")
     if not automated:
         if not env.has_key("system_install"):
@@ -493,6 +496,7 @@ lib_installers = {
 def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
+    _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition()
