@@ -56,16 +56,15 @@ def _setup_edition():
         from cloudbio.edition import Edition
         env.edition = 'biolinux'
         env.edition_version = '0.60'
-        edition = Edition(env)
+        env.cur_edition = Edition(env)
     elif edition == 'bionode':
         from cloudbio.edition.bionode import BioNode
         env.bionode = True
-        edition = BioNode(env)
+        env.cur_edition = BioNode(env)
     else:
         raise ValueError("Unknown edition: %s" % edition)
     env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
     env.logger.info("This is a %s" % edition.name)
-    env.cur_edition = edition
 
 def _setup_distribution_environment():
     """Setup distribution environment
