@@ -25,6 +25,7 @@ import yaml
 import logging
 
 # ## General setup
+env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 
 # use global cloudbio directory if installed, or utilize local if not
 try:
@@ -45,61 +46,52 @@ def _setup_logging():
     env.logger.addHandler(ch)
 
 # ### Configuration details for different server types
-from contrib.edition.bionode import *
 
 def _setup_edition():
     """Setup one of the BioLinux editions (which are derived from
        the Edition base class)
     """
-    global edition
     env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
-    if env.edition == 'bionode':
+    edition = env.get("edition", None)
+    if edition is None:
+        from cloudbio.edition import Edition
+        env.edition = 'biolinux'
+        env.edition_version = '0.60'
+        edition = Edition(env)
+    elif edition == 'bionode':
+        from cloudbio.edition.bionode import BioNode
         env.bionode = True
         edition = BioNode(env)
+    else:
     env.logger.info("This is a %s" % edition.name)
-
-# ---- Support for BioLinux editions. An edition is a basic 'specialization',
-#      with its own overrides of the Edition class.
-
-from edition import *
-
-edition = Edition(env)  # default is empty Edition
-
-env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-if not env.get('edition'):
-  # default values for edition (when missing in fabricrc)
-  env.edition = 'biolinux'
-  env.edition_version = '0.60'
-# specialization booleans, simplifying logic (somewhat)
-# these are the only 'special' boolean switches allowed, they can
-# also be moved into the 'edition' logic:
-env.debian = False       # is it pure Debian?
-env.ubuntu = False       # is it pure Ubuntu?
-env.centos = False       # is it pure CentOS?
-env.deb_derived = False  # is it Debian derived?
-
+    env.cur_edition = edition
 
 def _setup_distribution_environment():
     """Setup distribution environment
     """
     env.logger.info("Distribution %s" % env.distribution)
-    if env.distribution == 'debian':
-      env.debian = True
-      env.deb_derived = True
-    if env.distribution == 'ubuntu':
-      env.ubuntu = True
-      env.deb_derived = True
-    if env.distribution == 'centos':
-      env.centos = True
+    # specialization booleans, simplifying logic (somewhat)
+    # these are the only 'special' boolean switches allowed, they can
+    # also be moved into the 'edition' logic:
+    env.debian = False       # is it pure Debian?
+    env.ubuntu = False       # is it pure Ubuntu?
+    env.centos = False       # is it pure CentOS?
+    env.deb_derived = False  # is it Debian derived?
+
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
         _setup_local_environment()
     if env.distribution == "ubuntu":
+        env.ubuntu = True
+        env.deb_derived = True
         _setup_ubuntu()
     elif env.distribution == "centos":
+        env.centos = True
         _setup_centos()
     elif env.distribution == "debian":
+        env.debian = True
+        env.deb_derived = True
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
@@ -177,10 +169,10 @@ def _setup_deb_general():
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
     ]
-    if edition.include_oracle_virtualbox:
+    if env.cur_edition.include_oracle_virtualbox:
         # virtualbox (non-free, otherwise use virtualbox-ose instead)
         shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
-    if edition.include_freenx:
+    if env.cur_edition.include_freenx:
         # this arguably belongs in _setup_ubuntu:
         shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
@@ -551,7 +543,7 @@ def _add_apt_gpg_keys():
     standalone = [
         "http://archive.cloudera.com/debian/archive.key"
     ]
-    if edition.include_oracle_virtualbox:
+    if env.cur_edition.include_oracle_virtualbox:
         standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
     if env.ubuntu:
@@ -608,7 +600,7 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    edition.check_packages_source()
+    env.cur_edition.check_packages_source()
 
     comment = "# This file was modified for "+edition.name
     if not contains(env.sources_file, comment):
