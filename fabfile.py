@@ -24,9 +24,17 @@ from fabric.contrib.files import *
 import yaml
 import logging
 
+# ## General setup
+
+# use global cloudbio directory if installed, or utilize local if not
+try:
+    import cloudbio
+except ImportError:
+    sys.path.append(os.path.dirname(__file__))
+
 def _setup_logging():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
+    env.logger = logging.getLogger("cloudbiolinux")
+    env.logger.setLevel(logging.DEBUG)
 
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
@@ -34,8 +42,21 @@ def _setup_logging():
     formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
     # add formatter to ch
     ch.setFormatter(formatter)
+    env.logger.addHandler(ch)
 
-    logger.addHandler(ch)
+# ### Configuration details for different server types
+from contrib.edition.bionode import *
+
+def _setup_edition():
+    """Setup one of the BioLinux editions (which are derived from
+       the Edition base class)
+    """
+    global edition
+    env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
+    if env.edition == 'bionode':
+        env.bionode = True
+        edition = BioNode(env)
+    env.logger.info("This is a %s" % edition.name)
 
 # ---- Support for BioLinux editions. An edition is a basic 'specialization',
 #      with its own overrides of the Edition class.
@@ -57,24 +78,11 @@ env.ubuntu = False       # is it pure Ubuntu?
 env.centos = False       # is it pure CentOS?
 env.deb_derived = False  # is it Debian derived?
 
-# ### Configuration details for different server types
-from contrib.edition.bionode import *
-
-def _setup_edition():
-    """Setup one of the BioLinux editions (which are derived from
-       the Edition base class)
-    """
-    global edition
-    logger.debug("Edition %s %s" % (env.edition,env.edition_version))
-    if env.edition == 'bionode':
-        env.bionode = True
-        edition = BioNode(env)
-    logger.info("This is a %s" % edition.name)
 
 def _setup_distribution_environment():
     """Setup distribution environment
     """
-    logger.info("Distribution %s" % env.distribution)
+    env.logger.info("Distribution %s" % env.distribution)
     if env.distribution == 'debian':
       env.debian = True
       env.deb_derived = True
@@ -102,7 +110,7 @@ def _validate_target_distribution():
 
     Throws exception on error
     """
-    logger.debug("Checking target distribution %s",env.distribution)
+    env.logger.debug("Checking target distribution %s",env.distribution)
     if env.debian:
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
@@ -112,10 +120,10 @@ def _validate_target_distribution():
         if tag.find('buntu') == -1:
            raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
     else:
-        logger.debug("Unknown target distro")
+        env.logger.debug("Unknown target distro")
 
 def _setup_ubuntu():
-    logger.info("Ubuntu setup")
+    env.logger.info("Ubuntu setup")
     if not env.ubuntu:
        raise ValueError("Target is not Ubuntu")
     shared_sources = _setup_deb_general()
@@ -138,7 +146,7 @@ def _setup_ubuntu():
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_debian():
-    logger.info("Debian setup")
+    env.logger.info("Debian setup")
     if not env.debian:
        raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
@@ -160,7 +168,7 @@ def _setup_debian():
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
     """
-    logger.debug("Debian-shared setup")
+    env.logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
@@ -178,7 +186,7 @@ def _setup_deb_general():
     return shared_sources
 
 def _setup_centos():
-    logger.info("CentOS setup")
+    env.logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
@@ -187,17 +195,17 @@ def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     if not env.has_key("distribution"):
-        logger.info("Reading default fabricrc.txt")
+        env.logger.info("Reading default fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
             env.update(load_settings(config_file))
     else:
-        logger.warn("Skipping fabricrc.txt as distribution is already defined")
+        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
 
 def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
-    logger.debug("Expand paths")
+    env.logger.debug("Expand paths")
     if env.has_key("local_install"):
         if not exists(env.local_install):
             run("mkdir -p %s" % env.local_install)
@@ -210,7 +218,7 @@ def _expand_shell_paths():
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
     """
-    logger.info("Get local environment")
+    env.logger.info("Get local environment")
     if not env.has_key("user"):
         env.user = os.environ["USER"]
     if not env.has_key("java_home"):
@@ -220,7 +228,7 @@ def _setup_vagrant_environment():
     """Use vagrant commands to get connection information.
     https://gist.github.com/1d4f7c3e98efdf860b7e
     """
-    logger.info("Get vagrant environment")
+    env.logger.info("Get vagrant environment")
     raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
@@ -229,13 +237,13 @@ def _setup_vagrant_environment():
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
     env.key_filename = ssh_config["IdentityFile"]
-    logger.debug("ssh %s" % env.host_string)
+    env.logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):
     """Patch package source strings for version, e.g. Debian 'stable'
     """
     name = version
-    logger.debug("Source=%s" % name)
+    env.logger.debug("Source=%s" % name)
     final = []
     for s in sources:
         if s.find("%s") > 0:
@@ -262,7 +270,7 @@ def install_biolinux(target=None):
     _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config()  # read main.yaml
     _validate_target_distribution()
-    logger.info("Target=%s" % target)
+    env.logger.info("Target=%s" % target)
     if target is None or target == "packages":
         if env.deb_derived:
             _setup_apt_sources()
@@ -306,7 +314,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
     fab install_custom_package:package_name
     """
     _setup_logging()
-    logger.info("Install custom software packages")
+    env.logger.info("Install custom software packages")
     if not automated:
         if not env.has_key("system_install"):
             _parse_fabricrc()
@@ -314,7 +322,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
         sys.path.append(os.path.split(__file__)[0])
     try:
-        logger.debug("Import %s" % p)
+        env.logger.debug("Import %s" % p)
         mod = __import__("custom.%s" % pkg_to_group[p], fromlist=["custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
@@ -332,7 +340,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     # allow us to check for packages only available on 64bit machines
     machine = run("uname -m")
     is_64bit = machine.find("_64") > 0
-    logger.info("Reading %s" % yaml_file)
+    env.logger.info("Reading %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     if subs_yaml_file is not None:
@@ -515,7 +523,7 @@ def _do_library_installs(to_install):
 def _apt_packages(to_install):
     """Install packages available via apt-get.
     """
-    logger.info("Update and install all packages")
+    env.logger.info("Update and install all packages")
     pkg_config = os.path.join(env.config_dir, "packages.yaml")
     subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
                                    env.distribution)
@@ -539,7 +547,7 @@ def _apt_packages(to_install):
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
-    logger.info("Update GPG keys for repositories")
+    env.logger.info("Update GPG keys for repositories")
     standalone = [
         "http://archive.cloudera.com/debian/archive.key"
     ]
@@ -606,7 +614,7 @@ def _setup_apt_sources():
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
-        logger.debug("Source %s" % source)
+        env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
             sudo("add-apt-repository '%s'" % source)
         elif not contains(env.sources_file, source):
@@ -664,7 +672,7 @@ def _freenx_scripts():
 def _cleanup():
     """Clean up any extra files after building.
     """
-    logger.info("Cleaning up")
+    env.logger.info("Cleaning up")
     run("rm -f .bash_history")
     sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")
