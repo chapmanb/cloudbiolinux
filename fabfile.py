@@ -51,7 +51,6 @@ def _setup_edition():
     """Setup one of the BioLinux editions (which are derived from
        the Edition base class)
     """
-    env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
     edition = env.get("edition", None)
     if edition is None:
         from cloudbio.edition import Edition
@@ -63,6 +62,8 @@ def _setup_edition():
         env.bionode = True
         edition = BioNode(env)
     else:
+        raise ValueError("Unknown edition: %s" % edition)
+    env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
     env.logger.info("This is a %s" % edition.name)
     env.cur_edition = edition
 
@@ -293,7 +294,6 @@ def _custom_installs(to_install):
         run("mkdir -p %s" % env.local_install)
     pkg_config = os.path.join(env.config_dir, "custom.yaml")
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
-    sys.path.append(os.path.split(__file__)[0])
     for p in packages:
         install_custom(p, True, pkg_to_group)
 
@@ -310,12 +310,14 @@ def install_custom(p, automated=False, pkg_to_group=None):
     if not automated:
         if not env.has_key("system_install"):
             _parse_fabricrc()
+        _setup_edition()
+        _setup_distribution_environment()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
-        sys.path.append(os.path.split(__file__)[0])
     try:
         env.logger.debug("Import %s" % p)
-        mod = __import__("custom.%s" % pkg_to_group[p], fromlist=["custom"])
+        mod = __import__("cloudbio.custom.%s" % pkg_to_group[p],
+                         fromlist=["cloudbio", "custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
                 pkg_to_group[p])
@@ -529,11 +531,11 @@ def _apt_packages(to_install):
     #     sudo("apt-get -y --force-yes install %s" % package)
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
+    group_size = 30
     i = 0
     while i < len(packages):
-      list = packages[i:i+30]
-      sudo("apt-get -y --force-yes install %s" % " ".join(list))
-      i += 30
+      sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
+      i += group_size
     sudo("apt-get clean")
 
 def _add_apt_gpg_keys():
@@ -602,7 +604,7 @@ def _setup_apt_sources():
     sudo("apt-get install -y --force-yes python-software-properties")
     env.cur_edition.check_packages_source()
 
-    comment = "# This file was modified for "+edition.name
+    comment = "# This file was modified for "+ env.cur_edition.name
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
