@@ -64,7 +64,7 @@ def _setup_edition():
     else:
         raise ValueError("Unknown edition: %s" % edition)
     env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
-    env.logger.info("This is a %s" % edition.name)
+    env.logger.info("This is a %s" % env.cur_edition.name)
 
 def _setup_distribution_environment():
     """Setup distribution environment
