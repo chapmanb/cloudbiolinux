@@ -678,3 +678,6 @@ def _cleanup():
     for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
         if exists(db_location):
             sudo('rm -rf %s' % db_location)
+    # remove existing ssh host key pairs
+    # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
+    sudo("rm -f /etc/ssh/ssh_host_*")
