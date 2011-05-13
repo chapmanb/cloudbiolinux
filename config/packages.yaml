@@ -32,6 +32,7 @@ desktop:
   - evince
   - cloudbl-desktop
   - bio-linux-tutorials
+  - xvfb
 programming:
   editors:
     - emacs
@@ -77,6 +78,7 @@ programming:
     - g++
     - gfortran
     - stow
+    - rsync
   libraries:
     - libatlas-dev
     - libblas-dev
@@ -240,6 +242,7 @@ math:
   - prover9
   - octave3.2
 viz:
+  - imagemagick
   - x11-apps
   - mayavi2
   - mtasc # for modest maps

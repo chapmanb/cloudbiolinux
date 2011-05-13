@@ -6,6 +6,7 @@ desktop:
   - gnome-terminal
   - firefox
   - evince
+  - xorg-x11-server-Xvfb
 programming:
   editors:
     - emacs
@@ -56,6 +57,9 @@ programming:
     - gcc44
     - gcc44-c++
     - gcc44-gfortran
+    - rsync
+    - librsync
+    - librsync-devel
   libraries:
     - lapack
     - lapack-devel
@@ -145,6 +149,8 @@ math:
   - octave
   - octave-devel
 viz:
+  - ImageMagick
+  - ImageMagick-devel
   - graphviz
   - graphviz-devel
 web:
