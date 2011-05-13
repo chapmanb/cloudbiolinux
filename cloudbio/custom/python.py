@@ -5,14 +5,7 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_python_lib, _get_install
-
-def _python_make(env):
-    run("python%s setup.py build" % env.python_version_ext)
-    sudo("python%s setup.py install --skip-build" % env.python_version_ext)
-    sudo("rm -rf dist")
-    sudo("rm -rf build")
-    sudo("rm -rf lib/*.egg-info")
+from shared import _if_not_python_lib, _get_install, _python_make
 
 @_if_not_python_lib("bx")
 def install_bx_python(env):

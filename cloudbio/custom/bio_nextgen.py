@@ -7,7 +7,7 @@ from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _symlinked_java_version_dir, _fetch_and_unpack)
+                    _symlinked_java_version_dir, _fetch_and_unpack, _python_make)
 
 @_if_not_installed("faToTwoBit")
 def install_ucsc_tools(env):
@@ -41,7 +41,7 @@ def install_bowtie(env):
 
 @_if_not_installed("bwa")
 def install_bwa(env):
-    version = "0.5.9rc1"
+    version = "0.5.9"
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
@@ -176,7 +176,7 @@ def install_fastqc(env):
                                                 env.system_install, executable))
 
 def install_gatk(env):
-    version = "1.0.5506"
+    version = "1.0.5777"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
@@ -259,7 +259,7 @@ def install_tophat(env):
 def install_cufflinks(env):
     # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "0.9.3"
+    version = "1.0.1"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -289,3 +289,12 @@ def install_trinity(env):
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
           "trinityrnaseq-%s.tgz" % version
     _get_install_local(url, env, _make_copy())
+
+# --- ChIP-seq
+
+@_if_not_installed("macs14")
+def install_macs(env):
+    version = "1.4.0rc2"
+    url = "http://macs:chipseq@liulab.dfci.harvard.edu/MACS/src/"\
+          "MACS-%s.tar.gz" % version
+    _get_install(url, env, _python_make)

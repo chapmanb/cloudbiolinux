@@ -2,7 +2,8 @@
 # List of custom programs to install that are not packaged. These each require 
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
-
+bio_general:
+ - emboss
 bio_nextgen:
   alignment:
     - bwa
@@ -26,6 +27,8 @@ bio_nextgen:
     - transabyss
     - trinity
     - velvet
+  chip:
+    - macs
   needs_64bit:
     - ucsc_tools
     - bfast

@@ -139,3 +139,11 @@ def _symlinked_java_version_dir(pname, version):
         sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
     return None
+
+def _python_make(env):
+    run("python%s setup.py build" % env.python_version_ext)
+    sudo("python%s setup.py install --skip-build" % env.python_version_ext)
+    sudo("rm -rf dist")
+    sudo("rm -rf build")
+    sudo("rm -rf lib/*.egg-info")
+

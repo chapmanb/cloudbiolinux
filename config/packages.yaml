@@ -246,6 +246,7 @@ viz:
   - x11-apps
   - mayavi2
   - mtasc # for modest maps
+  - gnuplot
   - graphviz
   - libgraphviz-dev
   - libgl1-mesa-dev

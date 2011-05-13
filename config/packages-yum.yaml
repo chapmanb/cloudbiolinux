@@ -71,6 +71,8 @@ programming:
     - tcl-devel
     - tk-devel
     - ImageMagick
+    - boost141
+    - boost141-devel
     - boost
     - boost-devel
     - openmpi
@@ -149,6 +151,7 @@ math:
   - octave
   - octave-devel
 viz:
+  - gnuplot
   - ImageMagick
   - ImageMagick-devel
   - graphviz
