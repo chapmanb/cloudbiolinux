@@ -33,6 +33,10 @@ bio_nextgen:
 distributed:
   - mahout
   - pydoop
+python:
+  - bx-python
+  - matplotlib
+  - rpy
 java:
   - leinengin
   #- cljr

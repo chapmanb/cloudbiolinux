@@ -12,6 +12,7 @@ pypi:
   - lxml
   - mako
   - nose
+  - numpy
   - paste
   - pastescript
   - pycrypto
@@ -32,12 +33,10 @@ pypi:
   - Twisted
   # science
   - biopython
-  - bx-python
   - cogent
   - DendroPy
   - HTSeq
   - networkx
-  - numpy
   - pygr
   - pysam
   - pysparse
@@ -56,7 +55,7 @@ pypi:
   - SQLAlchemy
   # visualization
   - gnuplot-py
-  - matplotlib
+  - PIL
   - pydot
   - pygooglechart
   - reportlab

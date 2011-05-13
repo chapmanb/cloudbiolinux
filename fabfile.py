@@ -320,7 +320,10 @@ def install_custom(p, automated=False, pkg_to_group=None):
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
                 pkg_to_group[p])
+    replace_chars = ["-"]
     try:
+        for to_replace in replace_chars:
+            p = p.replace(to_replace, "_")
         fn = getattr(mod, "install_%s" % p)
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"
