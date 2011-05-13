@@ -22,10 +22,14 @@ cran:
  - DBI
  - digest
  - effects
+ - flashClust
  - foreign
+ - gdata
  - gee
  - graph
  - ggplot2
+ - gplots
+ - gtools
  - hdf5
  - hexbin
  - hmisc
@@ -37,6 +41,7 @@ cran:
  - latticeExtra
  - leaps
  - lmtest
+ - maptree
  - mass
  - matrix
  - mclust
@@ -48,6 +53,7 @@ cran:
  - NMF
  - nnet
  - pamr
+ - pi0
  - plotrix
  - plyr
  - proto
@@ -77,6 +83,7 @@ cran:
  - xtable
  - yacca
  - zoo
+
 biocrepo: http://bioconductor.org/biocLite.R
 bioc:
  - affy
@@ -94,6 +101,7 @@ bioc:
  - baySeq
  - beadarray
  - Biobase
+ - bioDist
  - biomaRt
  - Biostrings
  - BSgenome
