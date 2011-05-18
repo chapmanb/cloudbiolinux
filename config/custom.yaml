@@ -11,16 +11,18 @@ bio_nextgen:
     - gmap
     - lastz
     - perm
-  analysis:
+  utilitites:
     - bedtools
-    - cufflinks
     - fastqc
     - fastx_toolkit
+    - sabre
+    - solexaqa
+  analysis:
+    - cufflinks
     - freebayes
     - gatk
     - picard
     - snpeff
-    - solexaqa
     - tophat
   assembly:
     - abyss

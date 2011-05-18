@@ -167,6 +167,11 @@ def install_bedtools(env):
     repository = "git clone git://github.com/arq5x/bedtools.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
 
+@_if_not_installed("sabre")
+def install_sabre(env):
+    repo = "git clone git://github.com/najoshi/sabre.git"
+    _get_install(repo, env, _make_copy("find -perm -100 -name 'sabre*'"))
+
 # -- Analysis
 
 def install_picard(env):
