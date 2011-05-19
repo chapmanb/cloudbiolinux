@@ -284,9 +284,9 @@ bio_alignment:
   - probcons
   - t-coffee
   - bio-linux-seaview
-  - bio-linux-clustal
+  #- bio-linux-clustal
   - bio-linux-dotter
-  - bio-linux-jalview
+  #- bio-linux-jalview
   - bio-linux-pfaat
   - bio-linux-prank
   - bio-linux-squint
@@ -337,7 +337,7 @@ bio_utils:
   - bio-linux-base-directories
   - bio-linux-bldp-files
   - bio-linux-sampledata
-  - bio-linux-sequin
+  #- bio-linux-sequin
   - bio-linux-taxinspector
   - bio-linux-themes-v5
 phylogeny:
@@ -347,7 +347,7 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    - bio-linux-arb
+    #- bio-linux-arb
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml

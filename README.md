@@ -263,13 +263,19 @@ Allow ssh and web access to your instances:
 
 Each time you'd like to use EC2, you need to create a remote instance to work
 with, which can be done nicely via the [AWS console][4]. Pick an AMI,
-start an instance and ensure that it is running. You will
-need to increase the size of the root filesystem to fit all of the
-CloudBioLinux data and libraries. This is done by ssh-ing in to the
-machine:
+start an instance and ensure that it is running. 
+
+For building from scratch, you will need to increase the size of the 
+root filesystem to fit all of the CloudBioLinux data and libraries. 
+This is done by starting the instance from the commandline:
+
+       % ec2-run-instances ami-cef405a7 -k sobchak-keypair -t m1.large -b /dev/xvda1=:20
+       % ec2-describe-instances i-0ca39764
+
+Then ssh to the machine:
 
        % ssh -i ~/.ec2/id-sobchak.keypair ubuntut@ec2-174-129-68-135.compute-1.amazonaws.com
-       % sudo resize2fs /dev/sda1
+       % sudo resize2fs /dev/xvda1
        % df -h
 
 # LICENSE

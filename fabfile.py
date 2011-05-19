@@ -132,8 +132,8 @@ def _setup_ubuntu():
       "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
-      "deb http://archive.cloudera.com/debian %s-cdh3 contrib", # Hadoop
-      "ppa:sun-java-community-team/sun-java6", # sun-java
+      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
+      "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
     ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
 

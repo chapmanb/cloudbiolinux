@@ -21,6 +21,7 @@ pypi:
   - pyyaml
   - routes
   - simplejson
+  - sphinx
   - webhelpers
   - webob
   - xlrd

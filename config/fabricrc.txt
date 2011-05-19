@@ -8,7 +8,7 @@
 # details about the operating system
 ## Ubuntu
 distribution = ubuntu
-dist_name = maverick
+dist_name = natty
 ## Centos
 #distribution = centos
 ## Debian
