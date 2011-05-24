@@ -68,10 +68,14 @@ def _setup_edition():
     env.logger.info("This is a %s" % env.cur_edition.name)
 
 def _setup_flavor(flavor):
-    if flavor:
-      env.logger.info("Flavor %s" % flavor)
-      # to be filled in ...
-      env.logger.info("This is a %s" % env.cur_flavor.name)
+    """Setup flavor
+    """
+    if flavor != None:
+        env.logger.info("Flavor %s" % flavor)
+        # to be filled in ...
+        env.logger.info("This is a %s" % env.cur_flavor.name)
+    else:
+        env.logger.info("No flavor defined")
 
 def _setup_distribution_environment():
     """Setup distribution environment
@@ -205,6 +209,10 @@ def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
     env.logger.debug("Expand paths")
+    # This is the first point we call into a remote host - make sure
+    # it does not fail silently by calling a dummy run
+    test = run("pwd")
+    print("<%s>" % test)
     if env.has_key("local_install"):
         if not exists(env.local_install):
             run("mkdir -p %s" % env.local_install)
