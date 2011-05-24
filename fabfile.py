@@ -263,6 +263,8 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
     _setup_distribution_environment() # get parameters for distro, packages etc.
     pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     _validate_target_distribution()
+    print pkg_install
+    exit
     env.logger.info("Target=%s" % target)
     if target is None or target == "packages":
         if env.deb_derived:
