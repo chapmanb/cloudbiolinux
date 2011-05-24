@@ -8,7 +8,8 @@ Usage:
 
     fab -H hostname -i private_key_file install_biolinux
 
-which will call into the 'install_biolinux' method below.
+which will call into the 'install_biolinux' method below. See the README for
+more examples.
 
 Requires:
     Fabric http://docs.fabfile.org
