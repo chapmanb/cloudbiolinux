@@ -208,11 +208,16 @@ def _parse_fabricrc():
 def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
-    env.logger.debug("Expand paths")
     # This is the first point we call into a remote host - make sure
     # it does not fail silently by calling a dummy run
+    env.logger.info("Now, testing connection to host...")
     test = run("pwd")
-    print("<%s>" % test)
+    if test != None:
+      env.logger.info("Connection to host appears to work!")
+    else:
+      # This is sometimes not reached
+      raise NotImplementedError("Connection to host failed")
+    env.logger.debug("Expand paths")
     if env.has_key("local_install"):
         if not exists(env.local_install):
             run("mkdir -p %s" % env.local_install)
