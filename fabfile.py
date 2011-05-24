@@ -245,6 +245,7 @@ def _setup_vagrant_environment():
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
+    env.is_vagrant = True  # not sure where we should store this (one test below)
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
@@ -721,4 +722,6 @@ def _cleanup():
             sudo('rm -rf %s' % db_location)
     # remove existing ssh host key pairs
     # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
-    sudo("rm -f /etc/ssh/ssh_host_*")
+    # but not on vagrant - as it won't start again. Nor localhost, probably.
+    if not env.has_key("is_vagrant"):
+      sudo("rm -f /etc/ssh/ssh_host_*")
