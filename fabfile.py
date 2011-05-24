@@ -246,22 +246,22 @@ def _add_source_versions(version, sources):
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None):
-    """Main entry point for installing Biolinux on a remote server.
+def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
+    """Bare installation entry point, which allows a different main package
+    list (the main YAML file is passed in), and/or use of Flavor. So you can
+    say:
 
-    target is supplied on the fab CLI. Special targets are:
+      install_bare:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
 
-      - packages     Install distro packages (default)
-      - custom
-      - libraries
-      - finalize     Setup freenx
+    Both packagelist and flavor, as well as the Edition, can also be passed in
+    through the fabricrc file.
     """
     _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition()
     _setup_distribution_environment() # get parameters for distro, packages etc.
-    pkg_install, lib_install = _read_main_config()  # read main.yaml
+    pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     _validate_target_distribution()
     env.logger.info("Target=%s" % target)
     if target is None or target == "packages":
@@ -281,6 +281,20 @@ def install_biolinux(target=None):
     if target is None or target == "finalize":
         _freenx_scripts()
         _cleanup()
+
+
+def install_biolinux(target=None):
+    """Main entry point for installing Biolinux on a remote server.
+
+    target is supplied on the fab CLI. Special targets are:
+
+      - packages     Install distro packages (default)
+      - custom
+      - libraries
+      - finalize     Setup freenx
+    """
+    # Basically a bare install, with default main.yaml file and target...
+    install_bare(packagelist=None, flavor=None, target=target)
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -380,12 +394,13 @@ def _filter_subs_packages(initial, subs):
             final.append(new_p)
     return sorted(final)
 
-def _read_main_config():
+def _read_main_config(yaml_file=None):
     """Pull a list of groups to install based on our main configuration YAML.
 
     Reads 'main.yaml' and returns packages and libraries
     """
-    yaml_file = os.path.join(env.config_dir, "main.yaml")
+    if yaml_file==None:
+        yaml_file = os.path.join(env.config_dir, "main.yaml")
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data['packages']
