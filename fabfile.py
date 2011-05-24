@@ -67,6 +67,12 @@ def _setup_edition():
     env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
     env.logger.info("This is a %s" % env.cur_edition.name)
 
+def _setup_flavor(flavor):
+    if flavor:
+      env.logger.info("Flavor %s" % flavor)
+      # to be filled in ...
+      env.logger.info("This is a %s" % env.cur_flavor.name)
+
 def _setup_distribution_environment():
     """Setup distribution environment
     """
@@ -260,12 +266,13 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition()
+    _setup_flavor(flavor)
     _setup_distribution_environment() # get parameters for distro, packages etc.
+    env.logger.info("packagelist=%s" % packagelist)
     pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     _validate_target_distribution()
-    print pkg_install
-    exit
     env.logger.info("Target=%s" % target)
+    # print(pkg_install)
     if target is None or target == "packages":
         if env.deb_derived:
             _setup_apt_sources()
