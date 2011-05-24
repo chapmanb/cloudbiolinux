@@ -1,18 +1,23 @@
-CloudBioLinux is a build and deployment system which installs
-a large selection of Bioinformatics and machine learning libraries
-on a bare virtual machine (VM) image, freshly installed PC,
-or in the cloud. By default CloudBioLinux includes a
-large suite of tools and libraries, largely pulled from
-the package management system provided by the image. In addition
-CloudBioLinux installs packages through other mechanisms, such as
-native installers and libraries for Perl, R, Python, JAVA and Ruby, as
-well as installers for special data resources.
+CloudBioLinux is a build and deployment system which installs a large
+selection of Bioinformatics and machine learning libraries on a bare
+virtual machine (VM) image, freshly installed PC, or in the cloud. By
+default CloudBioLinux includes a large suite of tools and libraries,
+largely pulled from the package management system provided by the
+image. In addition to the default configuration, other software
+configurations are supported through, so called, 'editions' and
+'flavors'. An edition is a named base install. Flavors support
+overriding base packages for specific installations.  CloudBioLinux
+installs packages through multiple mechanisms, including the default
+distribution installer, native installers, and libraries for Perl, R,
+Python, JAVA and Ruby, as well as installers for special data
+resources.
 
-CloudBioLinux is designed for VMs on the desktop, such as [VirtualBox][v2], or
-cloud providers, such as [Amazon EC2][0], where you start with a bare bones
-system and bootstrap a running instance. CloudBioLinux included software
-packages are fully customizable, and different flavours of
-CloudBioLinux can be configured.
+CloudBioLinux is designed as a single install route for both VMs on
+the desktop, such as [VirtualBox][v2], and cloud providers, such as
+[Amazon EC2][0], where you start with a bare bones system and
+bootstrap a running instance. CloudBioLinux included software packages
+are fully customizable, and different flavours of CloudBioLinux can be
+configured.
 
 CloudBioLinux provides a [Fabric build file][3], written in Python.
 There is little need to understand Python, though, as most configuration
