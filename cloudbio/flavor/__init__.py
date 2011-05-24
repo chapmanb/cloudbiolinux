@@ -12,5 +12,5 @@ class Flavor:
     """Base class. Every flavor derives from this
     """
     def __init__(self, env):
-        self.name = "BioLinux base Flavor"
+        self.name = "Base Flavor - no overrides"
         self.env = env

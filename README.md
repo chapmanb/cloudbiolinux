@@ -218,6 +218,17 @@ additional custom bioinformatics package definitions for inclusion in
 CloudBioLinux. `custom/shared.py` contains a number of higher level functions
 which make it easier to write installation instructions.
 
+### Using flavors
+
+A Flavor is a specialization of an installation edition. A flavor can filter on
+packages and add packages and other software. To use a flavor, pass it
+in on the command line, e.g.
+
+      fab -f fabfile.py -H localhost install_biolinux:flavor=my_flavor
+
+And, like with the other options, a flavor can also be defined in the
+config file. A command line parameter, however, is preferred.
+
 ## EC2 quickstart
 
 This provides a quick cheat sheet of commands for getting up and running on EC2 using
