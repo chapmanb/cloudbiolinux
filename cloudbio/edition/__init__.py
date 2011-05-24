@@ -1,3 +1,11 @@
+"""An Edition reflects a base install, the default being BioLinux.
+
+Editions are shared between multiple projects. To specialize an edition, create
+a Flavor instead.
+
+Other editions can be found in this directory
+"""
+
 class Edition:
     """Base class. Every edition derives from this
     """

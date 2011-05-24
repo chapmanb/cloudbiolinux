@@ -8,7 +8,8 @@ Usage:
 
     fab -H hostname -i private_key_file install_biolinux
 
-which will call into the 'install_biolinux' method below.
+which will call into the 'install_biolinux' method below. See the README for
+more examples.
 
 Requires:
     Fabric http://docs.fabfile.org
@@ -65,6 +66,16 @@ def _setup_edition():
         raise ValueError("Unknown edition: %s" % edition)
     env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
     env.logger.info("This is a %s" % env.cur_edition.name)
+
+def _setup_flavor(flavor):
+    """Setup flavor
+    """
+    if flavor != None:
+        env.logger.info("Flavor %s" % flavor)
+        # to be filled in ...
+        env.logger.info("This is a %s" % env.cur_flavor.name)
+    else:
+        env.logger.info("No flavor defined")
 
 def _setup_distribution_environment():
     """Setup distribution environment
@@ -197,6 +208,15 @@ def _parse_fabricrc():
 def _expand_shell_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
     """
+    # This is the first point we call into a remote host - make sure
+    # it does not fail silently by calling a dummy run
+    env.logger.info("Now, testing connection to host...")
+    test = run("pwd")
+    if test != None:
+      env.logger.info("Connection to host appears to work!")
+    else:
+      # This is sometimes not reached
+      raise NotImplementedError("Connection to host failed")
     env.logger.debug("Expand paths")
     if env.has_key("local_install"):
         if not exists(env.local_install):
@@ -225,6 +245,7 @@ def _setup_vagrant_environment():
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
+    env.is_vagrant = True  # not sure where we should store this (one test below)
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
@@ -245,24 +266,27 @@ def _add_source_versions(version, sources):
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None):
-    """Main entry point for installing Biolinux on a remote server.
+def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
+    """Bare installation entry point, which allows a different main package
+    list (the main YAML file is passed in), and/or use of Flavor. So you can
+    say:
 
-    target is supplied on the fab CLI. Special targets are:
+      install_bare:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
 
-      - packages     Install distro packages (default)
-      - custom
-      - libraries
-      - finalize     Setup freenx
+    Both packagelist and flavor, as well as the Edition, can also be passed in
+    through the fabricrc file.
     """
     _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition()
+    _setup_flavor(flavor)
     _setup_distribution_environment() # get parameters for distro, packages etc.
-    pkg_install, lib_install = _read_main_config()  # read main.yaml
+    env.logger.info("packagelist=%s" % packagelist)
+    pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     _validate_target_distribution()
     env.logger.info("Target=%s" % target)
+    # print(pkg_install)
     if target is None or target == "packages":
         if env.deb_derived:
             _setup_apt_sources()
@@ -280,6 +304,20 @@ def install_biolinux(target=None):
     if target is None or target == "finalize":
         _freenx_scripts()
         _cleanup()
+
+
+def install_biolinux(target=None):
+    """Main entry point for installing Biolinux on a remote server.
+
+    target is supplied on the fab CLI. Special targets are:
+
+      - packages     Install distro packages (default)
+      - custom
+      - libraries
+      - finalize     Setup freenx
+    """
+    # Basically a bare install, with default main.yaml file and target...
+    install_bare(packagelist=None, flavor=None, target=target)
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -379,12 +417,13 @@ def _filter_subs_packages(initial, subs):
             final.append(new_p)
     return sorted(final)
 
-def _read_main_config():
+def _read_main_config(yaml_file=None):
     """Pull a list of groups to install based on our main configuration YAML.
 
     Reads 'main.yaml' and returns packages and libraries
     """
-    yaml_file = os.path.join(env.config_dir, "main.yaml")
+    if yaml_file==None:
+        yaml_file = os.path.join(env.config_dir, "main.yaml")
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data['packages']
@@ -683,4 +722,6 @@ def _cleanup():
             sudo('rm -rf %s' % db_location)
     # remove existing ssh host key pairs
     # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
-    sudo("rm -f /etc/ssh/ssh_host_*")
+    # but not on vagrant - as it won't start again. Nor localhost, probably.
+    if not env.has_key("is_vagrant"):
+      sudo("rm -f /etc/ssh/ssh_host_*")
