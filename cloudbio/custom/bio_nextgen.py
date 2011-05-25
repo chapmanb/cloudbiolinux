@@ -172,6 +172,40 @@ def install_sabre(env):
     repo = "git clone git://github.com/najoshi/sabre.git"
     _get_install(repo, env, _make_copy("find -perm -100 -name 'sabre*'"))
 
+_shrec_run = """
+#!/usr/bin/perl
+use warnings;
+use strict;
+use FindBin qw($RealBin);
+use Getopt::Long;
+
+my @java_args;
+my @args;
+foreach (@ARGV) {
+  if (/^\-X/) {push @java_args,$_;}
+  else {push @args,$_;}}
+system("cd $RealBin && java @java_args Shrec @args");
+"""
+
+@_if_not_installed("shrec")
+def install_shrec(env):
+    version = "2.1"
+    url = "http://downloads.sourceforge.net/project/shrec-ec/SHREC%%20%s/bin.zip" % version
+    use_sudo = True
+    install_dir = _symlinked_java_version_dir("shrec", version, use_sudo=use_sudo)
+    do_sudo = sudo if use_sudo else run
+    if install_dir:
+        shrec_script = "%s/shrec" % install_dir
+        with _make_tmp_dir() as work_dir:
+            run("wget %s" % (url))
+            run("unzip %s" % os.path.basename(url))
+            do_sudo("mv *.class %s" % install_dir)
+            for line in _shrec_run.split("\n"):
+                if line.strip():
+                    append(shrec_script, line, use_sudo=use_sudo)
+            do_sudo("chmod a+rwx %s" % shrec_script)
+            do_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
+
 # -- Analysis
 
 def install_picard(env):

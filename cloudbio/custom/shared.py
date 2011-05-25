@@ -129,14 +129,15 @@ def _get_install_local(url, env, make_command):
 
 # --- Language specific utilities
 
-def _symlinked_java_version_dir(pname, version):
+def _symlinked_java_version_dir(pname, version, use_sudo=True):
+    do_sudo = sudo if use_sudo else run
     base_dir = os.path.join(env.system_install, "share", "java", pname)
     install_dir = "%s-%s" % (base_dir, version)
     if not exists(install_dir):
-        sudo("mkdir -p %s" % install_dir)
+        do_sudo("mkdir -p %s" % install_dir)
         if exists(base_dir):
-            sudo("rm -f %s" % base_dir)
-        sudo("ln -s %s %s" % (install_dir, base_dir))
+            do_sudo("rm -f %s" % base_dir)
+        do_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
     return None
 
