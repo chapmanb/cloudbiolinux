@@ -284,9 +284,9 @@ bio_alignment:
   - probcons
   - t-coffee
   - bio-linux-seaview
-  #- bio-linux-clustal
+  # Version problem - bio-linux-clustal
   - bio-linux-dotter
-  #- bio-linux-jalview
+  # Version problem - bio-linux-jalview
   - bio-linux-pfaat
   - bio-linux-prank
   - bio-linux-squint
@@ -337,7 +337,7 @@ bio_utils:
   - bio-linux-base-directories
   - bio-linux-bldp-files
   - bio-linux-sampledata
-  #- bio-linux-sequin
+  # Version problem - bio-linux-sequin
   - bio-linux-taxinspector
   - bio-linux-themes-v5
 phylogeny:
@@ -347,10 +347,10 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    #- bio-linux-arb
+    # Version problem - bio-linux-arb
     - bio-linux-coalesce
     - bio-linux-dendroscope
-    - bio-linux-fastDNAml
+    # Version problem - bio-linux-fastDNAml
     - bio-linux-fluctuate
     - bio-linux-forester
     - bio-linux-happy
@@ -363,7 +363,7 @@ phylogeny:
     - bio-linux-qtlcart
     - bio-linux-recombine
     - bio-linux-splitstree
-    - bio-linux-treeview
+    # Version problem - bio-linux-treeview
   needs_64bit:
     - bio-linux-fasttree
 # To do -- in Deb Med but not propogated

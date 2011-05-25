@@ -15,9 +15,9 @@ dist_name = natty
 #distribution = debian
 #dist_name = squeeze
 
-# Whether to clean the system after finishing -- useful for preparing AMIs
-# but should not be run on vagrant or local machines
-do_final_cleanup = false
+# Whether to clean the system and install setup scripts after finishing
+# Useful for preparing AMI but should not be run on vagrant or local machines
+is_ec2_image = false
 
 # Global installation directory for packages and standard programs
 system_install = /usr

@@ -302,8 +302,8 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "finalize":
-        _freenx_scripts()
-        if env.do_final_cleanup.upper() in ["TRUE", "YES"]:
+        if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            _freenx_scripts()
             _cleanup()
 
 
@@ -704,6 +704,11 @@ def _freenx_scripts():
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
                 mode=0777)
+    userdata_script = "K20userdatapassnx.sh"
+    userdata_remote = "/etc/rc1.d/%s" % userdata_script
+    if not exists(userdata_remote):
+        put(os.path.join(install_file_dir, userdata_script), userdata_remote,
+            mode=0777, use_sudo=True)
 
 def _cleanup():
     """Clean up any extra files after building.
