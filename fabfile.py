@@ -303,7 +303,8 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
         _do_library_installs(lib_install)
     if target is None or target == "finalize":
         _freenx_scripts()
-        _cleanup()
+        if env.do_final_cleanup.upper() in ["TRUE", "YES"]:
+            _cleanup()
 
 
 def install_biolinux(target=None):
@@ -722,6 +723,4 @@ def _cleanup():
             sudo('rm -rf %s' % db_location)
     # remove existing ssh host key pairs
     # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
-    # but not on vagrant - as it won't start again. Nor localhost, probably.
-    if not env.has_key("is_vagrant"):
-      sudo("rm -f /etc/ssh/ssh_host_*")
+    sudo("rm -f /etc/ssh/ssh_host_*")
