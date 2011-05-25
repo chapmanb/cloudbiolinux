@@ -302,9 +302,10 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "finalize":
+        _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
-            _cleanup()
+            _cleanup_ec2()
 
 
 def install_biolinux(target=None):
@@ -710,15 +711,20 @@ def _freenx_scripts():
         put(os.path.join(install_file_dir, userdata_script), userdata_remote,
             mode=0777, use_sudo=True)
 
-def _cleanup():
+def _cleanup_space():
+    """Cleanup to recover space from builds and packages.
+    """
+    env.logger.info("Cleaning up space from package builds")
+    sudo("rm -rf .cpanm")
+    sudo("rm -f /var/crash/*")
+
+def _cleanup_ec2():
     """Clean up any extra files after building.
     """
-    env.logger.info("Cleaning up")
+    env.logger.info("Cleaning up for EC2 AMI creation")
     run("rm -f .bash_history")
-    sudo("rm -f /var/crash/*")
     sudo("rm -f /var/log/firstboot.done")
     sudo("rm -f .nx_setup_done")
-    sudo("rm -rf .cpanm")
     # RabbitMQ fails to start if its database is embedded into the image
     # because it saves the current IP address or host name so delete it now.
     # When starting up, RabbitMQ will recreate that directory.
