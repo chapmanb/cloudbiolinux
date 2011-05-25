@@ -229,6 +229,16 @@ in on the command line, e.g.
 And, like with the other options, a flavor can also be defined in the
 config file. A command line parameter, however, is preferred.
 
+### Rolling your own
+
+BioLinux normally creates a full system for Bioinformatics. The tool
+set to create such an environment is generic. So, if you want to
+install packages on any system, be it desktop, server or VM, the
+BioLinux tool set can be used to role your own. The first step it to us
+install_bare with a named package list, e.g.
+
+      fab -f fabfile.py -H localhost install_bare:packagelist=./contrib/minimal/main.yaml
+
 ## EC2 quickstart
 
 This provides a quick cheat sheet of commands for getting up and running on EC2 using
