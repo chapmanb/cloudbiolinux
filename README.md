@@ -102,8 +102,9 @@ no passwords needed! Get root with
 Through Vagrant additional facilities are available, such as a shared
 network drive.  It is also possible to tweak the image (e.g. RAM/CPU
 settings, and getting the all important guest additions) by firing up
-virtualbox itself. For more information, see the Vagrant
-[documentation][v1].
+virtualbox itself. For more information, see the BioLinux 
+[Vagrant documentation][doc], as well as the 
+documentation on the [Vagrant website][v1].
 
 # Building an image from scratch using CloudBioLinux
 
@@ -231,13 +232,17 @@ config file. A command line parameter, however, is preferred.
 
 ### Rolling your own
 
-BioLinux normally creates a full system for Bioinformatics. The tool
-set to create such an environment is generic. So, if you want to
+BioLinux normally creates a full system for Bioinformatics. The tools
+provided here to create such an environment are rather generic. So, if you want to
 install packages on any system, be it desktop, server or VM, the
 BioLinux tool set can be used to role your own. The first step it to us
 install_bare with a named package list, e.g.
 
       fab -f fabfile.py -H localhost install_bare:packagelist=./contrib/minimal/main.yaml
+
+where install_bare is the fab entry point to a non-specific install,
+starting from the package list in the passed in packagelist. For more
+information see the section 'Rolling your own' in the BioLinux vagrant documentation in [./doc/vagrant.md][doc].
 
 ## EC2 quickstart
 
@@ -298,6 +303,13 @@ This is done by starting the instance from the commandline:
        % ec2-run-instances ami-1aad5273 -k sobchak-keypair -t m1.large
                            -b /dev/sda1=:20
        % ec2-describe-instances i-0ca39764
+
+# Documentation
+
+Additional documentation can be found in the [./doc directory][doc] in the
+BioLinux source tree.
+
+[doc]: https://github.com/chapmanb/cloudbiolinux
 
 # LICENSE
 
