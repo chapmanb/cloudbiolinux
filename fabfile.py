@@ -58,6 +58,11 @@ def _setup_edition():
         env.edition = 'biolinux'
         env.edition_version = '0.60'
         env.cur_edition = Edition(env)
+    elif edition == 'minimal':
+        from cloudbio.edition.minimal import Minimal
+        env.edition = 'minimal'
+        env.edition_version = '0.1'
+        env.cur_edition = Minimal(env)
     elif edition == 'bionode':
         from cloudbio.edition.bionode import BioNode
         env.bionode = True
