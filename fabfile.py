@@ -58,6 +58,11 @@ def _setup_edition():
         env.edition = 'biolinux'
         env.edition_version = '0.60'
         env.cur_edition = Edition(env)
+    elif edition == 'minimal':
+        from cloudbio.edition.minimal import Minimal
+        env.edition = 'minimal'
+        env.edition_version = '0.1'
+        env.cur_edition = Minimal(env)
     elif edition == 'bionode':
         from cloudbio.edition.bionode import BioNode
         env.bionode = True
@@ -212,10 +217,12 @@ def _expand_shell_paths():
     # it does not fail silently by calling a dummy run
     env.logger.info("Now, testing connection to host...")
     test = run("pwd")
+    # If there is a connection failure, the rest of the code is (sometimes) not
+    # reached - for example with Vagrant the program just stops after above run
+    # command.
     if test != None:
       env.logger.info("Connection to host appears to work!")
     else:
-      # This is sometimes not reached
       raise NotImplementedError("Connection to host failed")
     env.logger.debug("Expand paths")
     if env.has_key("local_install"):
