@@ -184,7 +184,7 @@ my @args;
 foreach (@ARGV) {
   if (/^\-X/) {push @java_args,$_;}
   else {push @args,$_;}}
-system("cd $RealBin && java @java_args Shrec @args");
+system("java -cp $RealBin @java_args Shrec @args");
 """
 
 @_if_not_installed("shrec")
