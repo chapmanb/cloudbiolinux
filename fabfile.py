@@ -579,13 +579,14 @@ def _apt_packages(to_install):
     subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
                                    env.distribution)
     if not os.path.exists(subs_pkg_config): subs_pkg_config = None
-    sudo("apt-get update")
-    sudo("apt-get -y --force-yes upgrade")
-    # Retrieve packages to get and install each of them
+    sudo("apt-get update") # Always update
+    if env.edition.force_upgrade:
+      sudo("apt-get -y --force-yes upgrade")
+    else:
+      env.logger.debug("Skipping forced upgrade")
+    # Retrieve final package names
     (packages, _) = _yaml_to_packages(pkg_config, to_install,
                                       subs_pkg_config)
-    # for package in packages:
-    #     sudo("apt-get -y --force-yes install %s" % package)
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
     group_size = 30

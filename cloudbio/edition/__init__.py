@@ -17,6 +17,7 @@ class Edition:
         self.include_oracle_virtualbox = True
         self.include_freenx = True
         self.include_apt_automation = True
+        self.include_force_upgrade = True
         self.include_hadoop = True
 
     def check_packages_source(self):

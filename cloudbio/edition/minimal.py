@@ -14,6 +14,7 @@ class Minimal(Edition):
         self.include_oracle_virtualbox = False
         self.include_freenx = False
         self.include_apt_automation = False
+        self.force_upgrade = False
         self.include_hadoop = False
 
     def check_packages_source(self):
