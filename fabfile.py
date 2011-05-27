@@ -53,7 +53,7 @@ def _setup_edition():
        the Edition base class)
     """
     # fetch Edition from environment and load relevant class. Use
-    # an existing edition, if possiblu, and override behaviour through
+    # an existing edition, if possible, and override behaviour through
     # the Flavor mechanism.
     edition = env.get("edition", None)
     if edition is None:
@@ -163,12 +163,15 @@ def _setup_debian():
       main_repository = env.debian_repository
 
     sources = [
-      "deb {repo} %s main contrib non-free".format(repo=main_repository),
-      "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
-      "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
-      "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
-    ] + shared_sources
+        "deb {repo} %s main contrib non-free".format(repo=main_repository),
+        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
+    ]
+    if env.edition.short_name != 'minimal':
+        sources = sources + [
+          "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
+          "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
+          "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
+        ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_deb_general():
@@ -594,9 +597,11 @@ def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
     env.logger.info("Update GPG keys for repositories")
-    standalone = [
-        "http://archive.cloudera.com/debian/archive.key"
-    ]
+    standalone = []
+    if env.edition.include_hadoop:
+        standalone = [
+            "http://archive.cloudera.com/debian/archive.key"
+        ]
     if env.edition.include_oracle_virtualbox:
         standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
