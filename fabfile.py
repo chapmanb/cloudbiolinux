@@ -34,6 +34,7 @@ try:
 except ImportError:
     sys.path.append(os.path.dirname(__file__))
 
+
 def _setup_logging():
     env.logger = logging.getLogger("cloudbiolinux")
     env.logger.setLevel(logging.DEBUG)
@@ -73,10 +74,18 @@ def _setup_edition():
 def _setup_flavor(flavor):
     """Setup flavor
     """
+    if flavor == None:
+        flavor = env.get("flavor", None)
+        flavor_path = env.get("flavor_path", None)
     if flavor != None:
-        env.logger.info("Flavor %s" % flavor)
-        # to be filled in ...
-        env.logger.info("This is a %s" % env.cur_flavor.name)
+        # Add path for flavors
+        sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
+        env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
+        try:
+            mod = __import__(flavor_path, fromlist=[flavor])
+        except ImportError:
+            raise ImportError("Failed to import %s" % flavor)
+        env.logger.info("This is a %s" % env.flavor.name)
     else:
         env.logger.info("No flavor defined")
 

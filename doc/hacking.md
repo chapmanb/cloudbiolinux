@@ -43,6 +43,9 @@ would look like:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_bare:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
+The flavor module sets env.flavor (this can only happen once). For examples
+see the files in ./contrib/flavor
+
 = Tips and tricks
 
 == Tip for checking BioLinux installation effects

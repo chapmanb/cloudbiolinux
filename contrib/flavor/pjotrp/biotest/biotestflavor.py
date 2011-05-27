@@ -9,3 +9,4 @@ class BioTestFlavor(Flavor):
         Flavor.__init__(self,env)
         self.name = "Bio* cross-lang flavor"
 
+env.flavor = BioTestFlavor(env)
