@@ -7,8 +7,5 @@
 # This is the minimal version to kick-off development, including editors,
 # version control, and basic build support
 packages:
-  - editors
-  - version_control
-  - build
-  - util
+  - minimal
 libraries:
