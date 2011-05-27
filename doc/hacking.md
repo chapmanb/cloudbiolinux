@@ -46,6 +46,18 @@ would look like:
 The flavor module sets env.flavor (this can only happen once). For examples
 see the files in ./contrib/flavor
 
+== Flavor: add packages
+
+Coming soon...
+
+== Flavor: install special software
+
+Comint soon...
+
+== Flavor: filter packages
+
+Coming soon...
+
 = Tips and tricks
 
 == Tip for checking BioLinux installation effects
