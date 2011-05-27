@@ -34,6 +34,7 @@ try:
 except ImportError:
     sys.path.append(os.path.dirname(__file__))
 
+
 def _setup_logging():
     env.logger = logging.getLogger("cloudbiolinux")
     env.logger.setLevel(logging.DEBUG)
@@ -52,33 +53,39 @@ def _setup_edition():
     """Setup one of the BioLinux editions (which are derived from
        the Edition base class)
     """
+    # fetch Edition from environment and load relevant class. Use
+    # an existing edition, if possible, and override behaviour through
+    # the Flavor mechanism.
     edition = env.get("edition", None)
     if edition is None:
         from cloudbio.edition import Edition
-        env.edition = 'biolinux'
-        env.edition_version = '0.60'
-        env.cur_edition = Edition(env)
+        env.edition = Edition(env)
     elif edition == 'minimal':
         from cloudbio.edition.minimal import Minimal
-        env.edition = 'minimal'
-        env.edition_version = '0.1'
-        env.cur_edition = Minimal(env)
+        env.edition = Minimal(env)
     elif edition == 'bionode':
         from cloudbio.edition.bionode import BioNode
-        env.bionode = True
-        env.cur_edition = BioNode(env)
+        env.edition = BioNode(env)
     else:
         raise ValueError("Unknown edition: %s" % edition)
-    env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
-    env.logger.info("This is a %s" % env.cur_edition.name)
+    env.logger.debug("%s %s" % (env.edition.name, env.edition.version))
+    env.logger.info("This is a %s" % env.edition.short_name)
 
 def _setup_flavor(flavor):
     """Setup flavor
     """
+    if flavor == None:
+        flavor = env.get("flavor", None)
+        flavor_path = env.get("flavor_path", None)
     if flavor != None:
-        env.logger.info("Flavor %s" % flavor)
-        # to be filled in ...
-        env.logger.info("This is a %s" % env.cur_flavor.name)
+        # Add path for flavors
+        sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
+        env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
+        try:
+            mod = __import__(flavor_path, fromlist=[flavor])
+        except ImportError:
+            raise ImportError("Failed to import %s" % flavor)
+        env.logger.info("This is a %s" % env.flavor.name)
     else:
         env.logger.info("No flavor defined")
 
@@ -165,12 +172,15 @@ def _setup_debian():
       main_repository = env.debian_repository
 
     sources = [
-      "deb {repo} %s main contrib non-free".format(repo=main_repository),
-      "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
-      "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
-      "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
-    ] + shared_sources
+        "deb {repo} %s main contrib non-free".format(repo=main_repository),
+        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
+    ]
+    if env.edition.short_name != 'minimal':
+        sources = sources + [
+          "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
+          "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
+          "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
+        ] + shared_sources
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_deb_general():
@@ -182,13 +192,15 @@ def _setup_deb_general():
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
-    shared_sources = [
-      "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-    ]
-    if env.cur_edition.include_oracle_virtualbox:
+    shared_sources = []
+    if env.edition.name != 'minimal':
+        shared_sources = [
+          "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        ]
+    if env.edition.include_oracle_virtualbox:
         # virtualbox (non-free, otherwise use virtualbox-ose instead)
         shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
-    if env.cur_edition.include_freenx:
+    if env.edition.include_freenx:
         # this arguably belongs in _setup_ubuntu:
         shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
@@ -252,7 +264,6 @@ def _setup_vagrant_environment():
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
-    env.is_vagrant = True  # not sure where we should store this (one test below)
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
@@ -411,6 +422,8 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)
+    env.logger.debug("Packages:")
+    env.logger.debug(",".join(packages))
     return packages, pkg_to_group
 
 def _filter_subs_packages(initial, subs):
@@ -439,6 +452,9 @@ def _read_main_config(yaml_file=None):
     packages = packages if packages else []
     libraries = full_data['libraries']
     libraries = libraries if libraries else []
+    env.logger.info("Meta-package information")
+    env.logger.info(",".join(packages))
+    env.logger.info(",".join(libraries))
     return packages, sorted(libraries)
 
 # ### Library specific installation code
@@ -568,21 +584,23 @@ def _apt_packages(to_install):
     """Install packages available via apt-get.
     """
     env.logger.info("Update and install all packages")
-    pkg_config = os.path.join(env.config_dir, "packages.yaml")
-    subs_pkg_config = os.path.join(env.config_dir, "packages-%s.yaml" %
+    pkg_config_file = os.path.join(env.config_dir, "packages.yaml")
+    subs_pkg_config_file = os.path.join(env.config_dir, "packages-%s.yaml" %
                                    env.distribution)
-    if not os.path.exists(subs_pkg_config): subs_pkg_config = None
-    sudo("apt-get update")
-    sudo("apt-get -y --force-yes upgrade")
-    # Retrieve packages to get and install each of them
-    (packages, _) = _yaml_to_packages(pkg_config, to_install,
-                                      subs_pkg_config)
-    # for package in packages:
-    #     sudo("apt-get -y --force-yes install %s" % package)
+    if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
+    sudo("apt-get update") # Always update
+    if env.edition.force_upgrade:
+      sudo("apt-get -y --force-yes upgrade")
+    else:
+      env.logger.debug("Skipping forced upgrade")
+    # Retrieve final package names
+    (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
+                                      subs_pkg_config_file)
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
     group_size = 30
     i = 0
+    env.logger.info("Updating %i packages" % len(packages))
     while i < len(packages):
       sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
       i += group_size
@@ -592,10 +610,12 @@ def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
     env.logger.info("Update GPG keys for repositories")
-    standalone = [
-        "http://archive.cloudera.com/debian/archive.key"
-    ]
-    if env.cur_edition.include_oracle_virtualbox:
+    standalone = []
+    if env.edition.include_hadoop:
+        standalone = [
+            "http://archive.cloudera.com/debian/archive.key"
+        ]
+    if env.edition.include_oracle_virtualbox:
         standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
     if env.ubuntu:
@@ -621,27 +641,27 @@ def _setup_apt_automation():
     Postfix, setup for no configuration. See more on issues here:
     http://www.uluga.ubuntuforums.org/showthread.php?p=9120196
     """
-    interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
-    if not contains(env.shell_config, interactive_cmd):
-        append(env.shell_config, interactive_cmd)
-    package_info = [
-            "postfix postfix/main_mailer_type select No configuration",
-            "postfix postfix/mailname string notusedexample.org",
-            "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
-            "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
-            "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
-            "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
-            "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
-            "grub-pc grub2/linux_cmdline string ''",
-            "grub-pc grub-pc/install_devices_empty boolean true",
-            "acroread acroread/default-viewer boolean false",
-            ]
-    cmd = ""
-    for l in package_info:
-        #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
-        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
-
-    sudo(cmd)
+    if env.edition.include_apt_automation:
+        interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
+        if not contains(env.shell_config, interactive_cmd):
+            append(env.shell_config, interactive_cmd)
+        package_info = [
+                "postfix postfix/main_mailer_type select No configuration",
+                "postfix postfix/mailname string notusedexample.org",
+                "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
+                "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
+                "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
+                "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
+                "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
+                "grub-pc grub2/linux_cmdline string ''",
+                "grub-pc grub-pc/install_devices_empty boolean true",
+                "acroread acroread/default-viewer boolean false",
+                ]
+        cmd = ""
+        for l in package_info:
+            #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
+            cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+        sudo(cmd)
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
@@ -652,9 +672,9 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    env.cur_edition.check_packages_source()
+    env.edition.check_packages_source()
 
-    comment = "# This file was modified for "+ env.cur_edition.name
+    comment = "# This file was modified for "+ env.edition.name
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:

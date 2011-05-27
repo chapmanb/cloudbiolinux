@@ -3,9 +3,9 @@
 If you want to create a new specialization (say for your own server), the
 recommended procedure is to choose an existing base install (Edition) and write
 a Flavor. When your Flavor is of interest to other users, it may be a good idea
-to commit it to the main project.
+to commit it to the main project (in ./contrib/flavor).
 
-Other flavors can be found in this directory.
+Other (main) flavors can be found in this directory and in ./contrib/flavors
 """
 
 class Flavor:
