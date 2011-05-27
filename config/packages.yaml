@@ -19,8 +19,7 @@
 # The package list is organized taxonomically so that parts of it can
 # be selectively installed/ignored. See main.yaml for top level configuration.
 minimal:
-  #Packages to support a minimal installation
-minimal:
+  #Packages to support a minimal installation (no X!)
   editors:
     - vim
     # don't put in emacs, as it pulls in X
@@ -36,8 +35,15 @@ minimal:
     - gcc 
     - g++
     - gfortran
+    - patch
   util:
     - rsync
+    - openssh-server
+    - screen
+    - unzip
+    - tar
+    - less
+    - sudo
 desktop:
   #Packages to support a remote desktop
   - gnome-panel

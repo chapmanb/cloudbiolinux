@@ -5,7 +5,7 @@
 # installed.
 #
 # This is the minimal version to kick-off development, including editors,
-# version control, and basic build support
+# version control, and basic build support (GNU tools)
 packages:
   - minimal
 libraries:
