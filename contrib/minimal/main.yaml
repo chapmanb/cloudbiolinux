@@ -4,8 +4,11 @@
 # files should go here. Comment out any groups you don't want to have 
 # installed.
 #
-# This is the minimal version to kick-off development, including editors and
-# basic language support
+# This is the minimal version to kick-off development, including editors,
+# version control, and basic build support
 packages:
   - editors
+  - version_control
+  - build
+  - util
 libraries:

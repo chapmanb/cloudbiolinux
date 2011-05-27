@@ -52,25 +52,23 @@ def _setup_edition():
     """Setup one of the BioLinux editions (which are derived from
        the Edition base class)
     """
+    # fetch Edition from environment and load relevant class. Use
+    # an existing edition, if possiblu, and override behaviour through
+    # the Flavor mechanism.
     edition = env.get("edition", None)
     if edition is None:
         from cloudbio.edition import Edition
-        env.edition = 'biolinux'
-        env.edition_version = '0.60'
-        env.cur_edition = Edition(env)
+        env.edition = Edition(env)
     elif edition == 'minimal':
         from cloudbio.edition.minimal import Minimal
-        env.edition = 'minimal'
-        env.edition_version = '0.1'
-        env.cur_edition = Minimal(env)
+        env.edition = Minimal(env)
     elif edition == 'bionode':
         from cloudbio.edition.bionode import BioNode
-        env.bionode = True
-        env.cur_edition = BioNode(env)
+        env.edition = BioNode(env)
     else:
         raise ValueError("Unknown edition: %s" % edition)
-    env.logger.debug("Edition %s %s" % (env.edition, env.edition_version))
-    env.logger.info("This is a %s" % env.cur_edition.name)
+    env.logger.debug("%s %s" % (env.edition.name, env.edition.version))
+    env.logger.info("This is a %s" % env.edition.short_name)
 
 def _setup_flavor(flavor):
     """Setup flavor
@@ -185,10 +183,10 @@ def _setup_deb_general():
     shared_sources = [
       "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
     ]
-    if env.cur_edition.include_oracle_virtualbox:
+    if env.edition.include_oracle_virtualbox:
         # virtualbox (non-free, otherwise use virtualbox-ose instead)
         shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
-    if env.cur_edition.include_freenx:
+    if env.edition.include_freenx:
         # this arguably belongs in _setup_ubuntu:
         shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
@@ -252,7 +250,6 @@ def _setup_vagrant_environment():
                                       stdout=subprocess.PIPE).communicate()[0]
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
-    env.is_vagrant = True  # not sure where we should store this (one test below)
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
@@ -411,6 +408,8 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)
+    env.logger.debug("Packages:")
+    env.logger.debug(",".join(packages))
     return packages, pkg_to_group
 
 def _filter_subs_packages(initial, subs):
@@ -439,6 +438,9 @@ def _read_main_config(yaml_file=None):
     packages = packages if packages else []
     libraries = full_data['libraries']
     libraries = libraries if libraries else []
+    env.logger.info("Meta-package information")
+    env.logger.info(",".join(packages))
+    env.logger.info(",".join(libraries))
     return packages, sorted(libraries)
 
 # ### Library specific installation code
@@ -595,7 +597,7 @@ def _add_apt_gpg_keys():
     standalone = [
         "http://archive.cloudera.com/debian/archive.key"
     ]
-    if env.cur_edition.include_oracle_virtualbox:
+    if env.edition.include_oracle_virtualbox:
         standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
     if env.ubuntu:
@@ -621,27 +623,27 @@ def _setup_apt_automation():
     Postfix, setup for no configuration. See more on issues here:
     http://www.uluga.ubuntuforums.org/showthread.php?p=9120196
     """
-    interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
-    if not contains(env.shell_config, interactive_cmd):
-        append(env.shell_config, interactive_cmd)
-    package_info = [
-            "postfix postfix/main_mailer_type select No configuration",
-            "postfix postfix/mailname string notusedexample.org",
-            "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
-            "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
-            "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
-            "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
-            "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
-            "grub-pc grub2/linux_cmdline string ''",
-            "grub-pc grub-pc/install_devices_empty boolean true",
-            "acroread acroread/default-viewer boolean false",
-            ]
-    cmd = ""
-    for l in package_info:
-        #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
-        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
-
-    sudo(cmd)
+    if env.edition.include_apt_automation:
+        interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
+        if not contains(env.shell_config, interactive_cmd):
+            append(env.shell_config, interactive_cmd)
+        package_info = [
+                "postfix postfix/main_mailer_type select No configuration",
+                "postfix postfix/mailname string notusedexample.org",
+                "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
+                "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
+                "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
+                "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
+                "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
+                "grub-pc grub2/linux_cmdline string ''",
+                "grub-pc grub-pc/install_devices_empty boolean true",
+                "acroread acroread/default-viewer boolean false",
+                ]
+        cmd = ""
+        for l in package_info:
+            #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
+            cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+        sudo(cmd)
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
@@ -652,9 +654,9 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     sudo("apt-get install -y --force-yes python-software-properties")
-    env.cur_edition.check_packages_source()
+    env.edition.check_packages_source()
 
-    comment = "# This file was modified for "+ env.cur_edition.name
+    comment = "# This file was modified for "+ env.edition.name
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:

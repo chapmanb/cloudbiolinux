@@ -6,7 +6,9 @@ class BioNode(Edition):
     """BioNode specialization of BioLinux
     """
     def __init__(self, env):
+        Edition.__init__(self,env)
         self.name = "BioNode Edition"
+        self.short_name = "bionode"
         self.env = env
         self.include_oracle_virtualbox = False
         self.include_freenx = False
