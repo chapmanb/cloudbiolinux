@@ -183,9 +183,11 @@ def _setup_deb_general():
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
-    shared_sources = [
-      "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-    ]
+    shared_sources = []
+    if env.edition.name != 'minimal':
+        shared_sources = [
+          "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        ]
     if env.edition.include_oracle_virtualbox:
         # virtualbox (non-free, otherwise use virtualbox-ose instead)
         shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
