@@ -36,3 +36,8 @@ class Edition:
         """Override for check package definition file before updating
         """
         self.env.logger.debug("check_packages_source not implemented")
+
+    def override_apt_sources_list(self, list, main_repository):
+        """Allows editions to modify the sources list
+        """
+        list

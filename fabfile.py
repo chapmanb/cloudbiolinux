@@ -58,12 +58,15 @@ def _setup_edition():
     # the Flavor mechanism.
     edition = env.get("edition", None)
     if edition is None:
+        # the default BioLinux edition
         from cloudbio.edition import Edition
         env.edition = Edition(env)
     elif edition == 'minimal':
+        # the minimal edition - meant for special installs
         from cloudbio.edition.minimal import Minimal
         env.edition = Minimal(env)
     elif edition == 'bionode':
+        # the BioNode edition, which is Debian and FOSS centric
         from cloudbio.edition.bionode import BioNode
         env.edition = BioNode(env)
     else:
@@ -162,14 +165,13 @@ def _setup_debian():
     sources = [
         "deb {repo} %s main contrib non-free".format(repo=main_repository),
         "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
-    ]
-    if env.edition.short_name != 'minimal':
-        sources = sources + [
-          "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-          "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
-          "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
+        "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
+        "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
+        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
         ] + shared_sources
-    env.std_sources = _add_source_versions(version, sources)
+    sources = _add_source_versions(version, sources)
+    # Allow Edition to override apt sources
+    env.std_sources = env.edition.rewrite_apt_sources_list(sources, main_repository)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
@@ -180,14 +182,10 @@ def _setup_deb_general():
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
-    shared_sources = []
-    if env.edition.name != 'minimal':
-        shared_sources = [
-          "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-        ]
-    if env.edition.include_oracle_virtualbox:
-        # virtualbox (non-free, otherwise use virtualbox-ose instead)
-        shared_sources.append('deb http://download.virtualbox.org/virtualbox/debian %s contrib')
+    shared_sources = [
+        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
+    ]
     if env.edition.include_freenx:
         # this arguably belongs in _setup_ubuntu:
         shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
