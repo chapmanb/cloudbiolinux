@@ -308,6 +308,10 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
+    if target is None or target == "post_install":
+        # post install hooks for Edition and Flavor
+        env.edition.post_install()
+        env.flavor.post_install()
     if target is None or target == "finalize":
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:

@@ -43,8 +43,8 @@ would look like:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_bare:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
-The flavor module sets env.flavor (this can only happen once). For examples
-see the files in ./contrib/flavor
+The flavor module itsefl sets env.flavor on loading the module (this can only
+happen once). For examples see the files in ./contrib/flavor.
 
 == Flavor: add sources
 
@@ -80,13 +80,21 @@ main package system. There are methods for checking out source repositories,
 and building software. There are methods for accessing public data resources
 (such as Amazon S3). These are so called custom installs which are defined in
 custom.yaml. Each of these can be pulled in and are configured by code in the
-./cloudbio/custom/ directory. These mechanisms are shared between BioLinux
-editions.
+./cloudbio/custom/ directory.  The method fetches names from custom.yaml that
+delegate to a method in the custom/name.py program.  These mechanisms are
+shared between BioLinux editions.
 
-But, importantly, it is easy to role your own using a Flavor!
+But, importantly, it is easy to role your own custom methods using a Flavor!
+This mechanism can also be used to automatically run post-install software,
+such as puppet, cfruby and chef.
 
 For example, you can tell your flavor to clone a git repository, and execute
-a script by 
+a script by adding a post_install method to your flavor.
+
+You can run only the post_install (convinient for testing!) using the post_install
+target, e.g.
+
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_bare:packagelist=$flavor/main.yaml,target=post_install
 
 = Tips and tricks
 

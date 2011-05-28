@@ -20,4 +20,7 @@ class Flavor:
     def rewrite_packages_list(self, list):
         return list
 
+    def post_install(self):
+        """Post installation hook"""
+
 env.flavor = Flavor(env)

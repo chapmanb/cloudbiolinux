@@ -61,3 +61,5 @@ class Edition:
         """
         sudo("apt-get -y --force-yes upgrade")
 
+    def post_install(self):
+        """Post installation hook"""
