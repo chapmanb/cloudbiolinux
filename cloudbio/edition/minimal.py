@@ -16,6 +16,18 @@ class Minimal(Edition):
         self.include_apt_automation = False
         self.force_upgrade = False
         self.include_hadoop = False
+        self.is_ubuntu = False
+        self.is_debian = False
+        self.is_centos = False
+        self.is_debian_derived = False
+        if env.distribution == "ubuntu":
+            self.is_ubuntu = True
+            self.is_debian_derived = True
+        elif env.distribution == "centos":
+            self.centos = True
+        elif env.distribution == "debian":
+            self.is_debian = True
+            self.is_debian_derived = True
 
     def check_packages_source(self):
         # Removes sources, just to be sure

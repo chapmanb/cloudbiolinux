@@ -93,28 +93,16 @@ def _setup_distribution_environment():
     """Setup distribution environment
     """
     env.logger.info("Distribution %s" % env.distribution)
-    # specialization booleans, simplifying logic (somewhat)
-    # these are the only 'special' boolean switches allowed, they can
-    # also be moved into the 'edition' logic:
-    env.debian = False       # is it pure Debian?
-    env.ubuntu = False       # is it pure Ubuntu?
-    env.centos = False       # is it pure CentOS?
-    env.deb_derived = False  # is it Debian derived?
 
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
         _setup_local_environment()
     if env.distribution == "ubuntu":
-        env.ubuntu = True
-        env.deb_derived = True
         _setup_ubuntu()
     elif env.distribution == "centos":
-        env.centos = True
         _setup_centos()
     elif env.distribution == "debian":
-        env.debian = True
-        env.deb_derived = True
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
@@ -126,11 +114,11 @@ def _validate_target_distribution():
     Throws exception on error
     """
     env.logger.debug("Checking target distribution %s",env.distribution)
-    if env.debian:
+    if env.edition.is_debian:
         tag = run("cat /proc/version")
         if tag.find('ebian') == -1:
            raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    elif env.ubuntu:
+    elif env.edition.is_ubuntu:
         tag = run("cat /proc/version")
         if tag.find('buntu') == -1:
            raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
@@ -162,7 +150,7 @@ def _setup_ubuntu():
 
 def _setup_debian():
     env.logger.info("Debian setup")
-    if not env.debian:
+    if not env.edition.is_debian:
        raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
     version = env.dist_name
@@ -306,12 +294,12 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
     env.logger.info("Target=%s" % target)
     # print(pkg_install)
     if target is None or target == "packages":
-        if env.deb_derived:
+        if env.edition.is_debian_derived:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
             _apt_packages(pkg_install)
-        elif env.centos:
+        elif env.edition.is_centos:
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
@@ -618,7 +606,7 @@ def _add_apt_gpg_keys():
     if env.edition.include_oracle_virtualbox:
         standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
     keyserver = []
-    if env.ubuntu:
+    if env.edition.is_ubuntu:
         keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
