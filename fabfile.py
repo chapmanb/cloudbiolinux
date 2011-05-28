@@ -188,7 +188,7 @@ def _setup_deb_general():
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
     ]
     if env.edition.include_freenx:
-        # this arguably belongs in _setup_ubuntu:
+        # this arguably belongs in _setup_ubuntu (and could be handled in rewrite)
         shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
 
@@ -576,10 +576,7 @@ def _apt_packages(to_install):
                                    env.distribution)
     if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
     sudo("apt-get update") # Always update
-    if env.edition.force_upgrade:
-      sudo("apt-get -y --force-yes upgrade")
-    else:
-      env.logger.debug("Skipping forced upgrade")
+    env.edition.apt_upgrade_system()
     # Retrieve final package names
     (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
                                       subs_pkg_config_file)

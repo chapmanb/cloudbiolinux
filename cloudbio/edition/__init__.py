@@ -6,6 +6,8 @@ a Flavor instead.
 Other editions can be found in this directory
 """
 
+from fabric.api import *
+
 class Edition:
     """Base class. Every edition derives from this
     """
@@ -16,7 +18,6 @@ class Edition:
         self.env = env
         self.include_oracle_virtualbox = True
         self.include_freenx = True
-        self.include_force_upgrade = True
         self.include_hadoop = True
         self.is_ubuntu = False
         self.is_debian = False
@@ -45,3 +46,10 @@ class Edition:
         """Allows editions to modify the apt automation list
         """
         return list
+
+    def apt_upgrade_system(self):
+        """Upgrade system through apt - so this behaviour can be 
+        overridden
+        """
+        sudo("apt-get -y --force-yes upgrade")
+

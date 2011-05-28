@@ -13,7 +13,6 @@ class Minimal(Edition):
         self.env = env
         self.include_oracle_virtualbox = False
         self.include_freenx = False
-        self.force_upgrade = False
         self.include_hadoop = False
         self.is_ubuntu = False
         self.is_debian = False
@@ -48,3 +47,8 @@ class Minimal(Edition):
         """Allows editions to modify the apt automation list
         """
         return []
+
+    def apt_upgrade_system(self):
+        """Do nothing"""
+        env.logger.debug("Skipping forced system upgrade")
+
