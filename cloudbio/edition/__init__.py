@@ -47,6 +47,15 @@ class Edition:
         """
         return list
 
+    def rewrite_apt_keys(self, list):
+        """Allows editions to modify key list"""
+        return list
+
+    def rewrite_apt_keyserver(self, list):
+        """Allows editions to modify key list"""
+        return list
+
+
     def apt_upgrade_system(self):
         """Upgrade system through apt - so this behaviour can be 
         overridden

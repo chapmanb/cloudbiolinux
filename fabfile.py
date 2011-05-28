@@ -302,6 +302,8 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
+        else:
+            raise NotImplementedError("Unknown target distribution")
     if target is None or target == "custom":
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
@@ -594,13 +596,13 @@ def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
     """
     env.logger.info("Update GPG keys for repositories")
-    standalone = []
-    if env.edition.include_hadoop:
-        standalone = [
-            "http://archive.cloudera.com/debian/archive.key"
-        ]
-    if env.edition.include_oracle_virtualbox:
-        standalone.append('http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc')
+    standalone = [
+        "http://archive.cloudera.com/debian/archive.key",
+        'http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc'
+    ]
+    standalone = env.edition.rewrite_apt_keys(standalone)
+    for key in standalone:
+        sudo("wget -q -O- %s | apt-key add -" % key)
     keyserver = []
     if env.edition.is_ubuntu:
         keyserver = [
@@ -608,10 +610,9 @@ def _add_apt_gpg_keys():
             ("keyserver.ubuntu.com", "E084DAB9"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
+    keyserver = env.edition.rewrite_apt_keyserver(keyserver)
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
-    for key in standalone:
-        sudo("wget -q -O- %s | apt-key add -" % key)
 
 def _setup_apt_automation():
     """Setup the environment to be fully automated for tricky installs.

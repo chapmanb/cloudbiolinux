@@ -48,6 +48,14 @@ class Minimal(Edition):
         """
         return []
 
+    def rewrite_apt_keys(self, list):
+        """Allows editions to modify key list"""
+        return []
+
+    def rewrite_apt_keyserver(self, list):
+        """Allows editions to modify key list"""
+        return []
+
     def apt_upgrade_system(self):
         """Do nothing"""
         env.logger.debug("Skipping forced system upgrade")
