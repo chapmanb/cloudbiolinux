@@ -55,7 +55,6 @@ class Edition:
         """Allows editions to modify key list"""
         return list
 
-
     def apt_upgrade_system(self):
         """Upgrade system through apt - so this behaviour can be 
         overridden

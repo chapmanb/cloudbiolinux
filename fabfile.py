@@ -88,9 +88,9 @@ def _setup_flavor(flavor):
             mod = __import__(flavor_path, fromlist=[flavor])
         except ImportError:
             raise ImportError("Failed to import %s" % flavor)
-        env.logger.info("This is a %s" % env.flavor.name)
     else:
-        env.logger.info("No flavor defined")
+        from cloudbio.flavor import Flavor
+    env.logger.info("This is a %s" % env.flavor.name)
 
 def _setup_distribution_environment():
     """Setup distribution environment
@@ -411,6 +411,8 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)
+    # At this point allow the Flavor to rewrite the package list
+    packages = env.flavor.rewrite_packages_list(packages)
     env.logger.debug("Packages:")
     env.logger.debug(",".join(packages))
     return packages, pkg_to_group

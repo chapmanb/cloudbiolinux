@@ -46,9 +46,19 @@ would look like:
 The flavor module sets env.flavor (this can only happen once). For examples
 see the files in ./contrib/flavor
 
+== Flavor: add sources
+
+BioLinux creates a (default, or edition based) list of package sources. These
+sources can be overridden by the Flavor.rewrite_apt_sources_list method - which
+should return a new list.
+
 == Flavor: add packages
 
-Coming soon...
+The primary way of adding new packages is by creating a new main.yaml file, as
+discussed above in ''Define a flavor''. In addition a flavor can define a
+method: BioLinux creates a (default, or edition based) list of packages. These
+sources can be overridden by the Flavor.rewrite_packages_list method - which
+should return a new list.
 
 == Flavor: install special software
 
