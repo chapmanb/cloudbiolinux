@@ -17,6 +17,9 @@ class BioTestFlavor(Flavor):
         # list.append('test')
         return list
 
+    def rewrite_ruby_gem_list(self, list):
+        return [ 'bio' ]
+
     def post_install(self):
         env.logger.info("Starting post-install")
         env.logger.info("Load Scalability tests")

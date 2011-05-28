@@ -519,7 +519,7 @@ def _ruby_library_installer(config):
             gem_info = run("gem list --no-versions")
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
-    for gem in config['gems']:
+    for gem in env.flavor.rewrite_ruby_gem_list(config['gems']):
         # update current gems only to check for new installs
         if gem not in installed:
             installed = _cur_gems()

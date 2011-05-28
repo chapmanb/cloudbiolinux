@@ -73,6 +73,25 @@ the following to your Flavor to remove testpackage from the install list:
         list.remove('testpackage')
         return list
 
+== Flavor: rewrite Ruby gem, Perl CPAN, Python egg, R CRAN lists
+
+In a similar fashion to rewrite_packages_list there are functions for Ruby,
+Perl etc. Check the rewrite functions. The general idea is that the main
+Editions define the inclusion of the main languages, and pull in Bio* related
+packages. To override this behaviour use the rewrite functions, e.g.
+
+    def rewrite_ruby_gem_list(self, list):
+        return [ 'bio' ]
+
+only allows the BioRuby gem to be installed when adding to main.yaml
+
+    libraries:
+      - ruby-libs
+
+which pulls in ruby-libs.yaml. We share one ruby-libs.yaml to make sure all
+editions are up-to-date. Likewise for all the other yaml files. Your
+configuration options are at the main.yaml level, and using rewrite methods.
+
 == Flavor: install special software
 
 BioLinux comes with a bag of tricks to install special software outside the

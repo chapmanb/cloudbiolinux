@@ -20,6 +20,9 @@ class Flavor:
     def rewrite_packages_list(self, list):
         return list
 
+    def rewrite_ruby_gem_list(self, list):
+        return list
+
     def post_install(self):
         """Post installation hook"""
 
