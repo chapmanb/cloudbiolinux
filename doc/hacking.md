@@ -58,13 +58,22 @@ The primary way of adding new packages is by creating a new main.yaml file, as
 discussed above in ''Define a flavor''. In addition a flavor can define a
 method: BioLinux creates a (default, or edition based) list of packages. These
 sources can be overridden by the Flavor.rewrite_packages_list method - which
-should return a new list.
+should return a new list. In your Flavor add a function:
 
-== Flavor: install special software
-
-Comint soon...
+    def rewrite_packages_list(self, list):
+        list.append('testpackage')
+        return list
 
 == Flavor: filter packages
+
+To filter/remove packages from the default list, use rewrite_packages_list, add
+the following to your Flavor to remove testpackage from the install list:
+
+    def rewrite_packages_list(self, list):
+        list.remove('testpackage')
+        return list
+
+== Flavor: install special software
 
 Coming soon...
 

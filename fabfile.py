@@ -411,8 +411,6 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)
-    # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_packages_list(packages)
     env.logger.debug("Packages:")
     env.logger.debug(",".join(packages))
     return packages, pkg_to_group
@@ -584,6 +582,9 @@ def _apt_packages(to_install):
     # Retrieve final package names
     (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
                                       subs_pkg_config_file)
+    # At this point allow the Flavor to rewrite the package list
+    packages = env.flavor.rewrite_packages_list(packages)
+
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
     group_size = 30
@@ -682,6 +683,8 @@ def _yum_packages(to_install):
     sudo("yum -y upgrade")
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
+    # At this point allow the Flavor to rewrite the package list
+    packages = env.flavor.rewrite_packages_list(packages)
     for package in packages:
         sudo("yum -y install %s" % package)
 
