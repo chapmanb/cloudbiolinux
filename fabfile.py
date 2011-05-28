@@ -628,27 +628,27 @@ def _setup_apt_automation():
     Postfix, setup for no configuration. See more on issues here:
     http://www.uluga.ubuntuforums.org/showthread.php?p=9120196
     """
-    if env.edition.include_apt_automation:
-        interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
-        if not contains(env.shell_config, interactive_cmd):
-            append(env.shell_config, interactive_cmd)
-        package_info = [
-                "postfix postfix/main_mailer_type select No configuration",
-                "postfix postfix/mailname string notusedexample.org",
-                "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
-                "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
-                "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
-                "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
-                "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
-                "grub-pc grub2/linux_cmdline string ''",
-                "grub-pc grub-pc/install_devices_empty boolean true",
-                "acroread acroread/default-viewer boolean false",
-                ]
-        cmd = ""
-        for l in package_info:
-            #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
-            cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
-        sudo(cmd)
+    interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
+    if not contains(env.shell_config, interactive_cmd):
+        append(env.shell_config, interactive_cmd)
+    package_info = [
+            "postfix postfix/main_mailer_type select No configuration",
+            "postfix postfix/mailname string notusedexample.org",
+            "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
+            "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
+            "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
+            "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
+            "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",
+            "grub-pc grub2/linux_cmdline string ''",
+            "grub-pc grub-pc/install_devices_empty boolean true",
+            "acroread acroread/default-viewer boolean false",
+            ]
+    package_info = env.edition.rewrite_apt_automation(package_info)
+    cmd = ""
+    for l in package_info:
+        #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
+        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+    sudo(cmd)
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.

@@ -16,7 +16,6 @@ class Edition:
         self.env = env
         self.include_oracle_virtualbox = True
         self.include_freenx = True
-        self.include_apt_automation = True
         self.include_force_upgrade = True
         self.include_hadoop = True
         self.is_ubuntu = False
@@ -39,5 +38,10 @@ class Edition:
 
     def rewrite_apt_sources_list(self, list, main_repository):
         """Allows editions to modify the sources list
+        """
+        return list
+
+    def rewrite_apt_automation(self, list):
+        """Allows editions to modify the apt automation list
         """
         return list

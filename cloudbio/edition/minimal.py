@@ -13,7 +13,6 @@ class Minimal(Edition):
         self.env = env
         self.include_oracle_virtualbox = False
         self.include_freenx = False
-        self.include_apt_automation = False
         self.force_upgrade = False
         self.include_hadoop = False
         self.is_ubuntu = False
@@ -43,3 +42,9 @@ class Minimal(Edition):
           "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
         ]
         return sources
+
+
+    def rewrite_apt_automation(self, list):
+        """Allows editions to modify the apt automation list
+        """
+        return []
