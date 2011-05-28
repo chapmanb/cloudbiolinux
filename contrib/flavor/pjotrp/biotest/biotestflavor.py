@@ -19,13 +19,22 @@ class BioTestFlavor(Flavor):
 
     def post_install(self):
         env.logger.info("Starting post-install")
+        env.logger.info("Load Scalability tests")
         if exists('Scalability'):
             with cd('Scalability'):
                run('git pull')
         else:
            _fetch_and_unpack("git clone git://github.com/pjotrp/Scalability.git")
-        # Now run a post installation routine
+        # Now run a post installation routine (for the heck of it)
         run('./Scalability/scripts/hello.sh')
 
+        env.logger.info("Load Cross-language tests")
+        if exists('Cross-language-interfacing'):
+            with cd('Cross-language-interfacing'):
+               run('git pull')
+        else:
+           _fetch_and_unpack("git clone git://github.com/pjotrp/Cross-language-interfacing.git")
+        with cd('Cross-language-interfacing'):
+            run('./scripts/create_test_files.rb')
 
 env.flavor = BioTestFlavor(env)
