@@ -75,7 +75,18 @@ the following to your Flavor to remove testpackage from the install list:
 
 == Flavor: install special software
 
-Coming soon...
+BioLinux comes with a bag of tricks to install special software outside the
+main package system. There are methods for checking out source repositories,
+and building software. There are methods for accessing public data resources
+(such as Amazon S3). These are so called custom installs which are defined in
+custom.yaml. Each of these can be pulled in and are configured by code in the
+./cloudbio/custom/ directory. These mechanisms are shared between BioLinux
+editions.
+
+But, importantly, it is easy to role your own using a Flavor!
+
+For example, you can tell your flavor to clone a git repository, and execute
+a script by 
 
 = Tips and tricks
 
