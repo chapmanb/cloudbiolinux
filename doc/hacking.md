@@ -89,12 +89,26 @@ This mechanism can also be used to automatically run post-install software,
 such as puppet, cfruby and chef.
 
 For example, you can tell your flavor to clone a git repository, and execute
-a script by adding a post_install method to your flavor.
+a script by adding a post_install method to your flavor. E.g.
+
+            def post_install(self):
+                env.logger.info("Starting post-install")
+                if exists('Scalability'):
+                    with cd('Scalability'):
+                       run('git pull')
+                else:
+                   _fetch_and_unpack("git clone git://github.com/pjotrp/Scalability.git")
+                # Now run a post installation routine
+                run('./Scalability/scripts/hello.sh')
 
 You can run only the post_install (convinient for testing!) using the post_install
 target, e.g.
 
          fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_bare:packagelist=$flavor/main.yaml,target=post_install
+
+Now, is this neat, or what? For a full Flavor example see 
+
+    https://github.com/pjotrp/cloudbiolinux/blob/master/contrib/flavor/pjotrp/biotest/biotestflavor.py
 
 = Tips and tricks
 
