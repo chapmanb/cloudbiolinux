@@ -164,14 +164,15 @@ def _setup_debian():
 
     sources = [
         "deb {repo} %s main contrib non-free".format(repo=main_repository),
-        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
+        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
         "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
-        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib", # Hadoop
+        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
-    sources = _add_source_versions(version, sources)
     # Allow Edition to override apt sources
-    env.std_sources = env.edition.rewrite_apt_sources_list(sources, main_repository)
+    sources = env.edition.rewrite_apt_sources_list(sources, main_repository)
+    # fill in %s
+    env.std_sources = _add_source_versions(version, sources)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.

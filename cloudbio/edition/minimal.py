@@ -34,7 +34,7 @@ class Minimal(Edition):
         self.env.logger.debug("Clearing %s" % self.env.sources_file)
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
-    def override_apt_sources_list(self, list, main_repository):
+    def rewrite_apt_sources_list(self, list, main_repository):
         """Allows editions to modify the sources list. Minimal only
            uses the default packages
         """
@@ -42,4 +42,4 @@ class Minimal(Edition):
           "deb {repo} %s main contrib non-free".format(repo=main_repository),
           "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
         ]
-        sources
+        return sources
