@@ -36,6 +36,8 @@ minimal:
     - g++
     - gfortran
     - patch
+    - cmake
+    - swig
   util:
     - rsync
     - openssh-server
