@@ -37,7 +37,11 @@ class BioTestFlavor(Flavor):
                run('git pull')
         else:
            _fetch_and_unpack("git clone git://github.com/pjotrp/Cross-language-interfacing.git")
+        # Special installs for the tests
         with cd('Cross-language-interfacing'):
+            sudo('./scripts/install-packages-root.sh ')
+            run('./scripts/install-packages.sh')
             run('./scripts/create_test_files.rb')
+
 
 env.flavor = BioTestFlavor(env)

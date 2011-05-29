@@ -9,5 +9,7 @@
 packages:
   - minimal
   - ruby
+  - r
+  - python
 libraries:
   - ruby-libs
