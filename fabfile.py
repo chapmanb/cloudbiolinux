@@ -344,7 +344,7 @@ def _custom_installs(to_install):
         run("mkdir -p %s" % env.local_install)
     pkg_config = os.path.join(env.config_dir, "custom.yaml")
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
-    for p in packages:
+    for p in env.flavor.rewrite_custom_list(packages):
         install_custom(p, True, pkg_to_group)
 
 def install_custom(p, automated=False, pkg_to_group=None):
@@ -504,7 +504,7 @@ def _python_library_installer(config):
     """
     version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
     sudo("easy_install%s -U pip" % version_ext)
-    for pname in config['pypi']:
+    for pname in env.flavor.rewrite_python_egg_list(config['pypi']):
         sudo("easy_install%s -U %s" % (version_ext, pname))
         # Use pip when it doesn't re-download even if latest package installed
         # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
@@ -534,7 +534,7 @@ def _perl_library_installer(config):
     run("wget --no-check-certificate http://xrl.us/cpanm")
     run("chmod a+rwx cpanm")
     sudo("mv cpanm %s/bin" % env.system_install)
-    for lib in config['cpan']:
+    for lib in env.flavor.rewrite_perl_cpan_list(config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html

@@ -17,8 +17,14 @@ class BioTestFlavor(Flavor):
         # list.append('test')
         return list
 
+    def rewrite_python_egg_list(self, list):
+        return []
+
     def rewrite_ruby_gem_list(self, list):
         return [ 'bio' ]
+
+    def rewrite_custom_list(self, list):
+        return []
 
     def post_install(self):
         env.logger.info("Starting post-install")
