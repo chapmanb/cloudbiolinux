@@ -18,7 +18,10 @@ class BioTestFlavor(Flavor):
         return list
 
     def rewrite_python_egg_list(self, list):
-        return []
+        return [ 'biopython' ]
+
+    def rewrite_perl_cpan_list(self, list):
+        return [ 'bioperl' ]
 
     def rewrite_ruby_gem_list(self, list):
         return [ 'bio' ]
