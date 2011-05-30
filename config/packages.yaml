@@ -32,7 +32,7 @@ minimal:
     - darcs
   build:
     - make
-    - gcc 
+    - gcc
     - g++
     - gfortran
     - patch
@@ -95,7 +95,7 @@ programming:
     - libssl-dev
     - libpcre3-dev
     - libreadline5-dev
-    - gcc 
+    - gcc
     - g++
     - gfortran
     - stow
@@ -141,6 +141,7 @@ programming:
     - nfs-kernel-server
     - tree
     - screen
+    - time
   lang:
     - aspell
     - dictionaries-common
@@ -174,6 +175,7 @@ python:
     - python-rpy
 ruby:
   - ruby
+  - jruby
   - ruby-dev
   - rubygems
   - ruby1.9.1
