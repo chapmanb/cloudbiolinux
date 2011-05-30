@@ -18,6 +18,34 @@
 #
 # The package list is organized taxonomically so that parts of it can
 # be selectively installed/ignored. See main.yaml for top level configuration.
+minimal:
+  #Packages to support a minimal installation (no X!)
+  editors:
+    - vim
+    # don't put in emacs, as it pulls in X
+  version_control:
+    - git-core
+    - cvs
+    - subversion
+    - mercurial
+    - bzr
+    - darcs
+  build:
+    - make
+    - gcc
+    - g++
+    - gfortran
+    - patch
+    - cmake
+    - swig
+  util:
+    - rsync
+    - openssh-server
+    - screen
+    - unzip
+    - tar
+    - less
+    - sudo
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
@@ -38,21 +66,14 @@ programming:
     - emacs
     - emacs-goodies-el
     - emacsen-common
-    - vim
     - exuberant-ctags
-  version_control:
-    - git-core
-    - cvs
-    - subversion
-    - mercurial
-    - bzr
-    - darcs
   documentation:
     - texlive-latex-base
     - texlive-latex-recommended
     - texlive-latex-extra
   build:
     - swig
+    - cmake
     - curl
     - libcurl4-openssl-dev
     - libxml2
@@ -74,7 +95,7 @@ programming:
     - libssl-dev
     - libpcre3-dev
     - libreadline5-dev
-    - gcc 
+    - gcc
     - g++
     - gfortran
     - stow
@@ -120,6 +141,7 @@ programming:
     - nfs-kernel-server
     - tree
     - screen
+    - time
   lang:
     - aspell
     - dictionaries-common
@@ -153,6 +175,7 @@ python:
     - python-rpy
 ruby:
   - ruby
+  - jruby
   - ruby-dev
   - rubygems
   - ruby1.9.1

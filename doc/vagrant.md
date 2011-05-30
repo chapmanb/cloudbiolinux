@@ -81,7 +81,7 @@ basic laptop.
 For completeness, after a minimal install you can still install a full BioLinux
 execute
 
-          fab -H vagrant -f $source/fabfile.py install_biolinux
+        fab -H vagrant -f $source/fabfile.py install_biolinux
 
 Read the README for further information.
 
