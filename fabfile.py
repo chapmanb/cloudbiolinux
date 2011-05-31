@@ -17,7 +17,6 @@ Requires:
 """
 import os
 import sys
-import subprocess
 
 from fabric.main import load_settings
 from fabric.api import *
@@ -33,6 +32,9 @@ except ImportError:
     import cloudbio
 
 from cloudbio.edition import _setup_edition
+from cloudbio.distribution import _setup_distribution_environment
+
+# ## Utility functions for establishing our build environment
 
 def _setup_logging():
     env.logger = logging.getLogger("cloudbiolinux")
@@ -46,7 +48,43 @@ def _setup_logging():
     ch.setFormatter(formatter)
     env.logger.addHandler(ch)
 
-# ### Configuration details for different server types
+def _parse_fabricrc():
+    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
+    """
+    # ## General setup
+    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
+
+    if not env.has_key("distribution"):
+        env.logger.info("Reading default fabricrc.txt")
+        config_file = os.path.join(env.config_dir, "fabricrc.txt")
+        if os.path.exists(config_file):
+            env.update(load_settings(config_file))
+    else:
+        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
+
+def _create_local_paths():
+    """Expand any paths defined in terms of shell shortcuts (like ~).
+    """
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
+        # This is the first point we call into a remote host - make sure
+        # it does not fail silently by calling a dummy run
+        env.logger.info("Now, testing connection to host...")
+        test = run("pwd")
+        # If there is a connection failure, the rest of the code is (sometimes) not
+        # reached - for example with Vagrant the program just stops after above run
+        # command.
+        if test != None:
+          env.logger.info("Connection to host appears to work!")
+        else:
+          raise NotImplementedError("Connection to host failed")
+        env.logger.debug("Expand paths")
+        if env.has_key("local_install"):
+            if not exists(env.local_install):
+                run("mkdir -p %s" % env.local_install)
+            with cd(env.local_install):
+                result = run("pwd")
+                env.local_install = result
 
 def _setup_flavor(flavor):
     """Setup flavor
@@ -65,186 +103,6 @@ def _setup_flavor(flavor):
     else:
         from cloudbio.flavor import Flavor
     env.logger.info("This is a %s" % env.flavor.name)
-
-def _setup_distribution_environment():
-    """Setup distribution environment
-    """
-    env.logger.info("Distribution %s" % env.distribution)
-
-    if env.hosts == ["vagrant"]:
-        _setup_vagrant_environment()
-    elif env.hosts == ["localhost"]:
-        _setup_local_environment()
-    if env.distribution == "ubuntu":
-        _setup_ubuntu()
-    elif env.distribution == "centos":
-        _setup_centos()
-    elif env.distribution == "debian":
-        _setup_debian()
-    else:
-        raise ValueError("Unexpected distribution %s" % env.distribution)
-    _expand_shell_paths()
-
-def _validate_target_distribution():
-    """Check target matches environment setting (for sanity)
-
-    Throws exception on error
-    """
-    env.logger.debug("Checking target distribution %s",env.distribution)
-    if env.edition.is_debian:
-        tag = run("cat /proc/version")
-        if tag.find('ebian') == -1:
-           raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    elif env.edition.is_ubuntu:
-        tag = run("cat /proc/version")
-        if tag.find('buntu') == -1:
-           raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
-    else:
-        env.logger.debug("Unknown target distro")
-
-def _setup_ubuntu():
-    env.logger.info("Ubuntu setup")
-    if not env.ubuntu:
-       raise ValueError("Target is not Ubuntu")
-    shared_sources = _setup_deb_general()
-    # package information. This is ubuntu/debian based and could be generalized.
-    version = env.dist_name
-    sources = [
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s universe",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
-      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
-      "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
-    ] + shared_sources
-    env.std_sources = _add_source_versions(version, sources)
-
-def _setup_debian():
-    env.logger.info("Debian setup")
-    if not env.edition.is_debian:
-       raise ValueError("Target is not pure Debian")
-    shared_sources = _setup_deb_general()
-    version = env.dist_name
-    if not env.get('debian_repository'):
-      main_repository = 'http://ftp.us.debian.org/debian/'
-    else:
-      main_repository = env.debian_repository
-
-    sources = [
-        "deb {repo} %s main contrib non-free".format(repo=main_repository),
-        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
-        "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-        "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
-        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
-        ] + shared_sources
-    # Allow Edition to override apt sources
-    sources = env.edition.rewrite_apt_sources_list(sources, main_repository)
-    # fill in %s
-    env.std_sources = _add_source_versions(version, sources)
-
-def _setup_deb_general():
-    """Shared settings for different debian based/derived distributions.
-    """
-    env.logger.debug("Debian-shared setup")
-    env.sources_file = "/etc/apt/sources.list"
-    env.python_version_ext = ""
-    if not env.has_key("java_home"):
-        # XXX look for a way to find JAVA_HOME automatically
-        env.java_home = "/usr/lib/jvm/java-6-openjdk"
-    shared_sources = [
-        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-        "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
-    ]
-    if env.edition.include_freenx:
-        # this arguably belongs in _setup_ubuntu (and could be handled in rewrite)
-        shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
-    return shared_sources
-
-def _setup_centos():
-    env.logger.info("CentOS setup")
-    env.python_version_ext = "2.6"
-    if not env.has_key("java_home"):
-        env.java_home = "/etc/alternatives/java_sdk"
-
-def _parse_fabricrc():
-    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
-    """
-    # ## General setup
-    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-
-    if not env.has_key("distribution"):
-        env.logger.info("Reading default fabricrc.txt")
-        config_file = os.path.join(env.config_dir, "fabricrc.txt")
-        if os.path.exists(config_file):
-            env.update(load_settings(config_file))
-    else:
-        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
-
-def _expand_shell_paths():
-    """Expand any paths defined in terms of shell shortcuts (like ~).
-    """
-    # This is the first point we call into a remote host - make sure
-    # it does not fail silently by calling a dummy run
-    env.logger.info("Now, testing connection to host...")
-    test = run("pwd")
-    # If there is a connection failure, the rest of the code is (sometimes) not
-    # reached - for example with Vagrant the program just stops after above run
-    # command.
-    if test != None:
-      env.logger.info("Connection to host appears to work!")
-    else:
-      raise NotImplementedError("Connection to host failed")
-    env.logger.debug("Expand paths")
-    if env.has_key("local_install"):
-        if not exists(env.local_install):
-            run("mkdir -p %s" % env.local_install)
-        with cd(env.local_install):
-            with settings(hide('warnings', 'running', 'stdout', 'stderr'),
-                          warn_only=True):
-                result = run("pwd")
-                env.local_install = result
-
-def _setup_local_environment():
-    """Setup a localhost environment based on system variables.
-    """
-    env.logger.info("Get local environment")
-    if not env.has_key("user"):
-        env.user = os.environ["USER"]
-    if not env.has_key("java_home"):
-        env.java_home = os.environ.get("JAVA_HOME", "/usr/lib/jvm/java-6-openjdk")
-
-def _setup_vagrant_environment():
-    """Use vagrant commands to get connection information.
-    https://gist.github.com/1d4f7c3e98efdf860b7e
-    """
-    env.logger.info("Get vagrant environment")
-    raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
-                                      stdout=subprocess.PIPE).communicate()[0]
-    ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
-    env.user = ssh_config["User"]
-    env.hosts = [ssh_config["HostName"]]
-    env.port = ssh_config["Port"]
-    env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
-    env.key_filename = ssh_config["IdentityFile"]
-    env.logger.debug("ssh %s" % env.host_string)
-
-def _add_source_versions(version, sources):
-    """Patch package source strings for version, e.g. Debian 'stable'
-    """
-    name = version
-    env.logger.debug("Source=%s" % name)
-    final = []
-    for s in sources:
-        if s.find("%s") > 0:
-            s = s % name
-        final.append(s)
-    return final
 
 # ### Shared installation targets for all platforms
 
@@ -272,12 +130,10 @@ def install_biolinux(packagelist=None, flavor=None, target=None):
     _setup_edition(env)
     _setup_flavor(flavor)
     _setup_distribution_environment() # get parameters for distro, packages etc.
+    _create_local_paths()
     env.logger.info("packagelist=%s" % packagelist)
     pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
-    _validate_target_distribution()
     env.logger.info("Target=%s" % target)
-    raise NotImplementedError
-    # print(pkg_install)
     if target is None or target == "packages":
         if env.edition.is_debian_derived:
             _setup_apt_sources()
@@ -334,6 +190,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
             _parse_fabricrc()
         _setup_edition(env)
         _setup_distribution_environment()
+        _create_local_paths()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
     try:
@@ -534,6 +391,7 @@ def install_libraries(language):
     _parse_fabricrc()
     _setup_edition(env)
     _setup_distribution_environment()
+    _create_local_paths()
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
