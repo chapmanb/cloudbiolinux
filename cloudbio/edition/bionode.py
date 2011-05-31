@@ -10,8 +10,6 @@ class BioNode(Edition):
         self.name = "BioNode Edition"
         self.short_name = "bionode"
         self.env = env
-        self.include_oracle_virtualbox = False
-        self.include_freenx = False
 
     def check_packages_source(self):
         # Bionode removes sources, just to be sure

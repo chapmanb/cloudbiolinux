@@ -11,37 +11,17 @@ class Minimal(Edition):
         self.short_name = "minimal"
         self.version = env.version
         self.env = env
-        self.include_oracle_virtualbox = False
-        self.include_freenx = False
-        self.include_hadoop = False
-        self.is_ubuntu = False
-        self.is_debian = False
-        self.is_centos = False
-        self.is_debian_derived = False
-        if env.distribution == "ubuntu":
-            self.is_ubuntu = True
-            self.is_debian_derived = True
-        elif env.distribution == "centos":
-            self.centos = True
-        elif env.distribution == "debian":
-            self.is_debian = True
-            self.is_debian_derived = True
 
     def check_packages_source(self):
         # Removes sources, just to be sure
         self.env.logger.debug("Clearing %s" % self.env.sources_file)
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
-    def rewrite_apt_sources_list(self, list, main_repository):
+    def rewrite_apt_sources_list(self, sources):
         """Allows editions to modify the sources list. Minimal only
            uses the default packages
         """
-        sources = [
-          "deb {repo} %s main contrib non-free".format(repo=main_repository),
-          "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)
-        ]
-        return sources
-
+        return []
 
     def rewrite_apt_automation(self, list):
         """Allows editions to modify the apt automation list

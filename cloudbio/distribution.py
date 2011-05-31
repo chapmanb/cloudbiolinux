@@ -24,22 +24,19 @@ def _setup_distribution_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _validate_target_distribution()
+    _validate_target_distribution(env.distribution)
 
-def _validate_target_distribution():
+def _validate_target_distribution(dist):
     """Check target matches environment setting (for sanity)
 
     Throws exception on error
     """
     env.logger.debug("Checking target distribution %s",env.distribution)
-    if env.edition.is_debian:
+    if dist in ["debian", "ubuntu"]:
         tag = run("cat /proc/version")
-        if tag.find('ebian') == -1:
-           raise ValueError("Debian does not match target, are you using correct fabconfig?")
-    elif env.edition.is_ubuntu:
-        tag = run("cat /proc/version")
-        if tag.find('buntu') == -1:
-           raise ValueError("Ubuntu does not match target, are you using correct fabconfig?")
+        if tag.lower().find(dist) == -1:
+           raise ValueError("Distribution '%s' does not match machine;" +
+                            "are you using correct fabconfig?" % dist)
     else:
         env.logger.debug("Unknown target distro")
 
@@ -49,19 +46,13 @@ def _setup_ubuntu():
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
     sources = [
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s universe",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "deb-src http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
     ] + shared_sources
+    sources = env.edition.rewrite_apt_sources_list(sources)
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_debian():
@@ -70,20 +61,13 @@ def _setup_debian():
        raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
     version = env.dist_name
-    if not env.get('debian_repository'):
-      main_repository = 'http://ftp.us.debian.org/debian/'
-    else:
-      main_repository = env.debian_repository
-
     sources = [
-        "deb {repo} %s main contrib non-free".format(repo=main_repository),
-        "deb {repo} %s-updates main contrib non-free".format(repo=main_repository),
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
         "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
     # Allow Edition to override apt sources
-    sources = env.edition.rewrite_apt_sources_list(sources, main_repository)
+    sources = env.edition.rewrite_apt_sources_list(sources)
     # fill in %s
     env.std_sources = _add_source_versions(version, sources)
 
@@ -91,7 +75,7 @@ def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
     """
     env.logger.debug("Debian-shared setup")
-    env.sources_file = "/etc/apt/sources.list"
+    env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
     env.python_version_ext = ""
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
@@ -100,9 +84,6 @@ def _setup_deb_general():
         "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
     ]
-    if env.edition.include_freenx:
-        # this arguably belongs in _setup_ubuntu (and could be handled in rewrite)
-        shared_sources.append('deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main') # FreeNX PPA
     return shared_sources
 
 def _setup_centos():
