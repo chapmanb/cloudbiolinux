@@ -25,15 +25,12 @@ from fabric.contrib.files import *
 import yaml
 import logging
 
-# ## General setup
-env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-
 # use global cloudbio directory if installed, or utilize local if not
 try:
     import cloudbio
 except ImportError:
     sys.path.append(os.path.dirname(__file__))
-
+    import cloudbio
 
 def _setup_logging():
     env.logger = logging.getLogger("cloudbiolinux")
@@ -201,6 +198,9 @@ def _setup_centos():
 def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
+    # ## General setup
+    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
+
     if not env.has_key("distribution"):
         env.logger.info("Reading default fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
@@ -271,15 +271,23 @@ def _add_source_versions(version, sources):
 
 # ### Shared installation targets for all platforms
 
-def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
-    """Bare installation entry point, which allows a different main package
-    list (the main YAML file is passed in), and/or use of Flavor. So you can
-    say:
+def install_biolinux(packagelist=None, flavor=None, target=None):
+    """Main entry point for installing Biolinux on a remote server.
+
+    This allows a different main package list (the main YAML file is passed in),
+    and/or use of Flavor. So you can say:
 
       install_bare:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
 
     Both packagelist and flavor, as well as the Edition, can also be passed in
     through the fabricrc file.
+
+    target can also be supplied on the fab CLI. Special targets are:
+
+      - packages     Install distro packages
+      - custom       Install custom packages
+      - libraries    Install programming language libraries
+      - finalize     Setup freenx and clean-up environment
     """
     _setup_logging()
     _check_fabric_version()
@@ -317,20 +325,6 @@ def install_bare(packagelist='unknown_packagelist', flavor=None, target=None):
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
             _cleanup_ec2()
-
-
-def install_biolinux(target=None):
-    """Main entry point for installing Biolinux on a remote server.
-
-    target is supplied on the fab CLI. Special targets are:
-
-      - packages     Install distro packages (default)
-      - custom
-      - libraries
-      - finalize     Setup freenx
-    """
-    # Basically a bare install, with default main.yaml file and target...
-    install_bare(packagelist=None, flavor=None, target=target)
 
 def _check_fabric_version():
     """Checks for fabric version installed
