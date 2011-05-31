@@ -32,6 +32,8 @@ except ImportError:
     sys.path.append(os.path.dirname(__file__))
     import cloudbio
 
+from cloudbio.edition import _setup_edition
+
 def _setup_logging():
     env.logger = logging.getLogger("cloudbiolinux")
     env.logger.setLevel(logging.DEBUG)
@@ -45,31 +47,6 @@ def _setup_logging():
     env.logger.addHandler(ch)
 
 # ### Configuration details for different server types
-
-def _setup_edition():
-    """Setup one of the BioLinux editions (which are derived from
-       the Edition base class)
-    """
-    # fetch Edition from environment and load relevant class. Use
-    # an existing edition, if possible, and override behaviour through
-    # the Flavor mechanism.
-    edition = env.get("edition", None)
-    if edition is None:
-        # the default BioLinux edition
-        from cloudbio.edition import Edition
-        env.edition = Edition(env)
-    elif edition == 'minimal':
-        # the minimal edition - meant for special installs
-        from cloudbio.edition.minimal import Minimal
-        env.edition = Minimal(env)
-    elif edition == 'bionode':
-        # the BioNode edition, which is Debian and FOSS centric
-        from cloudbio.edition.bionode import BioNode
-        env.edition = BioNode(env)
-    else:
-        raise ValueError("Unknown edition: %s" % edition)
-    env.logger.debug("%s %s" % (env.edition.name, env.edition.version))
-    env.logger.info("This is a %s" % env.edition.short_name)
 
 def _setup_flavor(flavor):
     """Setup flavor
@@ -292,13 +269,14 @@ def install_biolinux(packagelist=None, flavor=None, target=None):
     _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
-    _setup_edition()
+    _setup_edition(env)
     _setup_flavor(flavor)
     _setup_distribution_environment() # get parameters for distro, packages etc.
     env.logger.info("packagelist=%s" % packagelist)
     pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     _validate_target_distribution()
     env.logger.info("Target=%s" % target)
+    raise NotImplementedError
     # print(pkg_install)
     if target is None or target == "packages":
         if env.edition.is_debian_derived:
@@ -354,7 +332,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
     if not automated:
         if not env.has_key("system_install"):
             _parse_fabricrc()
-        _setup_edition()
+        _setup_edition(env)
         _setup_distribution_environment()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
@@ -554,7 +532,7 @@ def install_libraries(language):
     _setup_logging()
     _check_fabric_version()
     _parse_fabricrc()
-    _setup_edition()
+    _setup_edition(env)
     _setup_distribution_environment()
     _do_library_installs(["%s-libs" % language])
 

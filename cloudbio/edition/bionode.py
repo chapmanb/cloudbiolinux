@@ -1,6 +1,6 @@
 from fabric.api import *
 
-from cloudbio.edition import Edition
+from cloudbio.edition.base import Edition
 
 class BioNode(Edition):
     """BioNode specialization of BioLinux
