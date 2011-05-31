@@ -6,9 +6,7 @@ a Flavor instead.
 Other editions can be found in this directory
 """
 
-from cloudbio.edition.base import Edition
-from cloudbio.edition.minimal import Minimal
-from cloudbio.edition.bionode import BioNode
+from cloudbio.edition.base import Edition, Minimal, BioNode
 
 _edition_map = {None: Edition,
                 "minimal": Minimal,
