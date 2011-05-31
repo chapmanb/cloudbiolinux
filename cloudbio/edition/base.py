@@ -16,7 +16,7 @@ class Edition:
     def check_packages_source(self):
         """Override for check package definition file before updating
         """
-        self.env.logger.debug("check_packages_source not implemented")
+        pass
 
     def rewrite_apt_sources_list(self, sources):
         """Allows editions to modify the sources list
@@ -43,6 +43,7 @@ class Edition:
 
     def post_install(self):
         """Post installation hook"""
+        pass
 
 class BioNode(Edition):
     """BioNode specialization of BioLinux
@@ -57,6 +58,15 @@ class BioNode(Edition):
         self.env.logger.debug("Clearing %s" % self.env.sources_file)
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
+    def rewrite_apt_sources_list(self, sources):
+        if not env.get('debian_repository'):
+            main_repository = 'http://ftp.us.debian.org/debian/'
+        else:
+            main_repository = env.debian_repository
+        new_sources = ["deb {repo} %s main contrib non-free".format(repo=main_repository),
+                       "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)]
+        return sources + new_sources
+
 class Minimal(Edition):
     """Minimal specialization of BioLinux
     """
@@ -64,9 +74,6 @@ class Minimal(Edition):
         Edition.__init__(self, env)
         self.name = "Minimal Edition"
         self.short_name = "minimal"
-
-    def check_packages_source(self):
-        pass
 
     def rewrite_apt_sources_list(self, sources):
         """Allows editions to modify the sources list. Minimal only

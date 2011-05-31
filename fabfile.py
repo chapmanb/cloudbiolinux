@@ -135,12 +135,12 @@ def install_biolinux(packagelist=None, flavor=None, target=None):
     pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
     env.logger.info("Target=%s" % target)
     if target is None or target == "packages":
-        if env.edition.is_debian_derived:
+        if env.distribution in ["debian", "ubuntu"]:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
             _apt_packages(pkg_install)
-        elif env.edition.is_centos:
+        elif env.distibution in ["centos"]:
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
@@ -150,11 +150,9 @@ def install_biolinux(packagelist=None, flavor=None, target=None):
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
-    if target is None or target == "post_install":
-        # post install hooks for Edition and Flavor
+    if target is None or target == "finalize":
         env.edition.post_install()
         env.flavor.post_install()
-    if target is None or target == "finalize":
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
@@ -425,8 +423,8 @@ def _apt_packages(to_install):
     i = 0
     env.logger.info("Updating %i packages" % len(packages))
     while i < len(packages):
-      sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
-      i += group_size
+        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
+        i += group_size
     sudo("apt-get clean")
 
 def _add_apt_gpg_keys():
@@ -440,9 +438,7 @@ def _add_apt_gpg_keys():
     standalone = env.edition.rewrite_apt_keys(standalone)
     for key in standalone:
         sudo("wget -q -O- %s | apt-key add -" % key)
-    keyserver = []
-    if env.edition.is_ubuntu:
-        keyserver = [
+    keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
@@ -481,7 +477,6 @@ def _setup_apt_automation():
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
-        #     sudo("echo %s | /usr/bin/debconf-set-selections" % l)
         cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
     sudo(cmd)
 
@@ -497,6 +492,8 @@ def _setup_apt_sources():
     env.edition.check_packages_source()
 
     comment = "# This file was modified for "+ env.edition.name
+    if not exists(env.sources_file):
+        sudo("touch %s" % env.sources_file)
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.std_sources:
