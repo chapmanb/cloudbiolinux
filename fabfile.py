@@ -496,7 +496,7 @@ def _setup_apt_sources():
         sudo("touch %s" % env.sources_file)
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
-    for source in env.std_sources:
+    for source in env.flavor.rewrite_apt_sources_list(env.std_sources):
         env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
             sudo("add-apt-repository '%s'" % source)

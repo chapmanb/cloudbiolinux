@@ -52,13 +52,10 @@ def _setup_ubuntu():
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
     ] + shared_sources
-    sources = env.edition.rewrite_apt_sources_list(sources)
     env.std_sources = _add_source_versions(version, sources)
 
 def _setup_debian():
     env.logger.info("Debian setup")
-    if not env.edition.is_debian:
-       raise ValueError("Target is not pure Debian")
     shared_sources = _setup_deb_general()
     version = env.dist_name
     sources = [
@@ -66,8 +63,6 @@ def _setup_debian():
         "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
-    # Allow Edition to override apt sources
-    sources = env.edition.rewrite_apt_sources_list(sources)
     # fill in %s
     env.std_sources = _add_source_versions(version, sources)
 

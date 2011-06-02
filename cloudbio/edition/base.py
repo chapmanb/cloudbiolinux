@@ -13,6 +13,13 @@ class Edition:
         self.version = env.version
         self.env = env
 
+    def check_distribution(self):
+        """Ensure the distribution matches an expected type for this edition.
+
+        Base supports multiple distributions.
+        """
+        pass
+
     def check_packages_source(self):
         """Override for check package definition file before updating
         """
@@ -52,6 +59,10 @@ class BioNode(Edition):
         Edition.__init__(self,env)
         self.name = "BioNode Edition"
         self.short_name = "bionode"
+
+    def check_distribution(self):
+        if self.env.distribution not in ["debian"]:
+            raise ValueError("Distribution is not pure Debian")
 
     def check_packages_source(self):
         # Bionode removes sources, just to be sure
