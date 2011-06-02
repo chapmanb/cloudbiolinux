@@ -101,6 +101,7 @@ programming:
     - stow
     - rsync
   libraries:
+    - libatlas-base-dev
     - libatlas-dev
     - libblas-dev
     - liblapack-dev

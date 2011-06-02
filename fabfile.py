@@ -106,7 +106,7 @@ def _setup_flavor(flavor):
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(packagelist=None, flavor=None, target=None):
+def install_biolinux(target=None, packagelist=None, flavor=None):
     """Main entry point for installing Biolinux on a remote server.
 
     This allows a different main package list (the main YAML file is passed in),
@@ -388,6 +388,7 @@ def install_libraries(language):
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
+    _setup_flavor(None)
     _setup_distribution_environment()
     _create_local_paths()
     _do_library_installs(["%s-libs" % language])
