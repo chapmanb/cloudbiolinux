@@ -293,16 +293,23 @@ Allow ssh and web access to your instances:
 ### Starting an instance
 
 Each time you'd like to use EC2, you need to create a remote instance to work
-with, which can be done nicely via the [AWS console][4]. Pick an AMI,
-start an instance and ensure that it is running.
+with; the [AWS console][4] is useful for managing this process.
 
-For building from scratch, you will need to increase the size of the
-root filesystem to fit all of the CloudBioLinux data and libraries.
-This is done by starting the instance from the commandline:
+When building from scratch with Alestic images, you will need to
+increase the size of the root filesystem to fit all of the
+CloudBioLinux data and libraries. This is done by starting the
+instance from the commandline with:
 
-       % ec2-run-instances ami-1aad5273 -k sobchak-keypair -t m1.large
+       % ec2-run-instances ami-1aad5273 -k kunkel-keypair -t m1.large
                            -b /dev/sda1=:20
        % ec2-describe-instances i-0ca39764
+
+On Ubuntu 10.04, you then need to ssh into the instance and resize the
+filesystem with:
+
+       % sudo resize2fs /dev/sda1
+
+On 11.04 the resize happens automatically and this is not required.
 
 # Documentation
 

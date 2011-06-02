@@ -46,6 +46,11 @@ def _setup_ubuntu():
     # package information. This is ubuntu/debian based and could be generalized.
     version = env.dist_name
     sources = [
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
+      "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
