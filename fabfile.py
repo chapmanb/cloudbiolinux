@@ -553,7 +553,7 @@ def _freenx_scripts():
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
                 mode=0777)
-    userdata_script = "K20userdatapassnx.sh"
+    userdata_script = "S20userdatapassnx.sh"
     userdata_remote = "/etc/rc1.d/%s" % userdata_script
     if not exists(userdata_remote):
         put(os.path.join(install_file_dir, userdata_script), userdata_remote,
