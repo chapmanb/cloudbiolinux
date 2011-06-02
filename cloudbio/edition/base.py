@@ -31,18 +31,14 @@ class Edition:
         """
         return sources
 
-    def rewrite_apt_automation(self, list):
+    def rewrite_apt_automation(self, package_info):
         """Allows editions to modify the apt automation list
         """
-        return list
+        return package_info
 
-    def rewrite_apt_keys(self, list):
+    def rewrite_apt_keys(self, standalone, keyserver):
         """Allows editions to modify key list"""
-        return list
-
-    def rewrite_apt_keyserver(self, list):
-        """Allows editions to modify key list"""
-        return list
+        return standalone, keyserver
 
     def apt_upgrade_system(self):
         """Upgrade system through apt - so this behaviour can be overridden
@@ -93,18 +89,11 @@ class Minimal(Edition):
         """
         return []
 
-    def rewrite_apt_automation(self, list):
-        """Allows editions to modify the apt automation list
-        """
+    def rewrite_apt_automation(self, package_info):
         return []
 
-    def rewrite_apt_keys(self, list):
-        """Allows editions to modify key list"""
-        return []
-
-    def rewrite_apt_keyserver(self, list):
-        """Allows editions to modify key list"""
-        return []
+    def rewrite_apt_keys(self, standalone, keyserver):
+        return [], []
 
     def apt_upgrade_system(self):
         """Do nothing"""

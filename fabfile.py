@@ -435,15 +435,14 @@ def _add_apt_gpg_keys():
         "http://archive.cloudera.com/debian/archive.key",
         'http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc'
     ]
-    standalone = env.edition.rewrite_apt_keys(standalone)
-    for key in standalone:
-        sudo("wget -q -O- %s | apt-key add -" % key)
     keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
-    keyserver = env.edition.rewrite_apt_keyserver(keyserver)
+    standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
+    for key in standalone:
+        sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
 
