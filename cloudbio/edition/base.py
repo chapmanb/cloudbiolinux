@@ -12,6 +12,7 @@ class Edition:
         self.short_name = "biolinux"
         self.version = env.version
         self.env = env
+        self.check_distribution()
 
     def check_distribution(self):
         """Ensure the distribution matches an expected type for this edition.
