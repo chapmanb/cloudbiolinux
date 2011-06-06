@@ -251,6 +251,7 @@ def install_snpeff(env):
                     sudo("mv *.jar %s" % install_dir)
                     run("sed -i.bak -r -e 's/data_dir = \.\/data\//data_dir = %s\/data/' %s" %
                         (install_dir.replace("/", "\/"), "snpEff.config"))
+                    run("chmod a+r *.config")
                     sudo("mv *.config %s" % install_dir)
                     data_dir = os.path.join(install_dir, "data")
                     sudo("mkdir %s" % data_dir)
