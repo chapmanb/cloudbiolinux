@@ -54,7 +54,7 @@ def _parse_fabricrc():
     # ## General setup
     env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 
-    if not env.has_key("distribution"):
+    if not env.has_key("distribution") and not env.has_key("system_install"):
         env.logger.info("Reading default fabricrc.txt")
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
@@ -184,8 +184,8 @@ def install_custom(p, automated=False, pkg_to_group=None):
     _setup_logging()
     env.logger.info("Install custom software packages")
     if not automated:
-        if not env.has_key("system_install"):
-            _parse_fabricrc()
+        print env
+        _parse_fabricrc()
         _setup_edition(env)
         _setup_distribution_environment()
         _create_local_paths()

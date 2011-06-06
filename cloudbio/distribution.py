@@ -3,6 +3,7 @@
 This module contains functions that help with initializing a Fabric environment
 for standard server types.
 """
+import os
 import subprocess
 
 from fabric.api import env, run
