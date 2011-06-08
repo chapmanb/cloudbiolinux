@@ -41,3 +41,7 @@ genome_indexes:
   - bwa
   - novoalign
   - ucsc
+
+# Additional data targets
+install_liftover: true
+install_uniref: false

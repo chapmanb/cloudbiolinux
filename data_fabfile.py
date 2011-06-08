@@ -238,19 +238,18 @@ def install_data(config_file=CONFIG_FILE):
     """
     _check_version()
     setup_environment()
-    genomes, genome_indexes = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_file)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
-    lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
-    _data_liftover(lift_over_genomes)
-    #_data_uniref()
+    _install_additional_data(genomes, config)
 
 def install_data_s3(config_file=CONFIG_FILE):
     """Install data using pre-existing genomes present on Amazon s3.
     """
     _check_version()
     setup_environment()
-    genomes, genome_indexes = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_file)
     _download_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
+    _install_additional_data(genomes, config)
 
 def upload_s3(config_file=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
@@ -261,9 +260,16 @@ def upload_s3(config_file=CONFIG_FILE):
         raise ValueError("Need to run S3 upload on a local machine")
     _check_version()
     setup_environment()
-    genomes, genome_indexes = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_file)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
+
+def _install_additional_data(genomes, config):
+    if config.get("install_liftover", False):
+        lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
+        _data_liftover(lift_over_genomes)
+    if config.get("install_uniref", False):
+        _data_uniref()
 
 def _check_version():
     version = env.version
@@ -284,7 +290,7 @@ def _get_genomes(config_file):
         name, gid, manager = ginfo
         manager.config = g
         genomes.append((name, gid, manager))
-    return genomes, config["genome_indexes"]
+    return genomes, config["genome_indexes"], config
 
 # == Decorators and context managers
 
