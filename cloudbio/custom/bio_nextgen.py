@@ -121,12 +121,14 @@ def install_lastz(env):
           "lastz-%s.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"))
 
-@_if_not_installed("MOSAIK")
+@_if_not_installed("MosaikAligner")
 def install_mosaik(env):
     repository = "git clone git://github.com/wanpinglee/MOSAIK.git"
-    def _chdir_src(env, work_cmd):
-        with cd("src"):
-            work_cmd(env)
+    def _chdir_src(work_cmd):
+        def do_work(env):
+            with cd("src"):
+                work_cmd(env)
+        return do_work
     _get_install(repository, env, _chdir_src(_make_copy("ls -1 ../bin/*")))
 
 # --- Utilities
