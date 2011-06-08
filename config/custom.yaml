@@ -10,6 +10,7 @@ bio_nextgen:
     - bowtie
     - gmap
     - lastz
+    - mosaik
     - perm
   utilitites:
     - bedtools

@@ -121,6 +121,14 @@ def install_lastz(env):
           "lastz-%s.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"))
 
+@_if_not_installed("MOSAIK")
+def install_mosaik(env):
+    repository = "git clone git://github.com/wanpinglee/MOSAIK.git"
+    def _chdir_src(env, work_cmd):
+        with cd("src"):
+            work_cmd(env)
+    _get_install(repository, env, _chdir_src(_make_copy("ls -1 ../bin/*")))
+
 # --- Utilities
 
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
