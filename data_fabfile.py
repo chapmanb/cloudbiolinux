@@ -227,7 +227,7 @@ GENOMES_SUPPORTED = [
           ]
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "eland", "bfast", "arachne"]
+                            "ucsc", "mosaik", "eland", "bfast", "arachne"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
 
@@ -346,6 +346,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
         "bwa" : _index_bwa,
         "bowtie": _index_bowtie,
         "maq": _index_maq,
+        "mosaik": _index_mosaik,
         "novoalign": _index_novoalign,
         "novoalign_cs": _index_novoalign_cs,
         "ucsc": _index_twobit,
@@ -369,7 +370,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
             _update_loc_file(ref_index_file, str_parts)
 
 class LocCols(object):
-    # Hold all possible .loc file column fields making sure the local 
+    # Hold all possible .loc file column fields making sure the local
     # variable names match column names in Galaxy's tool_data_table_conf.xml
     def __init__(self, config, dbkey, file_path):
         self.dbkey = dbkey
@@ -381,7 +382,6 @@ class LocCols(object):
         self.formats = config.get('index', 'fastqsanger')
         self.dbkey1 = config.get('index', dbkey)
         self.dbkey2 = config.get('index', dbkey)
-    
 
 def _build_galaxy_loc_line(dbkey, file_path, config, prefix, new_style, tool_name):
     """Prepare genome information to write to a Galaxy *.loc config file.
@@ -456,6 +456,8 @@ def _update_loc_file(ref_file, line_parts):
             if not contains(ref_file, add_str):
                 append(ref_file, add_str)
 
+# ## Indexing for specific aligners
+
 @_if_installed("faToTwoBit")
 def _index_twobit(ref_file):
     """Index reference files using 2bit for random access.
@@ -509,6 +511,18 @@ def _index_maq(ref_file):
                 binary_out))
     return os.path.join(dir_name, binary_out)
 
+def _index_w_command(dir_name, command, ref_file, ref_prep=None):
+    index_name = os.path.splitext(os.path.basename(ref_file))[0]
+    full_ref_path = os.path.join(os.pardir, ref_file)
+    if not exists(dir_name):
+        run("mkdir %s" % dir_name)
+        with cd(dir_name):
+            if ref_prep:
+                full_ref_path = ref_prep(full_ref_path)
+            print command
+            run(command.format(ref_file=full_ref_path, index_name=index_name))
+    return os.path.join(dir_name, index_name)
+
 @_if_installed("novoindex")
 def _index_novoalign(ref_file):
     dir_name = "novoalign"
@@ -535,6 +549,20 @@ def _index_sam(ref_file):
         if not exists("%s.fai" % local_file):
             run("samtools faidx %s" % local_file)
     return ref_file
+
+@_if_installed("MosaikJump")
+def _index_mosaik(ref_file):
+    hash_size = 13
+    dir_name = "mosaik"
+    cmd = "MosaikJump -hs {0} ".format(hash_size)
+    cmd += "-ia {ref_file} -out {index_name}"
+    def convert_to_mosaik(ref_file):
+        out_file = "{0}.dat".format(os.path.splitext(os.path.basename(ref_file))[0])
+        if not exists(out_file):
+            cmd = "MosaikBuild -fr {0} -oa {1}".format(ref_file, out_file)
+            run(cmd)
+        return out_file
+    return _index_w_command(dir_name, cmd, ref_file, ref_prep=convert_to_mosaik)
 
 @_if_installed("MakeLookupTable")
 def _index_arachne(ref_file):
