@@ -458,31 +458,33 @@ def _update_loc_file(ref_file, line_parts):
 
 # ## Indexing for specific aligners
 
+def _index_w_command(dir_name, command, ref_file, pre=None, post=None):
+    """Low level function to do the indexing and paths with an index command.
+    """
+    index_name = os.path.splitext(os.path.basename(ref_file))[0]
+    full_ref_path = os.path.join(os.pardir, ref_file)
+    if not exists(dir_name):
+        run("mkdir %s" % dir_name)
+        with cd(dir_name):
+            if pre:
+                full_ref_path = pre(full_ref_path)
+            run(command.format(ref_file=full_ref_path, index_name=index_name))
+            if post:
+                post(full_ref_path)
+    return os.path.join(dir_name, index_name)
+
 @_if_installed("faToTwoBit")
 def _index_twobit(ref_file):
     """Index reference files using 2bit for random access.
     """
     dir_name = "ucsc"
-    ref_base = os.path.splitext(os.path.split(ref_file)[-1])[0]
-    out_file = "%s.2bit" % ref_base
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-    with cd(dir_name):
-        if not exists(out_file):
-            run("faToTwoBit %s %s" % (os.path.join(os.pardir, ref_file),
-                out_file))
-    return os.path.join(dir_name, out_file)
+    cmd = "faToTwoBit {ref_file} {index_name}"
+    return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_bowtie(ref_file):
     dir_name = "bowtie"
-    ref_base = os.path.splitext(os.path.split(ref_file)[-1])[0]
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-        with cd(dir_name):
-            run("bowtie-build -f %s %s" % (
-                os.path.join(os.pardir, ref_file),
-                ref_base))
-    return os.path.join(dir_name, ref_base)
+    cmd = "bowtie-build -f {ref_file} {index_name}"
+    return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_bwa(ref_file):
     dir_name = "bwa"
@@ -501,47 +503,26 @@ def _index_bwa(ref_file):
 
 def _index_maq(ref_file):
     dir_name = "maq"
-    local_ref = os.path.split(ref_file)[-1]
-    binary_out = "%s.bfa" % os.path.splitext(local_ref)[0]
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-        with cd(dir_name):
-            run("ln -s %s" % os.path.join(os.pardir, ref_file))
-            run("maq fasta2bfa %s %s" % (local_ref,
-                binary_out))
-    return os.path.join(dir_name, binary_out)
-
-def _index_w_command(dir_name, command, ref_file, ref_prep=None):
-    index_name = os.path.splitext(os.path.basename(ref_file))[0]
-    full_ref_path = os.path.join(os.pardir, ref_file)
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-        with cd(dir_name):
-            if ref_prep:
-                full_ref_path = ref_prep(full_ref_path)
-            print command
-            run(command.format(ref_file=full_ref_path, index_name=index_name))
-    return os.path.join(dir_name, index_name)
+    cmd = "maq fasta2bfa {ref_file} {index_name}"
+    def link_local(ref_file):
+        local = os.path.basename(ref_file)
+        run("ln -s {0} {1}".format(ref_file, local))
+        return local
+    def rm_local(local_file):
+        run("rm -f {0}".format(local_file))
+    return _index_w_command(dir_name, cmd, ref_file, pre=link_local, post=rm_local)
 
 @_if_installed("novoindex")
 def _index_novoalign(ref_file):
     dir_name = "novoalign"
-    index_name = os.path.splitext(os.path.basename(ref_file))[0]
-    ref_file = os.path.join(os.pardir, ref_file)
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-        with cd(dir_name):
-            run("novoindex %s %s" % (index_name, ref_file))
+    cmd = "novoindex {index_name} {ref_file}"
+    return _index_w_command(dir_name, cmd, ref_file)
 
 @_if_installed("novoalignCS")
 def _index_novoalign_cs(ref_file):
     dir_name = "novoalign_cs"
-    index_name = os.path.splitext(os.path.basename(ref_file))[0]
-    ref_file = os.path.join(os.pardir, ref_file)
-    if not exists(dir_name):
-        run("mkdir %s" % dir_name)
-        with cd(dir_name):
-            run("novoindex -c %s %s" % (index_name, ref_file))
+    cmd = "novoindex -c {index_name} {ref_file}"
+    return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_sam(ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
@@ -562,7 +543,10 @@ def _index_mosaik(ref_file):
             cmd = "MosaikBuild -fr {0} -oa {1}".format(ref_file, out_file)
             run(cmd)
         return out_file
-    return _index_w_command(dir_name, cmd, ref_file, ref_prep=convert_to_mosaik)
+    def rm_local(local_file):
+        run("rm -f {0}".format(local_file))
+    return _index_w_command(dir_name, cmd, ref_file, pre=convert_to_mosaik,
+                            post=rm_local)
 
 @_if_installed("MakeLookupTable")
 def _index_arachne(ref_file):
