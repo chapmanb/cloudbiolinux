@@ -1,0 +1,21 @@
+---
+# Define haskell libraries to be installed via cabal.
+cabal:
+  # base
+  - network
+  - cabal-install
+  # libraries
+  - mtl
+  - parsec2
+  - parsec3
+  - quickcheck
+  - tagsoup
+  - utf8-string
+  - x11
+  - x11-xft
+  # bioinformatics
+  - bio
+  - Biobase
+  - flower
+  - flowsim
+  - samtools

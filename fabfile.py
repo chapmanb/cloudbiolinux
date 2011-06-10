@@ -373,13 +373,21 @@ def _clojure_library_installer(config):
     for lib in config['cljr']:
         run("cljr install %s" % lib)
 
+def _haskell_library_installer(config):
+    """Install haskell libraries using cabal.
+    """
+    run("cabal update")
+    for lib in config["cabal"]:
+        run("cabal install --root-cmd=sudo --global %s" % lib)
+
 lib_installers = {
-        "r-libs" : _r_library_installer,
-        "python-libs" : _python_library_installer,
-        "ruby-libs" : _ruby_library_installer,
-        "perl-libs" : _perl_library_installer,
-        "clojure-libs": _clojure_library_installer,
-        }
+    "r-libs" : _r_library_installer,
+    "python-libs" : _python_library_installer,
+    "ruby-libs" : _ruby_library_installer,
+    "perl-libs" : _perl_library_installer,
+    "clojure-libs": _clojure_library_installer,
+    "haskell-libs": _haskell_library_installer,
+    }
 
 def install_libraries(language):
     """High level target to install libraries for a specific language.

@@ -36,3 +36,4 @@ libraries:
   - python-libs
   - ruby-libs
   - perl-libs
+  - haskell-libs
