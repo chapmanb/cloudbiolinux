@@ -4,6 +4,7 @@ cabal:
   # base
   - network
   - cabal-install
+  - cabal-dev
   # libraries
   - mtl
   - parsec2
@@ -15,7 +16,6 @@ cabal:
   - x11-xft
   # bioinformatics
   - bio
-  - Biobase
   - flower
   - flowsim
   - samtools
