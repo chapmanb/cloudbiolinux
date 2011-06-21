@@ -194,25 +194,33 @@ class EnsemblGenome(_DownloadHelper):
 class BroadGenome(_DownloadHelper):
     """Retrieve genomes organized and sorted by Broad for use with GATK.
     """
-    def __init__(self, target_fasta):
+    def __init__(self, name, bundle_version, target_fasta):
         _DownloadHelper.__init__(self)
+        self._name = name
         self._target = target_fasta
-        self._ftp_url = "ftp://ftp.broadinstitute.org/pub/seq/references/"
+        self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
+                        "{ver}/{org}/".format(ver=bundle_version, org=name)
 
     def download(self, seq_dir):
-        if not self._exists(self._target, seq_dir):
-            run("wget %s/%s" % (self._ftp_url, self._target))
-        return self._target, []
+        org_file = "%s.fa" % self._name
+        if not self._exists(org_file, seq_dir):
+            run("wget %s%s.gz" % (self._ftp_url, self._target))
+            run("gunzip %s.gz" % self._target)
+            run("mv %s %s" % (self._target, org_file))
+        return org_file, []
+
+BROAD_BUNDLE_VERSION = "5974"
+DBSNP_VERSION = "132"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
            ("Scerevisiae", "sacCer2", UCSCGenome("sacCer2")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
-           ("Hsapiens", "hg18", UCSCGenome("hg18")),
-           ("Hsapiens", "hg18-broad", BroadGenome("Homo_sapiens_assembly18.fasta")),
-           ("Hsapiens", "GRCh37", BroadGenome("Homo_sapiens_assembly19.fasta")),
-           ("Hsapiens", "hg19", UCSCGenome("hg19")),
+           ("Hsapiens", "hg18", BroadGenome("hg18", BROAD_BUNDLE_VERSION,
+                                            "Homo_sapiens_assembly18.fasta")),
+           ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
+                                            "ucsc.hg19.fasta")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
@@ -273,7 +281,7 @@ def upload_s3(config_file=CONFIG_FILE):
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
 
 def _install_additional_data(genomes, config):
-    download_dbsnp(genomes)
+    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)

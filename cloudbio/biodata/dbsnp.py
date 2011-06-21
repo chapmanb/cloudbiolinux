@@ -9,10 +9,7 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-BROAD_BUNDLE_VERSION = "5974"
-DBSNP_VERSION = "132"
-
-def download_dbsnp(genomes):
+def download_dbsnp(genomes, bundle_version, dbsnp_version):
     """Download and install dbSNP variation data for supplied genomes.
     """
     folder_name = "variation"
@@ -23,14 +20,14 @@ def download_dbsnp(genomes):
         if not exists(vrn_dir):
             run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
-            _download_broad_dbsnp_bundle(gid)
+            _download_broad_dbsnp_bundle(gid, bundle_version, dbsnp_version)
 
-def _download_broad_dbsnp_bundle(gid):
-    broad_fname = "dbsnp_{ver}.{gid}.vcf".format(ver=DBSNP_VERSION, gid=gid)
+def _download_broad_dbsnp_bundle(gid, bundle_version, dbsnp_version):
+    broad_fname = "dbsnp_{ver}.{gid}.vcf".format(ver=dbsnp_version, gid=gid)
     fname = broad_fname.replace(".{0}".format(gid), "")
     base_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
                "{bundle}/{gid}/{fname}.gz".format(
-                   bundle=BROAD_BUNDLE_VERSION, fname=broad_fname, gid=gid)
+                   bundle=bundle_version, fname=broad_fname, gid=gid)
     if not exists(fname):
         run("wget %s" % base_url)
         run("gunzip %s" % os.path.basename(base_url))
