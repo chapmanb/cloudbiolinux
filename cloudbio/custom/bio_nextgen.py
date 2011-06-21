@@ -246,7 +246,7 @@ def install_gatk(env):
                     sudo("mv *.jar %s" % install_dir)
 
 def install_snpeff(env):
-    version = "1_9"
+    version = "1_9_5"
     genomes = ["hg37.61", "mm37.61"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version

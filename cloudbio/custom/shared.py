@@ -60,14 +60,15 @@ def _get_expected_file(url):
     raise ValueError("Did not find extract command for %s" % url)
 
 def _safe_dir_name(dir_name, need_dir=True):
-    replace_try = ["", "-src"]
+    replace_try = ["", "-src", "_core"]
     for replace in replace_try:
         check = dir_name.replace(replace, "")
         if exists(check):
             return check
     # still couldn't find it, it's a nasty one
     first_part = dir_name.split("-")[0].split("_")[0]
-    with settings(warn_only=True):
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
         dirs = run("ls -d1 *%s*/" % first_part).split("\n")
     if len(dirs) == 1:
         return dirs[0]
