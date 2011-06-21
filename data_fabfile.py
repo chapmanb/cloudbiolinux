@@ -10,6 +10,7 @@ Usage:
     fab -i key_file -H servername -f data_fabfile.py install_data
 """
 import os
+import sys
 import operator
 import socket
 import glob
@@ -26,6 +27,13 @@ try:
     import boto
 except ImportError:
     boto = None
+
+# use global cloudbio directory if installed, or utilize local if not
+try:
+    import cloudbio
+except ImportError:
+    sys.path.append(os.path.dirname(__file__))
+from cloudbio.biodata.dbsnp import download_dbsnp
 
 # -- Host specific setup for various groups of servers.
 
@@ -265,6 +273,7 @@ def upload_s3(config_file=CONFIG_FILE):
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
 
 def _install_additional_data(genomes, config):
+    download_dbsnp(genomes)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)
@@ -317,7 +326,7 @@ def _make_tmp_dir():
     if exists(work_dir):
         run("rm -rf %s" % work_dir)
 
-# == NGS
+# ## Genomes index for next-gen sequencing tools
 
 def _data_ngs_genomes(genomes, genome_indexes):
     """Download and create index files for next generation genomes.

@@ -19,8 +19,10 @@ genomes:
     name: phiX174
   - dbkey: hg18
     name: Human (hg18)
+    dbsnp: true
   - dbkey: hg19
     name: Human (hg19)
+    dbsnp: true
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: mm9
