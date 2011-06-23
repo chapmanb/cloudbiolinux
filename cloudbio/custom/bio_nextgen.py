@@ -199,7 +199,7 @@ system("java -cp $RealBin @java_args Shrec @args");
 
 @_if_not_installed("shrec")
 def install_shrec(env):
-    version = "2.1"
+    version = "2.2"
     url = "http://downloads.sourceforge.net/project/shrec-ec/SHREC%%20%s/bin.zip" % version
     use_sudo = True
     install_dir = _symlinked_java_version_dir("shrec", version, use_sudo=use_sudo)
@@ -207,14 +207,15 @@ def install_shrec(env):
     if install_dir:
         shrec_script = "%s/shrec" % install_dir
         with _make_tmp_dir() as work_dir:
-            run("wget %s" % (url))
-            run("unzip %s" % os.path.basename(url))
-            do_sudo("mv *.class %s" % install_dir)
-            for line in _shrec_run.split("\n"):
-                if line.strip():
-                    append(shrec_script, line, use_sudo=use_sudo)
-            do_sudo("chmod a+rwx %s" % shrec_script)
-            do_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
+            with cd(work_dir):
+                run("wget %s" % (url))
+                run("unzip %s" % os.path.basename(url))
+                do_sudo("mv *.class %s" % install_dir)
+                for line in _shrec_run.split("\n"):
+                    if line.strip():
+                        append(shrec_script, line, use_sudo=use_sudo)
+                do_sudo("chmod a+rwx %s" % shrec_script)
+                do_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
 
 # -- Analysis
 
