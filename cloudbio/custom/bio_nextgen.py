@@ -19,7 +19,8 @@ def install_ucsc_tools(env):
     tools = ["liftOver", "faToTwoBit", "bedToBigBed",
              "bigBedInfo", "bigBedSummary", "bigBedToBed",
              "bigWigInfo", "bigWigSummary", "bigWigToBedGraph", "bigWigToWig",
-             "fetchChromSizes", "wigToBigWig"]
+             "fetchChromSizes", "wigToBigWig", "faSize", "twoBitInfo",
+             "faCount"]
     url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/"
     install_dir = os.path.join(env.system_install, "bin")
     for tool in tools:
