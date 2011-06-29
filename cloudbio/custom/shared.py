@@ -88,7 +88,7 @@ def _fetch_and_unpack(url, need_dir=True):
         return _safe_dir_name(dir_name, need_dir)
 
 def _configure_make(env):
-    run("./configure --prefix=%s " % env.system_install)
+    run("./configure --disable-werror --prefix=%s " % env.system_install)
     run("make")
     sudo("make install")
 

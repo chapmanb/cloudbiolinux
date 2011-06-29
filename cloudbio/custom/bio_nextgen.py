@@ -274,7 +274,7 @@ def install_snpeff(env):
 
 @_if_not_installed("freebayes")
 def install_freebayes(env):
-    repository = "git clone git://github.com/ekg/freebayes.git"
+    repository = "git clone --recursive git://github.com/ekg/freebayes.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
 
 def _install_samtools_libs(env):

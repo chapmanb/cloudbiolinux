@@ -375,7 +375,7 @@ phylogeny:
     - bio-linux-mesquite
     - bio-linux-migrate
     - bio-linux-mrbayes-multi
-    - bio-linux-mothur
+    #- bio-linux-mothur
     - bio-linux-paml
     - bio-linux-omegamap
     - bio-linux-qtlcart
