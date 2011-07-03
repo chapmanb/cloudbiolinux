@@ -240,11 +240,11 @@ BioLinux normally creates a full system for Bioinformatics. The tools
 provided here to create such an environment are rather generic. So, if you want to
 install packages on any system, be it desktop, server or VM, the
 BioLinux tool set can be used to role your own. The first step it to us
-install_bare with a named package list, e.g.
+install_biolinux with a named package list, e.g.
 
-      fab -f fabfile.py -H localhost install_bare:packagelist=./contrib/minimal/main.yaml
+      fab -f fabfile.py -H localhost install_biolinux:packagelist=./contrib/minimal/main.yaml
 
-where install_bare is the fab entry point to a non-specific install,
+where install_biolinux is the fab entry point to a non-specific install,
 starting from the package list in the passed in packagelist. For more
 information see the section 'Rolling your own' in the BioLinux vagrant documentation in [./doc/vagrant.md][doc].
 

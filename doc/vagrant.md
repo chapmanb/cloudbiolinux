@@ -36,26 +36,29 @@ Creates a ./Vagrantfile describing the VM.
 
           vagrant init debian_squeeze_32
 
+Have a look inside the Vagrantfile. The default should be fine now.
+
 Start the VM (which gets copied the first time, which may take a while):
 
           vagrant up
 
 and login
 
-          vagrant ssh
+          vagrant ssh  # no password needed
 
-make sure you have enough disk space for the dir ~/VirtualBox\ VMs and
-~/.vagrant, as this is where VMs are copied.
+make sure you have enough disk space (twice the box size) for the dir
+~/VirtualBox\ VMs and ~/.vagrant, as this is where VMs are copied from the
+original box file.
 
-At this point a bare VM is running that will accept BioLinux
-installations. The next step is to pull the BioLinux tree and to run
-fab using the vagrant host, using a minimal install target. E.g.
+At this point a bare VM is running that will accept BioLinux installations. The
+next step is to pull the BioLinux tree on your local system, and to run fab using the
+vagrant host, using a minimal install target. E.g.
 
           export source=/path/to/cloudbiolinux
 
 and
 
-          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/minimal/fabricrc_debian.txt install_bare:packagelist=$source/contrib/minimal/main.yaml
+          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
 
 which uses the information from the local ./Vagrantfile. 
 
