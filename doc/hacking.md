@@ -10,6 +10,8 @@ installs the minimum of packages to bootstrap a full install. Minimal is invoked
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_bare:packagelist=$source/contrib/minimal/main.yaml
 
+where $source points to your biolinux source tree.
+
 The main.yaml file ascertains the major editors are included, as well remote
 access, version control, and the basic build system (gcc and friends). Note the
 Minimal edition overwrites the (apt) sources file to make sure there are no
