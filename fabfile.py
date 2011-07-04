@@ -22,7 +22,6 @@ from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
-import logging
 
 # use global cloudbio directory if installed, or utilize local if not
 try:
@@ -33,20 +32,9 @@ except ImportError:
 
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
+from cloudbio.utils import _setup_logging
 
 # ## Utility functions for establishing our build environment
-
-def _setup_logging():
-    env.logger = logging.getLogger("cloudbiolinux")
-    env.logger.setLevel(logging.DEBUG)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    # create formatter
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    # add formatter to ch
-    ch.setFormatter(formatter)
-    env.logger.addHandler(ch)
 
 def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
@@ -124,7 +112,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
       - libraries    Install programming language libraries
       - finalize     Setup freenx and clean-up environment
     """
-    _setup_logging()
+    _setup_logging(env)
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -181,7 +169,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
 
     fab install_custom_package:package_name
     """
-    _setup_logging()
+    _setup_logging(env)
     env.logger.info("Install custom software packages")
     if not automated:
         print env
@@ -392,7 +380,7 @@ lib_installers = {
 def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
-    _setup_logging()
+    _setup_logging(env)
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
