@@ -484,7 +484,6 @@ def _setup_apt_sources():
 
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
-    sudo("apt-get install -y --force-yes python-software-properties")
     env.edition.check_packages_source()
 
     comment = "# This file was modified for "+ env.edition.name
@@ -495,6 +494,7 @@ def _setup_apt_sources():
     for source in env.edition.rewrite_apt_sources_list(env.std_sources):
         env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
+            sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
         elif not contains(env.sources_file, source):
             append(env.sources_file, source, use_sudo=True)

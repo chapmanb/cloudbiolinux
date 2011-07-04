@@ -71,8 +71,10 @@ class BioNode(Edition):
             main_repository = 'http://ftp.us.debian.org/debian/'
         else:
             main_repository = env.debian_repository
-        new_sources = ["deb {repo} %s main contrib non-free".format(repo=main_repository),
-                       "deb {repo} %s-updates main contrib non-free".format(repo=main_repository)]
+        new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
+                                                                        dist=env.dist_name),
+                       "deb {repo} {dist}-updates main contrib non-free".format(
+                           repo=main_repository, dist=env.dist_name)]
         return sources + new_sources
 
 class Minimal(Edition):

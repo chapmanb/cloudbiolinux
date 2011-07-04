@@ -101,6 +101,7 @@ programming:
     - gfortran
     - stow
     - rsync
+    - python-software-properties
   libraries:
     - libatlas-base-dev
     - libatlas-dev
