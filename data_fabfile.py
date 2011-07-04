@@ -552,7 +552,7 @@ def _index_sam(ref_file):
 
 @_if_installed("MosaikJump")
 def _index_mosaik(ref_file):
-    hash_size = 13
+    hash_size = 15
     dir_name = "mosaik"
     cmd = "MosaikJump -hs {0} ".format(hash_size)
     cmd += "-ia {ref_file} -out {index_name}"
