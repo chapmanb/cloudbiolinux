@@ -26,6 +26,12 @@ def _setup_distribution_environment():
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _validate_target_distribution(env.distribution)
+    _cloudman_compatibility(env)
+
+def _cloudman_compatibility(env):
+    """Environmental variable naming for compatibility with CloudMan.
+    """
+    env.install_dir = env.system_install
 
 def _validate_target_distribution(dist):
     """Check target matches environment setting (for sanity)

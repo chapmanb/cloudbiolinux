@@ -37,6 +37,10 @@ bio_nextgen:
     - ucsc_tools
     - bfast
     - novoalign
+cloudman:
+  - nginx
+  - proftpd
+  - sge
 distributed:
   - mahout
   - pydoop
