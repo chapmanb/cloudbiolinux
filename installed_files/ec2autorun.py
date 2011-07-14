@@ -337,16 +337,33 @@ def _handle_yaml(user_data):
     log.debug("Composed user data: %s" % ud)
     with open(USER_DATA_FILE, 'w') as ud_yaml:
         yaml.dump(ud, ud_yaml, default_flow_style=False)
-    
+
+    if ud.has_key("freenxpass"):
+        _handle_freenx(ud["freenxpass"])
+
     # Get & run boot script
     if _get_boot_script(ud):
         _run_boot_script(DEFAULT_BOOT_SCRIPT_NAME)
+
+def _handle_freenx(passwd):
+    user = "ubuntu"
+    cl = ["/usr/bin/autopasswd", user, passwd]
+    subprocess.check_call(cl)
+    cl = ["sed", "-i" "'s/^PasswordAuthentication .*/PasswordAuthentication yes/'",
+          "/etc/ssh/sshd_config"]
+    subprocess.check_call(cl)
+    cl = ["/etc/init.d/ssh", "reload"]
+    subprocess.check_call(cl)
+    cl = ["dpkg-reconfigure", "-pcritical", "freenx-server"]
+    subprocess.check_call(cl)
 
 def _parse_user_data(ud):
     if ud == '':
         _handle_empty()
     elif _isurl(ud):
         _handle_url(ud)
+    elif ud.startswith("freenxpass="):
+        _handle_freenx(ud.strip().replace("freenxpass=", ""))
     else: # default to yaml
         _handle_yaml(ud)
 

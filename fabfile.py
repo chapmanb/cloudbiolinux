@@ -144,6 +144,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
         env.flavor.post_install()
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            _freenx_scripts()
             _configure_ec2_autorun(env)
             _cleanup_ec2(env)
 
@@ -550,11 +551,6 @@ def _freenx_scripts():
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
                 mode=0777)
-    userdata_script = "S20userdatapassnx.sh"
-    userdata_remote = "/etc/rc1.d/%s" % userdata_script
-    if not exists(userdata_remote):
-        put(os.path.join(install_file_dir, userdata_script), userdata_remote,
-            mode=0777, use_sudo=True)
 
 def _cleanup_space():
     """Cleanup to recover space from builds and packages.
