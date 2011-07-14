@@ -33,6 +33,7 @@ except ImportError:
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
+from cloudbio.cloudman import (_configure_ec2_autorun, _cleanup_ec2)
 
 # ## Utility functions for establishing our build environment
 
@@ -143,8 +144,8 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
         env.flavor.post_install()
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
-            _freenx_scripts()
-            _cleanup_ec2()
+            _configure_ec2_autorun(env)
+            _cleanup_ec2(env)
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -562,20 +563,3 @@ def _cleanup_space():
     sudo("rm -rf .cpanm")
     sudo("rm -f /var/crash/*")
 
-def _cleanup_ec2():
-    """Clean up any extra files after building.
-    """
-    env.logger.info("Cleaning up for EC2 AMI creation")
-    run("rm -f .bash_history")
-    sudo("rm -f /var/log/firstboot.done")
-    sudo("rm -f .nx_setup_done")
-    # RabbitMQ fails to start if its database is embedded into the image
-    # because it saves the current IP address or host name so delete it now.
-    # When starting up, RabbitMQ will recreate that directory.
-    sudo('/etc/init.d/rabbitmq-server stop')
-    for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
-        if exists(db_location):
-            sudo('rm -rf %s' % db_location)
-    # remove existing ssh host key pairs
-    # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
-    sudo("rm -f /etc/ssh/ssh_host_*")
