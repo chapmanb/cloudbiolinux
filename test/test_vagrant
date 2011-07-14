@@ -1,0 +1,45 @@
+#! /usr/bin/ruby
+
+print "Integration test script for CloudBioLinux\n"
+
+if ARGV.index('-h') or ARGV.index('--help')
+  print <<USAGE
+
+  Usage:
+
+    test_vagrant [edition] [flavor]
+
+      edition       The target edition (default Minimal)
+      flavor        The target flavor (default Minimal)
+
+  Example:
+
+     cd cloudbiolinux/test
+     test_vagrant Minimal       # test Minimal edition
+
+    Note: this testing framework is under development
+
+USAGE
+  exit 0
+end
+
+srcpath = File.dirname(File.dirname(__FILE__))
+
+edition_name = ARGV.shift
+edition_name = 'Minimal' if !edition_name
+flavor_name  = ARGV.shift
+flavor_name  = 'Minimal' if !flavor_name
+
+box = { 'Minimal' => [ 'debian-squeeze-32', 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box' ]}
+
+print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
+raise "Unknown box for #{edition_name}" if !box[edition_name]
+
+# find or install vagrant
+print "gem install vagrant" if `which vagrant` !~ /vagrant/
+
+# download box, if not there
+run "vagrant box add debian_squeeze_32 debian_squeeze_32.box"
+
+
+
