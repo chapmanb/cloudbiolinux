@@ -349,7 +349,7 @@ def _handle_freenx(passwd):
     user = "ubuntu"
     cl = ["/usr/bin/autopasswd", user, passwd]
     subprocess.check_call(cl)
-    cl = ["sed", "-i" "'s/^PasswordAuthentication .*/PasswordAuthentication yes/'",
+    cl = ["sed", "-i", "'s/^PasswordAuthentication .*/PasswordAuthentication yes/'",
           "/etc/ssh/sshd_config"]
     subprocess.check_call(cl)
     cl = ["/etc/init.d/ssh", "reload"]
