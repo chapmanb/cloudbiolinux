@@ -3,12 +3,17 @@
 The BioLinux tools allow building a full environment for Bioinformatics. The
 design allows for flexible targets (Editions) and specializations (Flavors).
 
+Please read the README and ./doc/vagrant documentation that come with the
+source tree first.
+
 == Start with the Minimal edition
 
 The Minimal edition is the smallest common denominator of all Editions, as it
 installs the minimum of packages to bootstrap a full install. Minimal is invoked by
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_bare:packagelist=$source/contrib/minimal/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+
+where $source points to your biolinux source tree.
 
 The main.yaml file ascertains the major editors are included, as well remote
 access, version control, and the basic build system (gcc and friends). Note the
@@ -21,7 +26,7 @@ To expand on the package list you can define your own main.yaml, and pass that
 in. In your main.yaml file add the meta-packages listed in
 config/packages.yaml. Invoke your new package list with
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_bare:packagelist=myproject/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=myproject/main.yaml
 
 It is that simple!
 
@@ -41,7 +46,7 @@ flavor in ./contrib/flavor/pjotrp/biotest/biotestflavor.py, named BioTestFlavor
 fabricrc.txt file, and a new main.yaml file.  So kicking it into submission
 would look like:
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_bare:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
 The flavor module itsefl sets env.flavor on loading the module (this can only
 happen once). For examples see the files in ./contrib/flavor.
@@ -123,7 +128,7 @@ a script by adding a post_install method to your flavor. E.g.
 You can run only the post_install (convinient for testing!) using the post_install
 target, e.g.
 
-         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_bare:packagelist=$flavor/main.yaml,target=post_install
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,target=post_install
 
 Now, is this neat, or what? For a full Flavor example see 
 
