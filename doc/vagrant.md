@@ -4,6 +4,8 @@ This document gives some additional information on using Vagrant with BioLinux.
 [Vagrant][v1] is a convenient command line manager for VirtualBox. In conjunction
 with the BioLinux fabric environment, any VirtualBox VM can be bootstrapped.
 
+Note the current version of vagrant needs at least VirtualBox version 4.0.x.
+
 # Rolling your own
 
 ## Start from a BioLinux box

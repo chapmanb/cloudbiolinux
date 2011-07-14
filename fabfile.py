@@ -496,6 +496,7 @@ def _setup_apt_sources():
 
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
+    env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     sudo("apt-get install -y --force-yes python-software-properties")
     env.edition.check_packages_source()
 
