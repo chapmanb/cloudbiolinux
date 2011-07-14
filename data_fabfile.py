@@ -15,6 +15,7 @@ import operator
 import socket
 import glob
 import subprocess
+import logging
 from contextlib import contextmanager
 from xml.etree import ElementTree
 
@@ -34,30 +35,24 @@ try:
 except ImportError:
     sys.path.append(os.path.dirname(__file__))
 from cloudbio.biodata.dbsnp import download_dbsnp
+from cloudbio.distribution import _setup_distribution_environment
+from cloudbio.utils import _setup_logging
 
 # -- Host specific setup for various groups of servers.
 
-env.config_dir = os.path.join(os.path.dirname(__file__), "config")
 env.remove_old_genomes = False
 
 def setup_environment():
     """Setup environment with required data file locations.
     """
+    _setup_logging(env)
     _add_defaults()
-    _amazon_ec2_environment()
-
-def _amazon_ec2_environment():
-    """Setup for a ubuntu amazon ec2 share; defaults if not set.
-
-    Need to pass in host and private key file on commandline:
-        -H hostname -i private_key_file
-    """
-    if not env.has_key("user") or not env.user:
-        env.user = 'ubuntu'
+    _setup_distribution_environment()
 
 def _add_defaults():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
+    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
     if not env.has_key("distribution"):
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
@@ -336,12 +331,19 @@ def _make_tmp_dir():
 
 # ## Genomes index for next-gen sequencing tools
 
+def _make_genome_dir():
+    genome_dir = os.path.join(env.data_files, "genomes")
+    with settings(warn_only=True):
+        result = run("mkdir -p %s" % genome_dir)
+    if result.failed:
+        sudo("mkdir -p %s" % genome_dir)
+        sudo("chown %s %s" % (env.user, genome_dir))
+    return genome_dir
+
 def _data_ngs_genomes(genomes, genome_indexes):
     """Download and create index files for next generation genomes.
     """
-    genome_dir = os.path.join(env.data_files, "genomes")
-    if not exists(genome_dir):
-        run('mkdir -p %s' % genome_dir)
+    genome_dir = _make_genome_dir()
     for organism, genome, manager in genomes:
         cur_dir = os.path.join(genome_dir, organism, genome)
         if not exists(cur_dir):
@@ -550,7 +552,7 @@ def _index_sam(ref_file):
 
 @_if_installed("MosaikJump")
 def _index_mosaik(ref_file):
-    hash_size = 13
+    hash_size = 15
     dir_name = "mosaik"
     cmd = "MosaikJump -hs {0} ".format(hash_size)
     cmd += "-ia {ref_file} -out {index_name}"
@@ -632,7 +634,7 @@ def _index_eland(ref_file):
 def _download_genomes(genomes, genome_indexes):
     """Download a group of genomes from Amazon s3 bucket.
     """
-    genome_dir = os.path.join(env.data_files, "genomes")
+    genome_dir = _make_genome_dir()
     for (orgname, gid, manager) in genomes:
         org_dir = os.path.join(genome_dir, orgname, gid)
         if not exists(org_dir):

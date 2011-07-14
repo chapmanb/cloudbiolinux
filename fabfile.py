@@ -22,31 +22,19 @@ from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
-import logging
 
-# use global cloudbio directory if installed, or utilize local if not
-try:
-    import cloudbio
-except ImportError:
-    sys.path.append(os.path.dirname(__file__))
-    import cloudbio
+# use local cloudbio directory
+for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
+    sys.path.remove(to_remove)
+sys.path.append(os.path.dirname(__file__))
+import cloudbio
 
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
+from cloudbio.utils import _setup_logging
+from cloudbio.cloudman import (_configure_ec2_autorun, _cleanup_ec2)
 
 # ## Utility functions for establishing our build environment
-
-def _setup_logging():
-    env.logger = logging.getLogger("cloudbiolinux")
-    env.logger.setLevel(logging.DEBUG)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    # create formatter
-    formatter = logging.Formatter('%(name)s %(levelname)s: %(message)s')
-    # add formatter to ch
-    ch.setFormatter(formatter)
-    env.logger.addHandler(ch)
 
 def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
@@ -124,7 +112,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
       - libraries    Install programming language libraries
       - finalize     Setup freenx and clean-up environment
     """
-    _setup_logging()
+    _setup_logging(env)
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -156,7 +144,8 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
-            _cleanup_ec2()
+            _configure_ec2_autorun(env)
+            _cleanup_ec2(env)
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -181,7 +170,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
 
     fab install_custom_package:package_name
     """
-    _setup_logging()
+    _setup_logging(env)
     env.logger.info("Install custom software packages")
     if not automated:
         print env
@@ -392,7 +381,7 @@ lib_installers = {
 def install_libraries(language):
     """High level target to install libraries for a specific language.
     """
-    _setup_logging()
+    _setup_logging(env)
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -497,7 +486,6 @@ def _setup_apt_sources():
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
-    sudo("apt-get install -y --force-yes python-software-properties")
     env.edition.check_packages_source()
 
     comment = "# This file was modified for "+ env.edition.name
@@ -508,6 +496,7 @@ def _setup_apt_sources():
     for source in env.edition.rewrite_apt_sources_list(env.std_sources):
         env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
+            sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
         elif not contains(env.sources_file, source):
             append(env.sources_file, source, use_sudo=True)
@@ -562,11 +551,6 @@ def _freenx_scripts():
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
                 mode=0777)
-    userdata_script = "S20userdatapassnx.sh"
-    userdata_remote = "/etc/rc1.d/%s" % userdata_script
-    if not exists(userdata_remote):
-        put(os.path.join(install_file_dir, userdata_script), userdata_remote,
-            mode=0777, use_sudo=True)
 
 def _cleanup_space():
     """Cleanup to recover space from builds and packages.
@@ -575,20 +559,3 @@ def _cleanup_space():
     sudo("rm -rf .cpanm")
     sudo("rm -f /var/crash/*")
 
-def _cleanup_ec2():
-    """Clean up any extra files after building.
-    """
-    env.logger.info("Cleaning up for EC2 AMI creation")
-    run("rm -f .bash_history")
-    sudo("rm -f /var/log/firstboot.done")
-    sudo("rm -f .nx_setup_done")
-    # RabbitMQ fails to start if its database is embedded into the image
-    # because it saves the current IP address or host name so delete it now.
-    # When starting up, RabbitMQ will recreate that directory.
-    sudo('/etc/init.d/rabbitmq-server stop')
-    for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
-        if exists(db_location):
-            sudo('rm -rf %s' % db_location)
-    # remove existing ssh host key pairs
-    # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
-    sudo("rm -f /etc/ssh/ssh_host_*")

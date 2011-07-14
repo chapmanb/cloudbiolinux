@@ -45,7 +45,6 @@ def _setup_ubuntu():
     env.logger.info("Ubuntu setup")
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
-    version = env.dist_name
     sources = [
       "deb http://us.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
       "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
@@ -58,19 +57,18 @@ def _setup_ubuntu():
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
     ] + shared_sources
-    env.std_sources = _add_source_versions(version, sources)
+    env.std_sources = _add_source_versions(env.dist_name, sources)
 
 def _setup_debian():
     env.logger.info("Debian setup")
     shared_sources = _setup_deb_general()
-    version = env.dist_name
     sources = [
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
         "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
     # fill in %s
-    env.std_sources = _add_source_versions(version, sources)
+    env.std_sources = _add_source_versions(env.dist_name, sources)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
