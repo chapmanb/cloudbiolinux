@@ -39,6 +39,7 @@ minimal:
     - cmake
     - swig
   util:
+    - axel
     - rsync
     - openssh-server
     - screen
@@ -94,6 +95,7 @@ programming:
     - libncurses5-dev
     - zlib1g-dev
     - libssl-dev
+    - libpcre3
     - libpcre3-dev
     - libreadline5-dev
     - gcc
@@ -142,7 +144,6 @@ programming:
     - virtualbox-4.0
     - dkms
   util:
-    - nfs-kernel-server
     - tree
     - screen
     - time
@@ -156,6 +157,7 @@ programming:
 # http://aws.amazon.com/elasticmapreduce/
 distributed:
   - rabbitmq-server
+  - nfs-kernel-server
   - hadoop-0.20
   - hadoop-pig
   - hadoop-hive
