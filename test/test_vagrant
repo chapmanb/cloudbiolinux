@@ -48,6 +48,7 @@ USAGE
 end
 
 srcpath = File.dirname(File.dirname(__FILE__))
+print srcpath, "\n"
 
 edition_name = ARGV.shift
 use_running_vm = false
