@@ -20,11 +20,13 @@ end
 if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
+    Note this testing framework is under development
+
   Usage:
 
-    test_vagrant [--running] [edition] [flavor]
+    test_vagrant [--continue] [edition] [flavor]
 
-      --running     Use an already running VM (no VM setup)
+      --continue    Continue on an already running VM (no VM setup)
       edition       The target edition (default Minimal)
       flavor        The target flavor (default Base)
 
@@ -33,10 +35,8 @@ if ARGV.index('-h') or ARGV.index('--help')
      cd cloudbiolinux/test
      test_vagrant Minimal       # test Minimal edition
 
-  The base install name.box will be pulled over the Internet, unless
+  The base install vm.box will be pulled over the Internet, unless
   it exist in the local directory.
-
-  Note: this testing framework is under development
 
   Available targets:
 
@@ -52,7 +52,7 @@ print srcpath, "\n"
 
 edition_name = ARGV.shift
 use_running_vm = false
-if edition_name == '--running'
+if edition_name == '--continue'
   use_running_vm = true
   edition_name = ARGV.shift
 end
@@ -72,7 +72,7 @@ print "gem install vagrant" if `which vagrant` !~ /vagrant/
 testname = "biolinux_"+File.basename(localbox,".box")
 
 if use_running_vm
-  print "Using already running VM #{testname}\n"
+  print "Continuing on an already running VM #{testname}\n"
 else
   # Remove old box, if there
   run "vagrant box remove #{testname}"
