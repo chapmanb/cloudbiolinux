@@ -63,7 +63,9 @@ print "gem install vagrant" if `which vagrant` !~ /vagrant/
 
 # Name a temporary dir
 testname = "biolinux_"+File.basename(localbox,".box")
-Dir.mkdir(testname) if !File.directory?(testname)
+
+# Remove old box, if there
+run "vagrant box remove #{testname}"
 
 if File.exist?(localbox)
   print "Starting from local #{localbox}\n"
@@ -73,4 +75,10 @@ else
   run "vagrant box add #{testname} #{remotebox}"
 end
 
-
+Dir.mkdir(testname) if !File.directory?(testname)
+Dir.chdir(testname) do
+  print `ls -l`
+  run "vagrant init #{testname}"
+  run "vagrant up"
+  run "vagrant ssh"
+end
