@@ -1,6 +1,21 @@
 #! /usr/bin/ruby
+#
+# Integration testing of BioLinux targets - see 
+#
+#   ./test/test_vagrant --help
+#
+
+# Available testing targets - this could be read from a YAML file.
+BOX = { 'Minimal' => 
+           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box' }
+}
 
 print "Integration test script for CloudBioLinux\n"
+
+def run cmd
+  print cmd
+  system(cmd)
+end
 
 if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
@@ -17,9 +32,17 @@ if ARGV.index('-h') or ARGV.index('--help')
      cd cloudbiolinux/test
      test_vagrant Minimal       # test Minimal edition
 
-    Note: this testing framework is under development
+  The base install name.box will be pulled over the Internet, unless
+  it exist in the local directory.
+
+  Note: this testing framework is under development
+
+  Available targets:
 
 USAGE
+  BOX.each do | edition, properties |
+    print "* ", edition, " (",properties[:url],")\n"
+  end
   exit 0
 end
 
@@ -30,16 +53,24 @@ edition_name = 'Minimal' if !edition_name
 flavor_name  = ARGV.shift
 flavor_name  = 'Minimal' if !flavor_name
 
-box = { 'Minimal' => [ 'debian-squeeze-32', 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box' ]}
-
 print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
-raise "Unknown box for #{edition_name}" if !box[edition_name]
+raise "Unknown box for #{edition_name}" if !BOX[edition_name]
+remotebox = BOX[edition_name][:url]
+localbox = File.basename(remotebox)
 
 # find or install vagrant
 print "gem install vagrant" if `which vagrant` !~ /vagrant/
 
-# download box, if not there
-run "vagrant box add debian_squeeze_32 debian_squeeze_32.box"
+# Name a temporary dir
+testname = "biolinux_"+File.basename(localbox,".box")
+Dir.mkdir(testname) if !File.directory?(testname)
 
+if File.exist?(localbox)
+  print "Starting from local #{localbox}\n"
+  run "vagrant box add #{testname} #{localbox}"
+else
+  print "Fetching #{remotebox}\n"
+  run "vagrant box add #{testname} #{remotebox}"
+end
 
 
