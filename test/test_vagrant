@@ -5,6 +5,8 @@
 #   ./test/test_vagrant --help
 #
 
+USE_EXISTING_BOX = true
+
 # Available testing targets - this could be read from a YAML file.
 BOX = { 'Minimal' => 
            { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box' }
@@ -13,7 +15,7 @@ BOX = { 'Minimal' =>
 print "Integration test script for CloudBioLinux\n"
 
 def run cmd
-  print cmd
+  print "--> ",cmd
   system(cmd)
 end
 
@@ -64,21 +66,43 @@ print "gem install vagrant" if `which vagrant` !~ /vagrant/
 # Name a temporary dir
 testname = "biolinux_"+File.basename(localbox,".box")
 
-# Remove old box, if there
-run "vagrant box remove #{testname}"
+if not USE_EXISTING_BOX
+  # Remove old box, if there
+  run "vagrant box remove #{testname}"
 
-if File.exist?(localbox)
-  print "Starting from local #{localbox}\n"
-  run "vagrant box add #{testname} #{localbox}"
-else
-  print "Fetching #{remotebox}\n"
-  run "vagrant box add #{testname} #{remotebox}"
+  if File.exist?(localbox)
+    print "Starting from local #{localbox}\n"
+    run "vagrant box add #{testname} #{localbox}"
+  else
+    print "Fetching #{remotebox}\n"
+    run "vagrant box add #{testname} #{remotebox}"
+  end
+
+  Dir.mkdir(testname) if !File.directory?(testname)
+  # Bring VM up
+  Dir.chdir(testname) do
+    print `ls -l`
+    run "vagrant init #{testname}"
+    run "vagrant up"
+  end
 end
 
-Dir.mkdir(testname) if !File.directory?(testname)
+# Using the VM
 Dir.chdir(testname) do
-  print `ls -l`
-  run "vagrant init #{testname}"
-  run "vagrant up"
-  run "vagrant ssh"
+  # Fetch the vagrant ssh key, and store it locally
+  # First see if we can copy a file - if we can there is no need to update .ssh/config
+  File.unlink('remote_hosts') if File.exists?('remote_hosts')
+  run "scp vagrant:/etc/hosts remote_hosts"
+  if !File.exist?('remote_hosts')
+    run "vagrant ssh-config >> ~/.ssh/config"
+    run "scp vagrant:/etc/hosts remote_hosts"
+  end
+  raise "Problem connecting to remote hosts (using scp)" if !File.exist?('remote_hosts')
+  File.unlink('remote_hosts')
+  # run "vagrant status"
+  print "We can use #{testname}!\n"
 end
+
+# export source=/path/to/cloudbiolinux
+# fab -f $source/fabfile.py -H vagrant  -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+
