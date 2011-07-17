@@ -1,0 +1,9 @@
+include *fabfile.py
+include *.md
+include *.mkd
+include config/*.yaml
+include config/fabricrc.txt
+include config/README.md
+include doc/*.md
+include installed_files/*
+include utils/*

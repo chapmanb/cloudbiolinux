@@ -15,9 +15,6 @@ setup(name = "cloudbiolinux",
       url = "http://cloudbiolinux.org",
       packages = find_packages(),
       scripts = [],
-      package_data = {
-          'config' : ['*.yaml'],
-          },
       install_requires = [
           "PyYAML >= 3.09",
           "fabric >= 1.1.1"]
