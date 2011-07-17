@@ -67,10 +67,13 @@ class BioNode(Edition):
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
     def rewrite_apt_sources_list(self, sources):
+        self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
+        # See if the repository is defined in env
         if not env.get('debian_repository'):
             main_repository = 'http://ftp.us.debian.org/debian/'
         else:
             main_repository = env.debian_repository
+        # The two basic repositories
         new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
                                                                         dist=env.dist_name),
                        "deb {repo} {dist}-updates main contrib non-free".format(
@@ -87,7 +90,7 @@ class Minimal(Edition):
 
     def rewrite_apt_sources_list(self, sources):
         """Allows editions to modify the sources list. Minimal only
-           uses the default packages
+           uses the barest default packages
         """
         return []
 

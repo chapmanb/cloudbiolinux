@@ -100,7 +100,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
     This allows a different main package list (the main YAML file is passed in),
     and/or use of Flavor. So you can say:
 
-      install_bare:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
+      install_biolinux:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
 
     Both packagelist and flavor, as well as the Edition, can also be passed in
     through the fabricrc file.
@@ -485,6 +485,7 @@ def _setup_apt_sources():
 
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
+    env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
 
     comment = "# This file was modified for "+ env.edition.name
