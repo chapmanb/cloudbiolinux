@@ -159,7 +159,7 @@ def _custom_installs(to_install):
         run("mkdir -p %s" % env.local_install)
     pkg_config = os.path.join(env.config_dir, "custom.yaml")
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
-    for p in env.flavor.rewrite_custom_list(packages):
+    for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
 def install_custom(p, automated=False, pkg_to_group=None):
@@ -319,7 +319,7 @@ def _python_library_installer(config):
     """
     version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
     env.safe_sudo("easy_install%s -U pip" % version_ext)
-    for pname in env.flavor.rewrite_python_egg_list(config['pypi']):
+    for pname in env.flavor.rewrite_config_items("python", config['pypi']):
         env.safe_sudo("easy_install%s -U %s" % (version_ext, pname))
         # Use pip when it doesn't re-download even if latest package installed
         # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
@@ -335,7 +335,7 @@ def _ruby_library_installer(config):
             gem_info = run("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
-    for gem in env.flavor.rewrite_ruby_gem_list(config['gems']):
+    for gem in env.flavor.rewrite_config_items("ruby", config['gems']):
         # update current gems only to check for new installs
         if gem not in installed:
             installed = _cur_gems()
@@ -351,7 +351,7 @@ def _perl_library_installer(config):
     run("chmod a+rwx cpanm")
     env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""
-    for lib in env.flavor.rewrite_perl_cpan_list(config['cpan']):
+    for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
@@ -415,7 +415,7 @@ def _apt_packages(to_install):
     (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
                                       subs_pkg_config_file)
     # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_packages_list(packages)
+    packages = env.flavor.rewrite_config_items("packages", packages)
 
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
@@ -515,7 +515,7 @@ def _yum_packages(to_install):
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
     # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_packages_list(packages)
+    packages = env.flavor.rewrite_config_items("packages", packages)
     for package in packages:
         sudo("yum -y install %s" % package)
 

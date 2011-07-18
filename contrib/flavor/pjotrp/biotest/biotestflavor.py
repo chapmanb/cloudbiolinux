@@ -12,22 +12,21 @@ class BioTestFlavor(Flavor):
         Flavor.__init__(self,env)
         self.name = "Bio* cross-lang flavor"
 
-    def rewrite_packages_list(self, list):
-        # list.remove('screen')
-        # list.append('test')
-        return list
-
-    def rewrite_python_egg_list(self, list):
-        return [ 'biopython' ]
-
-    def rewrite_perl_cpan_list(self, list):
-        return [ 'bioperl' ]
-
-    def rewrite_ruby_gem_list(self, list):
-        return [ 'bio' ]
-
-    def rewrite_custom_list(self, list):
-        return []
+    def rewrite_config_items(self, name, items):
+        if name == "packages":
+            # list.remove('screen')
+            # list.append('test')
+            return items
+        elif name == "python":
+            return [ 'biopython' ]
+        elif name == "perl":
+            return [ 'bioperl' ]
+        elif name == "ruby":
+            return [ 'bio' ]
+        elif name == "custom":
+            return []
+        else:
+            return items
 
     def post_install(self):
         env.logger.info("Starting post-install")
