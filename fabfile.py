@@ -328,10 +328,11 @@ def _python_library_installer(config):
 def _ruby_library_installer(config):
     """Install ruby specific gems.
     """
+    gem_ext = getattr(env, "ruby_version_ext", "")
     def _cur_gems():
         with settings(
                 hide('warnings', 'running', 'stdout', 'stderr')):
-            gem_info = run("gem list --no-versions")
+            gem_info = run("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
     for gem in env.flavor.rewrite_ruby_gem_list(config['gems']):
@@ -339,9 +340,9 @@ def _ruby_library_installer(config):
         if gem not in installed:
             installed = _cur_gems()
         if gem in installed:
-            env.safe_sudo("gem update %s" % gem)
+            env.safe_sudo("gem%s update %s" % (gem_ext, gem))
         else:
-            env.safe_sudo("gem install %s" % gem)
+            env.safe_sudo("gem%s install %s" % (gem_ext, gem))
 
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
@@ -367,7 +368,8 @@ def _haskell_library_installer(config):
     """
     run("cabal update")
     for lib in config["cabal"]:
-        run("cabal install --root-cmd=sudo --global %s" % lib)
+        sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
+        run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
     "r-libs" : _r_library_installer,
