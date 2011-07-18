@@ -93,7 +93,7 @@ def _setup_deb_general():
     env.logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
     env.python_version_ext = ""
-    env.ruby_version_ext = ""
+    env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
