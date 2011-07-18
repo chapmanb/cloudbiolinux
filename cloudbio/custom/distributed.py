@@ -39,8 +39,8 @@ def install_pydoop(env):
                              "&& export JAVA_HOME=%s" % (hadoop_version,
                                 os.path.join(os.pardir, hadoop_dir), java_home)
                 run("%s && python%s setup.py build" % (export_str, pyext))
-                sudo("%s && python%s setup.py install --skip-build" %
-                     (export_str, pyext))
+                env.safe_sudo("%s && python%s setup.py install --skip-build" %
+                              (export_str, pyext))
 
 def install_mahout(env):
     # ToDo setup mahout, must be checked out from repo ATM:

@@ -15,7 +15,7 @@ def install_cljr(env):
     """
     run("wget http://incanter.org/downloads/cljr-installer.jar")
     run("java -jar cljr-installer.jar")
-    sudo("ln -s .cljr/bin/cljr /usr/bin")
+    env.safe_sudo("ln -s .cljr/bin/cljr /usr/bin")
     run("rm cljr-installer.jar")
 
 @_if_not_installed("lein")
@@ -24,5 +24,5 @@ def install_leinengin(env):
     """
     run("wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein")
     run("chmod a+rwx lein")
-    sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
+    env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
     run("lein self-install")
