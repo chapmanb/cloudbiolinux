@@ -15,7 +15,29 @@ exec python %s/ec2autorun.py
 """
 import os
 
+from fabric.api import sudo, run, put
+from fabric.contrib.files import exists, settings, contains, append
+
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
+
+def _configure_cloudman(env, use_repo_autorun=False):
+    _setup_users(env)
+    _configure_ec2_autorun(env, use_repo_autorun)
+    _configure_sge(env)
+    _configure_nfs(env)
+
+def _setup_users(env):
+    def _add_user(username, uid=None):
+        """ Add user with username to the system """
+        if not contains('/etc/passwd', "%s:" % username):
+            uid_str = "--uid %s" % uid if uid else ""
+            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' +
+                 '-c"Galaxy-required user" %s --user-group %s' % \
+                     (username, uid_str, username))
+    # Must specify uid for 'galaxy' user because of the configuration for proFTPd
+    _add_user('galaxy', '1001')
+    _add_user('sgeadmin')
+    _add_user('postgres')
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
@@ -33,6 +55,21 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     remote_file = '/etc/init/%s' % cloudman_boot_file
     put(cloudman_boot_file, remote_file, use_sudo=777)
     os.remove(cloudman_boot_file)
+
+def _configure_sge(env):
+    """This method only sets up the environment for SGE w/o actually setting up SGE"""
+    sge_root = '/opt/sge'
+    if not exists(sge_root):
+        sudo("mkdir -p %s" % sge_root)
+        sudo("chown sgeadmin:sgeadmin %s" % sge_root)
+
+def _configure_nfs(env):
+    exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
+                '/mnt/galaxyData    *(rw,sync,no_root_squash,subtree_check,no_wdelay)',
+                '/mnt/galaxyIndices *(rw,sync,no_root_squash,no_subtree_check)',
+                '/mnt/galaxyTools   *(rw,sync,no_root_squash,no_subtree_check)',
+                '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
+    append('/etc/exports', exports, use_sudo=True)
 
 def _cleanup_ec2(env):
     """Clean up any extra files after building.

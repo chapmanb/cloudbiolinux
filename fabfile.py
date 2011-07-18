@@ -1,4 +1,4 @@
-"""Main Fabric deployment file for BioLinux distributionrepo=.
+"""Main Fabric deployment file for CloudBioLinux distribution.
 
 This installs a standard set of useful biological applications on a remote
 server. It is designed for bootstrapping a machine from scratch, as with new
@@ -32,7 +32,7 @@ import cloudbio
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
-from cloudbio.cloudman import (_configure_ec2_autorun, _cleanup_ec2)
+from cloudbio.cloudman import (_configure_cloudman, _cleanup_ec2)
 
 # ## Utility functions for establishing our build environment
 
@@ -144,7 +144,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
-            _configure_ec2_autorun(env)
+            _configure_cloudman(env)
             _cleanup_ec2(env)
 
 def _check_fabric_version():

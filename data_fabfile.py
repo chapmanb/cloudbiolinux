@@ -29,11 +29,10 @@ try:
 except ImportError:
     boto = None
 
-# use global cloudbio directory if installed, or utilize local if not
-try:
-    import cloudbio
-except ImportError:
-    sys.path.append(os.path.dirname(__file__))
+# use local cloudbio directory
+for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
+    sys.path.remove(to_remove)
+sys.path.append(os.path.dirname(__file__))
 from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
