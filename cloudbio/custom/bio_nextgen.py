@@ -26,8 +26,8 @@ def install_ucsc_tools(env):
     for tool in tools:
         with cd(install_dir):
             if not exists(tool):
-                sudo("wget %s%s" % (url, tool))
-                sudo("chmod a+rwx %s" % tool)
+                env.safe_sudo("wget %s%s" % (url, tool))
+                env.safe_sudo("chmod a+rwx %s" % tool)
 
 # --- Alignment tools
 
@@ -106,14 +106,14 @@ def install_novoalign(env):
                         "novo2sam.pl", "novoalign", "novobarcode",
                         "novoindex", "novope2bed.pl", "novorun.pl",
                         "novoutil"]:
-                    sudo("mv %s %s" % (fname, install_dir))
+                    env.safe_sudo("mv %s %s" % (fname, install_dir))
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, cs_url)
             run("tar -xzvpf novoalignCS%s.gcc.tar.gz" % cs_version)
             with cd("novoalignCS"):
                 for fname in ["novoalignCS"]:
-                    sudo("mv %s %s" % (fname, install_dir))
+                    env.safe_sudo("mv %s %s" % (fname, install_dir))
 
 @_if_not_installed("lastz")
 def install_lastz(env):
@@ -153,7 +153,7 @@ def install_solexaqa(env):
         with cd(work_dir):
             run("wget %s" % url)
             run("unzip %s" % os.path.basename(url))
-            sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
+            env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
 @_if_not_installed("fastqc")
 def install_fastqc(env):
@@ -161,17 +161,17 @@ def install_fastqc(env):
     url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
           "fastqc_v%s.zip" % version
     executable = "fastqc"
-    install_dir = _symlinked_java_version_dir("fastqc", version)
+    install_dir = _symlinked_java_version_dir("fastqc", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 run("wget %s" % (url))
                 run("unzip %s" % os.path.basename(url))
                 with cd("FastQC"):
-                    sudo("chmod a+rwx %s" % executable)
-                    sudo("mv * %s" % install_dir)
-                sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
-                                                env.system_install, executable))
+                    env.safe_sudo("chmod a+rwx %s" % executable)
+                    env.safe_sudo("mv * %s" % install_dir)
+                env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
+                                                         env.system_install, executable))
 
 @_if_not_installed("intersectBed")
 def install_bedtools(env):
@@ -202,21 +202,19 @@ system("java -cp $RealBin @java_args Shrec @args");
 def install_shrec(env):
     version = "2.2"
     url = "http://downloads.sourceforge.net/project/shrec-ec/SHREC%%20%s/bin.zip" % version
-    use_sudo = True
-    install_dir = _symlinked_java_version_dir("shrec", version, use_sudo=use_sudo)
-    do_sudo = sudo if use_sudo else run
+    install_dir = _symlinked_java_version_dir("shrec", version, env)
     if install_dir:
         shrec_script = "%s/shrec" % install_dir
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 run("wget %s" % (url))
                 run("unzip %s" % os.path.basename(url))
-                do_sudo("mv *.class %s" % install_dir)
+                env.safe_sudo("mv *.class %s" % install_dir)
                 for line in _shrec_run.split("\n"):
                     if line.strip():
-                        append(shrec_script, line, use_sudo=use_sudo)
-                do_sudo("chmod a+rwx %s" % shrec_script)
-                do_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
+                        append(shrec_script, line, use_sudo=env.use_sudo)
+                env.safe_sudo("chmod a+rwx %s" % shrec_script)
+                env.safe_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
 
 # -- Analysis
 
@@ -224,28 +222,28 @@ def install_picard(env):
     version = "1.41"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
-    install_dir = _symlinked_java_version_dir("picard", version)
+    install_dir = _symlinked_java_version_dir("picard", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 run("wget %s" % (url))
                 run("unzip %s" % os.path.basename(url))
                 with cd(os.path.splitext(os.path.basename(url))[0]):
-                    sudo("mv *.jar %s" % install_dir)
+                    env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_gatk(env):
     version = "1.0.5974"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
-    install_dir = _symlinked_java_version_dir("gatk", version)
+    install_dir = _symlinked_java_version_dir("gatk", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 run("wget %s" % (url))
                 run("tar -xjvpf %s" % os.path.basename(url))
                 with cd(os.path.basename(url).replace(ext, "")):
-                    sudo("mv *.jar %s" % install_dir)
+                    env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_snpeff(env):
     version = "1_9_5"
@@ -254,24 +252,24 @@ def install_snpeff(env):
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
                       "databases/v%s/snpEff_v%s_%s.zip"
-    install_dir = _symlinked_java_version_dir("snpeff", version)
+    install_dir = _symlinked_java_version_dir("snpeff", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
-                    sudo("mv *.jar %s" % install_dir)
+                    env.safe_sudo("mv *.jar %s" % install_dir)
                     run("sed -i.bak -r -e 's/data_dir = \.\/data\//data_dir = %s\/data/' %s" %
                         (install_dir.replace("/", "\/"), "snpEff.config"))
                     run("chmod a+r *.config")
-                    sudo("mv *.config %s" % install_dir)
+                    env.safe_sudo("mv *.config %s" % install_dir)
                     data_dir = os.path.join(install_dir, "data")
-                    sudo("mkdir %s" % data_dir)
+                    env.safe_sudo("mkdir %s" % data_dir)
                     for org in genomes:
                         if not exists(os.path.join(data_dir, org)):
                             gurl = genome_url_base % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
-                            sudo("mv data/%s %s" % (org, data_dir))
+                            env.safe_sudo("mv data/%s %s" % (org, data_dir))
 
 @_if_not_installed("freebayes")
 def install_freebayes(env):
@@ -285,9 +283,9 @@ def _install_samtools_libs(env):
         lib_dir = os.path.join(env.system_install, "lib")
         include_dir = os.path.join(env.system_install, "include", "bam")
         run("make")
-        sudo("mv -f libbam* %s" % lib_dir)
-        sudo("mkdir -p %s" % include_dir)
-        sudo("mv -f *.h %s" % include_dir)
+        env.safe_sudo("mv -f libbam* %s" % lib_dir)
+        env.safe_sudo("mkdir -p %s" % include_dir)
+        env.safe_sudo("mv -f *.h %s" % include_dir)
     check_dir = os.path.join(env.system_install, "include", "bam")
     if not exists(check_dir):
         _get_install(repository, env, _samtools_lib_install)

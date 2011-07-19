@@ -17,23 +17,13 @@ class Flavor:
         self.name = "Base Flavor - no overrides"
         self.env = env
 
-    def rewrite_packages_list(self, list):
-        return list
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
 
-    def rewrite_python_egg_list(self, list):
-        return list
-
-    def rewrite_ruby_gem_list(self, list):
-        return list
-
-    def rewrite_perl_cpan_list(self, list):
-        return list
-
-    def rewrite_r_cran_list(self, list):
-        return list
-
-    def rewrite_custom_list(self, list):
-        return list
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        return items
 
     def post_install(self):
         """Post installation hook"""

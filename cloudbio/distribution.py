@@ -6,7 +6,7 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env, run
+from fabric.api import env, run, sudo
 
 def _setup_distribution_environment():
     """Setup distribution environment
@@ -27,6 +27,17 @@ def _setup_distribution_environment():
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _validate_target_distribution(env.distribution)
     _cloudman_compatibility(env)
+    _configure_sudo(env)
+
+def _configure_sudo(env):
+    """Setup env variable and safe_sudo supporting non-privileged users.
+    """
+    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
+        env.safe_sudo = sudo
+        env.use_sudo = True
+    else:
+        env.safe_sudo = run
+        env.use_sudo = False
 
 def _cloudman_compatibility(env):
     """Environmental variable naming for compatibility with CloudMan.
@@ -82,6 +93,7 @@ def _setup_deb_general():
     env.logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
     env.python_version_ext = ""
+    env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
@@ -94,6 +106,7 @@ def _setup_deb_general():
 def _setup_centos():
     env.logger.info("CentOS setup")
     env.python_version_ext = "2.6"
+    env.ruby_version_ext = ""
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 

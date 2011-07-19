@@ -1,4 +1,4 @@
-"""Main Fabric deployment file for BioLinux distributionrepo=.
+"""Main Fabric deployment file for CloudBioLinux distribution.
 
 This installs a standard set of useful biological applications on a remote
 server. It is designed for bootstrapping a machine from scratch, as with new
@@ -32,7 +32,7 @@ import cloudbio
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
-from cloudbio.cloudman import (_configure_ec2_autorun, _cleanup_ec2)
+from cloudbio.cloudman import (_configure_cloudman, _cleanup_ec2)
 
 # ## Utility functions for establishing our build environment
 
@@ -144,7 +144,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _freenx_scripts()
-            _configure_ec2_autorun(env)
+            _configure_cloudman(env)
             _cleanup_ec2(env)
 
 def _check_fabric_version():
@@ -159,7 +159,7 @@ def _custom_installs(to_install):
         run("mkdir -p %s" % env.local_install)
     pkg_config = os.path.join(env.config_dir, "custom.yaml")
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
-    for p in env.flavor.rewrite_custom_list(packages):
+    for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
 def install_custom(p, automated=False, pkg_to_group=None):
@@ -173,7 +173,6 @@ def install_custom(p, automated=False, pkg_to_group=None):
     _setup_logging(env)
     env.logger.info("Install custom software packages")
     if not automated:
-        print env
         _parse_fabricrc()
         _setup_edition(env)
         _setup_distribution_environment()
@@ -312,16 +311,16 @@ def _r_library_installer(config):
     """
     append(out_file, final_update)
     # run the script and then get rid of it
-    sudo("Rscript %s" % out_file)
+    env.safe_sudo("Rscript %s" % out_file)
     run("rm -f %s" % out_file)
 
 def _python_library_installer(config):
     """Install python specific libraries using easy_install.
     """
     version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
-    sudo("easy_install%s -U pip" % version_ext)
-    for pname in env.flavor.rewrite_python_egg_list(config['pypi']):
-        sudo("easy_install%s -U %s" % (version_ext, pname))
+    env.safe_sudo("easy_install%s -U pip" % version_ext)
+    for pname in env.flavor.rewrite_config_items("python", config['pypi']):
+        env.safe_sudo("easy_install%s -U %s" % (version_ext, pname))
         # Use pip when it doesn't re-download even if latest package installed
         # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
         #sudo("pip%s install -U %s" % (version_ext,  pname))
@@ -329,32 +328,34 @@ def _python_library_installer(config):
 def _ruby_library_installer(config):
     """Install ruby specific gems.
     """
+    gem_ext = getattr(env, "ruby_version_ext", "")
     def _cur_gems():
         with settings(
                 hide('warnings', 'running', 'stdout', 'stderr')):
-            gem_info = run("gem list --no-versions")
+            gem_info = run("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
-    for gem in env.flavor.rewrite_ruby_gem_list(config['gems']):
+    for gem in env.flavor.rewrite_config_items("ruby", config['gems']):
         # update current gems only to check for new installs
         if gem not in installed:
             installed = _cur_gems()
         if gem in installed:
-            sudo("gem update %s" % gem)
+            env.safe_sudo("gem%s update %s" % (gem_ext, gem))
         else:
-            sudo("gem install %s" % gem)
+            env.safe_sudo("gem%s install %s" % (gem_ext, gem))
 
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
     run("wget --no-check-certificate http://xrl.us/cpanm")
     run("chmod a+rwx cpanm")
-    sudo("mv cpanm %s/bin" % env.system_install)
-    for lib in env.flavor.rewrite_perl_cpan_list(config['cpan']):
+    env.safe_sudo("mv cpanm %s/bin" % env.system_install)
+    sudo_str = "--sudo" if env.use_sudo else ""
+    for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
-        run("cpanm --sudo --skip-installed --notest %s < /dev/null" % (lib))
+        run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
 
 def _clojure_library_installer(config):
     """Install clojure libraries using cljr.
@@ -367,7 +368,8 @@ def _haskell_library_installer(config):
     """
     run("cabal update")
     for lib in config["cabal"]:
-        run("cabal install --root-cmd=sudo --global %s" % lib)
+        sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
+        run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
     "r-libs" : _r_library_installer,
@@ -413,7 +415,7 @@ def _apt_packages(to_install):
     (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
                                       subs_pkg_config_file)
     # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_packages_list(packages)
+    packages = env.flavor.rewrite_config_items("packages", packages)
 
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
@@ -513,7 +515,7 @@ def _yum_packages(to_install):
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
     # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_packages_list(packages)
+    packages = env.flavor.rewrite_config_items("packages", packages)
     for package in packages:
         sudo("yum -y install %s" % package)
 
@@ -546,7 +548,7 @@ def _freenx_scripts():
     if not exists(remote_setup):
         put(os.path.join(install_file_dir, setup_script), setup_script,
                 mode=0777)
-        sudo("mv %s %s" % (setup_script, remote_setup))
+        env.safe_sudo("mv %s %s" % (setup_script, remote_setup))
     remote_login = "configure_freenx.sh"
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
@@ -556,6 +558,6 @@ def _cleanup_space():
     """Cleanup to recover space from builds and packages.
     """
     env.logger.info("Cleaning up space from package builds")
-    sudo("rm -rf .cpanm")
+    env.safe_sudo("rm -rf .cpanm")
     sudo("rm -f /var/crash/*")
 

@@ -26,6 +26,10 @@ system_install = /usr
 local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
+# Global setting for using sudo; allows installation of custom packages
+# by non-privileged users.
+# system_install needs to point to a user writeable directory if set to False
+use_sudo = true 
 
 # details for biological data files and Galaxy
 data_files = /mnt/biodata

@@ -90,7 +90,7 @@ def _fetch_and_unpack(url, need_dir=True):
 def _configure_make(env):
     run("./configure --disable-werror --prefix=%s " % env.system_install)
     run("make")
-    sudo("make install")
+    env.safe_sudo("make install")
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
     def _do_work(env):
@@ -101,7 +101,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if find_cmd:
             install_dir = os.path.join(env.system_install, "bin")
             for fname in run(find_cmd).split("\n"):
-                sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
+                env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
 def _get_install(url, env, make_command):
@@ -130,22 +130,19 @@ def _get_install_local(url, env, make_command):
 
 # --- Language specific utilities
 
-def _symlinked_java_version_dir(pname, version, use_sudo=True):
-    do_sudo = sudo if use_sudo else run
+def _symlinked_java_version_dir(pname, version, env):
     base_dir = os.path.join(env.system_install, "share", "java", pname)
     install_dir = "%s-%s" % (base_dir, version)
     if not exists(install_dir):
-        do_sudo("mkdir -p %s" % install_dir)
+        env.safe_sudo("mkdir -p %s" % install_dir)
         if exists(base_dir):
-            do_sudo("rm -f %s" % base_dir)
-        do_sudo("ln -s %s %s" % (install_dir, base_dir))
+            env.safe_sudo("rm -f %s" % base_dir)
+        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
     return None
 
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)
-    sudo("python%s setup.py install --skip-build" % env.python_version_ext)
-    sudo("rm -rf dist")
-    sudo("rm -rf build")
-    sudo("rm -rf lib/*.egg-info")
-
+    env.safe_sudo("python%s setup.py install --skip-build" % env.python_version_ext)
+    for clean in ["dist", "build", "lib/*.egg-info"]:
+        env.safe_sudo("rm -rf %s" % clean)
