@@ -57,9 +57,10 @@ if ARGV.index('-h') or ARGV.index('--help')
 
        $cloudbiolinux/test/test_vagrant Minimal --continue
 
-  The base install vm_name.box will be pulled over the Internet, unless
-  it exist in the local directory. On my system the first run takes approx.
-  7 minutes, the second run 30 seconds and a --continue 8 seconds.
+  The base install vm_name.box will be pulled over the Internet, unless it
+  exist in the local directory. On my system the first install run takes
+  approx. 10 minutes (including download at 10Mbs), the second install run with
+  a local box 5 minutes, and --continue 8 seconds.
 
   For more information see ./doc/hacking.md
 
@@ -99,6 +100,11 @@ if use_running_vm
   print "Continuing on an already running VM #{testname}\n"
 else
   # Remove old box, if there
+  if File.directory?(testname)
+    Dir.chdir(testname) do
+      run "vagrant destroy"
+    end
+  end
   run "vagrant box remove #{testname}"
 
   if not File.exist?(localbox)
@@ -108,6 +114,7 @@ else
   error "Can not download #{remotebox} - is wget installed?" if not File.exist?(localbox)
   `md5sum #{localbox}` =~ /(\w+)/
   error "MD5 sum of #{localbox} does not match expected value #{md5box}" if md5box != $1
+  print "MD5 sum of #{localbox} is correct\n"
   print "Starting from local #{localbox}\n"
   run "vagrant box add #{testname} #{localbox}"
 
