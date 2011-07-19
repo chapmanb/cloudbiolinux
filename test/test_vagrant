@@ -28,7 +28,7 @@ if ARGV.index('-h') or ARGV.index('--help')
 
       --continue    Continue on an already running VM (no VM setup)
       edition       The target edition (default Minimal)
-      flavor        The target flavor (default Base)
+      flavor        The target flavor (default Base) (NYI)
 
   Example:
 
@@ -69,9 +69,9 @@ if edition_name == '--continue'
   use_running_vm = true
   edition_name = ARGV.shift
 end
-edition_name = 'Minimal' if !edition_name
+edition_name = 'Minimal' if !edition_name # Default
 flavor_name  = ARGV.shift
-flavor_name  = 'Minimal' if !flavor_name
+flavor_name  = 'Base' if !flavor_name # not used
 
 print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
 raise "Unknown box for #{edition_name}" if !BOX[edition_name]
