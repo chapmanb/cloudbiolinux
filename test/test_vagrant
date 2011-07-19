@@ -7,7 +7,8 @@
 
 # Available testing targets - this could be read from a YAML file.
 BOX = { 'Minimal' =>
-           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box' }
+           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5 => 'ff4ee2e9c2ebdde1d89db75af1483a99' }
 }
 
 print "Integration test script for CloudBioLinux\n"
@@ -17,10 +18,16 @@ def run cmd
   system(cmd)
 end
 
+def error msg
+  $stderr.print "FATAL ERROR: ",msg
+  exit 1
+end
+
 if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
-    Note this testing framework is under development
+    Note this testing framework is under development, and is meant to
+    work on Debian-type systems. It requires ruby, wget, md5sum
 
   Usage:
 
@@ -76,7 +83,8 @@ flavor_name  = 'Base' if !flavor_name # not used
 print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
 raise "Unknown box for #{edition_name}" if !BOX[edition_name]
 remotebox = BOX[edition_name][:url]
-localbox = File.basename(remotebox)
+localbox  = File.basename(remotebox)
+md5box    = BOX[edition_name][:md5]
 
 # find or install vagrant
 print "gem install vagrant" if `which vagrant` !~ /vagrant/
@@ -90,13 +98,15 @@ else
   # Remove old box, if there
   run "vagrant box remove #{testname}"
 
-  if File.exist?(localbox)
-    print "Starting from local #{localbox}\n"
-    run "vagrant box add #{testname} #{localbox}"
-  else
+  if not File.exist?(localbox)
     print "Fetching #{remotebox}\n"
-    run "vagrant box add #{testname} #{remotebox}"
+    run "wget #{remotebox}"
   end
+  error "Can not download #{remotebox} - is wget installed?" if not File.exist?(localbox)
+  `md5sum #{localbox}` =~ /(\w+)/
+  error "MD5 sum of #{localbox} does not match expected value #{md5box}" if md5box != $1
+  print "Starting from local #{localbox}\n"
+  run "vagrant box add #{testname} #{localbox}"
 
   Dir.mkdir(testname) if !File.directory?(testname)
   # Bring VM up
@@ -108,8 +118,7 @@ else
 end
 
 if not File.directory?(testname)
-  $stderr.print "VM #{testname} appears not to be installed"
-  exit 1
+  error "VM #{testname} appears not to be installed"
 end
 
 # Using the VM
