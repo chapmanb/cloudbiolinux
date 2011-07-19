@@ -149,4 +149,20 @@ Dir.chdir(testname) do
   # Fire up the fab file
   run "fab -f #{srcpath}/fabfile.py -H vagrant  -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
 
+  # test for completion of the fabfile
+  run "scp vagrant:/var/log/biolinux.log biolinux.log"
+  lastline = `tail -1 biolinux.log`
+  error "Installation looks incomplete "+lastline if lastline !~ /#{edition_name}/
+  print <<COMPLETE
+
+  SUCCESS!
+
+  The BioLinux installation test completed successfully!
+  You can check the running VM by logging in with:
+
+    cd #{testname}
+    vagrant ssh
+
+  Enjoy!
+COMPLETE
 end
