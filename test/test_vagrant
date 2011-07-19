@@ -11,7 +11,7 @@ BOX = { 'Minimal' =>
              :md5 => 'ff4ee2e9c2ebdde1d89db75af1483a99' }
 }
 
-print "Integration test script for CloudBioLinux\n"
+print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
 
 def run cmd
   print "--> ",cmd
@@ -58,7 +58,10 @@ if ARGV.index('-h') or ARGV.index('--help')
        $cloudbiolinux/test/test_vagrant Minimal --continue
 
   The base install vm_name.box will be pulled over the Internet, unless
-  it exist in the local directory. For more information see ./doc/hacking.md
+  it exist in the local directory. On my system the first run takes approx.
+  7 minutes, the second run 30 seconds and a --continue 8 seconds.
+
+  For more information see ./doc/hacking.md
 
 USAGE
   BOX.each do | edition, properties |
