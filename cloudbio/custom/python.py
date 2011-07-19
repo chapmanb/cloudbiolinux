@@ -25,4 +25,6 @@ def install_rpy(env):
     ext = "a"
     url = "http://downloads.sourceforge.net/project/rpy/rpy/" \
           "%s/rpy-%s%s.zip" % (version, version, ext)
-    _get_install(url, env, _python_make)
+    def _fix_libraries(env):
+        run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
+    _get_install(url, env, _python_make, post_unpack_fn=_fix_libraries)

@@ -141,8 +141,10 @@ def install_fastx_toolkit(env):
     url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
     fastx_url = "%sfastx_toolkit-%s.tar.bz2" % (url_base, version)
     gtext_url = "%slibgtextutils-%s.tar.bz2" % (url_base, gtext_version)
-    _get_install(gtext_url, env, _configure_make)
-    _get_install(fastx_url, env, _configure_make)
+    def _remove_werror(env):
+        sed("configure", " -Werror", "")
+    _get_install(gtext_url, env, _configure_make, post_unpack_fn=_remove_werror)
+    _get_install(fastx_url, env, _configure_make, post_unpack_fn=_remove_werror)
 
 @_if_not_installed("SolexaQA.pl")
 def install_solexaqa(env):
@@ -322,7 +324,9 @@ def install_abyss(env):
     # XXX check for no sparehash on non-ubuntu systems
     version = "1.2.7"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
-    _get_install(url, env, _configure_make)
+    def _remove_werror(env):
+        sed("configure", " -Werror", "")
+    _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror)
 
 def install_transabyss(env):
     version = "1.2.0"

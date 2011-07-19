@@ -15,6 +15,10 @@ gems:
   - xml-simple
   # science
   - bio
+  - bio-bwa
+  - bio-blastxmlparser
+  - biomart
+  - ruby-ensembl-api
   # databases
   - couchdb-ruby
   - data_objects
@@ -25,7 +29,6 @@ gems:
   - dm-cli
   - dm-constraints
   - dm-core
-  - dm-ferret-adapter
   - dm-is-list
   - dm-is-nested_set
   - dm-is-remixable
@@ -37,7 +40,6 @@ gems:
   - dm-observer
   - dm-rest-adapter
   - dm-serializer
-  - dm-sweatshop
   - dm-tags
   - dm-timestamps
   - dm-types
@@ -45,7 +47,9 @@ gems:
   - do_sqlite3
   # Require up to date ruby. Fail on Centos default
   - vagrant
-  - ruby-ensembl-api
   - mysql
   - do_mysql
   - sqlite3-ruby
+  # Problems building on 1.9.1
+  #- dm-ferret-adapter
+  #- dm-sweatshop

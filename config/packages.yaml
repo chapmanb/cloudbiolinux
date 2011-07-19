@@ -286,6 +286,7 @@ bio_general:
   - emboss 
   - emboss-data
   - emboss-lib
+  - ugene
 bio_search:
   - blast2
   - hmmer
@@ -368,7 +369,7 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    - bio-linux-arb # Version problem
+    #- bio-linux-arb # Broken, needs libmotif3
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem
