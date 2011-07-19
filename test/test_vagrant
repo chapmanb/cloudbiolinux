@@ -32,11 +32,26 @@ if ARGV.index('-h') or ARGV.index('--help')
 
   Example:
 
-     cd cloudbiolinux/test
-     test_vagrant Minimal       # test Minimal edition
+     cd to VM directory
 
-  The base install vm.box will be pulled over the Internet, unless
-  it exist in the local directory.
+       cd ~/my_test_vms/
+     
+     test Minimal edition - this will pull the remote box to local disk once
+
+       $cloudbiolinux/test/test_vagrant Minimal
+     
+     this should pass, but if not (or at interrupt with ^C), start fixing
+     with, for example
+  
+       cd vm_name
+       vagrant ssh
+
+     after a fix, continue where we left off
+
+       $cloudbiolinux/test/test_vagrant Minimal --continue  
+
+  The base install vm_name.box will be pulled over the Internet, unless
+  it exist in the local directory. For more information see ./doc/hacking.md
 
   Available targets:
 
