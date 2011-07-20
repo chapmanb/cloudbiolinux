@@ -47,7 +47,6 @@ minimal:
     - tar
     - less
     - sudo
-    - ruby1.9.1 # make sure Ruby1.9 is always installed
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
@@ -180,21 +179,12 @@ python:
     - python-distutils-extra
   wrappers:
     - python-rpy
-ruby_1_8:
-  - ruby1.8
-ruby_1_8_dev:
-  - ruby1.8-dev
-jruby:
-  - jruby
 ruby: 
-  - ruby1.8       # for compatibility
-  - ruby1.9.1-dev # default Ruby install
-  # - ruby1.9.1 - part of ruby-dev
-  # - rubygems - part of main ruby package
-  # - irb - part of main ruby package
-  # - ri - part of main ruby 1.9 package
-  # - rdoc - part of main ruby package
-  # - rake - part of main ruby pacakge
+  - ruby1.9.1 # default Ruby install
+  - ruby1.9.1-dev
+  - ruby1.8
+  - ruby1.8-dev
+  - jruby
 r:
   - r-base
   - r-base-core
