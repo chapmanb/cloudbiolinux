@@ -156,10 +156,10 @@ Dir.chdir(testname) do
   # run "vagrant status"
   print "We can use #{testname}!\n"
 
-  # Fire up the fab file
-  # run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+  # Fire up the BioLinux fab file - this installs the VM
+  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
 
-  # Now set up Ruby's vagrant access
+  # Now set up Ruby's vagrant access for testing
   vagrant = Vagrant::Environment.new
   raise "Must run `vagrant up`" if !vagrant.primary_vm.created?
   raise "Must be running!" if !vagrant.primary_vm.vm.running?
