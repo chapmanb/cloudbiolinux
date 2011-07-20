@@ -1,4 +1,4 @@
-#! /usr/bin/ruby
+#! /usr/bin/ruby 
 #
 # Integration testing of BioLinux targets - see
 #
@@ -14,6 +14,7 @@ BOX = { 'Minimal' =>
 }
 
 print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
+print "Running Ruby "+RUBY_VERSION+"\n"
 
 # find location of test files
 path = File.dirname(__FILE__)
