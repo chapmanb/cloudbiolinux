@@ -5,6 +5,8 @@
 #   ./test/test_vagrant --help
 #
 
+require 'rubygems'
+
 # Available testing targets - this could be read from a YAML file.
 BOX = { 'Minimal' =>
            { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
@@ -97,7 +99,9 @@ localbox  = File.basename(remotebox)
 md5box    = BOX[edition_name][:md5]
 
 # find or install vagrant
-print "gem install vagrant" if `which vagrant` !~ /vagrant/
+error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /vagrant/
+
+require 'vagrant'
 
 # Name a temporary dir
 testname = "biolinux_"+File.basename(localbox,".box")
@@ -153,7 +157,15 @@ Dir.chdir(testname) do
   print "We can use #{testname}!\n"
 
   # Fire up the fab file
-  run "fab -f #{srcpath}/fabfile.py -H vagrant  -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+  # run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+
+  # Now set up Ruby's vagrant access
+  vagrant = Vagrant::Environment.new
+  raise "Must run `vagrant up`" if !vagrant.primary_vm.created?
+  raise "Must be running!" if !vagrant.primary_vm.vm.running?
+  vagrant.primary_vm.ssh.execute do |ssh|
+    test_for_match(ssh,"ruby -v", "1.9")
+  end
 
   if test_for_completed_install(edition_name)
     print <<COMPLETE

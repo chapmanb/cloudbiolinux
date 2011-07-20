@@ -10,3 +10,11 @@ def test_for_completed_install(edition_name)
   error "Installation looks incomplete "+lastline if lastline !~ /#{edition_name}/
   true
 end
+
+# Simple comparison using a regex
+def test_for_match(ssh, cmd, regex)
+  res = ssh.exec!(cmd)
+  if res !~ /#{regex}/
+    error(regex+" ("+cmd+") does not match "+res)
+  end
+end
