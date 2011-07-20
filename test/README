@@ -1,4 +1,7 @@
 Integration test for CloudBioLinux.
 
-test_vagrant Edition
+Try:
+
+./test_vagrant --help
+
 

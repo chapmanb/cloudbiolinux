@@ -8,4 +8,5 @@ def test_for_completed_install(edition_name)
   lastline = `tail -1 biolinux.log`
   print lastline
   error "Installation looks incomplete "+lastline if lastline !~ /#{edition_name}/
+  true
 end
