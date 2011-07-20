@@ -13,6 +13,11 @@ BOX = { 'Minimal' =>
 
 print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
 
+# find location of test files
+path = File.dirname(__FILE__)
+$: << path
+require 'test_biolinux'
+
 def run cmd
   print "--> ",cmd
   system(cmd)
@@ -150,11 +155,8 @@ Dir.chdir(testname) do
   # Fire up the fab file
   run "fab -f #{srcpath}/fabfile.py -H vagrant  -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
 
-  # test for completion of the fabfile
-  run "scp vagrant:/var/log/biolinux.log biolinux.log"
-  lastline = `tail -1 biolinux.log`
-  error "Installation looks incomplete "+lastline if lastline !~ /#{edition_name}/
-  print <<COMPLETE
+  if test_for_completed_install(edition_name)
+    print <<COMPLETE
 
   SUCCESS!
 
@@ -166,4 +168,7 @@ Dir.chdir(testname) do
 
   Enjoy!
 COMPLETE
+  end
 end
+
+
