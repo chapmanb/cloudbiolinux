@@ -59,8 +59,9 @@ if ARGV.index('-h') or ARGV.index('--help')
 
   The base install vm_name.box will be pulled over the Internet, unless it
   exist in the local directory. On my system the first install run takes
-  approx. 10 minutes (including download at 10Mbs), the second install run with
-  a local box 5 minutes, and --continue 8 seconds.
+  approx. 10 minutes (including the original image download at 10Mbs), the
+  second fresh install run, using a local box, takes 5 minutes, and the
+  --continue switch only 8 seconds.
 
   For more information see ./doc/hacking.md
 
@@ -160,7 +161,7 @@ Dir.chdir(testname) do
   The BioLinux installation test completed successfully!
   You can check the running VM by logging in with:
 
-    cd #{testname}
+    cd ./#{testname}
     vagrant ssh
 
   Enjoy!
