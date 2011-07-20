@@ -17,9 +17,11 @@ See the main README file for firing up a pre-installed BioLinux box.
 Despite the extra work, starting from scratch may have advantages. For
 one you have more control of the base install. Say for a different
 version of Linux, a BSD kernel, or for install less software (do you
-really need X/KDE/Gnome?), so you do not end up with an 8 GB VM. The
-BioLinux setup is designed to be modular, to support multiple editions
-and flavors (see the main README for an explanation).
+really need X/KDE/Gnome?), so you do not end up with an 8 GB VM, or for more
+software and/or data pre-intstalled on a VM. 
+
+The BioLinux setup is designed to be modular, to support multiple editions and
+flavors (see the main README for an explanation of terms).
 
 Start with a standard downloadable prepared Vagrant box. For example a Debian
 32-bits box prepared for Vagrant, or create one from scratch as is explained on

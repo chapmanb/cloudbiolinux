@@ -1,0 +1,193 @@
+#! /usr/bin/ruby
+#
+# Integration testing of BioLinux targets - see
+#
+#   ./test/test_vagrant --help
+#
+
+require 'rubygems'
+
+# Available testing targets - this could be read from a YAML file.
+BOX = { 'Minimal' =>
+           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5 => 'ff4ee2e9c2ebdde1d89db75af1483a99' }
+}
+
+print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
+
+# find location of test files
+path = File.dirname(__FILE__)
+$: << path+'/testlib'
+require 'test_biolinux'
+
+def run cmd
+  print "--> ",cmd
+  system(cmd)
+end
+
+def error msg
+  $stderr.print "FATAL ERROR: ",msg
+  exit 1
+end
+
+if ARGV.index('-h') or ARGV.index('--help')
+  print <<USAGE
+
+    Note this testing framework is under development, and is meant to
+    work on Debian-type systems. It requires ruby, wget, md5sum
+
+  Usage:
+
+    test_vagrant [--continue] [edition] [flavor]
+
+      --continue    Continue on an already running VM (no VM setup)
+      edition       The target edition (default Minimal)
+      flavor        The target flavor (default Base) (NYI)
+
+  Example:
+
+     cd to VM directory
+
+       cd ~/my_test_vms/
+
+     test Minimal edition - this will pull the remote box to local disk once
+
+       $cloudbiolinux/test/test_vagrant Minimal
+
+     this should pass, but if not (or at interrupt with ^C), start fixing
+     with, for example
+
+       cd vm_name
+       vagrant ssh
+
+     after a fix, continue where we left off
+
+       $cloudbiolinux/test/test_vagrant Minimal --continue
+
+  The base install vm_name.box will be pulled over the Internet, unless it
+  exist in the local directory. On my system the first install run takes
+  approx. 10 minutes (including the original image download at 10Mbs), the
+  second fresh install run, using a local box, takes 5 minutes, and the
+  --continue switch only 8 seconds.
+
+  For more information see ./doc/hacking.md
+
+USAGE
+  BOX.each do | edition, properties |
+    print "* ", edition, " (",properties[:url],")\n"
+  end
+  exit 0
+end
+
+srcpath = File.dirname(File.dirname(__FILE__))
+print srcpath, "\n"
+
+edition_name = ARGV.shift
+use_running_vm = false
+if edition_name == '--continue'
+  use_running_vm = true
+  edition_name = ARGV.shift
+end
+edition_name = 'Minimal' if !edition_name # Default
+flavor_name  = ARGV.shift
+flavor_name  = 'Base' if !flavor_name # not used
+
+print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
+raise "Unknown box for #{edition_name}" if !BOX[edition_name]
+remotebox = BOX[edition_name][:url]
+localbox  = File.basename(remotebox)
+md5box    = BOX[edition_name][:md5]
+
+# find or install vagrant
+error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /vagrant/
+
+require 'vagrant'
+
+# Name a temporary dir
+testname = "biolinux_"+File.basename(localbox,".box")
+
+if use_running_vm
+  print "Continuing on an already running VM #{testname}\n"
+else
+  # Remove old box, if there
+  if File.directory?(testname)
+    Dir.chdir(testname) do
+      run "vagrant destroy"
+    end
+  end
+  run "vagrant box remove #{testname}"
+
+  if not File.exist?(localbox)
+    print "Fetching #{remotebox}\n"
+    run "wget #{remotebox}"
+  end
+  error "Can not download #{remotebox} - is wget installed?" if not File.exist?(localbox)
+  `md5sum #{localbox}` =~ /(\w+)/
+  error "MD5 sum of #{localbox} does not match expected value #{md5box}" if md5box != $1
+  print "MD5 sum of #{localbox} is correct\n"
+  print "Starting from local #{localbox}\n"
+  run "vagrant box add #{testname} #{localbox}"
+
+  Dir.mkdir(testname) if !File.directory?(testname)
+  # Bring VM up
+  Dir.chdir(testname) do
+    print `ls -l`
+    run "vagrant init #{testname}"
+    run "vagrant up"
+  end
+end
+
+if not File.directory?(testname)
+  error "VM #{testname} appears not to be installed"
+end
+
+# Using the VM
+Dir.chdir(testname) do
+  # Fetch the vagrant ssh key, and store it locally
+  # First see if we can copy a file - if we can there is no need to update .ssh/config
+  File.unlink('remote_hosts') if File.exists?('remote_hosts')
+  run "scp vagrant:/etc/hosts remote_hosts"
+  if !File.exist?('remote_hosts')
+    run "vagrant ssh-config >> ~/.ssh/config"
+    run "scp vagrant:/etc/hosts remote_hosts"
+  end
+  raise "Problem connecting to remote hosts (using scp)" if !File.exist?('remote_hosts')
+  File.unlink('remote_hosts')
+  # run "vagrant status"
+  print "We can use #{testname}!\n"
+
+  # Fire up the BioLinux fab file - this installs the VM
+  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+
+  # Now set up Ruby's vagrant access for testing
+  vagrant = Vagrant::Environment.new
+  raise "Must run `vagrant up`" if !vagrant.primary_vm.created?
+  raise "Must be running!" if !vagrant.primary_vm.vm.running?
+  vagrant.primary_vm.ssh.execute do |ssh|
+    # copy package list
+    File.open("dpkg.lst","w").write(ssh.exec!("dpkg -l"))
+    # Do we have ruby and tools?
+    test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
+    test_for_match(ssh,"/usr/bin/rdoc -v", "RDoc")
+    test_for_match(ssh,"which gem", "gem")
+    # Make sure Ruby 1.9.1 is in Minimal
+    test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
+  end
+
+  if test_for_completed_install(edition_name)
+    print <<COMPLETE
+
+  SUCCESS!
+
+  The BioLinux installation test completed successfully!
+  You can check the running VM by logging in with:
+
+    cd ./#{testname}
+    vagrant ssh
+
+  Enjoy!
+COMPLETE
+  end
+end
+
+
