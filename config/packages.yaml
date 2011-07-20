@@ -272,7 +272,6 @@ viz:
   - libglu1-mesa-dev
 web:
   - apache2
-  - nginx
 bio_general:
   - primer3
   - readseq

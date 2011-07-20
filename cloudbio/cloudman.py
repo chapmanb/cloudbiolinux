@@ -11,7 +11,7 @@ description     "Start CloudMan contextualization script"
 start on runlevel [2345]
 
 task
-exec python %s/ec2autorun.py
+exec python %s
 """
 import os
 
@@ -41,7 +41,7 @@ def _setup_users(env):
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
-    remote = os.path.join(env.install_dir, script)
+    remote = os.path.join(env.install_dir, "bin", script)
     if use_repo_autorun:
         url = os.path.join(REPO_ROOT_URL, script)
         sudo("wget --output-document=%s %s" % (remote, url))
@@ -51,7 +51,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
     with open( cloudman_boot_file, 'w' ) as f:
-        print >> f, cm_upstart % env.install_dir
+        print >> f, cm_upstart % remote
     remote_file = '/etc/init/%s' % cloudman_boot_file
     put(cloudman_boot_file, remote_file, use_sudo=777)
     os.remove(cloudman_boot_file)
@@ -62,6 +62,11 @@ def _configure_sge(env):
     if not exists(sge_root):
         sudo("mkdir -p %s" % sge_root)
         sudo("chown sgeadmin:sgeadmin %s" % sge_root)
+    # link our installed SGE to CloudMan's expected directory
+    sge_package_dir = "/opt/galaxy/pkg"
+    sge_dir = "ge6.2u5"
+    sudo("mkdir -p %s" % sge_package_dir)
+    sudo("ln -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
 
 def _configure_nfs(env):
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
