@@ -415,6 +415,11 @@ def _apt_packages(to_install):
     # Retrieve final package names
     (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
                                       subs_pkg_config_file)
+    # At this point allow the Edition to rewrite the package list - 
+    # this is shared within and between editions.
+    # Ref:  https://github.com/chapmanb/cloudbiolinux/pull/10#issuecomment-1616423
+    packages = env.edition.rewrite_config_items("packages", packages)
+
     # At this point allow the Flavor to rewrite the package list
     packages = env.flavor.rewrite_config_items("packages", packages)
 

@@ -49,6 +49,15 @@ class Edition:
         """Post installation hook"""
         pass
 
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        return items
+
+
 class BioNode(Edition):
     """BioNode specialization of BioLinux
     """
@@ -103,3 +112,13 @@ class Minimal(Edition):
     def apt_upgrade_system(self):
         """Do nothing"""
         env.logger.debug("Skipping forced system upgrade")
+
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        items.append('ruby1.9.1')
+        return items
+
