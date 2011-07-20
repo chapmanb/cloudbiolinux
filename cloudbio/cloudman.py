@@ -31,7 +31,7 @@ def _setup_users(env):
         """ Add user with username to the system """
         if not contains('/etc/passwd', "%s:" % username):
             uid_str = "--uid %s" % uid if uid else ""
-            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' +
+            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' \
                  '-c"Galaxy-required user" %s --user-group %s' % \
                      (username, uid_str, username))
     # Must specify uid for 'galaxy' user because of the configuration for proFTPd
