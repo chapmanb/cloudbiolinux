@@ -1,6 +1,8 @@
 ---
 # Configuration file defining ruby libraries to install
 # using gem install (avoiding the distribution package manager)
+#
+# Gems are installed for Ruby1.9
 gems:
   - addressable
   - cake

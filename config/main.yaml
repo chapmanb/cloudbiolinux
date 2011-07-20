@@ -11,7 +11,9 @@ packages:
   - amazon
   - python
   - r
-  - ruby
+  - ruby  # installs ruby1.9-dev
+  - ruby_1_8_dev
+  - jruby
   - perl
   - java
   - erlang

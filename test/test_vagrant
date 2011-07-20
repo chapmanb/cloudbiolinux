@@ -164,7 +164,12 @@ Dir.chdir(testname) do
   raise "Must run `vagrant up`" if !vagrant.primary_vm.created?
   raise "Must be running!" if !vagrant.primary_vm.vm.running?
   vagrant.primary_vm.ssh.execute do |ssh|
-    test_for_match(ssh,"ruby -v", "1.9")
+    # Do we have ruby and tools?
+    test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
+    test_for_match(ssh,"/usr/bin/rdoc -v", "RDoc")
+    test_for_match(ssh,"which gem", "gem")
+    # Make sure Ruby 1.9.1 is in Minimal
+    test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
   end
 
   if test_for_completed_install(edition_name)
