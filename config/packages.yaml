@@ -47,8 +47,7 @@ minimal:
     - tar
     - less
     - sudo
-  upgrade:
-    - ruby # this makes sure Ruby 1.9 is installed
+    - ruby1.9.1 # make sure Ruby1.9 is always installed
 desktop:
   #Packages to support a remote desktop
   - gnome-panel

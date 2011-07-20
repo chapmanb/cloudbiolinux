@@ -164,6 +164,8 @@ Dir.chdir(testname) do
   raise "Must run `vagrant up`" if !vagrant.primary_vm.created?
   raise "Must be running!" if !vagrant.primary_vm.vm.running?
   vagrant.primary_vm.ssh.execute do |ssh|
+    # copy package list
+    File.open("dpkg.lst","w").write(ssh.exec!("dpkg -l"))
     # Do we have ruby and tools?
     test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
     test_for_match(ssh,"/usr/bin/rdoc -v", "RDoc")
