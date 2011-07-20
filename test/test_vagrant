@@ -15,7 +15,7 @@ print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapma
 
 # find location of test files
 path = File.dirname(__FILE__)
-$: << path
+$: << path+'/testlib'
 require 'test_biolinux'
 
 def run cmd
