@@ -315,6 +315,14 @@ filesystem with:
 
 On 11.04 the resize happens automatically and this is not required.
 
+# Testing
+
+BioLinux comes with an integration testing frame work - currently
+based on Vagrant. Try:
+
+        cd test
+        ./testing_vagrant --help
+
 # Documentation
 
 Additional documentation can be found in the [./doc directory][doc] in the

@@ -9,11 +9,20 @@ source tree first.
 == Start with the Minimal edition
 
 The Minimal edition is the smallest common denominator of all Editions, as it
-installs the minimum of packages to bootstrap a full install. Minimal is invoked by
+installs the minimum of packages to bootstrap a full install. Once the
+vagrant box is up and running, Minimal is invoked by
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
 
-where $source points to your biolinux source tree.
+where $source points to your biolinux source tree. In fact, the testing script
+in ./test/test_vagrant does exactly this! Try:
+
+          cd $my_vms
+          $source/test/test_vagrant --help
+
+and the actual run:
+
+          $source/test/test_vagrant
 
 The main.yaml file ascertains the major editors are included, as well remote
 access, version control, and the basic build system (gcc and friends). Note the

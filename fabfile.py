@@ -134,6 +134,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
             _setup_yum_bashrc()
         else:
             raise NotImplementedError("Unknown target distribution")
+        _update_biolinux_log(target, flavor)
     if target is None or target == "custom":
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
@@ -538,6 +539,30 @@ def _setup_yum_sources():
             sudo("rpm -Uvh %s" % repo)
 
 # ### CloudBioLinux specific scripts
+
+def _update_biolinux_log(target, flavor):
+    """Updates the VM so it contains information on the latest BioLinux
+       update in /var/log/biolinux.log.
+
+       The latest information is appended to the file and can be used to see if
+       an installation/update has completed (see also ./test/test_vagrant).
+    """
+    if not target:
+      target = env.get("target", None)
+      if not target:
+        target = "unknown"
+      else:
+        target = target.name
+    if not flavor:
+      flavor = env.get("flavor", None)
+      if not flavor:
+        flavor = "unknown"
+      else:
+        flavor = flavor.name
+    logfn = "/var/log/biolinux.log"
+    info = "Target="+target+"; Edition="+env.edition.name+"; Flavor="+flavor
+    env.logger.info(info)
+    sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
 
 def _freenx_scripts():
     """Provide graphical access to clients via FreeNX.
