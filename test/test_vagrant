@@ -8,9 +8,19 @@
 require 'rubygems'
 
 # Available testing targets - this could be read from a YAML file.
-BOX = { 'Minimal' =>
-           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5 => 'ff4ee2e9c2ebdde1d89db75af1483a99' }
+BOX = { 
+        'Minimal' =>
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
+             :packagelist => 'contrib/minimal/main.yaml'
+           },
+        'BioNode' =>
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/bionode/fabricrc_bionode.txt',
+             :packagelist => 'contrib/bionode/main.yaml'
+           },
 }
 
 print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
@@ -95,9 +105,11 @@ flavor_name  = 'Base' if !flavor_name # not used
 
 print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
 raise "Unknown box for #{edition_name}" if !BOX[edition_name]
-remotebox = BOX[edition_name][:url]
-localbox  = File.basename(remotebox)
-md5box    = BOX[edition_name][:md5]
+remotebox    = BOX[edition_name][:url]
+localbox     = File.basename(remotebox)
+md5box       = BOX[edition_name][:md5]
+fabricrc     = srcpath + '/' + BOX[edition_name][:fabricrc]
+packagelist  = srcpath + '/' + BOX[edition_name][:packagelist]
 
 # find or install vagrant
 error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /vagrant/
@@ -158,7 +170,7 @@ Dir.chdir(testname) do
   print "We can use #{testname}!\n"
 
   # Fire up the BioLinux fab file - this installs the VM
-  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{fabricrc} install_biolinux:packagelist=#{packagelist}"
 
   # Now set up Ruby's vagrant access for testing
   vagrant = Vagrant::Environment.new
@@ -180,7 +192,7 @@ Dir.chdir(testname) do
 
   SUCCESS!
 
-  The BioLinux installation test completed successfully!
+  The BioLinux installation test of '#{edition_name}' completed successfully!
   You can check the running VM by logging in with:
 
     cd ./#{testname}
