@@ -6,7 +6,7 @@ import os, contextlib
 
 from fabric.api import sudo, run, env, cd, put, local
 from fabric.contrib.console import confirm
-from fabric.contrib.files import exists, settings, hide, contains, append
+from fabric.contrib.files import exists, settings, hide, contains, append, sed
 
 from cloudbio.custom.shared import _make_tmp_dir
 
@@ -14,6 +14,7 @@ CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 def install_nginx(env):
+
     version = "0.7.67"
     upload_module_version = "2.0.12"
     upload_url = "http://www.grid.net.ru/nginx/download/" \
@@ -24,7 +25,7 @@ def install_nginx(env):
     remote_conf_dir = os.path.join(install_dir, "conf")
 
     # skip install if already present
-    if contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
+    if exists(remote_conf_dir) and contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
         return
 
     with _make_tmp_dir() as work_dir:
@@ -50,6 +51,11 @@ def install_nginx(env):
     with cd(remote_errdoc_dir):
         sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
         sudo('tar xvzf %s' % nginx_errdoc_file)
+
+    cloudman_default_dir = "/opt/galaxy/sbin"
+    sudo("mkdir -p %s" % cloudman_default_dir)
+    if not exists("%s/nginx" % cloudman_default_dir):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
 
 def install_proftpd(env):
     version = "1.3.3d"
