@@ -184,7 +184,6 @@ ruby:
   - ruby1.9.1-dev
   - ruby1.8
   - ruby1.8-dev
-  - jruby
 r:
   - r-base
   - r-base-core
@@ -241,6 +240,8 @@ databases:
     - postgresql-plperl-8.4
     - libpq-dev
   sqlite:
+    - libsqlite0
+    - libsqlite0-dev
     - libsqlite3-0
     - libsqlite3-dev
     - sqlite3
