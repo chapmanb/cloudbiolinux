@@ -221,7 +221,7 @@ def install_shrec(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.41"
+    version = "1.49"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     install_dir = _symlinked_java_version_dir("picard", version, env)
@@ -234,7 +234,7 @@ def install_picard(env):
                     env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_gatk(env):
-    version = "1.0.5974"
+    version = "1.1-12-g2d94037"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
