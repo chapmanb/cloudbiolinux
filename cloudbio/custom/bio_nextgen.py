@@ -234,7 +234,7 @@ def install_picard(env):
                     env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_gatk(env):
-    version = "1.1-12-g2d94037"
+    version = "1.1"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
