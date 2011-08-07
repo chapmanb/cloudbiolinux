@@ -10,12 +10,13 @@ class BoincFlavor(Flavor):
     """
     def __init__(self, env):
         Flavor.__init__(self,env)
-        self.name = "Boinc client"
+        self.name = "BOINC VM"
 
     def rewrite_config_items(self, name, items):
         return []
 
     def post_install(self):
         env.logger.info("Starting post-install")
+        pass
 
 env.flavor = BoincFlavor(env)
