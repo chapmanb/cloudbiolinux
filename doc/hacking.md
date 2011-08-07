@@ -4,7 +4,7 @@ The BioLinux tools allow building a full environment for Bioinformatics. The
 design allows for flexible targets (Editions) and specializations (Flavors).
 
 Please read the README and ./doc/vagrant documentation that come with the
-source tree first.
+BioLinux source tree first (see http://github.com/chapmanb/cloudbiolinux).
 
 == Start with the Minimal edition
 
