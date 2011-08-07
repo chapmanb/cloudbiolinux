@@ -15,10 +15,11 @@ BOX = {
              :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
              :packagelist => 'contrib/minimal/main.yaml'
            },
-        'Boinc' =>  # Boinc is a Minimal flavor
+        'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
              :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
-             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',             :packagelist => 'contrib/minimal/main.yaml'
+             :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',        
+             :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
         'BioNode' =>
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
@@ -98,23 +99,23 @@ end
 srcpath = File.dirname(File.dirname(__FILE__))
 print srcpath, "\n"
 
-edition_name = ARGV.shift
+box_name = ARGV.shift
 use_running_vm = false
-if edition_name == '--continue'
+if box_name == '--continue'
   use_running_vm = true
-  edition_name = ARGV.shift
+  box_name = ARGV.shift
 end
-edition_name = 'Minimal' if !edition_name # Default
-flavor_name  = ARGV.shift
-flavor_name  = 'Base' if !flavor_name # not used
+box_name = 'Minimal' if !box_name # Default
+# flavor_name  = ARGV.shift
+# flavor_name  = 'Base' if !flavor_name # not used
 
-print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
-raise "Unknown box for #{edition_name}" if !BOX[edition_name]
-remotebox    = BOX[edition_name][:url]
+# print "Testing edition '#{box_name}' flavor '#{flavor_name}'\n"
+raise "Unknown box for #{box_name}" if !BOX[box_name]
+remotebox    = BOX[box_name][:url]
 localbox     = File.basename(remotebox)
-md5box       = BOX[edition_name][:md5]
-fabricrc     = srcpath + '/' + BOX[edition_name][:fabricrc]
-packagelist  = srcpath + '/' + BOX[edition_name][:packagelist]
+md5box       = BOX[box_name][:md5]
+fabricrc     = srcpath + '/' + BOX[box_name][:fabricrc]
+packagelist  = srcpath + '/' + BOX[box_name][:packagelist]
 
 # find or install vagrant
 error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /vagrant/
@@ -192,12 +193,12 @@ Dir.chdir(testname) do
     test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
   end
 
-  if test_for_completed_install(edition_name)
+  if test_for_completed_install(box_name)
     print <<COMPLETE
 
   SUCCESS!
 
-  The BioLinux installation test of '#{edition_name}' completed successfully!
+  The BioLinux installation test of '#{box_name}' completed successfully!
   You can check the running VM by logging in with:
 
     cd ./#{testname}
