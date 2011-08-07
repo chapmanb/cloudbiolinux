@@ -273,6 +273,10 @@ viz:
   - libglu1-mesa-dev
 web:
   - apache2
+boinc:
+  - lxde
+  - boinc-manager 
+  - boinc-client
 bio_general:
   - primer3
   - readseq
