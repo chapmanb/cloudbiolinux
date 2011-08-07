@@ -274,8 +274,6 @@ viz:
 web:
   - apache2
 boinc:
-  - lxde
-  - boinc-manager 
   - boinc-client
 bio_general:
   - primer3

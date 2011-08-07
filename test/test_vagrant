@@ -18,7 +18,7 @@ BOX = {
         'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
              :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
-             :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',        
+             :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
         'BioNode' =>
