@@ -110,7 +110,7 @@ box_name = 'Minimal' if !box_name # Default
 # flavor_name  = ARGV.shift
 # flavor_name  = 'Base' if !flavor_name # not used
 
-# print "Testing edition '#{box_name}' flavor '#{flavor_name}'\n"
+print "Testing box/VM named '#{box_name}'\n"
 raise "Unknown box for #{box_name}" if !BOX[box_name]
 remotebox    = BOX[box_name][:url]
 localbox     = File.basename(remotebox)
