@@ -55,11 +55,10 @@ if ARGV.index('-h') or ARGV.index('--help')
 
   Usage:
 
-    test_vagrant [--continue] [edition] [flavor]
+    test_vagrant [--continue] [name] 
 
       --continue    Continue on an already running VM (no VM setup)
-      edition       The target edition (default Minimal)
-      flavor        The target flavor (default Base) (NYI)
+      name          The target name (default Minimal)
 
   Example:
 
@@ -88,6 +87,8 @@ if ARGV.index('-h') or ARGV.index('--help')
   --continue switch only 8 seconds.
 
   For more information see ./doc/hacking.md
+
+  Available boxes are:
 
 USAGE
   BOX.each do | edition, properties |
