@@ -15,6 +15,12 @@ BOX = {
              :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
              :packagelist => 'contrib/minimal/main.yaml'
            },
+        'Boinc' =>  # Boinc is a Minimal flavor
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
+             :packagelist => 'contrib/minimal/main.yaml'
+           },
         'BioNode' =>
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
              :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
