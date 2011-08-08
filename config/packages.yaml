@@ -62,6 +62,9 @@ desktop:
   - cloudbl-desktop
   - bio-linux-tutorials
   - xvfb
+desktop-cloud:
+  # some special purpose VMs, such as BOINC, only require a minimal desktop
+  - lxde
 programming:
   editors:
     - emacs
