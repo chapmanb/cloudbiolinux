@@ -54,17 +54,22 @@ flavor in ./contrib/flavor/pjotrp/biotest/biotestflavor.py, named BioTestFlavor
 (note you also need an empty __init__.py file).  A Flavor class overrides the
 Flavor methods defined in ./cloudbio/flavor/__init__.py, in particular
 rewrite_config_items, a generic hook to rewrite a list of configured items (the
-package lists), and post_install, a post installation hook. See
-https://github.com/pjotrp/cloudbiolinux/blob/master/cloudbio/flavor/__init__.py.
+package lists), and post_install, a post installation hook. To see what packages
+your Flavor wants to install, simply override rewrite_config_items, and add a print
+statement. For example:
 
-The flavor comes with a new
-fabricrc.txt file, and a new main.yaml file.  So kicking it into submission
-would look like:
+    def rewrite_config_items(self, name, packages):
+        for package in packages:
+          env.logger.info("Selected: "+name+" "+package)
+        return packages
+
+The flavor is itself is found through a fabricrc.txt file. The main package list may be
+in a new main.yaml file.  Kicking it into submission:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
 The flavor module itsefl sets env.flavor on loading the module (this can only
-happen once). For examples see the files in ./contrib/flavor.
+happen once). For more examples see the files in ./contrib/flavor.
 
 == Flavor: add sources
 
