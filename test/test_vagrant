@@ -208,10 +208,8 @@ Dir.chdir(testname) do
     test_for_match(ssh,"which gem", "gem")
     # Make sure Ruby 1.9.1 is in Minimal
     test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
-  end
-
-  if test_for_completed_install(box_name)
-    print <<COMPLETE
+    if test_for_completed_install(ssh,box_name)
+      print <<COMPLETE
 
   SUCCESS!
 
@@ -223,7 +221,17 @@ Dir.chdir(testname) do
 
   Enjoy!
 COMPLETE
+    exit 0
+    end
   end
+  print <<INCOMPLETE
+
+  FAILURE!
+
+  Somehow the test did not complete.
+
+INCOMPLETE
+  exit 1
 end
 
 
