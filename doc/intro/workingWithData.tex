@@ -1,0 +1,187 @@
+\section{Introduction}\label{section:data}
+
+\paragraph{}For many bioinformatics tasks, you will want to work on your own data and files – for example, perhaps your own sequence data and blast databases. To do this, you will need to \emph{upload your files onto a machine that your CloudBioLinux instance can access}. Three options are covered in this chapter:
+\begin{enumerate}
+\item Copy your data directly onto the CloudBioLinux instance you are running. See section \ref{section:directcopy} This would be alright if you were going to use this data only on this running instance and you're happy for it to be deleted when you terminate the instance.
+\item Copy your date onto a separate EBS volume. This would be useful if you wish to store your files for use in other sessions, but you do not plan to keep the same running instance. (EBS Volumes are cheaper than running instances.) See section \ref{section:ebscopy}
+\item If the data you want to use is already available on Amazon EBS volumes (for example, ENSEMBL data), you can access this easily, with no data transfer costs.  \ref{section:publiccopy}. 
+\end{enumerate}
+
+\paragraph{}\href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/creating-snapshot-ebs.html}{Snapshots} are not discussed in this document, but are an important topic to understand if you plan to use the Amazon Cloud, especially if you will be working with your own data over a prolonged period or making customisations you do not wish to lose. 
+
+\section{Copying data onto your CloudBioLinux instance}
+\label{section:directcopy}
+\paragraph{}If you only need your data for a single CloudBioLinux instance, then you can just copy your data onto that instance directly. Once you are logged into your CloudBioLinux instance, there are a number of ways to do this. For example, there are command line tools like \textbf{scp}, for copying files from a machine you have an account on, or \textbf{wget} to bring in data from public websites or ftp sites. 
+\paragraph{}Alternatively, if you are logged into the full graphical desktop using NX (information on page \pageref{section:nx}), you can use the file browser to connect to a remote site and \textbf{drag and drop} your files to your running Bio-Linux instance. This is the method we focus on here.
+\begin{itemize}
+
+\item Go to the \textbf{Places} menu in the top taskbar and open up a file browser, for example by clicking on your Home Folder. 
+\item Now go to the \textbf{Go} menu and click on Location... (or just type Ctrl-L). 
+\item If you are going to copy files from a machine that you have login permissions on, then in the box next to the word \emph{Location} that appears in your file browser, type:
+\textbf{ssh://your.machine.com}, replacing your.machine.com with the address of the machine your files are on. Alternatively, if you wanted to copy files from a public ftp server, say, then you would enter something like the following in the Location box: 
+\\\textbf{ftp://ftp.someother.database.site}
+\end{itemize}
+
+\paragraph{}As a specific example, if I want to copy fasta files from the EMBL database sections, I would type the following into the Location box: 
+\\\textbf{ftp://ftp.ebi.ac.uk/pub/databases/fastafiles/emblrelease}
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/graphicalFTP_full"}
+\caption[Drag and drop from remote machine]{\label{fig:graphicalftp}Copying files from remote machine is easy using the graphical File Browser, which can be launched from under the \textbf{Places} menu in the top taskbar. Choosing the Locations option under the Go menu of the file browser will allow you to type in a protocol (e.g. ftp, ssh) and a location. Here, a section of EMBL from the EBI is copied to my system using drag and drop between the two file browser windows.}
+		\end{minipage}
+	}
+\end{figure}
+
+\paragraph{}Now open another file browser by going to the \textbf{Places} menu. Navigate to the folder you wish to store the files in. Now you can just drag and drop your files from the remote machine onto your CloudBioLinux instance. See figure \ref{fig:graphicalftp} on page \pageref{fig:graphicalftp}.
+
+
+
+
+\paragraph{}This process is simple, and for one-off jobs, is perfectly adequate. Note that you will generally pay for the network traffic you generate in transferring the data\footnote{Until November 1, 2010, data transfer onto Amazon is free. The first Gb per month of transfer off is also free. (Information taken from the \href{http://aws.amazon.com/ec2/pricing/}{Amazon website} on July 21, 2010, with no guarantees to be correct at the time you are reading this document. Please check the \href{http://aws.amazon.com/ec2/}{official pricing list}.} So if you are going to use the same dataset numerous times, it is worth considering setting up an EBS volume rather than transferring data onto new instances. Even if this transfer is free, it will still generally take more time than mounting an EBS volume that already has your data on it.
+
+\section{Using EBS volumes for data}
+\label{section:ebscopy}
+\paragraph{}An Amazon EBS volume is what you need if 
+\begin{itemize}
+\item you are going to use a dataset a number of times, with gaps in time between uses, or
+\item you want to store your data such that you can connect to it from different CloudBioLinux (or other Amazon EC2) images, or
+\item if you wish to share your data with other people also working on Amazon EC2 systems.
+\end{itemize}
+
+\paragraph{}This guide presents only a small part of what is possible with EBS volumes. Please check out the \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/ebs-api-overview.html}{EBS volume documentation on the Amazon website} for further information.
+
+\paragraph{A note on charging:}You will be \href{http://aws.amazon.com/ec2/}{charged for your Amazon EBS volume} as long as it is in existence, and you will be \emph{charged for the space you request}, not the space you are really using. So if you ask for 1Gb, you are paying for 1Gb, even if you only use 100Kb. 
+
+\paragraph{Creating your volume}
+
+\begin{figure}[!ht]
+%	\centering
+	\fbox
+	{
+		\begin{minipage}{13cm}
+			\includegraphics[width=\maxwidth]{"images/createAndMountVol-1"}
+			\caption[Attaching a volume]{\label{fig:createandmountvolume}To create a new volume and get access to it from your running instance involves 4 steps. Here we suggest that the first two are done using the AWS Console. The second two steps are done within your running instance. If you want to work with a volume you (or someone else) has created earlier, then you need only carry out the steps in the grey boxes. The commands for carrying out the two steps in your running instance are provided in the text on page \pageref{text:mounting}}
+		\end{minipage}
+	}
+\end{figure}
+
+
+\paragraph{}The instructions in this section assume you have already started up and have logged into an EC2 instance. 
+\paragraph{}The steps involved in creating and mounting a volume are illustrated in figure~\ref{fig:createandmountvolume}.
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/createVolume-1"}
+\caption[Create volume in console]{\label{fig:createvolume}The volumes pane of the AWS Console is brought up by clicking on the Volumes link in the Navigation pane (Green oval).  Red circle: Just click the Create Volume button - it does what it says. Purple circle: the status of your volume creation is reported to you. When the circle turns blue and the word says \emph{available}, you can proceed to attach and mount your volume.}
+		\end{minipage}
+	}
+\end{figure}
+
+\begin{itemize}
+\item In the Navigation pane (left side) of the AWS Management Console, go to the Elastic Block Store area and choose \textbf{Volumes}. See figure~\ref{fig:createvolume}.
+\item Click on the \textbf{Create Volume} button.
+\item Choose the same availability zone as the images you plan to use this volume with.
+\item After changing any other settings in this window, press the \textbf{Create} button.
+\item Wait until the yellow circle beside the word \emph{creating} is replaced by a blue circle beside the word \emph{available}.
+\end{itemize}
+
+\paragraph{}You now have an EBS volume attached to your running instance. This is analagous to plugging in a new piece of hardware to a server. This means that the volume \textbf{is not yet ready for copying data onto}. You first must mount the volume on your instance - this makes the volume accessible to you when you are logged into your instance \footnote{For those used to user-friendly plug 'n play systems, where you just plug a pre-formatted hard drive into a machine and copy to it directly, the steps outlined here might come as a bit of long-winded shock. In fact, all you are doing is carrying out the steps that, between your hardware vendor and your computer operating system, are often done for you. In particular, the equivalent to a disk drive here is the EBS volume, which is initally unformatted and needs to be formatted. To do this, you attach it to your running instance, then you format it. Now, to work with the filesystem on your volume, you need to mount in onto your image file system, so the whole thing - image and volume, can be interacted with as one. Until you unmount the volume of course.}. 
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/attachVolume-1"}
+\caption[Attaching a volume]{\label{fig:attachvolume1}Click on the Attach Volume button (Orange circle) to Attach a volume to an instance.}
+		\end{minipage}
+	}	
+\end{figure}
+
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/attachVolume-2"}
+\caption[Attaching a volume]{\label{fig:attachvolume2}Fill in the information requested. Note that both the instance and the EBS volume are in the same region. You just need to provide an unused device to attach your volume to. If you don't know what this means, and are starting up a CloudBioLinux instance, then just use any of the suggested locations: /dev/sdf, /dev/sdg, /dev/sdh....up to /dev/sdp for now and check out \href{http://it.toolbox.com/wiki/index.php/Mount_point}{some documentation to find out what it means later}.}
+		\end{minipage}
+	}
+\end{figure}
+
+
+\begin{itemize}
+\item Click on the \textbf{Attach Volume} button on the Volumes page. See figure~\ref{fig:attachvolume1}. 
+\item To attach a volume using the AWS Console interface, you just need to fill in the requested information. See figure~\ref{fig:attachvolume2}.
+\end{itemize}
+\paragraph{}Note that selecting any of your volumes in the AWS Management Console will bring up details of that volume at the bottom of the page. 
+
+
+\paragraph{Accessing your volume}
+\paragraph{}\label{text:mounting}This is where it gets a bit ugly, as you need to log into your machine and use the command line for the next couple of steps. The first of these steps, \textbf{formatting your disk}, only needs to be done \emph{the first time} you use a particular volume. The second step, \textbf{mounting the volume}, needs to be done  \emph{each time} you want to access data on your volume from a new instance. There are ways to automate mounting a volume onto new instances, but these are not covered here. 
+
+\begin{enumerate}
+\item Log into your instance. If you are logged in using NX, start up a terminal window.
+\item \textbf{The first time you mount a volume for use:} Type the following command to create an ext3 filesystem on your volume. Here I assume you have mounted it to /dev/sdf. See figure \ref{fig:attachvolume2} on page \pageref{fig:attachvolume2}.
+\\\textbf{sudo mkfs -t ext3 /dev/sdf }
+\item Now make an empty directory. This will act as a place where you can mount your new filesystem. By convention, mount points tend to be put in directories such as /mnt or /media. For example, the command below creates a directory called /mnt/datasets:
+\\\textbf{sudo mkdir /mnt/datasets}
+\item Now you can mount your volume onto this:
+\\\textbf{sudo mount /dev/sdf /mnt/datasets}
+\end{enumerate}
+
+\paragraph{}You will now be able to put data under the folder /mnt/datasets. All files under that directory are on your EBS volume and will not be lost when your instance terminates. Ensure you read the section on page \pageref{text:unmounting} on \textbf{unmounting your volume} as failure to unmount before detaching your volume (or terminating your instance) could lead to data corruption. 
+
+\paragraph{Unmounting your volume}
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/unmountDetach-1"}
+\caption[Attaching a volume]{\label{fig:unmountdetach}You must unmount a volume before detaching it. Not doing so may result in data corruption on the volume. You can then either detach the volume from your instance by using the \textbf{Detach Volume} button on the AWS Console, or the volume will be detached for you when you terminate your instance. The commands for unmounting a volume from within your running instance are provided in the text on page \pageref{text:unmounting}}
+		\end{minipage}
+	}
+\end{figure}
+
+\paragraph{This is a simple but vital step to avoid the possibility of data corruption.} Do this \emph{before you detach} your volume or terminate your instance.
+
+\paragraph{}If you had attached your device to /dev/sdf, then you simply need to type:
+\\\textbf{umount -d /dev/sdf}
+\label{text:unmounting}
+\paragraph{Detaching your volume}
+\paragraph{}You can detach your volume from your instance using the AWS Management Console using the Detach Volume button on the console Navigation pane. Alternatively, your volumes will be detached automatically when you terminate your instance.
+
+\paragraph{Backing up or sharing your volume}
+\paragraph{}Check out the Userguide information on \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/creating-snapshot-ebs.html}{creating snapshots} and on \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/modifying-snapshot-permissions-ebs.html}{modifying permisisons on snapshots}.
+
+
+\paragraph{Deleting your volume}
+\paragraph{}You can delete your volume using the Delete button on the console Navigation pane. 
+
+\section{Accesing public datasets on Amazon}
+\label{section:publiccopy}
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+\includegraphics[width=\maxwidth]{"images/public-ensembl"}
+\caption[List public data]{\label{fig:ensembl}Click the Snapshot link in the Navigation pane. Then select Public Snapshots in the Viewing menu. Searching for a term such as \emph{ensembl} brings up all the public snapshots that contain ensembl in their description. }
+		\end{minipage}
+	}
+\end{figure}
+
+\paragraph{}Amazon makes some \href{http://aws.amazon.com/publicdatasets/}{public data sets available as snapshots}. You can just attach and mount these (see grey boxes in figure~\ref{fig:createandmountvolume}. No data transfer is necessary. Finding datasets is easy: just search through the public snapshots for relevant terms. See figure~\ref{fig:ensembl}. Check out the \href{http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=243}{full public data set listing}. 
+
+\paragraph{}Amazon provides \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/using-public-data-sets.html}{documentation on how to make use of these public data resources}.
+
+
+\paragraph{}
+
+
+
+

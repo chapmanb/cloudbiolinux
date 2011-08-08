@@ -1,0 +1,43 @@
+\documentclass[pdftex]{report}
+\usepackage[pdftex]{graphicx}
+%\usepackage{graphicx}
+%\usepackage{floatflt}
+\usepackage{sidecap}
+\usepackage{hyperref}
+
+\begin{document}
+\title{Getting started with CloudBioLinux}
+\author{Bela Tiwari}
+\maketitle
+
+\makeatletter
+	\def\maxwidth
+	{
+	\ifdim\Gin@nat@width>\linewidth
+		\linewidth
+	\else
+		\Gin@nat@width
+	\fi
+	}
+\makeatother
+\tableofcontents
+\chapter{Preparing to work on the Amazon Cloud}
+\include{getReady}
+
+
+\chapter{Running a CloudBioLinux instance}
+\include{workingOnCloudBL}
+
+\chapter{Working with data on the cloud}
+
+\include{workingWithData}
+
+\appendix
+\chapter{Appendices}
+\include{cloudbl_desktopIntro}
+\include{basicTerminology}
+
+%\include{FAQ}
+
+
+\end{document}

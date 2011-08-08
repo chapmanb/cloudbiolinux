@@ -1,0 +1,42 @@
+\section{Basic terminology}
+\paragraph{}One of the most daunting parts of starting to work on the cloud is the abundance of new words and acronyms that litter the documentation. Here are a few of the most common terms you'll come across, and what they mean when used in the cloud computing context.
+
+\paragraph{Amazon Machine Image} - Pre-configured machine images that you can start up and work on. Most commonly referred to as AMI, or just "image" in documentation.
+
+\paragraph{Amazon Simple Storage Service} - More commonly known as "S3", this is a storage type offered as a web service. This document is primarily concerned with EBS Volumes for storage, rather than S3. However, if you take a snapshot of a volume, it is stored in S3. There are many \href{http://www.cloudiquity.com/2009/03/differences-between-s3-and-ebs/}{differences between EBS and S3}, which you should find out about if you plan to work on the cloud seriously.
+
+\paragraph{AMI} - see "Amazon Machine Image".
+
+\paragraph{Availability Regions and Zones} - Amazon have a number of data centres around the world. A Region in this context described centres in different geographic areas (e.g. the U.S. and Europe). An Availability Zone describes distinct locations within a region. For a new user, the most likely thing to look out for is that you create volumes in the same region and zone as your running instance(s). For more detailed information about regions and zones, check out the \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/concepts-regions-availability-zones.html}{EC2 Userguide}, including the \href{http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?FAQ_Regions_Availability_Zones.html}{Region and Availability Zone FAQ}.  
+
+\paragraph{AWS} - Stands for "Amazon Web Services". An umbrella name for the myriad of web services offered by Amazon. These services include the provision of compute power and storage, which are the focus of this document.
+
+\paragraph{AWS console} - \href{http://aws.amazon.com/console/}{A graphical web interface to your AWS account}. From this interface, you can create, manage and delete Amazon resources such as system instances and data volumes.
+
+\paragraph{EBS} - See "Elastic Block Storage".
+
+\paragraph{EC2} - See "Elastic Compute Cloud"  
+
+\paragraph{Elastic Block Strorage} - Also referred to as "volumes". A type of storage that was designed for Amazon EC2 instances. You can create EBS volumes and mount these as devices, as you might with a hard drive on a standard system. EBS volumes are particularly useful if you plan to store data for multiple uses.
+
+\paragraph{Elastic Compute Cloud} - Also known as EC2, this is an Amazon web service that makes computational capacity available as a virtual computing environment. When you start up an image, you do so from within an EC2 account, from the EC2 section of the AWS Console. 
+
+\paragraph{Image} - See "Amazon Machine Image"
+
+\paragraph{Instance} - See "Amazon Machine Image"
+
+\paragraph{NX} - At a user level, NX is a method allowing you to experience a full, graphical desktop session on a machine you are logged into remotely. \href{http://en.wikipedia.org/wiki/NX_technology}{Documentation outlining how this is achieved is available}.
+
+\paragraph{Putty} - In the context of this document, Putty is a program that can be used on Windows as an SSH client.
+
+\paragraph{S3} - See "Amazon Simple Storage Service"   
+
+\paragraph{SSH} - Stands for Secure Shell. A network protocol that allows data to be exchanged using a secure channel. Information sent over an SSH connection is encrypted. The standard port for SSH connections is port 22.
+
+\paragraph{Snapshot} - A snapshot is essentially a copy of a volume. Taking a snapshot of an EBS volume means that you save the state of your volume, as a snapshot, in Amazon S3. This snapshot is then replicated across multiple Availability Zones. This means that the information on your EBS volume is saved in a durable manner. Snapshots can then be used as the starting point for new EBS volumes. For example, if you select a snapshot in the AWS Console, you can choose to make a volume of it. Once you have attached and mounted that volume to a running image, you have access to all the information you saved when you took the snapshot. Snapshots can also be used when sharing data or images. See the offical documentation for more. 
+
+\paragraph{Volume} - See "Elastic Block Storage".
+
+
+
+

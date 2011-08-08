@@ -1,0 +1,5 @@
+These files make up an introductory tutorial about running CloudBioLinux on Amazon EC2. 
+
+The controlling file is called gettingStarted_Cloud-Bio-Linux.tex and mostly just has include statements for the other tex files. The pdf was made using pdflatex and calling it on gettingStarted_Cloud-Bio-Linux.tex 
+
+ 

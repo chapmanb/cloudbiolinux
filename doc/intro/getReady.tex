@@ -1,0 +1,75 @@
+\section{Get an Amazon AWS account}
+\label{section:getaccount}
+\paragraph{}Anyone can set up an account with Amazon to access their computer cloud. Just go to \href{http://aws.amazon.com}{http://aws.amazon.com} and sign up for an account.
+
+\begin{SCfigure}[][t]
+\includegraphics[width=40mm]{"images/aws_signup_button"}
+\caption[Sign up for AWS]{\label{fig:aws_signup}Signing up for an AWS account starts with the click of a button.}
+\end{SCfigure}
+
+\paragraph{The rest of this document assumes you have an AWS account and you are logged into it.}
+
+\section{Get an Amazon EC2 Account}
+
+\paragraph{}There are various ways you can access the power of the Amazon cloud. In this document, we describe using EC2. 
+
+\paragraph{}If you do not already have one, you need to sign up for an EC2 account. This is in addition to the general Amazon aws account you have if you followed the instructions in section \ref{section:getaccount}. 
+
+\paragraph{To get your EC2 account}, 
+\begin{enumerate}
+\item click on the Products tab on the \href{http://aws.amazon.com}{Amazon aws page},
+\item click on the \href{http://aws.amazon.com/ec2/}{Amazon Elastic Compute Cloud (EC2) link} that appears in the Compute section of the listing, and
+\item click on the button in the right hand pane that says Sign up for Amazon EC2.  
+\item Complete the registration process\footnote{Signing up for Amazon EC2 also automatically signs you up for Amazon Simple Storage Service and Amazon Virtual Private Cloud. You will not be charged for any service unless you use it.}.
+\end{enumerate}
+
+\section{Get an EC2 key pair}
+
+\paragraph{}After you've signed up for your account, Amazon will send you an email with a link in it to the Access Identifiers section of your account. Amazon provides a list of \href{http://docs.amazonwebservices.com/AWSSecurityCredentials/1.0/AboutAWSCredentials.html#EC2Credentials}{which credentials you need to do particular tasks}.  If all you will be doing is starting up Bio-Linux using the Amazon (graphical) console, then you only need an \href{http://docs.amazonwebservices.com/AWSSecurityCredentials/1.0/AboutAWSCredentials.html#EC2KeyPairs}{Amazon EC2 Key Pair}. 
+
+\begin{figure}[!hd]
+	\fbox
+	{
+		\begin{minipage}{13cm}
+%the maxwidth variable is defined in the summary page: gettingStarted_CloudBioLinux.tex
+\includegraphics[width=\maxwidth]{"images/EC2Homepage2"}
+\caption[EC2 Homepage]{\label{fig:ec2homepage}Your AWS home are will look something like this. Here, we are looking at the information under the EC2 tab (Red Circle). Blue Circle: your Key Pairs - if you don't have any, click on the link to create some. Purple Circle: You can easily launch any publicly available EC2 image from Amazon by clicking on this button. Green Circle: The number of running instances you have. If you have any, you can find out more about them by clicking on this link. Pink Circle: If you add Key Pairs, or start up instances, you may need to hit the refresh button to see changes on your EC2 Dashboard.}
+		\end{minipage}
+	}
+\end{figure}
+
+
+\begin{SCfigure}[][t]
+%the maxwidth variable is defined in the summary page: gettingStarted_CloudBioLinux.tex
+\includegraphics[width=60mm]{"images/keypairCreateButton"}
+\caption[Keypair creation]{\label{fig:keypaircreate}Keypair creation is simple - just click on the button and follow the instructions on screen.}
+\end{SCfigure}
+
+\paragraph{To create a key pair:}
+\begin{enumerate}
+\item Go to the the \href{https://console.aws.amazon.com/ec2/home}{EC2 area on Amazon https://console.aws.amazon.com/ec2/home}.
+\item Click on the \emph{Key Pairs} link under My Resources in the right hand area of the window. See the blue circle in figure~\ref{fig:ec2homepage}.
+\item Click on the \emph{Create Key Pair} button near the top of the Key Pairs section of the window. See figure \ref{fig:keypaircreate} on page \pageref{fig:keypaircreate}.
+\item Give your key pair a memorable name when prompted. Save your private key to a safe location. See the further information below about this. 
+\item Click on the link in the left hand pane to go back to the \emph{EC2 Dashboard} and then click on the \emph{Refresh button} at the far right hand side of the window (see pink circle in figure~\ref{fig:ec2homepage}). 
+\end{enumerate}
+
+\paragraph{}You should now see that you have a key pair registered in the \emph{My Resources} section. 
+
+\paragraph{}Each EC2 key pair includes a private key file and a public key file. \textbf{Save your private key to a secure and memorable location}. Don't lose it or share it. (Amazon does not make a copy of it.) If you're working on Linux, adjust the permissions on your key file so it is readable only by you. 
+
+\paragraph{}If you plan to use the command line tools to start up an instance, you will also need to get your \href{http://docs.amazonwebservices.com/AWSSecurityCredentials/1.0/AboutAWSCredentials.html#X509Credentials}{X509 certificates}. This document assumes that you will only be using the graphical console, so this is not covered further here. 
+
+\paragraph{How the EC2 key pairs work}
+
+\paragraph{}When you launch a CloudBioLinux instance from  Amazon, you will specify a particular EC2 key pair. The Amazon system puts a copy of your public key, which it has a record of, on the instance. You, as the (only!) holder of the private key will be the only one able to access the CloudBioLinux instance you just started up. 
+
+
+\section{Install an NX Client on your local machine}
+
+\paragraph{}To run a full desktop session, you need have NX client software on the machine you will be connecting to the Amazon Cloud from. If you don't already have NX Client software installed, we recommend the free clients from \href{http://www.nomachine.com/download.php}{NoMachine}\footnote{CloudBioLinux already has the FreeNXServer software installed}.
+%put that server line in a footnote, because for anyone not familiar with "server" and "client", it might be easy to get confused. 
+
+\paragraph{You only need to install an NX Client on your local system if you wish to run a full graphical desktop session for working on CloudBioLinux.}  
+
+
