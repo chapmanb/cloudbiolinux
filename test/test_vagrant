@@ -57,8 +57,9 @@ if ARGV.index('-h') or ARGV.index('--help')
 
     test_vagrant [--continue] [name] 
 
-      --continue    Continue on an already running VM (no VM setup)
-      name          The target name (default Minimal)
+      --continue    Continue install on an already running VM (no VM setup)
+      name          The target test VM name (default is 'Minimal')
+      --help        Print this info
 
   Example:
 
@@ -84,7 +85,7 @@ if ARGV.index('-h') or ARGV.index('--help')
   exist in the local directory. On my system the first install run takes
   approx. 10 minutes (including the original image download at 10Mbs), the
   second fresh install run, using a local box, takes 5 minutes, and the
-  --continue switch only 8 seconds.
+  --continue switch less than a minute.
 
   For more information see ./doc/hacking.md
 
@@ -124,7 +125,7 @@ error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /v
 require 'vagrant'
 
 # Name a temporary dir
-testname = "biolinux_"+File.basename(localbox,".box")
+testname = box_name+"_BioLinux_"+File.basename(localbox,".box")
 
 if use_running_vm
   print "Continuing on an already running VM #{testname}\n"
