@@ -1,14 +1,15 @@
-#! /usr/bin/ruby 
+#! /usr/bin/ruby
 #
 # Integration testing of BioLinux targets - see
 #
 #   ./test/test_vagrant --help
+#   ./test/test_vagrant --list
 #
 
 require 'rubygems'
 
 # Available testing targets - this could be read from a YAML file.
-BOX = { 
+BOX = {
         'Minimal' =>
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
              :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
@@ -47,19 +48,35 @@ def error msg
   exit 1
 end
 
+def list_boxes
+  print "BioLinux VMs available for testing:\n\n"
+  BOX.each do | edition, properties |
+    print "* ", edition, " (",properties[:url],")\n"
+  end
+end
+
+if ARGV.index('--list')
+  list_boxes
+  exit 0
+end
+
 if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
     Note this testing framework is under development, and is meant to
-    work on Debian-type systems. It requires ruby, wget, md5sum
+    work on Debian-type systems. It requires vagrant, virtualbox, wget,
+    md5sum.
 
   Usage:
 
-    test_vagrant [--continue] [name] 
+    test_vagrant [option] [name]
+
+  Options:
 
       --continue    Continue install on an already running VM (no VM setup)
-      name          The target test VM name (default is 'Minimal')
+      --list        List VMs available for testing
       --help        Print this info
+      name          The target test VM name (default is 'Minimal')
 
   Example:
 
@@ -85,16 +102,14 @@ if ARGV.index('-h') or ARGV.index('--help')
   exist in the local directory. On my system the first install run takes
   approx. 10 minutes (including the original image download at 10Mbs), the
   second fresh install run, using a local box, takes 5 minutes, and the
-  --continue switch less than a minute.
+  --continue switch less than half a minute.
 
   For more information see ./doc/hacking.md
 
   Available boxes are:
 
 USAGE
-  BOX.each do | edition, properties |
-    print "* ", edition, " (",properties[:url],")\n"
-  end
+  list_boxes
   exit 0
 end
 

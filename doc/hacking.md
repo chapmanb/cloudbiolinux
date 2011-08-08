@@ -51,7 +51,13 @@ version of BioLinux that would pull in a list of scripts and some additional
 packages.  Starting from an existing edition (in this case the Minimum edition,
 but it also works on top of BioNode and BioLinux editions), I created a new
 flavor in ./contrib/flavor/pjotrp/biotest/biotestflavor.py, named BioTestFlavor
-(note you also need an empty __init__.py file).  The flavor comes with a new
+(note you also need an empty __init__.py file).  A Flavor class overrides the
+Flavor methods defined in ./cloudbio/flavor/__init__.py, in particular
+rewrite_config_items, a generic hook to rewrite a list of configured items (the
+package lists), and post_install, a post installation hook. See
+https://github.com/pjotrp/cloudbiolinux/blob/master/cloudbio/flavor/__init__.py.
+
+The flavor comes with a new
 fabricrc.txt file, and a new main.yaml file.  So kicking it into submission
 would look like:
 
