@@ -8,4 +8,5 @@
 # version control, and basic build support (GNU tools)
 packages:
   - minimal
+  - ruby
 libraries:
