@@ -12,7 +12,8 @@ class BoincFlavor(Flavor):
         Flavor.__init__(self,env)
         self.name = "Boinc Flavor"
 
-    def rewrite_config_items(self, name, packages):
+    def rewrite_config_items(self, name, packages): 
+        packages += [ 'openssh-server', 'unzip', 'tar', 'sudo' ]
         for package in packages:
           env.logger.info("Selected: "+name+" "+package)
         return packages

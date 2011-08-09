@@ -119,6 +119,5 @@ class Minimal(Edition):
         Can define custom dispatches based on name: packages, custom,
         python, ruby, perl
         """
-        items.append('ruby1.9.1')
         return items
 
