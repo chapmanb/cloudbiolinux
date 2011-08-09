@@ -31,7 +31,7 @@ BOX = {
 }
 
 print "Integration test scripts for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
-print "Running Ruby "+RUBY_VERSION+"\n"
+print "BioLinux test frame work running on Ruby "+RUBY_VERSION+"\n"
 
 # find location of test files
 path = File.dirname(__FILE__)
