@@ -278,6 +278,7 @@ web:
   - apache2
 boinc:
   - boinc-client
+  - boinc-manager
 bio_general:
   - primer3
   - readseq
