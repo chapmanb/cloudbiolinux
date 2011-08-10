@@ -62,6 +62,9 @@ desktop:
   - cloudbl-desktop
   - bio-linux-tutorials
   - xvfb
+desktop-cloud:
+  # some special purpose VMs, such as BOINC, only require a minimal desktop
+  - lxde
 programming:
   editors:
     - emacs
@@ -179,7 +182,7 @@ python:
     - python-distutils-extra
   wrappers:
     - python-rpy
-ruby: 
+ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
   - ruby1.8
@@ -273,6 +276,9 @@ viz:
   - libglu1-mesa-dev
 web:
   - apache2
+boinc:
+  - boinc-client
+  - boinc-manager
 bio_general:
   - primer3
   - readseq

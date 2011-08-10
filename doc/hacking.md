@@ -4,7 +4,7 @@ The BioLinux tools allow building a full environment for Bioinformatics. The
 design allows for flexible targets (Editions) and specializations (Flavors).
 
 Please read the README and ./doc/vagrant documentation that come with the
-source tree first.
+BioLinux source tree first (see http://github.com/chapmanb/cloudbiolinux).
 
 == Start with the Minimal edition
 
@@ -51,60 +51,75 @@ version of BioLinux that would pull in a list of scripts and some additional
 packages.  Starting from an existing edition (in this case the Minimum edition,
 but it also works on top of BioNode and BioLinux editions), I created a new
 flavor in ./contrib/flavor/pjotrp/biotest/biotestflavor.py, named BioTestFlavor
-(note you also need an empty __init__.py file).  The flavor comes with a new
-fabricrc.txt file, and a new main.yaml file.  So kicking it into submission
-would look like:
+(note you also need an empty __init__.py file).  A Flavor class overrides the
+Flavor methods defined in ./cloudbio/flavor/__init__.py, in particular
+rewrite_config_items, a generic hook to rewrite a list of configured items (the
+package lists), and post_install, a post installation hook. To see what packages
+your Flavor wants to install, simply override rewrite_config_items, and add a print
+statement. For example:
+
+    def rewrite_config_items(self, name, packages):
+        for package in packages:
+          env.logger.info("Selected: "+name+" "+package)
+        return packages
+
+The flavor is itself is found through a fabricrc.txt file. The main package list may be
+in a new main.yaml file.  Kicking it into submission:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
 The flavor module itsefl sets env.flavor on loading the module (this can only
-happen once). For examples see the files in ./contrib/flavor.
+happen once). For more examples see the files in ./contrib/flavor.
 
-== Flavor: add sources
+== Distribute a VirtualBox
+
+With vagrant a box can be exported with
+
+          vagrant package
+
+== Flavor: change default sources (apt, yum, rpm)
+
+Note: NYI
 
 BioLinux creates a (default, or edition based) list of package sources. These
 sources can be overridden by the Flavor.rewrite_apt_sources_list method - which
 should return a new list.
 
-== Flavor: add packages
+== Flavor: install additional packages
 
 The primary way of adding new packages is by creating a new main.yaml file, as
 discussed above in ''Define a flavor''. In addition a flavor can define a
 method: BioLinux creates a (default, or edition based) list of packages. These
-sources can be overridden by the Flavor.rewrite_packages_list method - which
-should return a new list. In your Flavor add a function:
-
-    def rewrite_packages_list(self, list):
-        list.append('testpackage')
-        return list
+sources can be overridden by the Flavor.rewrite_config_list method - which
+should return a new list.
 
 == Flavor: filter packages
 
-To filter/remove packages from the default list, use rewrite_packages_list, add
-the following to your Flavor to remove testpackage from the install list:
-
-    def rewrite_packages_list(self, list):
-        list.remove('testpackage')
-        return list
+To filter/remove packages from the default list, use rewrite_config_list to filter existing
+meta packages.
 
 == Flavor: rewrite Ruby gem, Perl CPAN, Python egg, R CRAN lists
 
-In a similar fashion to rewrite_packages_list there are functions for Ruby,
-Perl etc. Check the rewrite functions. The general idea is that the main
+The function rewrite_config_list also allows rewriting package lists for Ruby, Python, R,
+Perl etc. The general idea is that the main
 Editions define the inclusion of the main languages, and pull in Bio* related
 packages. To override this behaviour use the rewrite functions, e.g.
 
-    def rewrite_ruby_gem_list(self, list):
+    def rewrite_config_list(self, name, list):
+      if name == 'ruby':
         return [ 'bio' ]
+      return list
 
-only allows the BioRuby gem to be installed when adding to main.yaml
+only allows the BioRuby 'bio' gem to be installed. This happens at the time your
+meta main.yaml reads
 
     libraries:
       - ruby-libs
 
-which pulls in ruby-libs.yaml. We share one ruby-libs.yaml to make sure all
-editions are up-to-date. Likewise for all the other yaml files. Your
-configuration options are at the main.yaml level, and using rewrite methods.
+and pulls in ruby-libs.yaml. One ruby-libs.yaml is shared to make sure all
+editions are up-to-date. Likewise for all the other yaml files. The
+configuration options are at the main.yaml (meta-package) level, and by using
+rewrite methods at Edition and Flavor levels.
 
 == Flavor: install special software
 
@@ -139,7 +154,7 @@ target, e.g.
 
          fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,target=post_install
 
-Now, is this neat, or what? For a full Flavor example see 
+For a full Flavor example see
 
     https://github.com/pjotrp/cloudbiolinux/blob/master/contrib/flavor/pjotrp/biotest/biotestflavor.py
 
@@ -151,7 +166,16 @@ To see the what a BioLinux install does to your system, store the settings of
 the original (untouched) state of a VM:
 
 1. Make a dump of the current installed package list
+
+                 dpkg -l > dpkg-original-list.txt
+
 2. Store the /etc tree - one way is to use git in /etc
 
 After running BioLinux you can see what has been done to your system by diffing
 against the package list, and checking /etc.
+
+== Use the testing framework to create new Flavors
+
+BioLinux comes with a testing framework in ./test. The frame work creates a new VM on
+a local machine. You can add tests, to check if a VM is complete. See the main README file for
+more information.

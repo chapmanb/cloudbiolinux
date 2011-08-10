@@ -2,12 +2,12 @@
 #
 #
 
-def test_for_completed_install(edition_name)
+def test_for_completed_install(ssh, box_name)
   # test for completion of the fabfile
-  run "scp vagrant:/var/log/biolinux.log biolinux.log"
-  lastline = `tail -1 biolinux.log`
+  run "scp default:/var/log/biolinux.log biolinux.log"
+  lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
   print lastline
-  error "Installation looks incomplete "+lastline if lastline !~ /#{edition_name}/
+  error "Installation looks incomplete "+lastline if lastline !~ /#{box_name}/
   true
 end
 

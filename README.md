@@ -323,6 +323,14 @@ based on Vagrant. Try:
         cd test
         ./testing_vagrant --help
 
+Target VMs can be listed with
+
+        ./testing_vagrant --list
+
+Build a minimal VM
+
+        ./testing_vagrant Minimal
+
 # Documentation
 
 Additional documentation can be found in the [./doc directory][doc] in the

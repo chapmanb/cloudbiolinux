@@ -19,6 +19,7 @@ gems:
   - bio
   - bio-bwa
   - bio-blastxmlparser
+  - bio-gff3
   - biomart
   - ruby-ensembl-api
   # databases

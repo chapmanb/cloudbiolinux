@@ -3,17 +3,35 @@
 # Integration testing of BioLinux targets - see
 #
 #   ./test/test_vagrant --help
+#   ./test/test_vagrant --list
 #
 
 require 'rubygems'
 
 # Available testing targets - this could be read from a YAML file.
-BOX = { 'Minimal' =>
-           { :url => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5 => 'ff4ee2e9c2ebdde1d89db75af1483a99' }
+BOX = {
+        'Minimal' =>
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
+             :packagelist => 'contrib/minimal/main.yaml'
+           },
+        'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',
+             :packagelist => 'contrib/flavor/boinc/main.yaml'
+           },
+        'BioNode' =>
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/bionode/fabricrc_bionode.txt',
+             :packagelist => 'contrib/bionode/main.yaml'
+           },
 }
 
-print "Integration test script for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
+print "Integration test scripts for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2011)\n"
+print "BioLinux test frame work running on Ruby "+RUBY_VERSION+"\n"
 
 # find location of test files
 path = File.dirname(__FILE__)
@@ -30,19 +48,35 @@ def error msg
   exit 1
 end
 
+def list_boxes
+  print "BioLinux VMs available for testing:\n\n"
+  BOX.each do | edition, properties |
+    print "* ", edition, " (",properties[:url],")\n"
+  end
+end
+
+if ARGV.index('--list')
+  list_boxes
+  exit 0
+end
+
 if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
     Note this testing framework is under development, and is meant to
-    work on Debian-type systems. It requires ruby, wget, md5sum
+    work on Debian-type systems. It requires vagrant, virtualbox, wget,
+    md5sum.
 
   Usage:
 
-    test_vagrant [--continue] [edition] [flavor]
+    test_vagrant [option] [name]
 
-      --continue    Continue on an already running VM (no VM setup)
-      edition       The target edition (default Minimal)
-      flavor        The target flavor (default Base) (NYI)
+  Options:
+
+      --continue    Continue install on an already running VM (no VM setup)
+      --list        List VMs available for testing
+      --help        Print this info
+      name          The target test VM name (default is 'Minimal')
 
   Example:
 
@@ -68,35 +102,37 @@ if ARGV.index('-h') or ARGV.index('--help')
   exist in the local directory. On my system the first install run takes
   approx. 10 minutes (including the original image download at 10Mbs), the
   second fresh install run, using a local box, takes 5 minutes, and the
-  --continue switch only 8 seconds.
+  --continue switch less than half a minute.
 
   For more information see ./doc/hacking.md
 
+  Available boxes are:
+
 USAGE
-  BOX.each do | edition, properties |
-    print "* ", edition, " (",properties[:url],")\n"
-  end
+  list_boxes
   exit 0
 end
 
 srcpath = File.dirname(File.dirname(__FILE__))
 print srcpath, "\n"
 
-edition_name = ARGV.shift
+box_name = ARGV.shift
 use_running_vm = false
-if edition_name == '--continue'
+if box_name == '--continue'
   use_running_vm = true
-  edition_name = ARGV.shift
+  box_name = ARGV.shift
 end
-edition_name = 'Minimal' if !edition_name # Default
-flavor_name  = ARGV.shift
-flavor_name  = 'Base' if !flavor_name # not used
+box_name = 'Minimal' if !box_name # Default
+# flavor_name  = ARGV.shift
+# flavor_name  = 'Base' if !flavor_name # not used
 
-print "Testing edition '#{edition_name}' flavor '#{flavor_name}'\n"
-raise "Unknown box for #{edition_name}" if !BOX[edition_name]
-remotebox = BOX[edition_name][:url]
-localbox  = File.basename(remotebox)
-md5box    = BOX[edition_name][:md5]
+print "Testing box/VM named '#{box_name}'\n"
+raise "Unknown box for #{box_name}" if !BOX[box_name]
+remotebox    = BOX[box_name][:url]
+localbox     = File.basename(remotebox)
+md5box       = BOX[box_name][:md5]
+fabricrc     = srcpath + '/' + BOX[box_name][:fabricrc]
+packagelist  = srcpath + '/' + BOX[box_name][:packagelist]
 
 # find or install vagrant
 error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /vagrant/
@@ -104,7 +140,7 @@ error "Vagrant not installed. Use: gem install vagrant" if `which vagrant` !~ /v
 require 'vagrant'
 
 # Name a temporary dir
-testname = "biolinux_"+File.basename(localbox,".box")
+testname = box_name+"_BioLinux_"+File.basename(localbox,".box")
 
 if use_running_vm
   print "Continuing on an already running VM #{testname}\n"
@@ -146,10 +182,10 @@ Dir.chdir(testname) do
   # Fetch the vagrant ssh key, and store it locally
   # First see if we can copy a file - if we can there is no need to update .ssh/config
   File.unlink('remote_hosts') if File.exists?('remote_hosts')
-  run "scp vagrant:/etc/hosts remote_hosts"
+  run "scp default:/etc/hosts remote_hosts"
   if !File.exist?('remote_hosts')
     run "vagrant ssh-config >> ~/.ssh/config"
-    run "scp vagrant:/etc/hosts remote_hosts"
+    run "scp default:/etc/hosts remote_hosts"
   end
   raise "Problem connecting to remote hosts (using scp)" if !File.exist?('remote_hosts')
   File.unlink('remote_hosts')
@@ -157,7 +193,7 @@ Dir.chdir(testname) do
   print "We can use #{testname}!\n"
 
   # Fire up the BioLinux fab file - this installs the VM
-  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{srcpath}/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=#{srcpath}/contrib/minimal/main.yaml"
+  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{fabricrc} install_biolinux:packagelist=#{packagelist}"
 
   # Now set up Ruby's vagrant access for testing
   vagrant = Vagrant::Environment.new
@@ -171,15 +207,13 @@ Dir.chdir(testname) do
     test_for_match(ssh,"/usr/bin/rdoc -v", "RDoc")
     test_for_match(ssh,"which gem", "gem")
     # Make sure Ruby 1.9.1 is in Minimal
-    test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
-  end
-
-  if test_for_completed_install(edition_name)
-    print <<COMPLETE
+    # test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
+    if test_for_completed_install(ssh,box_name)
+      print <<COMPLETE
 
   SUCCESS!
 
-  The BioLinux installation test completed successfully!
+  The BioLinux installation test of '#{box_name}' completed successfully!
   You can check the running VM by logging in with:
 
     cd ./#{testname}
@@ -187,7 +221,17 @@ Dir.chdir(testname) do
 
   Enjoy!
 COMPLETE
+    exit 0
+    end
   end
+  print <<INCOMPLETE
+
+  FAILURE!
+
+  Somehow the test did not complete.
+
+INCOMPLETE
+  exit 1
 end
 
 
