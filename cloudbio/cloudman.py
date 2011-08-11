@@ -66,13 +66,15 @@ def _configure_sge(env):
     sge_package_dir = "/opt/galaxy/pkg"
     sge_dir = "ge6.2u5"
     sudo("mkdir -p %s" % sge_package_dir)
-    sudo("ln -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
+    if not exists(os.path.join(sge_package_dir, sge_dir)):
+        sudo("ln -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
 
 def _configure_nfs(env):
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
                 '/mnt/galaxyData    *(rw,sync,no_root_squash,subtree_check,no_wdelay)',
                 '/mnt/galaxyIndices *(rw,sync,no_root_squash,no_subtree_check)',
                 '/mnt/galaxyTools   *(rw,sync,no_root_squash,no_subtree_check)',
+                '/data/nfsshare     *(rw,sync,no_root_squash,no_subtree_check)',
                 '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
     append('/etc/exports', exports, use_sudo=True)
 
@@ -84,6 +86,9 @@ def _cleanup_ec2(env):
               "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir]
     for fname in fnames:
         sudo("rm -f %s" % fname)
+    rmdirs = ["/mnt/galaxyData", "/mnt/cm", "/tmp/cm"]
+    for rmdir in rmdirs:
+        sudo("rm -rf %s" % rmdir)
     # Stop Apache from starting automatically at boot (it conflicts with Galaxy's nginx)
     sudo('/usr/sbin/update-rc.d -f apache2 remove')
 
