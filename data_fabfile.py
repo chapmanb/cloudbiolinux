@@ -336,7 +336,7 @@ def _make_genome_dir():
         result = run("mkdir -p %s" % genome_dir)
     if result.failed:
         sudo("mkdir -p %s" % genome_dir)
-        sudo("chown %s %s" % (env.user, genome_dir))
+        sudo("chown -R %s %s" % (env.user, genome_dir))
     return genome_dir
 
 def _data_ngs_genomes(genomes, genome_indexes):

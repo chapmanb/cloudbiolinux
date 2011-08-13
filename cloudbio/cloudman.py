@@ -70,12 +70,19 @@ def _configure_sge(env):
         sudo("ln -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
 
 def _configure_nfs(env):
+    nfs_dir = "/export/data"
+    cloudman_dir = "/mnt/galaxyData/export"
+    sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
+    sudo("chmod -R ubuntu:ubuntu %s" % os.path.dirname(nfs_dir))
+    if not exists(nfs_dir):
+        run("ln -s %s %s" % (cloudman_dir, nfs_dir))
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
                 '/mnt/galaxyData    *(rw,sync,no_root_squash,subtree_check,no_wdelay)',
                 '/mnt/galaxyIndices *(rw,sync,no_root_squash,no_subtree_check)',
                 '/mnt/galaxyTools   *(rw,sync,no_root_squash,no_subtree_check)',
-                '/data/nfsshare     *(rw,sync,no_root_squash,no_subtree_check)',
-                '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
+                '%s       *(rw,sync,no_root_squash,no_subtree_check)',
+                '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' %
+                (nfs_dir, env.install_dir)]
     append('/etc/exports', exports, use_sudo=True)
 
 def _cleanup_ec2(env):
