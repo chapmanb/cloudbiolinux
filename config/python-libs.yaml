@@ -34,6 +34,7 @@ pypi:
   - Twisted
   # science
   - biopython
+  - bcbio-nextgen
   - cogent
   - DendroPy
   - HTSeq
