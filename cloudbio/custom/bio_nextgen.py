@@ -134,6 +134,13 @@ def install_mosaik(env):
 
 # --- Utilities
 
+@_if_not_installed("samtools")
+def install_samtools(env):
+    version = "0.1.17"
+    url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
+          "%s/samtools-%s.tar.bz2" % (version, version)
+    _get_install(url, env, _make_copy("find -perm -100 -type f"))
+
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
 def install_fastx_toolkit(env):
     version = "0.0.13"

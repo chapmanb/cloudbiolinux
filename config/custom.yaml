@@ -23,6 +23,7 @@ bio_nextgen:
     - freebayes
     - gatk
     - picard
+    - samtools
     - shrec
     - snpeff
     - tophat

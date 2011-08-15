@@ -164,7 +164,6 @@ bio_general:
 bio_search:
 bio_alignment:
 bio_nextgen:
-  - samtools
 bio_sequencing:
 bio_annotation:
 bio_microarray:
