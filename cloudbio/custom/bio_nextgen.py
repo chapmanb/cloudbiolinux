@@ -7,6 +7,7 @@ from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
+                    _java_install,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make)
 
 @_if_not_installed("faToTwoBit")
@@ -228,31 +229,24 @@ def install_shrec(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.49"
+    version = "1.52"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
-    install_dir = _symlinked_java_version_dir("picard", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                run("wget %s" % (url))
-                run("unzip %s" % os.path.basename(url))
-                with cd(os.path.splitext(os.path.basename(url))[0]):
-                    env.safe_sudo("mv *.jar %s" % install_dir)
+    _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.1"
+    version = "1.1-35-ge253f6f"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
-    install_dir = _symlinked_java_version_dir("gatk", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                run("wget %s" % (url))
-                run("tar -xjvpf %s" % os.path.basename(url))
-                with cd(os.path.basename(url).replace(ext, "")):
-                    env.safe_sudo("mv *.jar %s" % install_dir)
+    _java_install("gatk", version, url, env)
+
+def install_gatk_queue(env):
+    version = "1.0.4052"
+    ext = ".tar.bz2"
+    url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
+          "Queue-%s%s" % (version, ext)
+    _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
     version = "1_9_5"

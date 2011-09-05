@@ -22,6 +22,7 @@ bio_nextgen:
     - cufflinks
     - freebayes
     - gatk
+    - gatk_queue
     - picard
     - samtools
     - shrec

@@ -143,6 +143,18 @@ def _symlinked_java_version_dir(pname, version, env):
         return install_dir
     return None
 
+def _java_install(pname, version, url, env, install_fn=None):
+    install_dir = _symlinked_java_version_dir(pname, version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                dir_name = _fetch_and_unpack(url)
+                with cd(dir_name):
+                    if install_fn is not None:
+                        install_fn(env)
+                    else:
+                        env.safe_sudo("mv *.jar %s" % install_dir)
+
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)
     env.safe_sudo("python%s setup.py install --skip-build" % env.python_version_ext)
