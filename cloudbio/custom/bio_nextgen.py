@@ -296,25 +296,15 @@ def _install_samtools_libs(env):
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
-    version = "1.2.0"
-    def _fixseqan_configure_make(env):
-        """Upgrade local copy of SeqAn before compiling to fix errors.
-
-        http://seqanswers.com/forums/showthread.php?t=9082
-        """
-        with cd("src/SeqAn-1.1"):
-            run("wget http://www.seqan.de/uploads/media/Seqan_Release_1.2.zip")
-            run("rm -rf seqan")
-            run("unzip Seqan_Release_1.2.zip")
-        _configure_make(env)
+    version = "1.3.2"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
-    _get_install(url, env, _fixseqan_configure_make)
+    _get_install(url, env, _configure_make)
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
     # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "1.0.1"
+    version = "1.0.3"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
