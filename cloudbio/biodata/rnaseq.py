@@ -10,26 +10,25 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-_orgname_map = {"Mmusculus": "Mus_musculus",
-                "Hsapiens": "Homo_sapiens"}
-
 def download_transcripts(genomes, env):
     folder_name = "rnaseq"
-    base_url = "ftp://igenome:*password*@ftp.illumina.com/{orgname}/{data_source}" \
-               "/{version}/{orgname}_{data_source}_{version}.tar.gz"
+    base_url = "https://s3.amazonaws.com/biodata/annotation/{gid}-rnaseq.tar.xz"
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("rnaseq", False)):
         cur_url = base_url.format(orgname=_orgname_map[orgname],
                                   version=gid, data_source=manager.data_source)
-        tx_dir = os.path.join(genome_dir, orgname, gid, folder_name)
+        org_dir = os.path.join(genome_dir, orgname)
+        tx_dir = os.path.join(org_dir, gid, folder_name)
         if not exists(tx_dir):
-            run("mkdir -p %s" % tx_dir)
-        with cd(tx_dir):
-            _download_igenome_bundle(cur_url)
+            with cd(org_dir):
+                _download_annotation_bundle(url.format(gid=gid))
 
-def _download_igenome_bundle(url):
-    """Download iGenome tarball and extract files of interest.
+def _download_annotation_bundle(url):
+    """Download bundle of RNA-seq data from S3 biodata/annotation
     """
-    files_want = ["Genes/genes.gtf"]
-    print url
+    tarball = os.path.basename(url)
+    if not exists(tarball):
+        run("wget %s" % url)
+    run("xz -dc %s | tar -xvpf -" % tarball)
+    run("rm -f %s" % tarball)

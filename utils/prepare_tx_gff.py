@@ -28,7 +28,9 @@ base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name"])
 build_info = {
     "hg19": Build("homo_sapiens", "Homo_sapiens.GRCh37.{release}.gtf.gz",
-                  "hsapiens_gene_ensembl")}
+                  "hsapiens_gene_ensembl"),
+    "mm9": Build("mus_musculus", "Mus_musculus.NCBIM37.{release}.gtf.gz",
+                 "mmusculus_gene_ensembl")}
 
 ucsc_db= "genome-mysql.cse.ucsc.edu"
 ucsc_user="genome"
@@ -45,8 +47,8 @@ def main(org_build):
         upload_to_s3([tx_gff, mask_gff], org_build)
 
 def upload_to_s3(fnames, org_build):
-    final_dir = "{org}-rnaseq".format(org=org_build)
-    final_tarball = "{0}.tar.xz".format(final_dir)
+    final_dir = os.path.join(org_build, "rnaseq")
+    final_tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
     if not os.path.exists(final_tarball):
         safe_makedir(final_dir)
         for fname in fnames:
@@ -104,8 +106,7 @@ def prepare_tx_gff(build, org_name):
 def _remap_gff(base_gff, name_map):
     """Remap chromosome names to UCSC instead of Ensembl
     """
-    base, ext = os.path.splitext(base_gff)
-    out_file = "{0}-ucsc{1}".format(base.replace(".", "-"), ext)
+    out_file = "ref-transcripts.gtf"
     if not os.path.exists(out_file):
         with open(out_file, "w") as out_handle, \
              open(base_gff) as in_handle:

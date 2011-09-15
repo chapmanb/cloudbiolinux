@@ -3,8 +3,7 @@
 Designed to automatically download and manage biologically associated
 data on cloud instances like Amazon EC2.
 
-Fabric (http://docs.fabfile.org) is used to manage the automation of
-a remote server.
+Fabric (http://docs.fabfile.org) manages automation of remote servers.
 
 Usage:
     fab -i key_file -H servername -f data_fabfile.py install_data
@@ -38,7 +37,7 @@ from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
 
-# -- Host specific setup for various groups of servers.
+# -- Host specific setup
 
 env.remove_old_genomes = False
 
