@@ -21,16 +21,27 @@ import rpy2.robjects as robjects
 
 from bcbio.utils import chdir, safe_makedir
 
+def build_ucsc_map(ensembl_chrs, mt_chr):
+    """Build mapping of Ensembl to UCSC names for standard chromosomes.
+    """
+    out = {}
+    for c in ensembl_chrs:
+        out[str(c)] = "chr{0}".format(c)
+    out[mt_chr] = "chrM"
+    return out
+
 # ##  Version and retrieval details for Ensembl and UCSC
 ensembl_release = "63"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
-Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name"])
+Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name",
+                                         "ucsc_map"])
 build_info = {
     "hg19": Build("homo_sapiens", "Homo_sapiens.GRCh37.{release}.gtf.gz",
-                  "hsapiens_gene_ensembl"),
+                  "hsapiens_gene_ensembl", None),
     "mm9": Build("mus_musculus", "Mus_musculus.NCBIM37.{release}.gtf.gz",
-                 "mmusculus_gene_ensembl")}
+                 "mmusculus_gene_ensembl",
+                 build_ucsc_map(range(1, 20) + ["X", "Y"], "MT"))}
 
 ucsc_db= "genome-mysql.cse.ucsc.edu"
 ucsc_user="genome"
@@ -86,7 +97,7 @@ def high_abudance_transcripts(build):
       mart <- useMart("ensembl", dataset=biomart.org)
       attrs <- c("ensembl_transcript_id")
       filters <- c("biotype")
-      filter.types <- c("Mt_rRNA", "rRNA", "rRNA_pseudogene")
+      filter.types <- c("Mt_rRNA", "rRNA")
       result <- getBM(attributes=attrs, filters=filters, values=filter.types,
                       mart=mart)
       result <- unique(result)
@@ -100,7 +111,8 @@ def prepare_tx_gff(build, org_name):
     """Prepare UCSC ready transcript file given build information.
     """
     ensembl_gff = _download_ensembl_gff(build)
-    ucsc_name_map = _query_for_ucsc_ensembl_map(org_name)
+    ucsc_name_map = (_query_for_ucsc_ensembl_map(org_name)
+                     if build.ucsc_map is None else build.ucsc_map)
     return _remap_gff(ensembl_gff, ucsc_name_map)
 
 def _remap_gff(base_gff, name_map):
