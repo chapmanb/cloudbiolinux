@@ -23,6 +23,7 @@ genomes:
   - dbkey: hg19
     name: Human (hg19)
     dbsnp: true
+    rnaseq: true
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: mm9

@@ -16,13 +16,11 @@ def download_transcripts(genomes, env):
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("rnaseq", False)):
-        cur_url = base_url.format(orgname=_orgname_map[orgname],
-                                  version=gid, data_source=manager.data_source)
         org_dir = os.path.join(genome_dir, orgname)
         tx_dir = os.path.join(org_dir, gid, folder_name)
         if not exists(tx_dir):
             with cd(org_dir):
-                _download_annotation_bundle(url.format(gid=gid))
+                _download_annotation_bundle(base_url.format(gid=gid))
 
 def _download_annotation_bundle(url):
     """Download bundle of RNA-seq data from S3 biodata/annotation

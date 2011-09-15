@@ -209,7 +209,7 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "5974"
+BROAD_BUNDLE_VERSION = "1.1"
 DBSNP_VERSION = "132"
 
 GENOMES_SUPPORTED = [
