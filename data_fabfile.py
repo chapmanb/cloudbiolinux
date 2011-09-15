@@ -34,6 +34,7 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
 from cloudbio.biodata.dbsnp import download_dbsnp
+from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
 
@@ -74,6 +75,7 @@ class _DownloadHelper:
 class UCSCGenome(_DownloadHelper):
     def __init__(self, genome_name):
         _DownloadHelper.__init__(self)
+        self.data_source = "UCSC"
         self._name = genome_name
         self._url = "ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips" % \
                 genome_name
@@ -130,6 +132,7 @@ class NCBIRest(_DownloadHelper):
     """
     def __init__(self, name, refs):
         _DownloadHelper.__init__(self)
+        self.data_source = "NCBI"
         self._name = name
         self._refs = refs
         self._base_url = "http://togows.dbcls.jp/entry/ncbi-nucleotide/%s.fasta"
@@ -162,6 +165,7 @@ class EnsemblGenome(_DownloadHelper):
     def __init__(self, ensembl_section, release_number, release2, organism,
             name, convert_to_ucsc=False):
         _DownloadHelper.__init__(self)
+        self.data_source = "Ensembl"
         if ensembl_section == "standard":
             url = "ftp://ftp.ensembl.org/pub/"
         else:
@@ -187,9 +191,12 @@ class EnsemblGenome(_DownloadHelper):
 
 class BroadGenome(_DownloadHelper):
     """Retrieve genomes organized and sorted by Broad for use with GATK.
+
+    Uses the UCSC-name compatible versions of the GATK bundles.
     """
     def __init__(self, name, bundle_version, target_fasta):
         _DownloadHelper.__init__(self)
+        self.data_source = "UCSC"
         self._name = name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
@@ -265,7 +272,7 @@ def upload_s3(config_file=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
     if boto is None:
-        raise ImportError("boto must be installed to upload to Amazon s3")
+        raise ImportError("install boto to upload to Amazon s3")
     if env.host != "localhost" and not env.host.startswith(socket.gethostname()):
         raise ValueError("Need to run S3 upload on a local machine")
     _check_version()
@@ -276,6 +283,7 @@ def upload_s3(config_file=CONFIG_FILE):
 
 def _install_additional_data(genomes, config):
     download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    download_transcripts(genomes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)

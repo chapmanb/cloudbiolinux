@@ -27,6 +27,7 @@ genomes:
     name: D melangogaster (dm3)
   - dbkey: mm9
     name: Mouse (mm9)
+    rnaseq: true
   - dbkey: araTha_tair9
     name: Arabidopsis thaliana (TAIR9)
   - dbkey: xenTro2
