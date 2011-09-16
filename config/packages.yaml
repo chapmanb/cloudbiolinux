@@ -109,7 +109,7 @@ programming:
     - python-software-properties
   libraries:
     - libatlas-base-dev
-    - libatlas-dev
+    #- libatlas-dev
     - libblas-dev
     - liblapack-dev
     - tcl-dev
