@@ -304,7 +304,7 @@ def install_tophat(env):
 def install_cufflinks(env):
     # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "1.0.3"
+    version = "1.1.0"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
