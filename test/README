@@ -21,3 +21,12 @@ all wrong information with
 
 and rerun the test.
 
+=== Error suggests 'vagrant up' ===
+
+If something went wrong with the install, Vagrant may complain that
+you need to run 'vagrant up' first. In practise, this may mean:
+
+* Remove other running vagrant instances (vagrant halt)
+* Remove an existing (faulty) instance using virtualbox
+* Check ~/.ssh/config contains no faulty lines
+* Rerun the tests from scratch, i.e. without the '--continue' switch
