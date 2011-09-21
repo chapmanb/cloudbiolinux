@@ -235,7 +235,7 @@ def install_picard(env):
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.1-35-ge253f6f"
+    version = "1.2"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
@@ -249,7 +249,7 @@ def install_gatk_queue(env):
     _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
-    version = "1_9_5"
+    version = "2_0_2"
     genomes = ["hg37.61", "mm37.61"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
