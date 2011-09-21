@@ -4,4 +4,20 @@ Try:
 
 ./test_vagrant --help
 
+== Testing issues ==
+
+The test system depends on a stack of tools, including virtualbox,
+vagrant, ssh, ruby and related libraries. Things can go wrong. Here we
+list a number of common problems.
+
+=== Error with ssh config ===
+
+The test system appends login code to enter a running vagrant
+virtualbox without asking for a password. Sometimes the contents of
+$HOME/.ssh/config get corrupted.  Check the contents out, and remove
+all wrong information with
+
+  vi ~/.ssh/config
+
+and rerun the test.
 

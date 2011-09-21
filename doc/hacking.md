@@ -24,6 +24,8 @@ and the actual run:
 
           $source/test/test_vagrant
 
+(also read $source/test/README)
+
 The main.yaml file ascertains the major editors are included, as well remote
 access, version control, and the basic build system (gcc and friends). Note the
 Minimal edition overwrites the (apt) sources file to make sure there are no
