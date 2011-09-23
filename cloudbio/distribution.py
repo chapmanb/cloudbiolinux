@@ -126,6 +126,7 @@ def _setup_vagrant_environment():
     env.logger.info("Get vagrant environment")
     raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
                                       stdout=subprocess.PIPE).communicate()[0]
+    env.logger.info(raw_ssh_config)
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
     env.hosts = [ssh_config["HostName"]]
