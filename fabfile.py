@@ -79,8 +79,11 @@ def _setup_flavor(flavor):
     """
     if flavor == None:
         flavor = env.get("flavor", None)
-        flavor_path = env.get("flavor_path", None)
     if flavor != None:
+        # import a flavor defined through parameters flavor and flavor_path
+        flavor_path = env.get("flavor_path", None)
+        if flavor_path == None:
+          raise ImportError("You need to define the flavor_path for %s!" % flavor)
         # Add path for flavors
         sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
         env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
@@ -89,6 +92,7 @@ def _setup_flavor(flavor):
         except ImportError:
             raise ImportError("Failed to import %s" % flavor)
     else:
+        # import default Flavor
         from cloudbio.flavor import Flavor
     env.logger.info("This is a %s" % env.flavor.name)
 

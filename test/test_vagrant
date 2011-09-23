@@ -169,12 +169,16 @@ else
   Dir.chdir(testname) do
     print `ls -l`
     run "vagrant init #{testname}"
-    run "vagrant up"
   end
 end
 
 if not File.directory?(testname)
   error "VM #{testname} appears not to be installed"
+end
+
+Dir.chdir(testname) do
+  # Always try to start the VM
+  run "vagrant up"
 end
 
 # Using the VM
