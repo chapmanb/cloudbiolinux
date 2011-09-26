@@ -22,6 +22,7 @@ gems:
   - bio-gff3
   - biomart
   - ruby-ensembl-api
+  - bio-biolinux
   # databases
   - couchdb-ruby
   - data_objects
