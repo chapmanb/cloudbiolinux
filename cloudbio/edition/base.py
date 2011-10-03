@@ -103,20 +103,21 @@ class BioNode(Edition):
         packages, i.e. the package dowload policy. Here we use
         'stable' packages, unless only available in 'testing'.
         """
-        preferences = """
-Package: *
+        preferences = """Package: *
 Pin: release a=stable
 Pin-Priority: 700
 
 Package: *
 Pin: release a=testing
 Pin-Priority: 650
-
-Package: *
-Pin: release a=unstable
-Pin-Priority: 600
 """
         return preferences.split('\n')
+
+    def rewrite_apt_automation(self, package_info):
+        return []
+
+    def rewrite_apt_keys(self, standalone, keyserver):
+        return [], []
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux

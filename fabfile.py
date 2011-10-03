@@ -506,12 +506,12 @@ def _setup_apt_sources():
     # make sure it exists, and is empty
     sudo("rm -f %s" % env.apt_preferences_file)
     sudo("touch %s" % env.apt_preferences_file)
-    if not contains(env.apt_preferences_file, comment):
-        append(env.apt_preferences_file, comment, use_sudo=True)
-    print env.edition.rewrite_apt_preferences([])
-    for line in env.edition.rewrite_apt_preferences([]):
-        env.logger.debug("Policy %s" % line)
-        append(env.apt_preferences_file, line, use_sudo=True)
+    append(env.apt_preferences_file, comment, use_sudo=True)
+    lines = "\n".join(env.edition.rewrite_apt_preferences([]))
+    env.logger.debug("Policy %s" % lines)
+    sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file)) # append won't duplicate
+    # check
+    env.logger.debug(sudo("apt-cache policy"))
 
     # Make sure a source file exists
     if not exists(env.sources_file):
@@ -524,7 +524,7 @@ def _setup_apt_sources():
         if source.startswith("ppa:"):
             sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
-        elif not contains(env.sources_file, source):
+        elif not contains(env.sources_file, source): # FIXME: append never adds dups!
             append(env.sources_file, source, use_sudo=True)
 
 # ### Automated installation on systems with yum package manager
