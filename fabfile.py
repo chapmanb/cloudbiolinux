@@ -499,10 +499,23 @@ def _setup_apt_sources():
     """
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
-
     comment = "# This file was modified for "+ env.edition.name
+
+    # Setup apt download policy (default is None)
+    # (see also https://help.ubuntu.com/community/PinningHowto)
+    # make sure it exists, and is empty
+    sudo("rm -f %s" % env.apt_preferences_file)
+    sudo("touch %s" % env.apt_preferences_file)
+    if not contains(env.apt_preferences_file, comment):
+        append(env.apt_preferences_file, comment, use_sudo=True)
+    for line in env.edition.rewrite_apt_preferences([]):
+        env.logger.debug("Policy %s" % line)
+        append(env.apt_preferences_file, line, use_sudo=True)
+
+    # Make sure a source file exists
     if not exists(env.sources_file):
         sudo("touch %s" % env.sources_file)
+    # Add a comment
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.edition.rewrite_apt_sources_list(env.std_sources):
