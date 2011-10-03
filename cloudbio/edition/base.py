@@ -96,7 +96,7 @@ class BioNode(Edition):
                            repo=main_repository, dist=env.dist_name),
                        "deb {repo} testing main contrib non-free".format(
                            repo=main_repository)]
-        return sources + new_sources
+        return new_sources
 
     def rewrite_apt_preferences(self, preferences):
         """Allows editions to modify apt preferences (load order of
