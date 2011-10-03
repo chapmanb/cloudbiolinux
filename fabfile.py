@@ -508,6 +508,7 @@ def _setup_apt_sources():
     sudo("touch %s" % env.apt_preferences_file)
     if not contains(env.apt_preferences_file, comment):
         append(env.apt_preferences_file, comment, use_sudo=True)
+    print env.edition.rewrite_apt_preferences([])
     for line in env.edition.rewrite_apt_preferences([]):
         env.logger.debug("Policy %s" % line)
         append(env.apt_preferences_file, line, use_sudo=True)

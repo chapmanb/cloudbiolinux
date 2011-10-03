@@ -80,7 +80,7 @@ class BioNode(Edition):
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
     def rewrite_apt_sources_list(self, sources):
-        """BioNode will pull packages from Debian 'testing', if not 
+        """BioNode will pull packages from Debian 'testing', if not
            available in stable.
         """
         self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
@@ -116,7 +116,7 @@ Package: *
 Pin: release a=unstable
 Pin-Priority: 600
 """
-        return preferences
+        return preferences.split('\n')
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux
