@@ -30,3 +30,8 @@ you need to run 'vagrant up' first. In practise, this may mean:
 * Remove an existing (faulty) instance using virtualbox
 * Check ~/.ssh/config contains no faulty lines
 * Rerun the tests from scratch, i.e. without the '--continue' switch
+
+=== Error: ffi.rb:106:in `call_and_check': Error in API call to get_state ===
+
+This is Ruby trying into the vagrant API. You need to reinstall the
+vagrant and virtualbox gems to match your version of Ruby.
