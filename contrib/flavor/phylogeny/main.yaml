@@ -1,0 +1,5 @@
+---
+packages:
+  # - minimal : skip, as we don't need the build system
+  - desktop-cloud
+libraries:
