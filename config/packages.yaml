@@ -366,8 +366,9 @@ bio_utils:
 phylogeny_testing:
     # new packages in testing (Debian 'wheezy')
   all:
-    - mrbayes-mpi # overrides biolinux-mrbayed-multi
+    - mrbayes-mpi # replaces biolinux-mrbayes-multi
     - raxml
+    - paml
 phylogeny:
   all:
     - phylip
