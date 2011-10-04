@@ -364,10 +364,13 @@ bio_utils:
   - bio-linux-taxinspector
   - bio-linux-themes-v5
 phylogeny_testing:
-    # new packages in testing (Debian 'wheezy')
+  # new packages in testing (Debian 'wheezy')
   all:
     - mrbayes-mpi # replaces biolinux-mrbayes-multi
     - raxml
+phylogeny_experimental:
+  # new packages in experimental 
+  all:
     - paml
 phylogeny:
   all:
