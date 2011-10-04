@@ -11,26 +11,26 @@ require 'rubygems'
 # Available testing targets - this could be read from a YAML file.
 BOX = {
         'Minimal' =>
-           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+           { :url         => 'http://bio4.dnsalias.org/download/biolinux/biolinux-minimal-0.91.box',
+             :md5         => '64cdea1f76028971e53e2cd2f19a490a',
              :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
              :packagelist => 'contrib/minimal/main.yaml'
            },
         'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
-           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+           { :url         => 'http://bio4.dnsalias.org/download/biolinux/biolinux-minimal-0.91.box',
+             :md5         => '64cdea1f76028971e53e2cd2f19a490a',
              :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
         'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
-           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+           { :url         => 'http://bio4.dnsalias.org/download/biolinux/biolinux-minimal-0.91.box',
+             :md5         => '64cdea1f76028971e53e2cd2f19a490a',
              :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/phylogeny/main.yaml'
            },
         'BioNode' =>
-           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
-             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+           { :url         => 'http://bio4.dnsalias.org/download/biolinux/biolinux-minimal-0.91.box',
+             :md5         => '64cdea1f76028971e53e2cd2f19a490a',
              :fabricrc    => 'contrib/bionode/fabricrc_bionode.txt',
              :packagelist => 'contrib/bionode/main.yaml'
            },
