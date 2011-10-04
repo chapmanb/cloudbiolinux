@@ -31,6 +31,11 @@ class Edition:
         """
         return sources
 
+    def rewrite_apt_preferences(self, preferences):
+        """Allows editions to modify the apt preferences policy file
+        """
+        return preferences
+
     def rewrite_apt_automation(self, package_info):
         """Allows editions to modify the apt automation list
         """
@@ -57,7 +62,6 @@ class Edition:
         """
         return items
 
-
 class BioNode(Edition):
     """BioNode specialization of BioLinux
     """
@@ -76,6 +80,9 @@ class BioNode(Edition):
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
     def rewrite_apt_sources_list(self, sources):
+        """BioNode will pull packages from Debian 'testing', if not
+           available in stable.
+        """
         self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
         # See if the repository is defined in env
         if not env.get('debian_repository'):
@@ -86,8 +93,31 @@ class BioNode(Edition):
         new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
                                                                         dist=env.dist_name),
                        "deb {repo} {dist}-updates main contrib non-free".format(
-                           repo=main_repository, dist=env.dist_name)]
-        return sources + new_sources
+                           repo=main_repository, dist=env.dist_name),
+                       "deb {repo} testing main contrib non-free".format(
+                           repo=main_repository)]
+        return new_sources
+
+    def rewrite_apt_preferences(self, preferences):
+        """Allows editions to modify apt preferences (load order of
+        packages, i.e. the package dowload policy. Here we use
+        'stable' packages, unless only available in 'testing'.
+        """
+        preferences = """Package: *
+Pin: release a=stable
+Pin-Priority: 700
+
+Package: *
+Pin: release a=testing
+Pin-Priority: 650
+"""
+        return preferences.split('\n')
+
+    def rewrite_apt_automation(self, package_info):
+        return []
+
+    def rewrite_apt_keys(self, standalone, keyserver):
+        return [], []
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux
@@ -98,10 +128,20 @@ class Minimal(Edition):
         self.short_name = "minimal"
 
     def rewrite_apt_sources_list(self, sources):
-        """Allows editions to modify the sources list. Minimal only
-           uses the barest default packages
+        """Allows editions to modify the sources list. Minimal, by
+           default, uses the barest 'stable' packages.
         """
-        return []
+        # See if the repository is defined in env
+        if not env.get('debian_repository'):
+            main_repository = 'http://ftp.us.debian.org/debian/'
+        else:
+            main_repository = env.debian_repository
+        # The two basic repositories
+        new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
+                                                                        dist=env.dist_name),
+                       "deb {repo} {dist}-updates main contrib non-free".format(
+                           repo=main_repository, dist=env.dist_name)]
+        return new_sources
 
     def rewrite_apt_automation(self, package_info):
         return []

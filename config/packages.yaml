@@ -363,6 +363,12 @@ bio_utils:
   - bio-linux-sequin # Version problem
   - bio-linux-taxinspector
   - bio-linux-themes-v5
+phylogeny_testing:
+    # new packages in testing (Debian 'wheezy')
+  all:
+    - mrbayes-mpi # replaces biolinux-mrbayes-multi
+    - raxml
+    - paml
 phylogeny:
   all:
     - phylip

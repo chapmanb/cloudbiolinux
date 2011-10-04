@@ -499,10 +499,27 @@ def _setup_apt_sources():
     """
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
-
     comment = "# This file was modified for "+ env.edition.name
+
+    # Setup apt download policy (default is None)
+    # (see also https://help.ubuntu.com/community/PinningHowto)
+    # make sure it exists, and is empty
+    sudo("rm -f %s" % env.apt_preferences_file)
+    preferences = env.edition.rewrite_apt_preferences([])
+    if len(preferences):
+        sudo("touch %s" % env.apt_preferences_file)
+        append(env.apt_preferences_file, comment, use_sudo=True)
+        lines = "\n".join(preferences)
+        env.logger.debug("Policy %s" % lines)
+        # append won't duplicate, so we use echo
+        sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file))
+        # check there is no error parsing the file
+        env.logger.debug(sudo("apt-cache policy"))
+
+    # Make sure a source file exists
     if not exists(env.sources_file):
         sudo("touch %s" % env.sources_file)
+    # Add a comment
     if not contains(env.sources_file, comment):
         append(env.sources_file, comment, use_sudo=True)
     for source in env.edition.rewrite_apt_sources_list(env.std_sources):
@@ -510,7 +527,7 @@ def _setup_apt_sources():
         if source.startswith("ppa:"):
             sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
-        elif not contains(env.sources_file, source):
+        elif not contains(env.sources_file, source): # FIXME: append never adds dups!
             append(env.sources_file, source, use_sudo=True)
 
 # ### Automated installation on systems with yum package manager
