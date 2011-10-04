@@ -503,10 +503,10 @@ def _setup_apt_sources():
 
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
-    # make sure it exists, and is empty
-    sudo("rm -f %s" % env.apt_preferences_file)
     preferences = env.edition.rewrite_apt_preferences([])
     if len(preferences):
+        # make sure it exists, and is empty
+        sudo("rm -f %s" % env.apt_preferences_file)
         sudo("touch %s" % env.apt_preferences_file)
         append(env.apt_preferences_file, comment, use_sudo=True)
         lines = "\n".join(preferences)
