@@ -505,10 +505,10 @@ def _setup_apt_sources():
     # (see also https://help.ubuntu.com/community/PinningHowto)
     # make sure it exists, and is empty
     sudo("rm -f %s" % env.apt_preferences_file)
-    sudo("touch %s" % env.apt_preferences_file)
-    append(env.apt_preferences_file, comment, use_sudo=True)
     preferences = env.edition.rewrite_apt_preferences([])
     if len(preferences):
+        sudo("touch %s" % env.apt_preferences_file)
+        append(env.apt_preferences_file, comment, use_sudo=True)
         lines = "\n".join(preferences)
         env.logger.debug("Policy %s" % lines)
         # append won't duplicate, so we use echo
