@@ -75,7 +75,7 @@ class BioNode(Edition):
             raise ValueError("Distribution is not pure Debian")
 
     def check_packages_source(self):
-        # Bionode removes sources, just to be sure
+        # Bionode always removes sources, just to be sure
         self.env.logger.debug("Clearing %s" % self.env.sources_file)
         sudo("cat /dev/null > %s" % self.env.sources_file)
 
@@ -95,7 +95,9 @@ class BioNode(Edition):
                        "deb {repo} {dist}-updates main contrib non-free".format(
                            repo=main_repository, dist=env.dist_name),
                        "deb {repo} testing main contrib non-free".format(
-                           repo=main_repository)]
+                           repo=main_repository),
+                        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux"
+                      ]
         return new_sources
 
     def rewrite_apt_preferences(self, preferences):

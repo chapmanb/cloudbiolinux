@@ -379,7 +379,6 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    - tracer
     #- bio-linux-arb # Broken, needs libmotif3
     - bio-linux-coalesce
     - bio-linux-dendroscope
