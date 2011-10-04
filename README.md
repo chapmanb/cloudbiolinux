@@ -149,7 +149,7 @@ including Ubuntu, Debian Linux and CentOS.
 ## VirtualBox with vagrant
 
 Add a base image and boot it up; community Vagrant boxes are available from
-[http://vagrantbox.es][v3]:
+[http://vagrantbox.es][v3] and [http://biobeat.org/bionode][BioLinux flavors]:
 
         vagrant box add box_name http://path_to_the_image.box
         mkdir tmp/biolinux

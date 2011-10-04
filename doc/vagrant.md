@@ -31,7 +31,8 @@ Next add the virtualbox to vagrant using a URL, or box file:
 
           vagrant box add debian_squeeze_32 debian_squeeze_32.box
 
-and create your own version
+(boxes are available form [http://vagrantbox.es][v3] and
+[http://biobeat.org/bionode][BioLinux flavors]) and create your own version
 
           mkdir myflavor
           cd myflavor
