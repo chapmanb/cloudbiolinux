@@ -84,12 +84,20 @@ Despite the fact that running fabfile.py is destructive, i.e. it overwrites the
 current install, it is reasonably safe as it mostly uses the underlying package
 management system and dependency resolution. Rerunning a BioLinux fabfile can
 be fast.  The minimal edition runs the second time in under 20 seconds on a
-basic laptop.
+basic laptop, as we do with a 'Minimal' install:
+
+         ./test/test_vagrant --continue
 
 For completeness, after a minimal install you can still install a full BioLinux
 execute
 
         fab -H vagrant -f $source/fabfile.py install_biolinux
+
+Once you have a working Virtual Box VM with vagrant, you can package it with
+
+        vagrant package
+
+and make the resulting .box file available for others to use.
 
 Read the README for further information.
 
