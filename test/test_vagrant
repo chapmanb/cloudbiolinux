@@ -22,6 +22,12 @@ BOX = {
              :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
+        'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
+           { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
+             :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
+             :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
+             :packagelist => 'contrib/flavor/phylogeny/main.yaml'
+           },
         'BioNode' =>
            { :url         => 'http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box',
              :md5         => 'ff4ee2e9c2ebdde1d89db75af1483a99',
