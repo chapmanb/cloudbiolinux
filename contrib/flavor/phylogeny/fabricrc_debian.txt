@@ -7,7 +7,7 @@
 # Copyright (C) 2011 Pjotr Prins <pjotr.prins@thebird.nl> 
 #
 edition = bionode
-edition_version = 0.10
+edition_version = 0.92
 flavor = PhylogenyFlavor
 flavor_path = phylogeny.phylogenyflavor
 distribution = debian
