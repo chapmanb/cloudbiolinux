@@ -507,11 +507,14 @@ def _setup_apt_sources():
     sudo("rm -f %s" % env.apt_preferences_file)
     sudo("touch %s" % env.apt_preferences_file)
     append(env.apt_preferences_file, comment, use_sudo=True)
-    lines = "\n".join(env.edition.rewrite_apt_preferences([]))
-    env.logger.debug("Policy %s" % lines)
-    sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file)) # append won't duplicate
-    # check
-    env.logger.debug(sudo("apt-cache policy"))
+    preferences = env.edition.rewrite_apt_preferences([])
+    if len(preferences):
+        lines = "\n".join(preferences)
+        env.logger.debug("Policy %s" % lines)
+        # append won't duplicate, so we use echo
+        sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file))
+        # check there is no error parsing the file
+        env.logger.debug(sudo("apt-cache policy"))
 
     # Make sure a source file exists
     if not exists(env.sources_file):
