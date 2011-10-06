@@ -173,6 +173,8 @@ move it to a public webserver, such as Amazon S3:
         s3cmd put --acl-public --guess-mime-type biolinux_20110122.box
               s3://chapmanb/biolinux_20110122.box
 
+For more on vagrant and CloudBioLinux see ./doc/vagrant.md.
+
 [0]: http://aws.amazon.com/ec2/
 [1]: http://cloudbiolinux.org/
 [2]: https://console.aws.amazon.com/ec2/home
