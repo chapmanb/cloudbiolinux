@@ -1,9 +1,13 @@
 CloudBioLinux is a build and deployment system which installs a large
 selection of Bioinformatics and machine learning libraries on a bare
-virtual machine (VM) image, freshly installed PC, or in the cloud. By
-default CloudBioLinux includes a large suite of tools and libraries,
-largely pulled from the package management system provided by the
-image. In addition to the default configuration, other software
+virtual machine (VM) image, freshly installed PC, or in the Cloud.
+All that is required is a login with ssh (secure shell) into a fresh
+base install of Linux. The CloudBiolinux scripts will login and
+install software remotely - followed by system configuration.
+
+By default CloudBioLinux includes a large suite of tools and
+libraries, largely pulled from the package management system provided
+by the image. In addition to the default configuration, other software
 configurations are supported through, so called, 'editions' and
 'flavors'. An edition is a named base install, e.g. CloudBioLinux for
 Ubuntu. Such an Edition reflects shared installation properties
