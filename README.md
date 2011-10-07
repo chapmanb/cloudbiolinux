@@ -123,7 +123,7 @@ documentation on the [Vagrant website][v1].
 # Building an image from scratch using CloudBioLinux
 
 CloudBioLinux can be built for any virtualized platform, as long as
-the target VM is Linux.
+the target VM is Linux, with an ssh command line.
 
 ## Amazon
 
@@ -158,6 +158,11 @@ and CentOS.
 
 6. When finished, use the [Amazon console][2] to create an AMI.
    Thereafter make it public so it can be used by others.
+
+## OpenStack
+
+[OpenStack][openstack] is a promising platform for Cloud computing.
+CloudBioLinux support for OpenStack is planned.
 
 ## VirtualBox with vagrant
 
