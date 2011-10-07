@@ -103,3 +103,25 @@ and make the resulting .box file available for others to use.
 Read the README for further information.
 
 [v1]: http://vagrantup.com/docs/base_boxes.html
+
+## Trouble shooting
+
+### Guest additions
+
+You may see an error
+
+  [default] The guest additions on this VM do not match the install version of
+  VirtualBox! This may cause things such as forwarded ports, shared
+  folders, and more to not work properly. If any of those things fail on
+  this machine, please update the guest additions and repackage the
+  box.
+
+  Guest Additions Version: 4.0.4
+  VirtualBox Version: 4.1.0
+
+this error may actually be caused by the Vbox Linux kernel drivers not having
+been loaded! Fix
+
+       modprobe vboxdrv
+
+
