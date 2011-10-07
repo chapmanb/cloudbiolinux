@@ -194,7 +194,7 @@ For more on vagrant and CloudBioLinux see ./doc/vagrant.md.
 As long as there is an 'ssh' entry to an running VM, CloudBioLinux can
 install itself.
 
-For more on XEN and CloudBioLinux see ./doc/xen.md.
+For more on private Cloud and CloudBioLinux see ./doc/private\_cloud.md.
 
 [0]: http://aws.amazon.com/ec2/
 [1]: http://cloudbiolinux.org/
