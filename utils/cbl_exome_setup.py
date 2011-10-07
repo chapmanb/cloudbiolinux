@@ -3,6 +3,8 @@
 
 - Updates configuration file with server details.
 - Adds RabbitMQ user and virtual host with correct permissions.
+
+Run the script with sudo or the root user.
 """
 import os
 import time
@@ -26,7 +28,7 @@ def main():
 def setup_rabbitmq(vhost, user, passwd):
     """Add virtual host, user and password to RabbitMQ.
     """
-    base_cl = ["sudo", "rabbitmqctl"]
+    base_cl = ["rabbitmqctl"]
     subprocess.check_call(base_cl + ["add_user", user, passwd])
     subprocess.check_call(base_cl + ["add_vhost", vhost])
     subprocess.check_call(base_cl + ["set_permissions", "-p", vhost,
@@ -50,6 +52,7 @@ def read_ampq_config(fname):
 def update_amqp_config(fname, hostname):
     """Update AMQP configuration with internal hostname.
     """
+    orig_stat = os.stat(fname)
     backup_file = "{0}.bak".format(fname)
     shutil.move(fname, backup_file)
     with open(backup_file) as in_handle:
@@ -58,6 +61,8 @@ def update_amqp_config(fname, hostname):
                 if line.startswith("host ="):
                     line = "host = {0}\n".format(hostname)
                 out_handle.write(line)
+    # make updated file readable by initial user
+    os.chown(fname, orig_stat.st_uid, orig_stat.st_gid)
 
 def wait_until_mounted(fname):
     """Wait up to 3 minutes for mounted directory with file.
