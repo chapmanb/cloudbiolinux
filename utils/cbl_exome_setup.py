@@ -5,6 +5,7 @@
 - Adds RabbitMQ user and virtual host with correct permissions.
 """
 import os
+import time
 import shutil
 import socket
 import subprocess
@@ -16,6 +17,7 @@ def main():
     config_dir = "/export/data/galaxy"
     amqp_config = os.path.join(config_dir, "universe_wsgi.ini")
     pp_config = os.path.join(config_dir, "post_process.yaml")
+    wait_until_mounted(amqp_config)
     update_amqp_config(amqp_config, socket.getfqdn())
     amqp_user, amqp_pass = read_ampq_config(amqp_config)
     amqp_vhost = read_pp_config(pp_config)
@@ -56,6 +58,21 @@ def update_amqp_config(fname, hostname):
                 if line.startswith("host ="):
                     line = "host = {0}\n".format(hostname)
                 out_handle.write(line)
+
+def wait_until_mounted(fname):
+    """Wait up to 3 minutes for mounted directory with file.
+    """
+    max_tries = 36
+    wait_sec = 5
+    num_tries = 0
+    while 1:
+        if os.path.exists(fname):
+            break
+        elif num_tries > max_tries:
+            raise ValueError("Did not find {f} after {s} seconds.".format(
+                f=fname, s=max_tries*wait_sec))
+        time.sleep(wait_sec)
+        num_tries += 1
  
 if __name__ == "__main__":
     main()
