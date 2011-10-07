@@ -3,5 +3,6 @@ packages:
   # - minimal : skip, as we don't need the build system
   - desktop-cloud
   - editors
+  - phylogeny
   - phylogeny_testing
 libraries:

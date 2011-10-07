@@ -52,6 +52,9 @@ python:
   - rpy
 java:
   - leinengin
+phylogeny:
+  - tracer
+  - beast
   #- cljr
 # ToDo -- test on 64bit with bfast
 #- dnaa
