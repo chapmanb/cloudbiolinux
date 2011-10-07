@@ -118,10 +118,10 @@ documentation on the [Vagrant website][v1].
 
 ## Amazon
 
-Basically a bare Linux image is configured from another machine, e.g.
-your local desktop, using ssh and Fabric tools, after launching the
-image in the Cloud. Multiple distributions are supported,
-including Ubuntu, Debian Linux and CentOS.
+A bare Linux image launched in Amazon EC2 is configured from another
+machine, i.e.  your local desktop, using ssh and cloudbiolinux.
+Any cloudbiolinux distribution can be used, including Ubuntu, Debian Linux
+and CentOS.
 
 1. On your local machine, install [Fabric][3]:
 
@@ -133,26 +133,26 @@ including Ubuntu, Debian Linux and CentOS.
         git clone git://github.com/chapmanb/cloudbiolinux.git
         cd cloudbiolinux
 
-3. Edit the `config/fabricrc.txt` to match the system you plan to
+3. Edit the `config/fabricrc.txt`, to match the system you plan to
    install on. Specifically, `distribution` and `dist_name` parameters
-   specify details about the type of machine.
+   specify details about the type of target.
 
-4. Start an Amazon EC2 base instance and get it's hostname:
+4. Start an Amazon EC2 base instance and retrieve it's DNS hostname:
 
    - [Alestic Ubuntu images][4]
    - [Camptocamp Debian images][4b]
 
-5. From your local machine, start installing CloudBioLinux on your
+5. From your local machine, have CloudBioLinux install your
    Amazon instance:
 
         fab -f fabfile.py -H hostname -u username -i private_key_file install_biolinux
 
-6. When finished, use the [Amazon console][2] to create an AMI. Make
-   it public to share it with others.
+6. When finished, use the [Amazon console][2] to create an AMI.
+   Thereafter make it public so it can be used by others.
 
 ## VirtualBox with vagrant
 
-Add a base image and boot it up; community Vagrant boxes are available from
+Add a base image to vagrant, and boot it up; community Vagrant boxes are available from
 [http://vagrantbox.es][v3] and [http://biobeat.org/bionode][BioLinux flavors]:
 
         vagrant box add box_name http://path_to_the_image.box
