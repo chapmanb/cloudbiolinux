@@ -31,7 +31,8 @@ Next add the virtualbox to vagrant using a URL, or box file:
 
           vagrant box add debian_squeeze_32 debian_squeeze_32.box
 
-and create your own version
+(boxes are available form [http://vagrantbox.es][v3] and
+[http://biobeat.org/bionode][BioLinux flavors]) and create your own version
 
           mkdir myflavor
           cd myflavor
@@ -84,13 +85,43 @@ Despite the fact that running fabfile.py is destructive, i.e. it overwrites the
 current install, it is reasonably safe as it mostly uses the underlying package
 management system and dependency resolution. Rerunning a BioLinux fabfile can
 be fast.  The minimal edition runs the second time in under 20 seconds on a
-basic laptop.
+basic laptop, as we do with a 'Minimal' install:
+
+         ./test/test_vagrant --continue
 
 For completeness, after a minimal install you can still install a full BioLinux
 execute
 
         fab -H vagrant -f $source/fabfile.py install_biolinux
 
+Once you have a working Virtual Box VM with vagrant, you can package it with
+
+        vagrant package
+
+and make the resulting .box file available for others to use.
+
 Read the README for further information.
 
 [v1]: http://vagrantup.com/docs/base_boxes.html
+
+## Trouble shooting
+
+### Guest additions
+
+You may see an error
+
+  [default] The guest additions on this VM do not match the install version of
+  VirtualBox! This may cause things such as forwarded ports, shared
+  folders, and more to not work properly. If any of those things fail on
+  this machine, please update the guest additions and repackage the
+  box.
+
+  Guest Additions Version: 4.0.4
+  VirtualBox Version: 4.1.0
+
+this error may actually be caused by the Vbox Linux kernel drivers not having
+been loaded! Fix
+
+       modprobe vboxdrv
+
+

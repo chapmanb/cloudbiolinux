@@ -10,7 +10,7 @@
 
 ## BioNode is Debian
 edition = minimal
-edition_version = 0.91
+edition_version = 0.92
 distribution = debian
 dist_name = squeeze
 
