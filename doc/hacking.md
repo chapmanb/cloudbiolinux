@@ -184,6 +184,18 @@ which automatically becomes part of the Flavor environment state as
 
 # Tips and tricks
 
+## Using VNC
+
+To have a remote desktop, login with ssh to the VM and start VNC
+
+        vnc4server
+
+Enter a password.
+
+on the client (your desktop) use
+
+        vncviewer IP:1
+
 ## Tip for checking BioLinux installation effects
 
 To see the what a BioLinux install does to your system, store the settings of
@@ -200,6 +212,6 @@ against the package list, and checking /etc.
 
 ## Use the testing framework to create new Flavors
 
-BioLinux comes with a testing framework in ./test. The frame work creates a new VM on
-a local machine. You can add tests, to check if a VM is complete. See the main README file for
-more information.
+BioLinux comes with a testing framework in ./test. The frame work
+creates a new VM on a local machine. You can add tests, to check if a
+VM is complete. See the main README file for more information.
