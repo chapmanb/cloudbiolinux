@@ -169,20 +169,22 @@ For a full Flavor example see
 
     https://github.com/pjotrp/cloudbiolinux/blob/master/contrib/flavor/pjotrp/biotest/biotestflavor.py
 
-## Individualize a Flavor
+## Individualize a Flavor with env.enviroment
 
-Sometimes it may be useful to have post-install one-offs, for individual
-purposes (say you want to define a user account for yourself). Rather than
-create a full Flavor you could add a parameter to the fabricrc file, and/or add
-a command line parameter named 'environment' to the install_biolinux parameter
+Sometimes it may be useful to have post-install one-offs, for
+individual purposes (say you want to define a user account for
+yourself). Rather than create a full Flavor for every possibility, you
+could add a parameter to the fabricrc file. Even better, add a command
+line parameter named 'environment' to the install_biolinux parameter
 list. E.g.
 
          fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,environment=special
 
 which automatically becomes part of the Flavor environment state as
-'env.environment'.
+'env.environment'. Use this parameter to distinguish between targets.
+We use it for distinguishing dev,test and production environments.
 
-# Tips and tricks
+# More tips and tricks
 
 ## Using VNC
 
@@ -190,7 +192,7 @@ To have a remote desktop, login with ssh to the VM and start VNC
 
         vnc4server
 
-Enter a password.
+Enter a password. Note the output pointing to the VNC viewer (IP:1).
 
 on the client (your desktop) use
 
