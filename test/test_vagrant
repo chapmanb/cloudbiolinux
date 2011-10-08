@@ -203,7 +203,7 @@ Dir.chdir(testname) do
   print "We can use #{testname}!\n"
 
   # Fire up the BioLinux fab file - this installs the VM
-  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{fabricrc} install_biolinux:packagelist=#{packagelist}"
+  run "fab -f #{srcpath}/fabfile.py -H vagrant -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
 
   # Now set up Ruby's vagrant access for testing
   vagrant = Vagrant::Environment.new
