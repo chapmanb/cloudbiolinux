@@ -65,6 +65,7 @@ desktop:
 desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
+  - vnc4server
 programming:
   editors:
     - emacs
