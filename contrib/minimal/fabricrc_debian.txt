@@ -13,6 +13,7 @@ edition = minimal
 edition_version = 0.92
 distribution = debian
 dist_name = squeeze
+nixpkgs = True
 
 # Update to the target's nearest repository:
 debian_repository=http://ftp.nl.debian.org/debian/
