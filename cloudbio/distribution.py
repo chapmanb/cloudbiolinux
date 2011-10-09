@@ -27,6 +27,7 @@ def _setup_distribution_environment():
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _validate_target_distribution(env.distribution)
     _cloudman_compatibility(env)
+    _setup_nixpkgs()
     _configure_sudo(env)
 
 def _configure_sudo(env):
@@ -110,6 +111,12 @@ def _setup_centos():
     env.ruby_version_ext = ""
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
+
+def _setup_nixpkgs():
+    if not env.has_key("nixpgks"):
+        env.nixpkgs = true
+    else:
+        env.nixpkgs = false
 
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.

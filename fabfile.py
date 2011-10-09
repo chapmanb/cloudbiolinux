@@ -148,6 +148,9 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
             _setup_yum_bashrc()
         else:
             raise NotImplementedError("Unknown target distribution")
+        if env.nixpkgs: # ./doc/nixpkgs.md
+            _setup_nix_sources()
+            _nix_packages(pkg_install)
         _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
         _custom_installs(pkg_install)
@@ -573,6 +576,14 @@ def _setup_yum_sources():
     for repo in repos:
         with settings(warn_only=True):
             sudo("rpm -Uvh %s" % repo)
+
+# ### Nix Packages specific
+
+def _setup_nix_sources():
+    pass
+
+def _nix_packages(to_install):
+    pass
 
 # ### CloudBioLinux specific scripts
 
