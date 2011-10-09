@@ -15,8 +15,10 @@ class PhylogenyFlavor(Flavor):
     def rewrite_config_items(self, name, packages):
         if name == 'packages':
           packages += [ 'openssh-server', 'unzip', 'tar', 'sudo', 'openjdk-6-jre']
-          if 'bio-linux-mrbayes-multi' in packages:
-            packages.remove('bio-linux-mrbayes-multi')
+          packages += [ 'openmpi-bin' ]  # required for MrBayes-MPI
+          # if 'bio-linux-mrbayes-multi' in packages:
+          #   (Debian version is still not OK)
+          #   packages.remove('bio-linux-mrbayes-multi')
 
         for package in packages:
           env.logger.info("Selected: "+name+" "+package)

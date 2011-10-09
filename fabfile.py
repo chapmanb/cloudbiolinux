@@ -74,12 +74,17 @@ def _create_local_paths():
                 result = run("pwd")
                 env.local_install = result
 
-def _setup_flavor(flavor):
+def _setup_flavor(flavor, environment=None):
     """Setup flavor
     """
-    if flavor == None:
+    if not flavor:
         flavor = env.get("flavor", None)
-    if flavor != None:
+    if not environment:
+        environment = env.get("environment", None)
+    if environment:
+        env.environment = environment
+        env.logger.info("Environment %s" % env.environment)
+    if flavor:
         # import a flavor defined through parameters flavor and flavor_path
         flavor_path = env.get("flavor_path", None)
         if flavor_path == None:
@@ -98,7 +103,7 @@ def _setup_flavor(flavor):
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None, packagelist=None, flavor=None):
+def install_biolinux(target=None, packagelist=None, flavor=None, environment=None):
     """Main entry point for installing Biolinux on a remote server.
 
     This allows a different main package list (the main YAML file is passed in),
@@ -115,12 +120,17 @@ def install_biolinux(target=None, packagelist=None, flavor=None):
       - custom       Install custom packages
       - libraries    Install programming language libraries
       - finalize     Setup freenx and clean-up environment
+
+    environment allows adding additional information on the command line -
+    usually for defining environments, for example environment=testing, or
+    environment=production, will set the deployment environment and tune
+    post-installation settings.
     """
     _setup_logging(env)
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
-    _setup_flavor(flavor)
+    _setup_flavor(flavor, environment)
     _setup_distribution_environment() # get parameters for distro, packages etc.
     _create_local_paths()
     env.logger.info("packagelist=%s" % packagelist)
