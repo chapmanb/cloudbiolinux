@@ -594,7 +594,7 @@ def _setup_nix_sources():
             # Set sources
             sudo("nix-channel --add http://nixos.org/releases/nixpkgs/channels/nixpkgs-unstable")
             sudo("nix-channel --update")
-            # upgrade Nix to latest (the older version is much slower)
+            # upgrade Nix to latest (and remove the older version, as it is much slower)
             sudo("nix-env -b -i nix")
             if exists("/usr/bin/nix-env"):
                 env.logger.info("uninstall older Nix (Debian release)")
@@ -606,10 +606,9 @@ def _nix_packages(to_install):
     if env.nixpkgs:
         env.logger.info("Update and install NixPkgs packages")
         pkg_config_file = os.path.join(env.config_dir, "packages-nix.yaml")
-        # sudo("nix-channel --update")
+        sudo("nix-channel --update")
         # Retrieve final package names
         (packages, _) = _yaml_to_packages(pkg_config_file, to_install)
-        print packages
         packages = env.edition.rewrite_config_items("packages", packages)
         packages = env.flavor.rewrite_config_items("packages", packages)
         for p in packages:
