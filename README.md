@@ -22,10 +22,12 @@ data resources.
 
 CloudBioLinux is designed as a single install route for both VMs on
 the desktop, such as [VirtualBox][v2], and cloud providers, such as
-[Amazon EC2][0], where you start with a bare bones system and
-bootstrap a running instance. CloudBioLinux included software packages
-are fully customizable, and different flavours of CloudBioLinux can be
-configured.
+[Amazon EC2][0], [Openstack][openstack], where you start with a bare
+bones system and bootstrap a running instance. You can even create a
+minimalistic private cloud on top of [XEN][XEN] or Linux [KVM][KVM],
+just plain, or with [Eucalyptus][eucalyptus]. CloudBioLinux included
+software packages are fully customizable, and different flavours of
+CloudBioLinux can be configured.
 
 CloudBioLinux provides a [Fabric build file][3], written in Python.
 There is little need to understand Python, though, as most configuration
@@ -34,6 +36,9 @@ added too. Package selection is through YAML files in the ./config
 directory.
 
 # Using an instance
+
+CloudBioLinux has ready-made images for Amazon EC2 and VirtualBox.
+Also a repository of biological data is available.
 
 ## Amazon
 
@@ -83,7 +88,8 @@ to a local or [cloud-based][bd3] Galaxy server.
 
 ## VirtualBox with vagrant
 
-Vagrant allows easy deploying and connecting to VirtualBox images.
+Vagrant allows easy deploying and connecting to VirtualBox images. The 
+setup is ideal for runnig CloudBioLinux on a desktop computer.
 Install [VirtualBox 4.0][v2] and [vagrant][v1]. Then add the pre-built
 CloudLinux VirtualBox images and start it up:
 
@@ -115,6 +121,9 @@ virtualbox itself. For more information, see the BioLinux
 documentation on the [Vagrant website][v1].
 
 # Building an image from scratch using CloudBioLinux
+
+CloudBioLinux can be built for any virtualized platform, as long as
+the target VM is Linux, with an ssh command line.
 
 ## Amazon
 
@@ -150,6 +159,11 @@ and CentOS.
 6. When finished, use the [Amazon console][2] to create an AMI.
    Thereafter make it public so it can be used by others.
 
+## OpenStack
+
+[OpenStack][openstack] is a promising platform for Cloud computing.
+CloudBioLinux support for OpenStack is planned.
+
 ## VirtualBox with vagrant
 
 Add a base image to vagrant, and boot it up; community Vagrant boxes are available from
@@ -175,6 +189,13 @@ move it to a public webserver, such as Amazon S3:
 
 For more on vagrant and CloudBioLinux see ./doc/vagrant.md.
 
+## XEN/KVM/Eucalyptus private Cloud
+
+As long as there is an 'ssh' entry to an running VM, CloudBioLinux can
+install itself.
+
+For more on private Cloud and CloudBioLinux see ./doc/private\_cloud.md.
+
 [0]: http://aws.amazon.com/ec2/
 [1]: http://cloudbiolinux.org/
 [2]: https://console.aws.amazon.com/ec2/home
@@ -184,6 +205,10 @@ For more on vagrant and CloudBioLinux see ./doc/vagrant.md.
 [v1]: http://vagrantup.com/
 [v2]: http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/
 [v3]: http://vagrantbox.es/
+[XEN]: http://xen.org/
+[KVM]: http://www.linux-kvm.org/
+[eucalyptus]: http://open.eucalyptus.com/
+[openstack]: http://www.openstack.org/
 
 # Technical details for using build scripts
 

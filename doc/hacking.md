@@ -1,21 +1,24 @@
-= Hacking BioLinux tips and tricks
+# Hacking BioLinux tips and tricks
 
 The BioLinux tools allow building a full environment for Bioinformatics. The
 design allows for flexible targets (Editions) and specializations (Flavors).
 
+VirtualBox + Vagrant make an ideal toying environment for building and testing
+targets. The BioLinux regression test system (in ./test/) uses that combo too.
 Please read the README and ./doc/vagrant documentation that come with the
 BioLinux source tree first (see http://github.com/chapmanb/cloudbiolinux).
 
-== Start with the Minimal edition
+## Start with the Minimal edition
 
 The Minimal edition is the smallest common denominator of all Editions, as it
 installs the minimum of packages to bootstrap a full install. Once the
-vagrant box is up and running, Minimal is invoked by
+vagrant box is up and running, Minimal is invoked from the desktop by
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
 
-where $source points to your biolinux source tree. In fact, the testing script
-in ./test/test_vagrant does exactly this! Try:
+where $source points to your biolinux source tree (replace 'target_hostname'
+with 'vagrant' when using that). In fact, the testing script in
+./test/test_vagrant does exactly this! Try:
 
           cd $my_vms
           $source/test/test_vagrant --help
@@ -31,7 +34,7 @@ access, version control, and the basic build system (gcc and friends). Note the
 Minimal edition overwrites the (apt) sources file to make sure there are no
 conflicts with user settings.
 
-== Adding install packages
+## Adding install packages
 
 To expand on the package list you can define your own main.yaml, and pass that
 in. In your main.yaml file add the meta-packages listed in
@@ -46,7 +49,7 @@ main repository. The alternative is to create your own flavor, which we will do
 in a minute. The same strategy holds for the other definitions in the ./config
 directory, such as for Ruby gems, Python eggs, Perl CPAN, R-CRAN etc.
 
-== Define a Flavor
+## Define a Flavor
 
 For a cross language Bio* project performance test I needed to create a special
 version of BioLinux that would pull in a list of scripts and some additional
@@ -65,21 +68,25 @@ statement. For example:
           env.logger.info("Selected: "+name+" "+package)
         return packages
 
-The flavor is itself is found through a fabricrc.txt file. The main package list may be
-in a new main.yaml file.  Kicking it into submission:
+The flavor is itself is found through a fabricrc.txt file. The main package
+list may be in a new main.yaml file.  Kicking it into submission:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
 
 The flavor module itsefl sets env.flavor on loading the module (this can only
 happen once). For more examples see the files in ./contrib/flavor.
 
-== Distribute a VirtualBox
+## Distribute a VirtualBox
 
 With vagrant a box can be exported with
 
           vagrant package
 
-== Flavor: change default sources (apt, yum, rpm)
+To extract the contained VirtualBox vmdk:
+
+          tar xvf package.box
+
+## Flavor: change default sources (apt, yum, rpm)
 
 Note: NYI
 
@@ -87,7 +94,7 @@ BioLinux creates a (default, or edition based) list of package sources. These
 sources can be overridden by the Flavor.rewrite_apt_sources_list method - which
 should return a new list.
 
-== Flavor: install additional packages
+## Flavor: install additional packages
 
 The primary way of adding new packages is by creating a new main.yaml file, as
 discussed above in ''Define a flavor''. In addition a flavor can define a
@@ -95,25 +102,25 @@ method: BioLinux creates a (default, or edition based) list of packages. These
 sources can be overridden by the Flavor.rewrite_config_list method - which
 should return a new list.
 
-== Flavor: filter packages
+## Flavor: filter packages
 
-To filter/remove packages from the default list, use rewrite_config_list to filter existing
-meta packages.
+To filter/remove packages from the default list, use rewrite_config_list to
+filter existing meta packages.
 
-== Flavor: rewrite Ruby gem, Perl CPAN, Python egg, R CRAN lists
+## Flavor: rewrite Ruby gem, Perl CPAN, Python egg, R CRAN lists
 
-The function rewrite_config_list also allows rewriting package lists for Ruby, Python, R,
-Perl etc. The general idea is that the main
-Editions define the inclusion of the main languages, and pull in Bio* related
-packages. To override this behaviour use the rewrite functions, e.g.
+The function rewrite_config_list also allows rewriting package lists for Ruby,
+Python, R, Perl etc. The general idea is that the main Editions define the
+inclusion of the main languages, and pull in Bio* related packages. To override
+this behaviour use the rewrite functions, e.g.
 
     def rewrite_config_list(self, name, list):
       if name == 'ruby':
         return [ 'bio' ]
       return list
 
-only allows the BioRuby 'bio' gem to be installed. This happens at the time your
-meta main.yaml reads
+only allows the BioRuby 'bio' gem to be installed. This happens at the time
+your meta main.yaml reads
 
     libraries:
       - ruby-libs
@@ -123,7 +130,7 @@ editions are up-to-date. Likewise for all the other yaml files. The
 configuration options are at the main.yaml (meta-package) level, and by using
 rewrite methods at Edition and Flavor levels.
 
-== Flavor: install special software
+## Flavor: install special software
 
 BioLinux comes with a bag of tricks to install special software outside the
 main package system. There are methods for checking out source repositories,
@@ -151,18 +158,47 @@ a script by adding a post_install method to your flavor. E.g.
                 # Now run a post installation routine
                 run('./Scalability/scripts/hello.sh')
 
-You can run only the post_install (convinient for testing!) using the post_install
+You can run post_install on its own (convenient for testing!) using the finalize
 target, e.g.
 
-         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,target=post_install
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,target=finalize
+
+(Note: finalize may become post-install in the future)
 
 For a full Flavor example see
 
     https://github.com/pjotrp/cloudbiolinux/blob/master/contrib/flavor/pjotrp/biotest/biotestflavor.py
 
-= Tips and tricks
+## Individualize a Flavor with env.enviroment
 
-== Tip for checking BioLinux installation effects
+Sometimes it may be useful to have post-install one-offs, for
+individual purposes (say you want to define a user account for
+yourself). Rather than create a full Flavor for every possibility, you
+could add a parameter to the fabricrc file. Even better, add a command
+line parameter named 'environment' to the install_biolinux parameter
+list. E.g.
+
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,environment=special
+
+which automatically becomes part of the Flavor environment state as
+'env.environment'. Use this parameter to distinguish between targets.
+We use it for distinguishing dev,test and production environments.
+
+# More tips and tricks
+
+## Using VNC
+
+To have a remote desktop, login with ssh to the VM and start VNC
+
+        vnc4server
+
+Enter a password. Note the output pointing to the VNC viewer (IP:1).
+
+on the client (your desktop) use
+
+        vncviewer IP:1
+
+## Tip for checking BioLinux installation effects
 
 To see the what a BioLinux install does to your system, store the settings of
 the original (untouched) state of a VM:
@@ -176,8 +212,8 @@ the original (untouched) state of a VM:
 After running BioLinux you can see what has been done to your system by diffing
 against the package list, and checking /etc.
 
-== Use the testing framework to create new Flavors
+## Use the testing framework to create new Flavors
 
-BioLinux comes with a testing framework in ./test. The frame work creates a new VM on
-a local machine. You can add tests, to check if a VM is complete. See the main README file for
-more information.
+BioLinux comes with a testing framework in ./test. The frame work
+creates a new VM on a local machine. You can add tests, to check if a
+VM is complete. See the main README file for more information.
