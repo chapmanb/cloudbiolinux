@@ -53,8 +53,11 @@ def _validate_target_distribution(dist):
     if dist in ["debian", "ubuntu"]:
         tag = run("cat /proc/version")
         if tag.lower().find(dist) == -1:
-           raise ValueError("Distribution '%s' does not match machine;" +
-                            "are you using correct fabconfig?" % dist)
+           # hmmm, test issue file
+           tag2 = run("cat /etc/issue")
+           if tag2.lower().find(dist) == -1:
+               raise ValueError("Distribution '%s' does not match machine;" +
+                                "are you using correct fabconfig?" % dist)
     else:
         env.logger.debug("Unknown target distro")
 
