@@ -507,10 +507,17 @@ def _setup_apt_sources():
 
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
+
+    # It may be sudo is not installed - which has fab fail - therefor
+    # we'll try to install it by default, assuming we have root access
+    # already (e.g. on EC2). Fab will fail anyway, otherwise.
+    if not exists('/usr/bin/sudo'):
+        run('apt-get update')
+        run('apt-get -y --force-yes install sudo')
+
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
     comment = "# This file was modified for "+ env.edition.name
-
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
     preferences = env.edition.rewrite_apt_preferences([])
