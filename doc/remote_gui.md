@@ -1,7 +1,7 @@
 # BioLinux Remote X access
 
 BioLinux supports both VNC and freenx GUI X-windows access to a remote
-VM.
+VM. And you can use X programs through ssh, naturally.
 
 ## VNC
 
@@ -48,7 +48,24 @@ can tunnel over ssh for improved security. Or use freenx instead.
 
 ## FreeNX
 
+FreeNX is a fast version of the X protocol.
+
 Make sure freenx is installed on the VM. CloudBioLinux comes with scripts
 for setting up freenx.
 
 (to be filled in)
+
+## X over ssh
+
+Normally you have ssh access to the remote VM. You can use X-windows programs
+remotely, provided you have a local X server (always on Linux and OSX). Just
+login with the -X switch
+
+      ssh -X user@$hostIP
+
+in the terminal type an X program, e.g.
+
+      firefox
+
+and the program should display locally (running remotely).
+
