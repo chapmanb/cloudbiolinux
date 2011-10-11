@@ -24,7 +24,7 @@ BOX = {
            },
         'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
            { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-phylogeny-debian-0.92-i386.box',
-             :md5         => 'cf8b6125b38538ecd322495d7fe8b16f',
+             :md5         => 'e7481104d24a7896ea1151a14e05d497',
              :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/phylogeny/main.yaml',
              :call_test   => 'test_phylogeny_flavor'
@@ -193,9 +193,10 @@ if not File.exist?(vagrant_init_orig)
   INJECT =<<EOI
   # Expand RAM
   config.vm.customize do |vm|
-    vm.memory_size = 512
+    vm.memory_size = 512  # default to 512 Mb RAM
+    # vm.cpu_count = 2      # default to 2 CPUs -- not yet in all Vagrants
   end
-  # Forward guest port 80 to host port 4567 and name the mapping "web"
+  # Forward guest port 5900 to host port 5900 and name the mapping "vnc"
   config.vm.forward_port('vnc0', 5900, 5900)
   config.vm.forward_port('vnc1', 5901, 5901)
 end
