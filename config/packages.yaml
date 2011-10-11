@@ -66,6 +66,7 @@ desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
   - vnc4server
+  - freenx
 programming:
   editors:
     - emacs
@@ -381,9 +382,9 @@ phylogeny:
     - njplot
     - tree-puzzle
     #- bio-linux-arb # Broken, needs libmotif3
-    # ape package is source. It needs R - not in deps - and
+    # biolinux-ape package is source (i386). It needs R - not in deps - and
     # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
-    - bio-linux-ape 
+    # - bio-linux-ape 
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem
