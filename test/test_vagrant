@@ -196,11 +196,11 @@ if not File.exist?(vagrant_init_orig)
     vm.memory_size = 512
   end
   # Forward guest port 80 to host port 4567 and name the mapping "web"
-  config.vm.forward_port("vnc0", 5900, 5900)
-  config.vm.forward_port("vnc1", 5901, 5901)
+  config.vm.forward_port('vnc0', 5900, 5900)
+  config.vm.forward_port('vnc1', 5901, 5901)
 end
 EOI
-  print `echo -ne "#{INJECT}" >> #{vagrant_file_init}`
+  print `echo "#{INJECT}" >> #{vagrant_init}`
 end
 
 Dir.chdir(testname) do
