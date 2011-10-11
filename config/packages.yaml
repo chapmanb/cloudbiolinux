@@ -20,6 +20,9 @@
 # be selectively installed/ignored. See main.yaml for top level configuration.
 minimal:
   #Packages to support a minimal installation (no X!)
+  administration:
+    - sudo
+    - htop
   editors:
     - vim
     # don't put in emacs, as it pulls in X
@@ -46,7 +49,6 @@ minimal:
     - unzip
     - tar
     - less
-    - sudo
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
