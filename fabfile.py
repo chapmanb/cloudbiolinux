@@ -153,11 +153,15 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
-    if target is None or target == "finalize":
+    if target is None or target == "post_install":
         env.edition.post_install()
         env.flavor.post_install()
+    if target is None or target == "finalize":
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            # this switch leads to confusion - why default to Cloudman on EC2,
+            # why no freenx on other VMs? 'finalize' is also about cleanup, 
+            # I think. It should be 'cleanup' targets.
             _freenx_scripts()
             _configure_cloudman(env)
             _cleanup_ec2(env)

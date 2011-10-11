@@ -1,5 +1,6 @@
 from fabric.api import *
 from fabric.contrib.files import *
+from fabfile import _freenx_scripts
 
 from cloudbio.flavor import Flavor
 
@@ -26,6 +27,7 @@ class PhylogenyFlavor(Flavor):
 
     def post_install(self):
         env.logger.info("Starting post-install")
+        _freenx_scripts()
         pass
 
 env.flavor = PhylogenyFlavor(env)
