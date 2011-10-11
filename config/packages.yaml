@@ -381,6 +381,7 @@ phylogeny:
     - njplot
     - tree-puzzle
     #- bio-linux-arb # Broken, needs libmotif3
+    - bio-linux-ape
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem
