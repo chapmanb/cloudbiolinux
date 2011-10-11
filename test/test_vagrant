@@ -23,8 +23,8 @@ BOX = {
              :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
         'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
-           { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-phylogeny-0.91.box',
-             :md5         => 'c86bd85064b397cc9b4412be0e011044',
+           { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-phylogeny-debian-0.92-i386.box',
+             :md5         => 'cf8b6125b38538ecd322495d7fe8b16f',
              :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/phylogeny/main.yaml',
              :call_test   => 'test_phylogeny_flavor'
