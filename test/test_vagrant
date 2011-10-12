@@ -23,8 +23,8 @@ BOX = {
              :packagelist => 'contrib/flavor/boinc/main.yaml'
            },
         'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
-           { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-phylogeny-0.91.box',
-             :md5         => 'c86bd85064b397cc9b4412be0e011044',
+           { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-phylogeny-debian-0.92-i386.box',
+             :md5         => 'e7481104d24a7896ea1151a14e05d497',
              :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
              :packagelist => 'contrib/flavor/phylogeny/main.yaml',
              :call_test   => 'test_phylogeny_flavor'
@@ -180,8 +180,28 @@ else
   end
 end
 
-if not File.directory?(testname)
-  error "VM #{testname} appears not to be installed"
+vagrant_init = testname + '/Vagrantfile'
+vagrant_init_orig = testname + '/Vagrantfile.original'
+if not File.exist?(vagrant_init)
+  error "Vagrant VM #{testname} appears not to be installed"
+end
+
+if not File.exist?(vagrant_init_orig)
+  # modify Vagrant file
+  print `mv #{vagrant_init} #{vagrant_init_orig}`
+  print `sed '$d' < #{vagrant_init_orig} > #{vagrant_init}` # remove last line
+  INJECT =<<EOI
+  # Expand RAM
+  config.vm.customize do |vm|
+    vm.memory_size = 512  # default to 512 Mb RAM
+    # vm.cpu_count = 2      # default to 2 CPUs -- not yet in all Vagrants
+  end
+  # Forward guest port 5900 to host port 5900 and name the mapping "vnc"
+  config.vm.forward_port('vnc0', 5900, 5900)
+  config.vm.forward_port('vnc1', 5901, 5901)
+end
+EOI
+  print `echo "#{INJECT}" >> #{vagrant_init}`
 end
 
 Dir.chdir(testname) do

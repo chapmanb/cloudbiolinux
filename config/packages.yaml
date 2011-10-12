@@ -20,6 +20,9 @@
 # be selectively installed/ignored. See main.yaml for top level configuration.
 minimal:
   #Packages to support a minimal installation (no X!)
+  administration:
+    - sudo
+    - htop
   editors:
     - vim
     # don't put in emacs, as it pulls in X
@@ -46,7 +49,6 @@ minimal:
     - unzip
     - tar
     - less
-    - sudo
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
@@ -66,6 +68,7 @@ desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
   - vnc4server
+  - freenx
 programming:
   editors:
     - emacs
@@ -381,6 +384,9 @@ phylogeny:
     - njplot
     - tree-puzzle
     #- bio-linux-arb # Broken, needs libmotif3
+    # biolinux-ape package is source (i386). It needs R - not in deps - and
+    # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
+    # - bio-linux-ape 
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem

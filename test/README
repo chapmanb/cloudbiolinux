@@ -35,3 +35,9 @@ you need to run 'vagrant up' first. In practise, this may mean:
 
 This is Ruby trying into the vagrant API. You need to reinstall the
 vagrant and virtualbox gems to match your version of Ruby.
+
+=== Grub error
+
+On a kernel upgrade, the test scripts may want to install grub, which is
+the boot loader. Vagrant does not need that, so don't try to install (select 
+ignore).

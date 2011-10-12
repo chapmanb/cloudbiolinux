@@ -148,16 +148,23 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
             _setup_yum_bashrc()
         else:
             raise NotImplementedError("Unknown target distribution")
+        if env.nixpkgs: # ./doc/nixpkgs.md
+            _setup_nix_sources()
+            _nix_packages(pkg_install)
         _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
         _custom_installs(pkg_install)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
-    if target is None or target == "finalize":
+    if target is None or target == "post_install":
         env.edition.post_install()
         env.flavor.post_install()
+    if target is None or target == "finalize":
         _cleanup_space()
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            # this switch leads to confusion - why default to Cloudman on EC2,
+            # why no freenx on other VMs? 'finalize' is also about cleanup, 
+            # I think. It should be 'cleanup' targets.
             _freenx_scripts()
             _configure_cloudman(env)
             _cleanup_ec2(env)
@@ -507,10 +514,17 @@ def _setup_apt_sources():
 
        Uses python-software-properties, which provides an abstraction of apt repositories
     """
+
+    # It may be sudo is not installed - which has fab fail - therefor
+    # we'll try to install it by default, assuming we have root access
+    # already (e.g. on EC2). Fab will fail anyway, otherwise.
+    if not exists('/usr/bin/sudo'):
+        run('apt-get update')
+        run('apt-get -y --force-yes install sudo')
+
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
     comment = "# This file was modified for "+ env.edition.name
-
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
     preferences = env.edition.rewrite_apt_preferences([])
@@ -573,6 +587,43 @@ def _setup_yum_sources():
     for repo in repos:
         with settings(warn_only=True):
             sudo("rpm -Uvh %s" % repo)
+
+# ### Nix Packages specific
+
+def _setup_nix_sources():
+    if env.nixpkgs:
+        # first override the path
+        append("/root/.bashrc", "export PATH=$HOME/.nix-profile/bin:$PATH", use_sudo=True)
+        env.logger.info("Checking NixPkgs")
+        if not exists("/nix/store"):
+            if not exists("/usr/bin/nix-env"):
+               # install Nix (standard Debian release)
+               nix_deb = "nix_0.16-1_i386.deb"
+               if not exists(nix_deb):
+                   run("wget http://hydra.nixos.org/build/565031/download/1/nix_0.16-1_i386.deb")
+                   sudo("dpkg -i "+nix_deb)
+            # Set sources
+            sudo("nix-channel --add http://nixos.org/releases/nixpkgs/channels/nixpkgs-unstable")
+            sudo("nix-channel --update")
+            # upgrade Nix to latest (and remove the older version, as it is much slower)
+            sudo("nix-env -b -i nix")
+            if exists("/usr/bin/nix-env"):
+                env.logger.info("uninstall older Nix (Debian release)")
+                sudo("dpkg -r nix")
+
+def _nix_packages(to_install):
+    """Install packages available via nixpkgs (optional)
+    """
+    if env.nixpkgs:
+        env.logger.info("Update and install NixPkgs packages")
+        pkg_config_file = os.path.join(env.config_dir, "packages-nix.yaml")
+        sudo("nix-channel --update")
+        # Retrieve final package names
+        (packages, _) = _yaml_to_packages(pkg_config_file, to_install)
+        packages = env.edition.rewrite_config_items("packages", packages)
+        packages = env.flavor.rewrite_config_items("packages", packages)
+        for p in packages:
+            sudo("nix-env -b -i %s" % p)
 
 # ### CloudBioLinux specific scripts
 

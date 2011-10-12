@@ -27,6 +27,7 @@ def _setup_distribution_environment():
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _validate_target_distribution(env.distribution)
     _cloudman_compatibility(env)
+    _setup_nixpkgs()
     _configure_sudo(env)
 
 def _configure_sudo(env):
@@ -53,8 +54,11 @@ def _validate_target_distribution(dist):
     if dist in ["debian", "ubuntu"]:
         tag = run("cat /proc/version")
         if tag.lower().find(dist) == -1:
-           raise ValueError("Distribution '%s' does not match machine;" +
-                            "are you using correct fabconfig?" % dist)
+           # hmmm, test issue file
+           tag2 = run("cat /etc/issue")
+           if tag2.lower().find(dist) == -1:
+               raise ValueError("Distribution '%s' does not match machine;" +
+                                "are you using correct fabconfig?" % dist)
     else:
         env.logger.debug("Unknown target distro")
 
@@ -110,6 +114,18 @@ def _setup_centos():
     env.ruby_version_ext = ""
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
+
+def _setup_nixpkgs():
+    # for now, Nix packages are only supported in Debian - it can
+    # easily be done for others - just get Nix installed from the .rpm
+    if env.distribution in ["debian", "ubuntu"]:
+        if env.has_key("nixpkgs"):
+            if env.nixpkgs == "True":
+                env.nixpkgs = True
+            else:
+                env.nixpkgs = False
+            if env.nixpkgs:
+                env.logger.info("Adding NixPkgs support")
 
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.

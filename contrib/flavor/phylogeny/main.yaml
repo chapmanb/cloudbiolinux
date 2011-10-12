@@ -5,4 +5,5 @@ packages:
   - editors
   - phylogeny
   - phylogeny_testing
+  - r
 libraries:
