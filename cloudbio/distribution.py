@@ -116,13 +116,16 @@ def _setup_centos():
         env.java_home = "/etc/alternatives/java_sdk"
 
 def _setup_nixpkgs():
-    env.nixpkgs = False
     # for now, Nix packages are only supported in Debian - it can
-    # easily be done for others - just get it installed from the .rpm
+    # easily be done for others - just get Nix installed from the .rpm
     if env.distribution in ["debian", "ubuntu"]:
         if env.has_key("nixpkgs"):
-            env.logger.info("Adding NixPkgs support")
-            env.nixpkgs = True
+            if env.nixpkgs == "True":
+                env.nixpkgs = True
+            else:
+                env.nixpkgs = False
+            if env.nixpkgs:
+                env.logger.info("Adding NixPkgs support")
 
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
