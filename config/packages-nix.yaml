@@ -5,6 +5,7 @@
 
 minimal:
   - nix
+editors:
   - vim-7.3 # a recent vim, just for the test
 phylogeny:
   - paml
