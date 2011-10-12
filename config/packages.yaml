@@ -155,6 +155,10 @@ programming:
     - tree
     - screen
     - time
+    - fdupes
+  network:
+    - lynx
+    - traceroute
   lang:
     - aspell
     - dictionaries-common
