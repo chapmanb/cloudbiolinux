@@ -151,9 +151,14 @@ programming:
     - virtualbox-4.0
     - dkms
   util:
+    - mc
     - tree
     - screen
     - time
+    - fdupes
+  network:
+    - lynx
+    - traceroute
   lang:
     - aspell
     - dictionaries-common
