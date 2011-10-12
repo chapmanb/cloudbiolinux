@@ -1,0 +1,10 @@
+# These are packages defined in Nix packages. Nix is an independent and
+# distribution agnostic packaging system, with many interesting features.
+#
+# For more information see http://nixos.org/nixpkgs/
+
+minimal:
+  - nix
+  - vim-7.3 # a recent vim, just for the test
+phylogeny:
+  - paml
