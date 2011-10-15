@@ -34,8 +34,8 @@ you need to run 'vagrant up' first. In practise, this may mean:
 === Fatal error: Name lookup failed for vagrant
 
 Probably there is another VirtualBox + vagrant running somewhere. This
-conflicts with the information in ./ssh/config. Easy solution: kill
-the running instance first.
+conflicts with the information in ./ssh/config. Easy solution: remove
+and kill the running instance first.
 
 === Error: ffi.rb:106:in `call_and_check': Error in API call to get_state ===
 
