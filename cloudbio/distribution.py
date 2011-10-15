@@ -118,6 +118,7 @@ def _setup_centos():
 def _setup_nixpkgs():
     # for now, Nix packages are only supported in Debian - it can
     # easily be done for others - just get Nix installed from the .rpm
+    env.nixpkgs = False
     if env.distribution in ["debian", "ubuntu"]:
         if env.has_key("nixpkgs"):
             if env.nixpkgs == "True":
