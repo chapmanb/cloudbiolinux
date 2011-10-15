@@ -22,7 +22,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
     to_download = [("dbsnp_{ver}".format(ver=dbsnp_version), ""),
                    ("hapmap_3.3", ".sites"),
                    ("1000G_omni2.5", ".sites"),
-                   ("indels_mills_devine", ".sites")]
+                   ("Mills_Devine_2hit.indels", ".sites")]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
@@ -31,7 +31,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
             run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
             for dl_name, dl_ext in to_download:
-                _download_broad_bundle(gid, bundle_version, dl_name, dl_ext)
+                _download_broad_bundle(manager._name, bundle_version, dl_name, dl_ext)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}{ext}.vcf".format(gid=gid, name=name, ext=ext)

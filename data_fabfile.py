@@ -209,7 +209,7 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "1.1"
+BROAD_BUNDLE_VERSION = "1.2"
 DBSNP_VERSION = "132"
 
 GENOMES_SUPPORTED = [
@@ -221,6 +221,8 @@ GENOMES_SUPPORTED = [
                                             "Homo_sapiens_assembly18.fasta")),
            ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
                                             "ucsc.hg19.fasta")),
+           ("Hsapiens", "GRCh37", BroadGenome("b37", BROAD_BUNDLE_VERSION,
+                                              "human_g1k_v37.fasta")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
