@@ -47,7 +47,7 @@ require 'test_biolinux'
 
 def run cmd
   print "--> ",cmd
-  return `#{cmd}`
+  system(cmd)  # don't use backticks for fab!
 end
 
 def error msg
@@ -120,7 +120,7 @@ USAGE
   exit 0
 end
 
-vagrant_hostname = "vagrant"
+vagrant_hostname = "default"
 srcpath = File.dirname(File.dirname(__FILE__))
 print srcpath, "\n"
 
@@ -213,7 +213,7 @@ end
 # Using the VM
 Dir.chdir(testname) do
   # ssh info
-  ssh_config = run "vagrant ssh-config"
+  ssh_config = `vagrant ssh-config`
   ssh_config =~ /Host (\S+)/
   vagrant_hostname = $1
   print "Hostname #{vagrant_hostname}\n"
