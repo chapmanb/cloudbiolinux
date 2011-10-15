@@ -13,9 +13,10 @@ def _setup_nix_sources():
         if not exists("/nix/store"):
             if not exists("/usr/bin/nix-env"):
                # install Nix (standard Debian release)
-               nix_deb = "nix_0.16-1_i386.deb"
+               nix_deb = "nix_0.16-1_"+env.arch+".deb"
                if not exists(nix_deb):
-                   run("wget http://hydra.nixos.org/build/565031/download/1/nix_0.16-1_i386.deb")
+                   # run("wget http://hydra.nixos.org/build/565031/download/1/nix_0.16-1_i386.deb")
+                   run("wget http://hydra.nixos.org/build/565048/download/1/"+nix_deb)
                    sudo("dpkg -i "+nix_deb)
             # Set sources
             sudo("nix-channel --add http://nixos.org/releases/nixpkgs/channels/nixpkgs-unstable")

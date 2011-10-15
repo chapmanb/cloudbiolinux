@@ -13,6 +13,19 @@ def _setup_distribution_environment():
     """
     env.logger.info("Distribution %s" % env.distribution)
 
+    target_info = run("uname -a")
+    env.logger.info("Target: "+target_info)
+    # find the target architecture, if not preset
+    if not env.has_key("arch"):
+        if target_info.find("amd64"):
+            env.arch = "amd64"
+        elif target_info.find("i386"):
+            env.arch = "i386"
+        elif target_info.find("i686"):
+            env.arch = "i686"
+        else:
+            env.arch = "unknown"
+
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:

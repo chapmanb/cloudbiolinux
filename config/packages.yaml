@@ -49,6 +49,9 @@ minimal:
     - unzip
     - tar
     - less
+  network:
+    - curl
+    - wget
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
@@ -82,7 +85,6 @@ programming:
   build:
     - swig
     - cmake
-    - curl
     - libcurl4-openssl-dev
     - libxml2
     - libxml2-dev
