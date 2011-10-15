@@ -47,7 +47,7 @@ require 'test_biolinux'
 
 def run cmd
   print "--> ",cmd
-  system(cmd)
+  return `#{cmd}`
 end
 
 def error msg
@@ -120,6 +120,7 @@ USAGE
   exit 0
 end
 
+vagrant_hostname = "vagrant"
 srcpath = File.dirname(File.dirname(__FILE__))
 print srcpath, "\n"
 
@@ -211,13 +212,19 @@ end
 
 # Using the VM
 Dir.chdir(testname) do
+  # ssh info
+  ssh_config = run "vagrant ssh-config"
+  ssh_config =~ /Host (\S+)/
+  vagrant_hostname = $1
+  print "Hostname #{vagrant_hostname}\n"
+
   # Fetch the vagrant ssh key, and store it locally
   # First see if we can copy a file - if we can there is no need to update .ssh/config
   File.unlink('remote_hosts') if File.exists?('remote_hosts')
-  run "scp vagrant:/etc/hosts remote_hosts"
+  run "scp #{vagrant_hostname}:/etc/hosts remote_hosts"
   if !File.exist?('remote_hosts')
-    run "vagrant ssh-config >> ~/.ssh/config"
-    run "scp vagrant:/etc/hosts remote_hosts"
+    ssh_config = run "vagrant ssh-config >> ~/.ssh/config"
+    run "scp #{vagrant_hostname}:/etc/hosts remote_hosts"
   end
   raise "Problem connecting to remote hosts (using scp)" if !File.exist?('remote_hosts')
   File.unlink('remote_hosts')
@@ -242,7 +249,7 @@ Dir.chdir(testname) do
     # test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
     # Run flavor/edition specific tests
     eval(call_test+'(vagrant)') if call_test
-    if test_for_completed_install(ssh,box_name)
+    if test_for_completed_install(ssh,vagrant_hostname,box_name)
       print <<COMPLETE
 
   SUCCESS!
