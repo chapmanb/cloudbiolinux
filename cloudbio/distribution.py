@@ -119,14 +119,16 @@ def _setup_nixpkgs():
     # for now, Nix packages are only supported in Debian - it can
     # easily be done for others - just get Nix installed from the .rpm
     env.nixpkgs = False
-    if env.distribution in ["debian", "ubuntu"]:
-        if env.has_key("nixpkgs"):
+    if env.has_key("nixpkgs"):
+        if env.distribution in ["debian", "ubuntu"]:
             if env.nixpkgs == "True":
                 env.nixpkgs = True
             else:
                 env.nixpkgs = False
             if env.nixpkgs:
                 env.logger.info("Adding NixPkgs support")
+        else:
+            env.logger.warn("NixPkgs are currently not supported for " + env.distribution)
 
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
