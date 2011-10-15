@@ -13,6 +13,7 @@ def _setup_distribution_environment():
     """
     env.logger.info("Distribution %s" % env.distribution)
 
+    run("echo testing connection")
     target_info = run("uname -a")
     env.logger.info("Target: "+target_info)
     # find the target architecture, if not preset

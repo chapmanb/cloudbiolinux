@@ -31,6 +31,12 @@ you need to run 'vagrant up' first. In practise, this may mean:
 * Check ~/.ssh/config contains no faulty lines
 * Rerun the tests from scratch, i.e. without the '--continue' switch
 
+=== Fatal error: Name lookup failed for vagrant
+
+Probably there is another VirtualBox + vagrant running somewhere. This
+conflicts with the information in ./ssh/config. Easy solution: kill
+the running instance first.
+
 === Error: ffi.rb:106:in `call_and_check': Error in API call to get_state ===
 
 This is Ruby trying into the vagrant API. You need to reinstall the

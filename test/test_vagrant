@@ -193,7 +193,7 @@ if not File.exist?(vagrant_init_orig)
   INJECT =<<EOI
   # Expand RAM
   config.vm.customize do |vm|
-    vm.memory_size = 512  # default to 512 Mb RAM
+    vm.memory_size = 512    # default to 512 Mb RAM
     # vm.cpu_count = 2      # default to 2 CPUs -- not yet in all Vagrants
   end
   # Forward guest port 5900 to host port 5900 and name the mapping "vnc"
@@ -214,10 +214,10 @@ Dir.chdir(testname) do
   # Fetch the vagrant ssh key, and store it locally
   # First see if we can copy a file - if we can there is no need to update .ssh/config
   File.unlink('remote_hosts') if File.exists?('remote_hosts')
-  run "scp default:/etc/hosts remote_hosts"
+  run "scp vagrant:/etc/hosts remote_hosts"
   if !File.exist?('remote_hosts')
     run "vagrant ssh-config >> ~/.ssh/config"
-    run "scp default:/etc/hosts remote_hosts"
+    run "scp vagrant:/etc/hosts remote_hosts"
   end
   raise "Problem connecting to remote hosts (using scp)" if !File.exist?('remote_hosts')
   File.unlink('remote_hosts')

@@ -123,7 +123,9 @@ Pin-Priority: 650
 
     def rewrite_config_items(self, name, items):
         # BioLinux add keyring
-        return items + [ 'bio-linux-keyring' ]
+        if name == 'minimal':
+            return items + [ 'bio-linux-keyring' ]
+        return items
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux
