@@ -81,7 +81,7 @@ class BioNode(Edition):
 
     def rewrite_apt_sources_list(self, sources):
         """BioNode will pull packages from Debian 'testing', if not
-           available in stable.
+           available in stable. Also BioLinux packages are included.
         """
         self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
         # See if the repository is defined in env
@@ -120,6 +120,10 @@ Pin-Priority: 650
 
     def rewrite_apt_keys(self, standalone, keyserver):
         return [], []
+
+    def rewrite_config_items(self, name, items):
+        # BioLinux add keyring
+        return items + [ 'bio-linux-keyring' ]
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux
