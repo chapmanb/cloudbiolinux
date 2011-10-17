@@ -7,7 +7,13 @@ from cloudbio.package.shared import _yaml_to_packages
 
 def _setup_nix_sources():
     if env.nixpkgs:
-        # first override the path
+        target_info = run("uname -a")
+        env.logger.info("Target: "+target_info)
+        # find the target architecture, if not preset
+        if not env.has_key("arch"):
+          env.arch = run("uname -m")
+
+     # first override the path
         append("/root/.bashrc", "export PATH=$HOME/.nix-profile/bin:$PATH", use_sudo=True)
         env.logger.info("Checking NixPkgs")
         if not exists("/nix/store"):
