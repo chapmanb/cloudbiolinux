@@ -19,6 +19,7 @@ def _setup_nix_sources():
                    # run("wget http://hydra.nixos.org/build/565031/download/1/nix_0.16-1_i386.deb")
                    run("wget http://hydra.nixos.org/build/565048/download/1/"+nix_deb)
                    sudo("dpkg -i "+nix_deb)
+        run("nix-channel --list")
         if run("nix-channel --list") == "":
             # Setup channel
             sudo("nix-channel --add http://nixos.org/releases/nixpkgs/channels/nixpkgs-unstable")

@@ -13,12 +13,12 @@ def _setup_distribution_environment():
     """
     env.logger.info("Distribution %s" % env.distribution)
 
-    # run("echo Testing connection to host")
-    # target_info = run("uname -a")
-    # env.logger.info("Target: "+target_info)
+    run("echo Testing connection to host")
+    target_info = run("uname -a")
+    env.logger.info("Target: "+target_info)
     # find the target architecture, if not preset
-    # if not env.has_key("arch"):
-    #     env.arch = run("uname -m")
+    if not env.has_key("arch"):
+        env.arch = run("uname -m")
 
     if env.hosts == ["vagrant"]:
         _setup_vagrant_environment()

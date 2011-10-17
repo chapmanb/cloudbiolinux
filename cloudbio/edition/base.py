@@ -110,12 +110,21 @@ class BioNode(Edition):
         'stable' packages, unless only available in 'testing'.
         """
         preferences = """Package: *
+Package: *
+Pin: release n=natty
+Pin-Priority: 900
+
+Package: *
 Pin: release a=stable
 Pin-Priority: 700
 
 Package: *
 Pin: release a=testing
 Pin-Priority: 650
+
+Package: *
+Pin: release a=bio-linux
+Pin-Priority: 400
 """
         return preferences.split('\n')
 
