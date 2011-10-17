@@ -4,6 +4,6 @@ packages:
   - desktop-cloud
   - editors
   - phylogeny
-  - phylogeny_testing
+  # - phylogeny_testing - Debian only
   - r
 libraries:

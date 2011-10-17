@@ -71,8 +71,9 @@ class BioNode(Edition):
         self.short_name = "bionode"
 
     def check_distribution(self):
-        if self.env.distribution not in ["debian"]:
-            raise ValueError("Distribution is not pure Debian")
+        # if self.env.distribution not in ["debian"]:
+        #    raise ValueError("Distribution is not pure Debian")
+        pass
 
     def check_packages_source(self):
         # Bionode always removes sources, just to be sure
@@ -84,20 +85,23 @@ class BioNode(Edition):
            available in stable. Also BioLinux packages are included.
         """
         self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
-        # See if the repository is defined in env
-        if not env.get('debian_repository'):
-            main_repository = 'http://ftp.us.debian.org/debian/'
-        else:
-            main_repository = env.debian_repository
-        # The two basic repositories
-        new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
-                                                                        dist=env.dist_name),
-                       "deb {repo} {dist}-updates main contrib non-free".format(
-                           repo=main_repository, dist=env.dist_name),
-                       "deb {repo} testing main contrib non-free".format(
-                           repo=main_repository),
-                        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux"
-                      ]
+        new_sources = []
+        if self.env.distribution in ["debian"]:
+          # See if the repository is defined in env
+          if not env.get('debian_repository'):
+              main_repository = 'http://ftp.us.debian.org/debian/'
+          else:
+              main_repository = env.debian_repository
+          # The two basic repositories
+          new_sources += ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
+                                                                          dist=env.dist_name),
+                         "deb {repo} {dist}-updates main contrib non-free".format(
+                             repo=main_repository, dist=env.dist_name),
+                         "deb {repo} testing main contrib non-free".format(
+                             repo=main_repository)
+                        ]
+        new_sources = new_sources + [ "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux" ]
+
         return new_sources
 
     def rewrite_apt_preferences(self, preferences):

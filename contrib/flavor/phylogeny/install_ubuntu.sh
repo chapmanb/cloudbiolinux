@@ -21,6 +21,6 @@ if [ ! -e fabfile.py -o -z $host ]; then
   echo   ./contrib/flavor/phylogeny/install_host.sh user@hostname
 fi
 source=`pwd`
-fabricrc=$source/contrib/flavor/phylogeny/fabricrc_debian.txt
+fabricrc=$source/contrib/flavor/phylogeny/fabricrc_ubuntu.txt
 packagelist=$source/contrib/flavor/phylogeny/main.yaml
 fab -f $source/fabfile.py -H $host -c $fabricrc install_biolinux:packagelist=$packagelist

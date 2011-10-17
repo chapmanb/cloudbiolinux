@@ -15,7 +15,7 @@ dist_name = natty
 nixpkgs = True
 
 # Update to the target's nearest repository:
-debian_repository=http://ftp.nl.debian.org/debian/
+# debian_repository=http://ftp.nl.debian.org/debian/
 
 # Global installation directory for packages and standard programs
 system_install = /usr
