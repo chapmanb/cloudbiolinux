@@ -12,7 +12,7 @@ flavor = PhylogenyFlavor
 flavor_path = phylogeny.phylogenyflavor
 distribution = ubuntu
 dist_name = natty
-nixpkgs = True
+# nixpkgs = True
 
 # Update to the target's nearest repository:
 # debian_repository=http://ftp.nl.debian.org/debian/
