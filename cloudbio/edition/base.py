@@ -71,8 +71,9 @@ class BioNode(Edition):
         self.short_name = "bionode"
 
     def check_distribution(self):
-        if self.env.distribution not in ["debian"]:
-            raise ValueError("Distribution is not pure Debian")
+        # if self.env.distribution not in ["debian"]:
+        #    raise ValueError("Distribution is not pure Debian")
+        pass
 
     def check_packages_source(self):
         # Bionode always removes sources, just to be sure
@@ -81,23 +82,26 @@ class BioNode(Edition):
 
     def rewrite_apt_sources_list(self, sources):
         """BioNode will pull packages from Debian 'testing', if not
-           available in stable.
+           available in stable. Also BioLinux packages are included.
         """
         self.env.logger.debug("BioNode.rewrite_apt_sources_list!")
-        # See if the repository is defined in env
-        if not env.get('debian_repository'):
-            main_repository = 'http://ftp.us.debian.org/debian/'
-        else:
-            main_repository = env.debian_repository
-        # The two basic repositories
-        new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
-                                                                        dist=env.dist_name),
-                       "deb {repo} {dist}-updates main contrib non-free".format(
-                           repo=main_repository, dist=env.dist_name),
-                       "deb {repo} testing main contrib non-free".format(
-                           repo=main_repository),
-                        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux"
-                      ]
+        new_sources = []
+        if self.env.distribution in ["debian"]:
+          # See if the repository is defined in env
+          if not env.get('debian_repository'):
+              main_repository = 'http://ftp.us.debian.org/debian/'
+          else:
+              main_repository = env.debian_repository
+          # The two basic repositories
+          new_sources += ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
+                                                                          dist=env.dist_name),
+                         "deb {repo} {dist}-updates main contrib non-free".format(
+                             repo=main_repository, dist=env.dist_name),
+                         "deb {repo} testing main contrib non-free".format(
+                             repo=main_repository)
+                        ]
+        new_sources = new_sources + [ "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux" ]
+
         return new_sources
 
     def rewrite_apt_preferences(self, preferences):
@@ -106,12 +110,21 @@ class BioNode(Edition):
         'stable' packages, unless only available in 'testing'.
         """
         preferences = """Package: *
+Package: *
+Pin: release n=natty
+Pin-Priority: 900
+
+Package: *
 Pin: release a=stable
 Pin-Priority: 700
 
 Package: *
 Pin: release a=testing
 Pin-Priority: 650
+
+Package: *
+Pin: release a=bio-linux
+Pin-Priority: 400
 """
         return preferences.split('\n')
 
@@ -120,6 +133,12 @@ Pin-Priority: 650
 
     def rewrite_apt_keys(self, standalone, keyserver):
         return [], []
+
+    def rewrite_config_items(self, name, items):
+        # BioLinux add keyring
+        if name == 'minimal':
+            return items + [ 'bio-linux-keyring' ]
+        return items
 
 class Minimal(Edition):
     """Minimal specialization of BioLinux

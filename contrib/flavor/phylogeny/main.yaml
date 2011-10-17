@@ -1,9 +1,9 @@
 ---
 packages:
-  # - minimal : skip, as we don't need the build system
+  - minimal
   - desktop-cloud
   - editors
   - phylogeny
-  - phylogeny_testing
+  # - phylogeny_testing - Debian only
   - r
 libraries:
