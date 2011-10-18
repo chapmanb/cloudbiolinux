@@ -100,9 +100,9 @@ def _setup_apt_sources():
     # It may be sudo is not installed - which has fab fail - therefor
     # we'll try to install it by default, assuming we have root access
     # already (e.g. on EC2). Fab will fail anyway, otherwise.
-    if not exists('/usr/bin/sudo'):
-        run('apt-get update')
-        run('apt-get -y --force-yes install sudo')
+    if not exists('/usr/bin/sudo') or not exists('/usr/bin/curl'):
+        sudo('apt-get update')
+        sudo('apt-get -y --force-yes install sudo curl')
 
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()

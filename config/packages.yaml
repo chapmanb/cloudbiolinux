@@ -49,6 +49,9 @@ minimal:
     - unzip
     - tar
     - less
+  network:
+    - curl
+    - wget
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
@@ -68,7 +71,6 @@ desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
   - vnc4server
-  - freenx
 programming:
   editors:
     - emacs
@@ -82,7 +84,6 @@ programming:
   build:
     - swig
     - cmake
-    - curl
     - libcurl4-openssl-dev
     - libxml2
     - libxml2-dev
@@ -151,9 +152,14 @@ programming:
     - virtualbox-4.0
     - dkms
   util:
+    - mc
     - tree
     - screen
     - time
+    - fdupes
+  network:
+    - lynx
+    - traceroute
   lang:
     - aspell
     - dictionaries-common
@@ -370,8 +376,9 @@ bio_utils:
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
-    - mrbayes-mpi # should eventually replace biolinux-mrbayes-multi
+    - debian-archive-keyring
     - raxml
+    # - mrbayes-mpi broken, should eventually replace biolinux-mrbayes-multi
 phylogeny_experimental:
   # new packages in experimental 
   all:

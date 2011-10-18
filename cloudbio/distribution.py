@@ -50,15 +50,14 @@ def _validate_target_distribution(dist):
 
     Throws exception on error
     """
-    env.logger.debug("Checking target distribution %s",env.distribution)
+    env.logger.debug("Checking target distribution " + env.distribution)
     if dist in ["debian", "ubuntu"]:
         tag = run("cat /proc/version")
         if tag.lower().find(dist) == -1:
            # hmmm, test issue file
            tag2 = run("cat /etc/issue")
            if tag2.lower().find(dist) == -1:
-               raise ValueError("Distribution '%s' does not match machine;" +
-                                "are you using correct fabconfig?" % dist)
+               raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
         env.logger.debug("Unknown target distro")
 
@@ -118,14 +117,20 @@ def _setup_centos():
 def _setup_nixpkgs():
     # for now, Nix packages are only supported in Debian - it can
     # easily be done for others - just get Nix installed from the .rpm
-    if env.distribution in ["debian", "ubuntu"]:
-        if env.has_key("nixpkgs"):
+    nixpkgs = False
+    if env.has_key("nixpkgs"):
+        if env.distribution in ["debian", "ubuntu"]:
             if env.nixpkgs == "True":
-                env.nixpkgs = True
+                nixpkgs = True
             else:
-                env.nixpkgs = False
-            if env.nixpkgs:
-                env.logger.info("Adding NixPkgs support")
+                nixpkgs = False
+        else:
+            env.logger.warn("NixPkgs are currently not supported for " + env.distribution)
+    if nixpkgs:
+        env.logger.info("NixPkgs: supported")
+    else:
+        env.logger.debug("NixPkgs: Ignored")
+    env.nixpkgs = nixpkgs
 
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
