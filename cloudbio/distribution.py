@@ -72,7 +72,7 @@ def _setup_ubuntu():
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
+      "deb http://software.rc.fas.harvard.edu/mirrors/R/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX

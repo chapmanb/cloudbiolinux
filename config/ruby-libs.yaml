@@ -22,7 +22,7 @@ gems:
   - bio-gff3
   - biomart
   - ruby-ensembl-api
-  - bio-biolinux
+  #- bio-biolinux # error: uninitialized constant Syck::Syck
   # databases
   - couchdb-ruby
   - data_objects

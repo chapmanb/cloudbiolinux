@@ -73,7 +73,7 @@ def _configure_nfs(env):
     nfs_dir = "/export/data"
     cloudman_dir = "/mnt/galaxyData/export"
     sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
-    sudo("chown -R ubuntu %s" % os.path.dirname(nfs_dir))
+    sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
     with settings(warn_only=True):
         run("ln -s %s %s" % (cloudman_dir, nfs_dir))
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',

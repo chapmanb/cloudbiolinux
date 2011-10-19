@@ -4,6 +4,9 @@ These are a set of testing and supported edition classes.
 """
 from fabric.api import *
 
+from cloudbio.cloudman import _configure_cloudman
+from cloudbio.cloudbiolinux import _freenx_scripts
+
 class Edition:
     """Base class. Every edition derives from this
     """
@@ -61,6 +64,20 @@ class Edition:
         python, ruby, perl
         """
         return items
+
+class CloudBioLinux(Edition):
+    """Specific customizations for CloudBioLinux builds.
+    """
+    def __init__(self, env):
+        Edition.__init__(self,env)
+        self.name = "CloudBioLinux Edition"
+        self.short_name = "cloudbiolinux"
+        
+    def post_install(self):
+        """Add scripts for starting FreeNX and CloudMan.
+        """
+        _freenx_scripts(self.env)
+        _configure_cloudman(self.env)
 
 class BioNode(Edition):
     """BioNode specialization of BioLinux

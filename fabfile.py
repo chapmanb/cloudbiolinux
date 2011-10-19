@@ -32,7 +32,8 @@ import cloudbio
 from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging, _update_biolinux_log
-from cloudbio.cloudman import (_configure_cloudman, _cleanup_ec2)
+from cloudbio.cloudman import _cleanup_ec2
+from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
                                   _setup_apt_automation, _setup_apt_sources)
@@ -165,14 +166,9 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     if target is None or target == "post_install":
         env.edition.post_install()
         env.flavor.post_install()
-    if target is None or target == "finalize":
-        _cleanup_space()
+    if target is None or target == "cleanup":
+        _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
-            # this switch leads to confusion - why default to Cloudman on EC2,
-            # why no freenx on other VMs? 'finalize' is also about cleanup, 
-            # I think. It should be 'cleanup' targets.
-            _freenx_scripts()
-            _configure_cloudman(env)
             _cleanup_ec2(env)
 
 def _check_fabric_version():
@@ -375,28 +371,3 @@ def _do_library_installs(to_install):
         with open(yaml_file) as in_handle:
             config = yaml.load(in_handle)
         lib_installers[iname](config)
-
-# ### CloudBioLinux specific scripts
-
-def _freenx_scripts():
-    """Provide graphical access to clients via FreeNX.
-    """
-    setup_script = "setupnx.sh"
-    remote_setup = "%s/bin/%s" % (env.system_install, setup_script)
-    install_file_dir = os.path.join(env.config_dir, os.pardir, "installed_files")
-    if not exists(remote_setup):
-        put(os.path.join(install_file_dir, setup_script), setup_script,
-                mode=0777)
-        env.safe_sudo("mv %s %s" % (setup_script, remote_setup))
-    remote_login = "configure_freenx.sh"
-    if not exists(remote_login):
-        put(os.path.join(install_file_dir, 'bash_login'), remote_login,
-                mode=0777)
-
-def _cleanup_space():
-    """Cleanup to recover space from builds and packages.
-    """
-    env.logger.info("Cleaning up space from package builds")
-    env.safe_sudo("rm -rf .cpanm")
-    sudo("rm -f /var/crash/*")
-
