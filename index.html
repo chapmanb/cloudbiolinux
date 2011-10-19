@@ -100,8 +100,10 @@ new TWTR.Widget({
           </ul>
           <li><a href="http://vagrantup.com/">Vagrant</a> <a href="http://www.virtualbox.org/">VirtualBox</a> images, for installation on a local machine</li>
           <ul>
-            <li class="inner"><a href="https://s3.amazonaws.com/cloudbiolinux/cbl_ubuntu_11_4_32_20110628.box">Ubuntu 11.04 32bit (29 June 2011)</a>
-            </br><a href="https://s3.amazonaws.com/cloudbiolinux/cbl_debian32_20110427.box">Debian squeeze 32bit (27 April 2011)</a>
+            <li class="inner">
+                 <a href="https://s3.amazonaws.com/cloudbiolinux/cbl_ubuntu_11_04_64bit_20111019.box">Ubuntu 11.04 64bit; Vagrant 0.8 (19 October 2011)</a>
+            <br/><a href="https://s3.amazonaws.com/cloudbiolinux/cbl_ubuntu_11_4_32_20110628.box">Ubuntu 11.04 32bit; Vagrant 0.7 (29 June 2011)</a>
+            <br/><a href="https://s3.amazonaws.com/cloudbiolinux/cbl_debian32_20110427.box">Debian squeeze 32bit; Vagrant 0.7 (27 April 2011)</a>
             </li>
           </ul>
           <li>Indexed genome builds for aligners such as <a href="http://bowtie-bio.sourceforge.net/">Bowtie</a>, <a href="http://bio-bwa.sourceforge.net/">BWA</a> and <a href="http://www.novocraft.com/">Novoalign</a> in the <a href="http://s3.amazonaws.com/biodata">biodata S3 bucket</a>. An <a href="https://github.com/chapmanb/bcbb/blob/master/ec2/biolinux/data_fabfile.py">automated script</a> pulls the requested genomes and aligner indexes to an Amazon machine or your local computer; integration with Galaxy is also provided.</li>
