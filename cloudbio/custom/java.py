@@ -5,7 +5,7 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_installed
+from shared import (_if_not_installed, _make_tmp_dir)
 
 @_if_not_installed("cljr")
 def install_cljr(env):
@@ -22,7 +22,9 @@ def install_cljr(env):
 def install_leinengin(env):
     """Standard clojure build tool: http://github.com/technomancy/leiningen
     """
-    run("wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein")
-    run("chmod a+rwx lein")
-    env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
-    run("lein self-install")
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            run("wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein")
+            run("chmod a+rwx lein")
+            env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
+            run("lein self-install")

@@ -34,6 +34,7 @@ from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging, _update_biolinux_log
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
+from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
                                   _setup_apt_automation, _setup_apt_sources)
@@ -320,9 +321,11 @@ def _ruby_library_installer(config):
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
-    run("wget --no-check-certificate http://xrl.us/cpanm")
-    run("chmod a+rwx cpanm")
-    env.safe_sudo("mv cpanm %s/bin" % env.system_install)
+    with _make_tmp_dir() as tmp_dir:
+        with cd(tmp_dir):
+            run("wget --no-check-certificate http://xrl.us/cpanm")
+            run("chmod a+rwx cpanm")
+            env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""
     for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that

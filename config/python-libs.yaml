@@ -15,7 +15,7 @@ pypi:
   - numpy
   - paste
   - pastescript
-  - pycrypto
+  #- pycrypto # build failure with 2.4
   - python-cjson
   - pyOpenSSL
   - pyyaml
