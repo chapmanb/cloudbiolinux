@@ -32,7 +32,7 @@ def setup_rabbitmq(vhost, user, passwd):
     subprocess.check_call(base_cl + ["add_user", user, passwd])
     subprocess.check_call(base_cl + ["add_vhost", vhost])
     subprocess.check_call(base_cl + ["set_permissions", "-p", vhost,
-                                     user, '".*"', '".*"', '".*"'])
+                                     user, '.*', '.*', '.*'])
 
 def read_pp_config(fname):
     """Read AMQP vhost from YAML configuration file.
