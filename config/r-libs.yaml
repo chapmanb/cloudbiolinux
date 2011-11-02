@@ -101,6 +101,7 @@ bioc:
  - baySeq
  - beadarray
  - Biobase
+ - BiocInstaller
  - bioDist
  - biomaRt
  - Biostrings
@@ -115,11 +116,18 @@ bioc:
  - chipseq
  - ChIPseqR
  - ChIPsim
+ - CNAnorm
+ - cn.mops
  - CSAR
+ - cummeRbund
  - DEGseq
  - DESeq
+ - DEXSeq
+ - DiffBind
  - DynDoc
  - edgeR
+ - EDASeq
+ - exomeCopy
  - gage
  - gcrma
  - genefilter
@@ -132,11 +140,14 @@ bioc:
  - GGtools
  - globaltest
  #- GO.db
+ - GOFunction
  - goseq
  - GOstats
  - GSEABase
+ - GWASTools
  - hgu95av2.db
  - HilbertVis
+ - htSeqTools
  - IRanges
  - KEGG.db
  - limma
