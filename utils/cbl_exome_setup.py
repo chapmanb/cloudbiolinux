@@ -2,6 +2,8 @@
 """Automate the final steps of configuring the CloudBioLinux exome example.
 
 - Updates configuration file with server details.
+- Provides links to custom Galaxy instance
+- Start toplevel processing server to run exome analysis.
 - Adds RabbitMQ user and virtual host with correct permissions.
 
 Run the script with sudo or the root user.
@@ -23,7 +25,47 @@ def main():
     update_amqp_config(amqp_config, socket.getfqdn())
     amqp_user, amqp_pass = read_ampq_config(amqp_config)
     amqp_vhost = read_pp_config(pp_config)
+    setup_custom_galaxy()
+    run_nextgen_analysis_server(pp_config)
     setup_rabbitmq(amqp_vhost, amqp_user, amqp_pass)
+
+def setup_custom_galaxy():
+    """Provide links to custom Galaxy instance on shared volume.
+    """
+    galaxy_path = "/mnt/galaxyTools/galaxy-central"
+    custom_galaxy_path = "/mnt/galaxyData/galaxy-central-hbc"
+    storage_dir = "/export/data/galaxy/storage"
+    if not os.path.exists(galaxy_path):
+        subprocess.check_call(["mkdir", "-p", os.path.split(galaxy_path)[0]])
+        subprocess.check_call(["ln", "-s", custom_galaxy_path, galaxy_path])
+        subprocess.check_call(["chown", "-R", "galaxy:galaxy",
+                               os.path.split(galaxy_path)[0]])
+    subprocess.check_call(["chmod", "a+rwx", storage_dir])
+
+UPSTART_SCRIPT = """
+description   "Nextgen analysis server"
+
+start on startup
+
+env WORK_DIR=/usr/tmp/nextgen_analysis
+env CONFIG={config_file}
+env WORK_USER=galaxy
+
+script
+    mkdir -p $WORK_DIR
+    chown -R $WORK_USER $WORK_DIR
+    chdir $WORK_DIR
+    exec su -c 'nextgen_analysis_server.py -q toplevel $CONFIG' $WORK_USER
+end script
+"""
+
+def run_nextgen_analysis_server(pp_config):
+    """Run a nextgen sequencing server using Ubuntu upstart.
+    """
+    upstart_file = "/etc/init/nextgen-analysis.conf"
+    with open(upstart_file, "w") as out_handle:
+        out_handle.write(UPSTART_SCRIPT.format(config_file=pp_config))
+    subprocess.check_call(["service", "start", "nextgen-analysis"])
 
 def setup_rabbitmq(vhost, user, passwd):
     """Add virtual host, user and password to RabbitMQ.
