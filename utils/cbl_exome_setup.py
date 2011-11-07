@@ -34,7 +34,7 @@ def setup_custom_galaxy():
     """
     galaxy_path = "/mnt/galaxyTools/galaxy-central"
     custom_galaxy_path = "/mnt/galaxyData/galaxy-central-hbc"
-    storage_dir = "/export/data/galaxy/storage"
+    storage_dir = "/export/data/upload/storage"
     if not os.path.exists(galaxy_path):
         subprocess.check_call(["mkdir", "-p", os.path.split(galaxy_path)[0]])
         subprocess.check_call(["ln", "-s", custom_galaxy_path, galaxy_path])
@@ -43,11 +43,11 @@ def setup_custom_galaxy():
     subprocess.check_call(["chmod", "a+rwx", storage_dir])
 
 UPSTART_SCRIPT = """
-description   "Nextgen analysis server"
+description   "Nextgen sequencing analysis server"
 
-start on startup
+start on runlevel [2345]
 
-env WORK_DIR=/usr/tmp/nextgen_analysis
+env WORK_DIR=/export/data/work
 env CONFIG={config_file}
 env WORK_USER=galaxy
 
@@ -65,7 +65,7 @@ def run_nextgen_analysis_server(pp_config):
     upstart_file = "/etc/init/nextgen-analysis.conf"
     with open(upstart_file, "w") as out_handle:
         out_handle.write(UPSTART_SCRIPT.format(config_file=pp_config))
-    subprocess.check_call(["service", "start", "nextgen-analysis"])
+    subprocess.check_call(["service", "nextgen-analysis", "start"])
 
 def setup_rabbitmq(vhost, user, passwd):
     """Add virtual host, user and password to RabbitMQ.
