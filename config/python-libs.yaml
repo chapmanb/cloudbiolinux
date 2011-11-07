@@ -39,12 +39,14 @@ pypi:
   - DendroPy
   - HTSeq
   - networkx
+  - pandas
   - pygr
   - pysam
   - pysparse
   - rpy2
   - rpy2-bioconductor-extensions
   - scikits.learn
+  - scikits.statsmodels
   - scipy
   - sympy
   # databases
