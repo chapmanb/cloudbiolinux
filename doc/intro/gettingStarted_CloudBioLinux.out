@@ -1,0 +1,27 @@
+\BOOKMARK [0][-]{chapter.1}{Preparing to work on the Amazon Cloud}{}
+\BOOKMARK [1][-]{section.1.1}{Get an Amazon AWS account}{chapter.1}
+\BOOKMARK [1][-]{section.1.2}{Get an Amazon EC2 Account}{chapter.1}
+\BOOKMARK [1][-]{section.1.3}{Get an EC2 key pair}{chapter.1}
+\BOOKMARK [1][-]{section.1.4}{Install an NX Client on your local machine}{chapter.1}
+\BOOKMARK [0][-]{chapter.2}{Running a CloudBioLinux instance}{}
+\BOOKMARK [1][-]{section.2.1}{The process in a nutshell}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{Starting up a CloudBioLinux instance}{chapter.2}
+\BOOKMARK [1][-]{section.2.3}{Connecting to and logging into your CloudBioLinux instance}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.3.1}{Graphical, or command line?}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.2}{Find out the address of your instance}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.3}{Logging into a terminal using ssh}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.4}{Logging into graphical desktop using NX}{section.2.3}
+\BOOKMARK [2][-]{subsection.2.3.5}{The logic of the NX setup}{section.2.3}
+\BOOKMARK [1][-]{section.2.4}{Logging out of your CloudBioLinux instance}{chapter.2}
+\BOOKMARK [1][-]{section.2.5}{Terminating your CloudBioLinux instance}{chapter.2}
+\BOOKMARK [0][-]{chapter.3}{Working with data on the cloud}{}
+\BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Copying data onto your CloudBioLinux instance}{chapter.3}
+\BOOKMARK [1][-]{section.3.3}{Using EBS volumes for data}{chapter.3}
+\BOOKMARK [1][-]{section.3.4}{Accesing public datasets on Amazon}{chapter.3}
+\BOOKMARK [0][-]{appendix.A}{Appendices}{}
+\BOOKMARK [1][-]{section.A.1}{The CloudBioLinux Desktop}{appendix.A}
+\BOOKMARK [2][-]{subsection.A.1.1}{Bioinformatics documentation}{section.A.1}
+\BOOKMARK [2][-]{subsection.A.1.2}{The bioinformatics menu}{section.A.1}
+\BOOKMARK [2][-]{subsection.A.1.3}{Opening a terminal}{section.A.1}
+\BOOKMARK [1][-]{section.A.2}{Basic terminology}{appendix.A}
