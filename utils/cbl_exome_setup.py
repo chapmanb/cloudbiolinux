@@ -55,7 +55,7 @@ script
     mkdir -p $WORK_DIR
     chown -R $WORK_USER $WORK_DIR
     chdir $WORK_DIR
-    exec su -c 'nextgen_analysis_server.py -q toplevel $CONFIG' $WORK_USER
+    exec su -l -c 'nextgen_analysis_server.py -q toplevel $CONFIG' $WORK_USER
 end script
 """
 
@@ -99,9 +99,13 @@ def update_amqp_config(fname, hostname):
     shutil.move(fname, backup_file)
     with open(backup_file) as in_handle:
         with open(fname, "w") as out_handle:
+            in_amqp = False
             for line in in_handle:
-                if line.startswith("host ="):
+                if line.startswith("[galaxy_amqp]"):
+                    in_amqp = True
+                if in_amqp and line.startswith("host ="):
                     line = "host = {0}\n".format(hostname)
+                    in_amqp = False
                 out_handle.write(line)
     # make updated file readable by initial user
     os.chown(fname, orig_stat.st_uid, orig_stat.st_gid)
