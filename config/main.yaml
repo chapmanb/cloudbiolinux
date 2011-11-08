@@ -15,7 +15,7 @@ packages:
   - perl
   - java
   - erlang
-  - haskell
+#  - haskell
   - databases
   - math
   - viz
@@ -37,4 +37,4 @@ libraries:
   - python-libs
   - ruby-libs
   - perl-libs
-  - haskell-libs
+#  - haskell-libs
