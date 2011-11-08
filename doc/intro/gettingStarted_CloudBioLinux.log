@@ -1,0 +1,720 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2011.8.6)  8 AUG 2011 20:12
+entering extended mode
+ %&-line parsing enabled.
+**gettingStarted_CloudBioLinux.tex
+(./gettingStarted_CloudBioLinux.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+(/usr/share/texmf-texlive/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/etc/texmf/tex/latex/config/graphics.cfg
+File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: pdftex.def on input line 91.
+
+(/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
+\Gread@gobject=\count88
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+(/usr/share/texmf-texlive/tex/latex/sidecap/sidecap.sty
+Package: sidecap 2003/06/06 v1.6f SideCap Package (RN/HjG)
+
+(/usr/share/texmf-texlive/tex/latex/base/ifthen.sty
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\SC@BOXWD=\dimen105
+\SC@CAPWD=\dimen106
+\SC@tempdima=\dimen107
+\SC@tempdimb=\dimen108
+\c@SC@C=\count89
+\SC@BOX=\box26
+)
+(/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2009/10/09 v6.79a Hypertext links for LaTeX
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2009/04/10 v2.0 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in pdf mode detected.
+)
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2008/11/04 v1.4 Switches for detecting VTeX and its modes (HO)
+Package ifvtex Info: VTeX not detected.
+)
+(/usr/share/texmf-texlive/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2009/01/23 v0.5 Provides ifxetex conditional
+)
+(/usr/share/texmf-texlive/tex/latex/oberdiek/hycolor.sty
+Package: hycolor 2009/10/02 v1.5 Code for color options of hyperref/bookmark (H
+O)
+
+(/usr/share/texmf-texlive/tex/latex/oberdiek/xcolor-patch.sty
+Package: xcolor-patch 2009/10/02 xcolor patch
+))
+\@linkdim=\dimen109
+\Hy@linkcounter=\count90
+\Hy@pagecounter=\count91
+
+(/usr/share/texmf-texlive/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2009/10/09 v6.79a Hyperref: PDFDocEncoding definition (HO)
+)
+(/usr/share/texmf-texlive/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2007/12/12 v1.2 Prefix for e-TeX command names (HO)
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2007/09/09 v1.2 Providing info/warning/message (HO)
+)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)
+(/usr/share/texmf-texlive/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+(/usr/share/texmf-texlive/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2009/08/13 v3.4 Keyval support for LaTeX options (HO)
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2009/07/30 v1.5 Key value parser with default handler suppor
+t (HO)
+))
+Package hyperref Info: Hyper figures OFF on input line 2975.
+Package hyperref Info: Link nesting OFF on input line 2980.
+Package hyperref Info: Hyper index ON on input line 2983.
+Package hyperref Info: Plain pages OFF on input line 2990.
+Package hyperref Info: Backreferencing OFF on input line 2995.
+
+Implicit mode ON; LaTeX internals redefined
+Package hyperref Info: Bookmarks ON on input line 3191.
+(/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
+\Urlmuskip=\muskip10
+Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 3428.
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/bitset.sty
+Package: bitset 2007/09/28 v1.0 Data type bit set (HO)
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/intcalc.sty
+Package: intcalc 2007/09/27 v1.1 Expandable integer calculations (HO)
+)
+(/usr/share/texmf-texlive/tex/generic/oberdiek/bigintcalc.sty
+Package: bigintcalc 2007/11/11 v1.1 Expandable big integer calculations (HO)
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2009/09/23 v0.6 LuaTeX support for pdfTeX utility functions
+ (HO)
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2009/04/17 v1.2 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2009/08/05 v1.0 Some LaTeX kernel commands for general use (HO
+)
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+)))
+\Fld@menulength=\count92
+\Field@Width=\dimen110
+\Fld@charsize=\dimen111
+\Field@toks=\toks15
+Package hyperref Info: Hyper figures OFF on input line 4377.
+Package hyperref Info: Link nesting OFF on input line 4382.
+Package hyperref Info: Hyper index ON on input line 4385.
+Package hyperref Info: backreferencing OFF on input line 4392.
+Package hyperref Info: Link coloring OFF on input line 4397.
+Package hyperref Info: Link coloring with OCG OFF on input line 4402.
+Package hyperref Info: PDF/A mode OFF on input line 4407.
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/atbegshi.sty
+Package: atbegshi 2008/07/31 v1.9 At begin shipout hook (HO)
+)
+\Hy@abspage=\count93
+\c@Item=\count94
+\c@Hfootnote=\count95
+)
+*hyperref using driver hpdftex*
+(/usr/share/texmf-texlive/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2009/10/09 v6.79a Hyperref driver for pdfTeX
+\Fld@listcount=\count96
+)
+No file gettingStarted_CloudBioLinux.aux.
+\openout1 = `gettingStarted_CloudBioLinux.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 8.
+LaTeX Font Info:    ... okay on input line 8.
+(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count97
+\scratchdimen=\dimen112
+\scratchbox=\box27
+\nofMPsegments=\count98
+\nofMParguments=\count99
+\everyMPshowfont=\toks16
+\MPscratchCnt=\count100
+\MPscratchDim=\dimen113
+\MPnumerator=\count101
+\everyMPtoPDFconversion=\toks17
+) (/usr/share/texmf-texlive/tex/latex/ms/ragged2e.sty
+Package: ragged2e 2009/05/21 v2.1 ragged2e Package (MS)
+
+(/usr/share/texmf-texlive/tex/latex/ms/everysel.sty
+Package: everysel 1999/06/08 v1.03 EverySelectfont Package (MS)
+LaTeX Info: Redefining \selectfont on input line 125.
+)
+\CenteringLeftskip=\skip43
+\RaggedLeftLeftskip=\skip44
+\RaggedRightLeftskip=\skip45
+\CenteringRightskip=\skip46
+\RaggedLeftRightskip=\skip47
+\RaggedRightRightskip=\skip48
+\CenteringParfillskip=\skip49
+\RaggedLeftParfillskip=\skip50
+\RaggedRightParfillskip=\skip51
+\JustifyingParfillskip=\skip52
+\CenteringParindent=\skip53
+\RaggedLeftParindent=\skip54
+\RaggedRightParindent=\skip55
+\JustifyingParindent=\skip56
+)
+Package hyperref Info: Link coloring OFF on input line 8.
+
+(/usr/share/texmf-texlive/tex/latex/hyperref/nameref.sty
+Package: nameref 2007/05/29 v2.31 Cross-referencing by name of section
+
+(/usr/share/texmf-texlive/tex/latex/oberdiek/refcount.sty
+Package: refcount 2008/08/11 v3.1 Data extraction from references (HO)
+)
+\c@section@level=\count102
+)
+LaTeX Info: Redefining \ref on input line 8.
+LaTeX Info: Redefining \pageref on input line 8.
+\@outlinefile=\write3
+\openout3 = `gettingStarted_CloudBioLinux.out'.
+
+\AtBeginShipoutBox=\box28
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 12.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 12.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 12.
+ [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+\tf@toc=\write4
+\openout4 = `gettingStarted_CloudBioLinux.toc'.
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.24 \chapter
+             {Preparing to work on the Amazon Cloud} [1
+
+]
+Chapter 1.
+[2
+
+]
+\openout2 = `getReady.aux'.
+
+ (./getReady.tex
+<"images/aws_signup_button".png, id=22, 257.96375pt x 138.5175pt>
+File: "images/aws_signup_button".png Graphic file (type png)
+
+<use "images/aws_signup_button".png>
+Underfull \hbox (badness 1688) in paragraph at lines 8--8
+\OT1/cmr/m/n/10 an AWS ac-count starts
+ []
+
+
+LaTeX Warning: Reference `section:getaccount' on page 3 undefined on input line
+ 16.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 23.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 23.
+<"images/EC2Homepage2".png, id=29, 1018.80624pt x 531.9875pt>
+File: "images/EC2Homepage2".png Graphic file (type png)
+
+<use "images/EC2Homepage2".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 38--39
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<"images/keypairCreateButton".png, id=30, 343.2825pt x 145.54375pt>
+File: "images/keypairCreateButton".png Graphic file (type png)
+
+<use "images/keypairCreateButton".png> [3
+
+ <./images/aws_signup_button.png>]
+Overfull \hbox (22.90344pt too wide) in paragraph at lines 50--51
+[]\OT1/cmr/m/n/10 Go to the the []EC2 area on Ama-zon https://console.aws.amazo
+n.com/ec2/home[]. 
+ []
+
+
+LaTeX Warning: Reference `fig:ec2homepage' on page 4 undefined on input line 51
+.
+
+
+LaTeX Warning: Reference `fig:keypaircreate' on page 4 undefined on input line 
+52.
+
+
+LaTeX Warning: Reference `fig:keypaircreate' on page 4 undefined on input line 
+52.
+
+
+LaTeX Warning: Reference `fig:ec2homepage' on page 4 undefined on input line 54
+.
+
+[4 <./images/EC2Homepage2.png>]) [5 <./images/keypairCreateButton.png>]
+Chapter 2.
+[6
+
+
+]
+\openout2 = `workingOnCloudBL.aux'.
+
+ (./workingOnCloudBL.tex
+<"images/nutshell".png, id=93, 845.40843pt x 398.23781pt>
+File: "images/nutshell".png Graphic file (type png)
+
+<use "images/nutshell".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 11--12
+[][] 
+ []
+
+
+LaTeX Warning: Reference `fig:nutshell' on page 7 undefined on input line 14.
+
+[7
+
+ <./images/nutshell.png>]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 31.
+ (/usr/share/texmf-texlive/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 31.
+<"images/requestInstance".png, id=111, 869.2475pt x 377.41pt>
+File: "images/requestInstance".png Graphic file (type png)
+
+<use "images/requestInstance".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 47--48
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Overfull \hbox (49.2646pt too wide) in paragraph at lines 57--58
+[]\OT1/cmr/m/n/10 Go to the []EC2 Man-age-ment Con-sole URL: http://console.aws
+.amazon.com/ec2/home[] 
+ []
+
+
+LaTeX Warning: Reference `fig:requestInstance' on page 8 undefined on input lin
+e 60.
+
+[8] [9 <./images/requestInstance.png>]
+<"images/instancesOptions".png, id=143, 723.70375pt x 406.51875pt>
+File: "images/instancesOptions".png Graphic file (type png)
+
+<use "images/instancesOptions".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 95--96
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: Reference `fig:instancesOptions' on page 10 undefined on input l
+ine 100.
+
+[10]
+Overfull \hbox (4.76613pt too wide) in paragraph at lines 111--111
+ \OT1/cmr/bx/n/10 ssh -i mykey.pem root@ec2-184-72-144-209.compute-1.amazonaws.
+com[] 
+ []
+
+
+Overfull \hbox (19.83548pt too wide) in paragraph at lines 115--115
+ \OT1/cmr/bx/n/10 ssh -i mykey.pem ubuntu@ec2-184-72-144-209.compute-1.amazonaw
+s.com[] 
+ []
+
+[11 <./images/instancesOptions.png>]
+<"images/NX-menuOnUbuntu".png, id=178, 411.5375pt x 281.05pt>
+File: "images/NX-menuOnUbuntu".png Graphic file (type png)
+
+<use "images/NX-menuOnUbuntu".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 137--138
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: Reference `fig:NXConnectionWizard' on page 12 undefined on input
+ line 140.
+
+<"images/NXConnectionWizardandGnome".png, id=179, 631.35875pt x 632.3625pt>
+File: "images/NXConnectionWizardandGnome".png Graphic file (type png)
+
+<use "images/NXConnectionWizardandGnome".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 149--150
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: Reference `fig:bldesktop' on page 12 undefined on input line 152
+.
+
+[12]
+
+LaTeX Warning: Reference `fig:nxshutdown' on page 13 undefined on input line 16
+2.
+
+
+LaTeX Warning: Reference `fig:instancesOptions' on page 13 undefined on input l
+ine 168.
+
+[13 <./images/NX-menuOnUbuntu.png>] [14 <./images/NXConnectionWizardandGnome.pn
+g>] <"images/initalNXdesktop".png, id=218, 1039.885pt x 752.8125pt>
+File: "images/initalNXdesktop".png Graphic file (type png)
+
+<use "images/initalNXdesktop".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 179--180
+[][] 
+ []
+
+<"images/nxshutdown".png, id=219, 360.34625pt x 219.82124pt>
+File: "images/nxshutdown".png Graphic file (type png)
+
+<use "images/nxshutdown".png>
+Underfull \hbox (badness 2608) in paragraph at lines 187--187
+\OT1/cmr/m/n/10 your Cloud-Bi-oLinux in-
+ []
+
+) [15 <./images/initalNXdesktop.png (PNG copy)>] [16 <./images/nxshutdown.png (
+PNG copy)>]
+Chapter 3.
+[17
+
+
+]
+\openout2 = `workingWithData.aux'.
+
+ (./workingWithData.tex
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no “ in font cmr10!
+
+
+LaTeX Warning: Reference `section:directcopy' on page 18 undefined on input lin
+e 5.
+
+
+LaTeX Warning: Reference `section:ebscopy' on page 18 undefined on input line 6
+.
+
+
+LaTeX Warning: Reference `section:publiccopy' on page 18 undefined on input lin
+e 7.
+
+
+LaTeX Warning: Reference `section:nx' on page 18 undefined on input line 15.
+
+[18
+
+] <"images/graphicalFTP_full".png, id=251, 1190.4475pt x 639.38875pt>
+File: "images/graphicalFTP_full".png Graphic file (type png)
+
+<use "images/graphicalFTP_full".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 35--36
+[][] 
+ []
+
+
+LaTeX Warning: Reference `fig:graphicalftp' on page 19 undefined on input line 
+38.
+
+
+LaTeX Warning: Reference `fig:graphicalftp' on page 19 undefined on input line 
+38.
+
+[19 <./images/graphicalFTP_full.png>]
+<"images/createAndMountVol-1".png, id=266, 845.40843pt x 597.73312pt>
+File: "images/createAndMountVol-1".png Graphic file (type png)
+
+<use "images/createAndMountVol-1".png>
+
+LaTeX Warning: Reference `text:mounting' on page 20 undefined on input line 68.
+
+
+
+LaTeX Warning: Reference `text:mounting' on page 20 undefined on input line 68.
+
+
+
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 68--69
+[][] 
+ []
+
+
+LaTeX Warning: Reference `fig:createandmountvolume' on page 20 undefined on inp
+ut line 73.
+
+<"images/createVolume-1".png, id=267, 1124.2pt x 430.60875pt>
+File: "images/createVolume-1".png Graphic file (type png)
+
+<use "images/createVolume-1".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 82--83
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: Reference `fig:createvolume' on page 20 undefined on input line 
+86.
+
+[20] <"images/attachVolume-1".png, id=281, 922.44624pt x 144.54pt>
+File: "images/attachVolume-1".png Graphic file (type png)
+
+<use "images/attachVolume-1".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 102--103
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<"images/attachVolume-2".png, id=282, 801.99625pt x 261.97874pt>
+File: "images/attachVolume-2".png Graphic file (type png)
+
+<use "images/attachVolume-2".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 113--114
+[][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: Reference `fig:attachvolume1' on page 21 undefined on input line
+ 118.
+
+[21 <./images/createAndMountVol-1.png>]
+
+LaTeX Warning: Reference `fig:attachvolume2' on page 22 undefined on input line
+ 119.
+
+[22 <./images/createVolume-1.png> <./images/attachVolume-1.png>]
+
+LaTeX Warning: Reference `fig:attachvolume2' on page 23 undefined on input line
+ 129.
+
+
+LaTeX Warning: Reference `fig:attachvolume2' on page 23 undefined on input line
+ 129.
+
+
+LaTeX Warning: Reference `text:unmounting' on page 23 undefined on input line 1
+37.
+
+<"images/unmountDetach-1".png, id=303, 845.40843pt x 597.73312pt>
+File: "images/unmountDetach-1".png Graphic file (type png)
+
+<use "images/unmountDetach-1".png>
+
+LaTeX Warning: Reference `text:unmounting' on page 23 undefined on input line 1
+48.
+
+
+LaTeX Warning: Reference `text:unmounting' on page 23 undefined on input line 1
+48.
+
+
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 148--149
+[][] 
+ []
+
+[23 <./images/attachVolume-2.png>] [24 <./images/unmountDetach-1.png>]
+<"images/public-ensembl".png, id=329, 1113.15875pt x 416.55624pt>
+File: "images/public-ensembl".png Graphic file (type png)
+
+<use "images/public-ensembl".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 175--176
+[][] 
+ []
+
+
+LaTeX Warning: Reference `fig:createandmountvolume' on page 25 undefined on inp
+ut line 178.
+
+
+LaTeX Warning: Reference `fig:ensembl' on page 25 undefined on input line 178.
+
+) [25 <./images/public-ensembl.png>]
+Appendix A.
+[26
+
+
+]
+\openout2 = `cloudbl_desktopIntro.aux'.
+
+ (./cloudbl_desktopIntro.tex
+
+LaTeX Warning: Reference `fig:bldocs' on page 27 undefined on input line 9.
+
+<"images/blbioinfDocumentation".png, id=354, 809.0225pt x 528.97626pt>
+File: "images/blbioinfDocumentation".png Graphic file (type png)
+
+<use "images/blbioinfDocumentation".png>
+Overfull \hbox (38.35246pt too wide) in paragraph at lines 18--19
+[][] 
+ []
+
+
+LaTeX Warning: Reference `fig:bioinfmenu' on page 27 undefined on input line 24
+.
+
+<"images/bioinfMenuNX2".png, id=355, 206.7725pt x 421.575pt>
+File: "images/bioinfMenuNX2".png Graphic file (type png)
+
+<use "images/bioinfMenuNX2".png>
+
+LaTeX Warning: Reference `fig:bldocs' on page 27 undefined on input line 29.
+
+
+LaTeX Warning: Reference `fig:bldocs' on page 27 undefined on input line 29.
+
+
+Underfull \hbox (badness 2351) in paragraph at lines 29--29
+\OT1/cmr/m/n/10 ing of the bioin-for-mat-
+ []
+
+
+Underfull \hbox (badness 1484) in paragraph at lines 29--29
+\OT1/cmr/m/n/10 tem, check out the in-
+ []
+
+[27
+
+ <./images/blbioinfDocumentation.png (PNG copy)>]
+
+LaTeX Warning: Reference `fig:NXterminal' on page 28 undefined on input line 34
+.
+
+<"images/openTerminalNX".png, id=366, 560.0925pt x 300.12125pt>
+File: "images/openTerminalNX".png Graphic file (type png)
+
+<use "images/openTerminalNX".png>
+Underfull \hbox (badness 2351) in paragraph at lines 40--40
+\OT1/cmr/m/n/10 a com-mand line ter-mi-
+ []
+
+) [28 <./images/bioinfMenuNX2.png> <./images/openTerminalNX.png (PNG copy)>]
+\openout2 = `basicTerminology.aux'.
+
+
+(./basicTerminology.tex [29
+
+
+]) [30] (./gettingStarted_CloudBioLinux.aux
+(./getReady.aux) (./workingOnCloudBL.aux) (./workingWithData.aux)
+(./cloudbl_desktopIntro.aux) (./basicTerminology.aux))
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 4751 strings out of 495061
+ 70160 string characters out of 1182622
+ 133782 words of memory out of 3000000
+ 7623 multiletter control sequences out of 15000+50000
+ 9812 words of font info for 34 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 38i,8n,38p,1204b,385s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/sha
+re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-te
+xlive/fonts/type1/public/amsfonts/cm/cmbxti10.pfb></usr/share/texmf-texlive/fon
+ts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/pub
+lic/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts
+/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr6.pfb
+></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/
+texmf-texlive/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-texlive
+/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type
+1/public/amsfonts/cm/cmti10.pfb>
+Output written on gettingStarted_CloudBioLinux.pdf (31 pages, 2217520 bytes).
+PDF statistics:
+ 497 PDF objects out of 1000 (max. 8388607)
+ 217 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+

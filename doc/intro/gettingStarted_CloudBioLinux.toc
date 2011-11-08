@@ -1,0 +1,124 @@
+\contentsline {chapter}{\numberline {1}Preparing to work on the Amazon Cloud}{2}{chapter.1}
+\contentsline {section}{\numberline {1.1}Get an Amazon AWS account}{3}{section.1.1}
+\contentsline {paragraph}{}{3}{section*.2}
+\contentsline {paragraph}{The rest of this document assumes you have an AWS account and you are logged into it.}{3}{section*.3}
+\contentsline {section}{\numberline {1.2}Get an Amazon EC2 Account}{3}{section.1.2}
+\contentsline {paragraph}{}{3}{section*.4}
+\contentsline {paragraph}{}{3}{section*.5}
+\contentsline {paragraph}{To get your EC2 account}{3}{section*.6}
+\contentsline {section}{\numberline {1.3}Get an EC2 key pair}{3}{section.1.3}
+\contentsline {paragraph}{}{3}{section*.7}
+\contentsline {paragraph}{To create a key pair:}{4}{section*.8}
+\contentsline {paragraph}{}{4}{section*.9}
+\contentsline {paragraph}{}{5}{section*.10}
+\contentsline {paragraph}{}{5}{section*.11}
+\contentsline {paragraph}{How the EC2 key pairs work}{5}{section*.12}
+\contentsline {paragraph}{}{5}{section*.13}
+\contentsline {section}{\numberline {1.4}Install an NX Client on your local machine}{5}{section.1.4}
+\contentsline {paragraph}{}{5}{section*.14}
+\contentsline {paragraph}{You only need to install an NX Client on your local system if you wish to run a full graphical desktop session for working on CloudBioLinux.}{5}{section*.15}
+\contentsline {chapter}{\numberline {2}Running a CloudBioLinux instance}{6}{chapter.2}
+\contentsline {section}{\numberline {2.1}The process in a nutshell}{7}{section.2.1}
+\contentsline {paragraph}{}{7}{section*.16}
+\contentsline {paragraph}{}{8}{section*.17}
+\contentsline {paragraph}{A note about charging:}{8}{section*.18}
+\contentsline {paragraph}{}{8}{section*.19}
+\contentsline {paragraph}{A couple of things to note when starting out:}{8}{section*.20}
+\contentsline {section}{\numberline {2.2}Starting up a CloudBioLinux instance}{8}{section.2.2}
+\contentsline {paragraph}{This document focusses on using the \href {http://console.aws.amazon.com/ec2/home}{AWS Management Console}, a web-interface, for managing Amazon Web Services resources.}{8}{figure.2.2}
+\contentsline {paragraph}{}{10}{section*.22}
+\contentsline {section}{\numberline {2.3}Connecting to and logging into your CloudBioLinux instance}{10}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Graphical, or command line?}{10}{subsection.2.3.1}
+\contentsline {paragraph}{For those wanting to work in a graphical computing environment}{10}{section*.23}
+\contentsline {paragraph}{For those comfortable in text-only environments, including Linux users who wish to run graphical programs, without a full desktop,}{10}{section*.24}
+\contentsline {paragraph}{}{10}{section*.25}
+\contentsline {subsection}{\numberline {2.3.2}Find out the address of your instance}{10}{subsection.2.3.2}
+\contentsline {paragraph}{}{10}{section*.26}
+\contentsline {subsection}{\numberline {2.3.3}Logging into a terminal using ssh}{11}{subsection.2.3.3}
+\contentsline {paragraph}{}{11}{section*.27}
+\contentsline {paragraph}{ssh -i mykey.pem root@ec2-184-72-144-209.compute-1.amazonaws.com}{11}{section*.28}
+\contentsline {paragraph}{}{11}{section*.29}
+\contentsline {paragraph}{ssh -i mykey.pem ubuntu@ec2-184-72-144-209.compute-1.amazonaws.com}{11}{section*.30}
+\contentsline {paragraph}{}{11}{section*.31}
+\contentsline {paragraph}{Note:}{12}{section*.32}
+\contentsline {paragraph}{ssh -i /home/mydirectory/keys/mykey.pem ubuntu@ec2-184-72-144-209.compute-1.amazonaws.com}{12}{section*.33}
+\contentsline {paragraph}{}{12}{section*.34}
+\contentsline {paragraph}{}{12}{section*.35}
+\contentsline {subsection}{\numberline {2.3.4}Logging into graphical desktop using NX}{12}{subsection.2.3.4}
+\contentsline {paragraph}{}{12}{section*.36}
+\contentsline {paragraph}{}{12}{section*.37}
+\contentsline {paragraph}{}{12}{section*.38}
+\contentsline {subsection}{\numberline {2.3.5}The logic of the NX setup}{12}{subsection.2.3.5}
+\contentsline {paragraph}{}{12}{section*.39}
+\contentsline {paragraph}{}{13}{section*.40}
+\contentsline {section}{\numberline {2.4}Logging out of your CloudBioLinux instance}{13}{section.2.4}
+\contentsline {paragraph}{From an NX connection}{13}{section*.41}
+\contentsline {paragraph}{From an ssh command line (or Putty) connection}{13}{section*.42}
+\contentsline {section}{\numberline {2.5}Terminating your CloudBioLinux instance}{14}{section.2.5}
+\contentsline {paragraph}{}{14}{section*.43}
+\contentsline {paragraph}{}{15}{section*.44}
+\contentsline {chapter}{\numberline {3}Working with data on the cloud}{17}{chapter.3}
+\contentsline {section}{\numberline {3.1}Introduction}{18}{section.3.1}
+\contentsline {paragraph}{}{18}{section*.45}
+\contentsline {paragraph}{}{18}{section*.46}
+\contentsline {section}{\numberline {3.2}Copying data onto your CloudBioLinux instance}{18}{section.3.2}
+\contentsline {paragraph}{}{18}{section*.47}
+\contentsline {paragraph}{}{18}{section*.48}
+\contentsline {paragraph}{}{19}{section*.49}
+\contentsline {paragraph}{}{19}{section*.50}
+\contentsline {paragraph}{}{19}{section*.51}
+\contentsline {section}{\numberline {3.3}Using EBS volumes for data}{20}{section.3.3}
+\contentsline {paragraph}{}{20}{section*.52}
+\contentsline {paragraph}{}{20}{section*.53}
+\contentsline {paragraph}{A note on charging:}{20}{section*.54}
+\contentsline {paragraph}{Creating your volume}{20}{figure.3.2}
+\contentsline {paragraph}{}{20}{section*.56}
+\contentsline {paragraph}{}{20}{section*.57}
+\contentsline {paragraph}{}{21}{section*.58}
+\contentsline {paragraph}{}{22}{section*.59}
+\contentsline {paragraph}{Accessing your volume}{22}{section*.60}
+\contentsline {paragraph}{}{22}{section*.61}
+\contentsline {paragraph}{}{23}{section*.62}
+\contentsline {paragraph}{Unmounting your volume}{24}{figure.3.6}
+\contentsline {paragraph}{This is a simple but vital step to avoid the possibility of data corruption.}{24}{section*.64}
+\contentsline {paragraph}{}{24}{section*.65}
+\contentsline {paragraph}{Detaching your volume}{24}{section*.66}
+\contentsline {paragraph}{}{24}{section*.67}
+\contentsline {paragraph}{Backing up or sharing your volume}{25}{section*.68}
+\contentsline {paragraph}{}{25}{section*.69}
+\contentsline {paragraph}{Deleting your volume}{25}{section*.70}
+\contentsline {paragraph}{}{25}{section*.71}
+\contentsline {section}{\numberline {3.4}Accesing public datasets on Amazon}{25}{section.3.4}
+\contentsline {paragraph}{}{25}{section*.72}
+\contentsline {paragraph}{}{25}{section*.73}
+\contentsline {paragraph}{}{25}{section*.74}
+\contentsline {chapter}{\numberline {A}Appendices}{26}{appendix.A}
+\contentsline {section}{\numberline {A.1}The CloudBioLinux Desktop}{27}{section.A.1}
+\contentsline {paragraph}{}{27}{section*.75}
+\contentsline {subsection}{\numberline {A.1.1}Bioinformatics documentation}{27}{subsection.A.1.1}
+\contentsline {paragraph}{}{27}{section*.76}
+\contentsline {paragraph}{}{27}{section*.77}
+\contentsline {subsection}{\numberline {A.1.2}The bioinformatics menu}{28}{subsection.A.1.2}
+\contentsline {paragraph}{}{28}{section*.78}
+\contentsline {subsection}{\numberline {A.1.3}Opening a terminal}{28}{subsection.A.1.3}
+\contentsline {paragraph}{}{28}{section*.79}
+\contentsline {section}{\numberline {A.2}Basic terminology}{29}{section.A.2}
+\contentsline {paragraph}{}{29}{section*.80}
+\contentsline {paragraph}{Amazon Machine Image}{29}{section*.81}
+\contentsline {paragraph}{Amazon Simple Storage Service}{29}{section*.82}
+\contentsline {paragraph}{AMI}{29}{section*.83}
+\contentsline {paragraph}{Availability Regions and Zones}{29}{section*.84}
+\contentsline {paragraph}{AWS}{29}{section*.85}
+\contentsline {paragraph}{AWS console}{29}{section*.86}
+\contentsline {paragraph}{EBS}{29}{section*.87}
+\contentsline {paragraph}{EC2}{29}{section*.88}
+\contentsline {paragraph}{Elastic Block Strorage}{29}{section*.89}
+\contentsline {paragraph}{Elastic Compute Cloud}{30}{section*.90}
+\contentsline {paragraph}{Image}{30}{section*.91}
+\contentsline {paragraph}{Instance}{30}{section*.92}
+\contentsline {paragraph}{NX}{30}{section*.93}
+\contentsline {paragraph}{Putty}{30}{section*.94}
+\contentsline {paragraph}{S3}{30}{section*.95}
+\contentsline {paragraph}{SSH}{30}{section*.96}
+\contentsline {paragraph}{Snapshot}{30}{section*.97}
+\contentsline {paragraph}{Volume}{30}{section*.98}
