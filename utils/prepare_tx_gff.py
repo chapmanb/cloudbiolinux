@@ -63,7 +63,7 @@ def upload_to_s3(fnames, org_build):
     if not os.path.exists(final_tarball):
         safe_makedir(final_dir)
         for fname in fnames:
-            shutil.copy(fname, final_dir)
+            shutil.move(fname, final_dir)
         subprocess.check_call("tar -cvpf - {dir} | xz -zc - > {tarball}".format(
             dir=final_dir, tarball=final_tarball), shell=True)
     python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
