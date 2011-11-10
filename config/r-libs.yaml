@@ -82,6 +82,7 @@ cran:
  - XML
  - xtable
  - yacca
+ - yaml
  - zoo
 
 biocrepo: http://bioconductor.org/biocLite.R
