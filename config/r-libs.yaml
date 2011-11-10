@@ -61,6 +61,7 @@ cran:
  - rcmdr
  - relimp
  - reshape
+ - reshape2
  - rgl
  - RColorBrewer
  - RCurl
