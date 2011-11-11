@@ -20,6 +20,7 @@ cran:
  - colorspace
  - date
  - DBI
+ - devtools
  - digest
  - effects
  - flashClust
@@ -77,6 +78,7 @@ cran:
  - statmod
  - strucchange
  - survival
+ - testthat
  - vegan
  - vgam
  - vr
