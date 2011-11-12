@@ -63,7 +63,7 @@ def run_nextgen_analysis_server(pp_config, work_dir, work_user):
     upstart_file = "/etc/init/nextgen-analysis.conf"
     with open(upstart_file, "w") as out_handle:
         out_handle.write(UPSTART_SCRIPT.format(config_file=pp_config,
-                                               work_dir=work_user,
+                                               work_dir=work_dir,
                                                user=work_user))
     subprocess.check_call(["service", "nextgen-analysis", "start"])
 
