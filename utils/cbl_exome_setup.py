@@ -19,6 +19,8 @@ import yaml
 
 def main():
     config_dir = "/export/data/galaxy"
+    work_dir = "/export/data/work"
+    work_user = "galaxy"
     amqp_config = os.path.join(config_dir, "universe_wsgi.ini")
     pp_config = os.path.join(config_dir, "post_process.yaml")
     wait_until_mounted(amqp_config)
@@ -26,7 +28,7 @@ def main():
     amqp_user, amqp_pass = read_ampq_config(amqp_config)
     amqp_vhost = read_pp_config(pp_config)
     setup_custom_galaxy()
-    run_nextgen_analysis_server(pp_config)
+    run_nextgen_analysis_server(pp_config, work_dir, work_user)
     setup_rabbitmq(amqp_vhost, amqp_user, amqp_pass)
 
 def setup_custom_galaxy():
@@ -47,24 +49,22 @@ description   "Nextgen sequencing analysis server"
 
 start on runlevel [2345]
 
-env WORK_DIR=/export/data/work
-env CONFIG={config_file}
-env WORK_USER=galaxy
-
-script
-    mkdir -p $WORK_DIR
-    chown -R $WORK_USER $WORK_DIR
-    chdir $WORK_DIR
-    exec su -l -c 'nextgen_analysis_server.py -q toplevel $CONFIG' $WORK_USER
+pre-start script
+    mkdir -p {work_dir}
+    chown -R {user} {work_dir}
 end script
+
+exec su -l -c 'nextgen_analysis_server.py -q toplevel {config_file} --basedir={work_dir}' {user}
 """
 
-def run_nextgen_analysis_server(pp_config):
+def run_nextgen_analysis_server(pp_config, work_dir, work_user):
     """Run a nextgen sequencing server using Ubuntu upstart.
     """
     upstart_file = "/etc/init/nextgen-analysis.conf"
     with open(upstart_file, "w") as out_handle:
-        out_handle.write(UPSTART_SCRIPT.format(config_file=pp_config))
+        out_handle.write(UPSTART_SCRIPT.format(config_file=pp_config,
+                                               work_dir=work_user,
+                                               user=work_user))
     subprocess.check_call(["service", "nextgen-analysis", "start"])
 
 def setup_rabbitmq(vhost, user, passwd):
