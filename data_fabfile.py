@@ -500,6 +500,21 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None):
                 post(full_ref_path)
     return os.path.join(dir_name, index_name)
 
+def _index_picard(ref_file):
+    """Provide a Picard style dict index file for a reference genome.
+    """
+    index_name = "%s.dict" % os.path.splitext(ref_file)[0]
+    try:
+        picard_jar = os.path.join(env.picard_home, "CreateSequenceDictionary.jar")
+    except AttributeError:
+        picard_jar = None
+    if picard_jar and os.path.exists(picard_jar) and not os.path.exists(index_name):
+        cl = ["java", "-jar", picard_jar]
+        opts = ["%s=%s" % (x, y) for x, y in [("REFERENCE", ref_file),
+                                             ("OUTPUT", index_name)]]
+        run(" ".join(cl + opts))
+    return index_name
+
 @_if_installed("faToTwoBit")
 def _index_twobit(ref_file):
     """Index reference files using 2bit for random access.
@@ -556,6 +571,7 @@ def _index_sam(ref_file):
     with cd(ref_dir):
         if not exists("%s.fai" % local_file):
             run("samtools faidx %s" % local_file)
+    _index_picard(ref_file)
     return ref_file
 
 @_if_installed("MosaikJump")
