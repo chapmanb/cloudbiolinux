@@ -8,6 +8,7 @@ bio_nextgen:
   alignment:
     - bwa
     - bowtie
+    - bowtie2
     - gmap
     - lastz
     - mosaik
@@ -16,7 +17,6 @@ bio_nextgen:
     - bedtools
     - fastqc
     - fastx_toolkit
-    - sabre
     - solexaqa
   analysis:
     - cufflinks

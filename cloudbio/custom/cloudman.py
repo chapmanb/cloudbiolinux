@@ -31,9 +31,11 @@ def install_nginx(env):
             run("wget %s" % url)
             run("tar xvzf %s" % os.path.split(url)[1])
             with cd("nginx-%s" % version):
-                run("./configure --prefix=%s --with-ipv6 %s --user=galaxy --group=galaxy "
+                run("./configure --prefix=%s --with-ipv6 %s "
+                    "--user=galaxy --group=galaxy "
                     "--with-http_ssl_module --with-http_gzip_static_module" %
                     (install_dir, module_flags))
+                sed("objs/Makefile", "-Werror", "")
                 run("make")
                 sudo("make install")
                 sudo("cd %s; stow nginx" % env.install_dir)

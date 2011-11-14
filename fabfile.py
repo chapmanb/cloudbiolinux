@@ -127,7 +127,8 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
       - packages     Install distro packages
       - custom       Install custom packages
       - libraries    Install programming language libraries
-      - finalize     Setup freenx and clean-up environment
+      - post_install Setup CloudMan, FreeNX and other system services
+      - cleanup      Remove downloaded files and prepare images for AMI builds
 
     environment allows adding additional information on the command line -
     usually for defining environments, for example environment=testing, or

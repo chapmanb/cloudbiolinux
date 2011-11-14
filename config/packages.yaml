@@ -58,7 +58,7 @@ desktop:
   - gnome-system-tools
   - synaptic
   - software-center
-  - freenx
+  - freenx-server
   - gnome-themes
   - gnome-backgrounds
   - gnome-terminal
@@ -105,7 +105,7 @@ programming:
     - libssl-dev
     - libpcre3
     - libpcre3-dev
-    - libreadline5-dev
+    - libreadline-dev
     - gcc
     - g++
     - gfortran
@@ -126,7 +126,6 @@ programming:
     - libboost-dev
     - libboost-python-dev
     - libboost-thread-dev
-    - boost-build
     - libopenmpi-dev 
     - libopenmpi1.3
     - openmpi-bin
@@ -149,7 +148,7 @@ programming:
     - pbuilder
     - unzip
   virtual:
-    - virtualbox-4.0
+    - virtualbox-4.1
     - dkms
   util:
     - mc
@@ -200,7 +199,6 @@ ruby:
 r:
   - r-base
   - r-base-core
-  - r-base-core-ra
   - r-base-dev
   - r-base-html
 perl:

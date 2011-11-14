@@ -35,7 +35,7 @@ pypi:
   # science
   - biopython
   - bcbio-nextgen
-  - cogent
+  #- cogent # build error with python 2.7
   - DendroPy
   - HTSeq
   - networkx
