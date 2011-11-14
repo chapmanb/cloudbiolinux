@@ -342,6 +342,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
         "maq": _index_maq,
         "novoalign": _index_novoalign,
         "novoalign_cs": _index_novoalign_cs,
+        "picard": _index_picard,
         "ucsc": _index_twobit,
         "eland": _index_eland,
         "bfast": _index_bfast,
@@ -449,6 +450,24 @@ def _update_loc_file(ref_file, line_parts):
                 run("touch %s" % ref_file)
             if not contains(ref_file, add_str):
                 append(ref_file, add_str)
+
+def _index_picard(ref_file):
+    """Provide a Picard style dict index file for a reference genome.
+    """
+    dir_name = "picard"
+    index_name = "%s.dict" % os.path.splitext(ref_file)[0]
+    dict_cmd = os.path.join(env.picard_home, "CreateSequenceDictionary.jar")
+
+    cmd = "java -jar"
+    cmd = ' '.join([cmd, dict_cmd])
+
+    if not os.path.exists(index_name):
+       opts = [("REFERENCE", "{ref_file}"),
+               ("OUTPUT", "{index_name}.dict")]
+       opts = ["%s=%s" % (x, y) for x, y in opts]
+       for opt in opts:
+           cmd = ' '.join([cmd, opt])
+    return _index_w_command(dir_name, cmd, ref_file)
 
 @_if_installed("faToTwoBit")
 def _index_twobit(ref_file):
