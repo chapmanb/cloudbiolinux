@@ -244,7 +244,7 @@ GENOMES_SUPPORTED = [
            ("Tguttata_Zebra_finch", "taeGut1", UCSCGenome("taeGut1")),
           ]
 
-GENOME_INDEXES_SUPPORTED = ["bowtie", "bwa", "maq", "novoalign", "novoalign-cs",
+GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
                             "ucsc", "mosaik", "eland", "bfast", "arachne"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
@@ -372,6 +372,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
         "seq" : _index_sam,
         "bwa" : _index_bwa,
         "bowtie": _index_bowtie,
+        "bowtie2": _index_bowtie2,
         "maq": _index_maq,
         "mosaik": _index_mosaik,
         "novoalign": _index_novoalign,
@@ -526,6 +527,11 @@ def _index_twobit(ref_file):
 def _index_bowtie(ref_file):
     dir_name = "bowtie"
     cmd = "bowtie-build -f {ref_file} {index_name}"
+    return _index_w_command(dir_name, cmd, ref_file)
+
+def _index_bowtie2(ref_file):
+    dir_name = "bowtie2"
+    cmd = "bowtie2-build {ref_file} {index_name}"
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_bwa(ref_file):
