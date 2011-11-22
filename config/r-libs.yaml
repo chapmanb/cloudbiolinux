@@ -69,6 +69,7 @@ cran:
  - rpart
  - rjson
  - Rmpi
+ - RMySQL
  - RSQLite
  - sandwich
  - sm
