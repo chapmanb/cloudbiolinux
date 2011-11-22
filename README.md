@@ -161,7 +161,7 @@ and CentOS.
 
 ## Virtualbox
 
-See [the VirtualBox and Vagrant documentation[vb1] for details on creating a
+See [the VirtualBox and Vagrant documentation][vb1] for details on creating a
 local virtual machine from scratch with CloudBioLinux.
 
 [vb1]: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md

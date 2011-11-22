@@ -9,7 +9,7 @@ Note the current version of vagrant needs at least VirtualBox version 4.1.x.
 ## VirtualBox with vagrant
 
 Add a base image to vagrant, and boot it up; community Vagrant boxes are available from
-[http://vagrantbox.es][v3] and [http://biobeat.org/bionode][BioLinux flavors]:
+[http://vagrantbox.es][v3] and [BioLinux flavors][v4]:
 
         vagrant box add box_name http://path_to_the_image.box
         mkdir tmp/biolinux
@@ -30,6 +30,7 @@ move it to a public webserver, such as Amazon S3:
               s3://chapmanb/biolinux_20110122.box
 
 [v3]: http://vagrantbox.es/
+[v4]: http://biobeat.org/bionode
 
 # Rolling your own
 
