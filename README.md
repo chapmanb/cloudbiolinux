@@ -159,35 +159,17 @@ and CentOS.
 6. When finished, use the [Amazon console][2] to create an AMI.
    Thereafter make it public so it can be used by others.
 
+## Virtualbox
+
+See [the VirtualBox and Vagrant documentation[vb1] for details on creating a
+local virtual machine from scratch with CloudBioLinux.
+
+[vb1]: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md
+
 ## OpenStack
 
 [OpenStack][openstack] is a promising platform for Cloud computing.
 CloudBioLinux support for OpenStack is planned.
-
-## VirtualBox with vagrant
-
-Add a base image to vagrant, and boot it up; community Vagrant boxes are available from
-[http://vagrantbox.es][v3] and [http://biobeat.org/bionode][BioLinux flavors]:
-
-        vagrant box add box_name http://path_to_the_image.box
-        mkdir tmp/biolinux
-        cd tmp/biolinux
-        vagrant init box_name
-        vagrant up
-
-Run the fabfile, building CloudBioLinux:
-
-        fab -H vagrant -f /path/to/cloudbiolinux/fabfile.py install_biolinux
-
-Then build the box, renaming package.box to `cloudbiolinux_date` and
-move it to a public webserver, such as Amazon S3:
-
-        vagrant package
-        mv package.box biolinux_20110122.box
-        s3cmd put --acl-public --guess-mime-type biolinux_20110122.box
-              s3://chapmanb/biolinux_20110122.box
-
-For more on vagrant and CloudBioLinux see ./doc/vagrant.md.
 
 ## XEN/KVM/Eucalyptus private Cloud
 
@@ -204,7 +186,6 @@ For more on private Cloud and CloudBioLinux see ./doc/private\_cloud.md.
 [4b]: http://www.camptocamp.com/en/infrastructure-solutions/amazon-images
 [v1]: http://vagrantup.com/
 [v2]: http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/
-[v3]: http://vagrantbox.es/
 [XEN]: http://xen.org/
 [KVM]: http://www.linux-kvm.org/
 [eucalyptus]: http://open.eucalyptus.com/

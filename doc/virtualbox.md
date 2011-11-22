@@ -1,10 +1,35 @@
-# BioLinux and Vagrant
+# CloudBioLinux and Vagrant
 
 This document gives some additional information on using Vagrant with BioLinux.
 [Vagrant][v1] is a convenient command line manager for VirtualBox. In conjunction
 with the BioLinux fabric environment, any VirtualBox VM can be bootstrapped.
 
-Note the current version of vagrant needs at least VirtualBox version 4.0.x.
+Note the current version of vagrant needs at least VirtualBox version 4.1.x.
+
+## VirtualBox with vagrant
+
+Add a base image to vagrant, and boot it up; community Vagrant boxes are available from
+[http://vagrantbox.es][v3] and [http://biobeat.org/bionode][BioLinux flavors]:
+
+        vagrant box add box_name http://path_to_the_image.box
+        mkdir tmp/biolinux
+        cd tmp/biolinux
+        vagrant init box_name
+        vagrant up
+
+Run the fabfile, building CloudBioLinux:
+
+        fab -H vagrant -f /path/to/cloudbiolinux/fabfile.py install_biolinux
+
+Then build the box, renaming package.box to `cloudbiolinux_date` and
+move it to a public webserver, such as Amazon S3:
+
+        vagrant package
+        mv package.box biolinux_20110122.box
+        s3cmd put --acl-public --guess-mime-type biolinux_20110122.box
+              s3://chapmanb/biolinux_20110122.box
+
+[v3]: http://vagrantbox.es/
 
 # Rolling your own
 
@@ -124,4 +149,58 @@ been loaded! Fix
 
        modprobe vboxdrv
 
+# Converting Vagrant images to VirtualBox and Eucalyptus images
+
+(protocol steps tested in Ubuntu Natty)
+
+## software pre-requisite
+
+    sudo gem install vagrant
+    sudo apt-get install cloud-utils
+
+## Importing cloud biolinux VM to your system
+
+    vagrant box add base 
+    https://s3.amazonaws.com/cloudbiolinux/cbl_ubuntu_11_4_32_20110628.box
+    vagrant init base
+    vagrant up
+
+## adding some missing components to the vagrant VMs 
+
+    vagrant ssh
+    sudo apt-get install gdm cloud-utils openssh
+    sudo useradd -d /home/ubuntu -m ubuntusudo passwd ubuntu
+    sudo shutdown -r now
+
+in the graphical login after reboot get in with user:ubuntu / pass:ubuntu
+go to System--->Administration--->Login Window to enable autologin
+
+## making a virtualbox appliance
+
+open the Virtualbox GUI, you should see the VM added by vagrant - you can 
+rename it to "Cloud BioLinux 32"
+do File->Export Appliance
+distribute the .ova you get from this operation
+anyone in any OS can import the .ova with File->Import Appliance on their 
+Virtualbox
+
+## making a Eucalyptus image
+
+we start with the Cloud BioLinux Virtualbox .vmdk (we can find its location 
+in the VM properties from the Virtualbox GUI). We might want to resize the 
+vmdk, since if we have set the disk of our Virtualbox VM to be 40G, we will 
+end up with a Eucalyptus image of that size. The best solution I found is 
+here (sort of a hack) :
+
+http://mtnbike.org/blog/?p=29 and the same here:
+http://www.my-guides.net/en/content/view/122/26/
+
+convert to raw .img by doing
+
+    qemu-img convert -O raw CloudBioLinux-32bit-disk1.vmdk 
+    CloudBioLinux-32bit-disk1.img
+
+finally deploy to Eucalyptus via
+
+    uec-publish-img CloudBioLinux-32bit-disk1.img
 
