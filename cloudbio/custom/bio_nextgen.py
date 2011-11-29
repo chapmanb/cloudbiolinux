@@ -325,9 +325,13 @@ def install_abyss(env):
     # XXX check for no sparehash on non-ubuntu systems
     version = "1.3.1"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
-    def _remove_werror(env):
+    def _remove_werror_get_boost(env):
         sed("configure", " -Werror", "")
-    _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror)
+        # http://osdir.com/ml/abyss-users-science/2011-10/msg00108.html
+        run("wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2")
+        run("tar jxf boost_1_47_0.tar.bz2")
+        run("ln -s boost_1_47_0/boost boost")
+    _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
     version = "1.2.0"
