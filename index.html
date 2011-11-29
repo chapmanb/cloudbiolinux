@@ -98,7 +98,17 @@ new TWTR.Widget({
           <ul>
             <li class="inner">These images work with micro instances, a cost effective way to explore Amazon resources.</li>
           </ul>
-          <li><a href="http://vagrantup.com/">Vagrant</a> <a href="http://www.virtualbox.org/">VirtualBox</a> images, for installation on a local machine</li>
+          <li> Cloud BioLinux can be executed on a desktop computer without the need for a cloud: </li>
+          <ul>
+             <li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/CloudBioLinux-32bit.ova">Cloud BioLinux 32-bit VirtualBox appliance</a> 
+             </br>Information for end-users <a href="http://www.virtualbox.org/wiki/Downloads">for installing Virtualbox</a> and <a href="http://www.virtualbox.org/manual/ch01.html#ovf">importing Cloud BioLinux images </a> for execution within Virtualbox. 
+          </ul>
+          <li> Cloud BioLinux images are available for execution on a private <a href="http://open.eucalyptus.com">Eucalyptus</a> cloud: </li>
+          <ul>
+             <li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/CloudBioLinux-32bit.Eucalyptus.img">Cloud BioLinux 32-bit Eucalyptus .img</a>
+             </br>The .img file can be uploaded to your Eucalyptus cloud by simply running "uec-publish-image file.img" from the <a href="http://packages.ubuntu.com/lucid/cloud-utils">Ubuntu cloud-utils</a> 
+          </ul>
+          <li><a href="http://vagrantup.com/">Vagrant</a> .box images, for developers who want to work locally with Cloud BioLinux: </li>
           <ul>
             <li class="inner">
                  <a href="https://s3.amazonaws.com/cloudbiolinux/cbl_ubuntu_11_04_64bit_20111019.box">Ubuntu 11.04 64bit; Vagrant 0.8 (19 October 2011)</a>
@@ -107,10 +117,8 @@ new TWTR.Widget({
             </li>
             <li class="inner">Information on how to import Cloud BioLinux images in VirtualBox can be found <a href="http://www.virtualbox.org/manual/ch01.html#ovf">here</a>
             </li>
-            <li class="inner">Information on how to import Cloud BioLinux images in VirtualBox can be found <a href="http://www.virtualbox.org/manual/ch01.html#ovf">here</a>
-            </li>
           </ul>
-          <li>Indexed genome builds for aligners such as <a href="http://bowtie-bio.sourceforge.net/">Bowtie</a>, <a href="http://bio-bwa.sourceforge.net/">BWA</a> and <a href="http://www.novocraft.com/">Novoalign</a> in the <a href="http://s3.amazonaws.com/biodata">biodata S3 bucket</a>. An <a href="https://github.com/chapmanb/bcbb/blob/master/ec2/biolinux/data_fabfile.py">automated script</a> pulls the requested genomes and aligner indexes to an Amazon machine or your local computer; integration with Galaxy is also provided.</li>
+          <li>Indexed genome builds for aligners such as <a href="http://bowtie-bio.sourceforge.net/">Bowtie</a>, <a href="http://bio-bwa.sourceforge.net/">BWA</a> and <a href="http://www.novocraft.com/">Novoalign</a> in the <a href="http://s3.amazonaws.com/biodata">biodata S3 bucket</a>. An <a href="https://github.com/chapmanb/cloudbiolinux/blob/master/data_fabfile.py">automated script</a> pulls the requested genomes and aligner indexes to an Amazon machine or your local computer; integration with Galaxy is also provided.</li>
         </ul>
         <h2>Documentation</h2>
         <ul class="fancy">
