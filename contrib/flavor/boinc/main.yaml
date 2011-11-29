@@ -1,0 +1,6 @@
+---
+packages:
+  # - minimal : skip, as we don't need the build system
+  - boinc
+  - desktop-cloud
+libraries:

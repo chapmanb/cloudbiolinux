@@ -15,7 +15,7 @@ packages:
   - perl
   - java
   - erlang
-#  - haskell
+  - haskell
   - databases
   - math
   - viz
@@ -33,8 +33,11 @@ packages:
   - galaxy
   - cloudman
 libraries:
-  - r-libs
+  - haskell-libs
+  - perl-libs
   - python-libs
+  - r-libs
   - ruby-libs
   - perl-libs
-#  - haskell-libs
+  - haskell-libs
+=======

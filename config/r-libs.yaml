@@ -20,6 +20,7 @@ cran:
  - colorspace
  - date
  - DBI
+ - devtools
  - digest
  - effects
  - flashClust
@@ -61,12 +62,14 @@ cran:
  - rcmdr
  - relimp
  - reshape
+ - reshape2
  - rgl
  - RColorBrewer
  - RCurl
  - rpart
  - rjson
  - Rmpi
+ - RMySQL
  - RSQLite
  - sandwich
  - sm
@@ -76,12 +79,14 @@ cran:
  - statmod
  - strucchange
  - survival
+ - testthat
  - vegan
  - vgam
  - vr
  - XML
  - xtable
  - yacca
+ - yaml
  - zoo
 
 biocrepo: http://bioconductor.org/biocLite.R
@@ -101,6 +106,7 @@ bioc:
  - baySeq
  - beadarray
  - Biobase
+ - BiocInstaller
  - bioDist
  - biomaRt
  - Biostrings
@@ -115,11 +121,18 @@ bioc:
  - chipseq
  - ChIPseqR
  - ChIPsim
+ - CNAnorm
+ - cn.mops
  - CSAR
+ - cummeRbund
  - DEGseq
  - DESeq
+ - DEXSeq
+ - DiffBind
  - DynDoc
  - edgeR
+ - EDASeq
+ - exomeCopy
  - gage
  - gcrma
  - genefilter
@@ -132,11 +145,14 @@ bioc:
  - GGtools
  - globaltest
  #- GO.db
+ - GOFunction
  - goseq
  - GOstats
  - GSEABase
+ - GWASTools
  - hgu95av2.db
  - HilbertVis
+ - htSeqTools
  - IRanges
  - KEGG.db
  - limma

@@ -27,6 +27,7 @@ def _setup_distribution_environment():
         raise ValueError("Unexpected distribution %s" % env.distribution)
     _validate_target_distribution(env.distribution)
     _cloudman_compatibility(env)
+    _setup_nixpkgs()
     _configure_sudo(env)
 
 def _configure_sudo(env):
@@ -49,12 +50,14 @@ def _validate_target_distribution(dist):
 
     Throws exception on error
     """
-    env.logger.debug("Checking target distribution %s",env.distribution)
+    env.logger.debug("Checking target distribution " + env.distribution)
     if dist in ["debian", "ubuntu"]:
         tag = run("cat /proc/version")
         if tag.lower().find(dist) == -1:
-           raise ValueError("Distribution '%s' does not match machine;" +
-                            "are you using correct fabconfig?" % dist)
+           # hmmm, test issue file
+           tag2 = run("cat /etc/issue")
+           if tag2.lower().find(dist) == -1:
+               raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
         env.logger.debug("Unknown target distro")
 
@@ -69,7 +72,7 @@ def _setup_ubuntu():
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://cran.stat.ucla.edu/bin/linux/ubuntu %s/", # lastest R versions
+      "deb http://software.rc.fas.harvard.edu/mirrors/R/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
@@ -92,6 +95,7 @@ def _setup_deb_general():
     """
     env.logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
+    env.apt_preferences_file = "/etc/apt/preferences"
     env.python_version_ext = ""
     env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
@@ -110,6 +114,24 @@ def _setup_centos():
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
+def _setup_nixpkgs():
+    # for now, Nix packages are only supported in Debian - it can
+    # easily be done for others - just get Nix installed from the .rpm
+    nixpkgs = False
+    if env.has_key("nixpkgs"):
+        if env.distribution in ["debian", "ubuntu"]:
+            if env.nixpkgs == "True":
+                nixpkgs = True
+            else:
+                nixpkgs = False
+        else:
+            env.logger.warn("NixPkgs are currently not supported for " + env.distribution)
+    if nixpkgs:
+        env.logger.info("NixPkgs: supported")
+    else:
+        env.logger.debug("NixPkgs: Ignored")
+    env.nixpkgs = nixpkgs
+
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
     """
@@ -126,6 +148,7 @@ def _setup_vagrant_environment():
     env.logger.info("Get vagrant environment")
     raw_ssh_config = subprocess.Popen(["vagrant", "ssh-config"],
                                       stdout=subprocess.PIPE).communicate()[0]
+    env.logger.info(raw_ssh_config)
     ssh_config = dict([l.strip().split() for l in raw_ssh_config.split("\n") if l])
     env.user = ssh_config["User"]
     env.hosts = [ssh_config["HostName"]]

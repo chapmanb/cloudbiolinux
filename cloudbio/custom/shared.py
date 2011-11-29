@@ -37,8 +37,11 @@ def _if_not_python_lib(library):
 
 @contextmanager
 def _make_tmp_dir():
-    home_dir = run("echo $HOME")
-    work_dir = os.path.join(home_dir, "tmp", "cloudbiolinux")
+    tmp_dir = run("echo $TMPDIR").strip()
+    if not tmp_dir:
+        home_dir = run("echo $HOME")
+        tmp_dir = os.path.join(home_dir, "tmp")
+    work_dir = os.path.join(tmp_dir, "cloudbiolinux")
     if not exists(work_dir):
         run("mkdir -p %s" % work_dir)
     yield work_dir
@@ -66,12 +69,14 @@ def _safe_dir_name(dir_name, need_dir=True):
         if exists(check):
             return check
     # still couldn't find it, it's a nasty one
-    first_part = dir_name.split("-")[0].split("_")[0]
-    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
-                  warn_only=True):
-        dirs = run("ls -d1 *%s*/" % first_part).split("\n")
-    if len(dirs) == 1:
-        return dirs[0]
+    for check_part in (dir_name.split("-")[0].split("_")[0],
+                       dir_name.split("-")[-1].split("_")[-1]):
+        with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                      warn_only=True):
+            dirs = run("ls -d1 *%s*/" % check_part).split("\n")
+            dirs = [x for x in dirs if "cannot access" not in x]
+        if len(dirs) == 1:
+            return dirs[0]
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
@@ -142,6 +147,18 @@ def _symlinked_java_version_dir(pname, version, env):
         env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
     return None
+
+def _java_install(pname, version, url, env, install_fn=None):
+    install_dir = _symlinked_java_version_dir(pname, version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                dir_name = _fetch_and_unpack(url)
+                with cd(dir_name):
+                    if install_fn is not None:
+                        install_fn(env)
+                    else:
+                        env.safe_sudo("mv *.jar %s" % install_dir)
 
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)

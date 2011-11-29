@@ -8,6 +8,7 @@ bio_nextgen:
   alignment:
     - bwa
     - bowtie
+    - bowtie2
     - gmap
     - lastz
     - mosaik
@@ -16,13 +17,14 @@ bio_nextgen:
     - bedtools
     - fastqc
     - fastx_toolkit
-    - sabre
     - solexaqa
   analysis:
     - cufflinks
     - freebayes
     - gatk
+    - gatk_queue
     - picard
+    - samtools
     - shrec
     - snpeff
     - tophat
@@ -50,6 +52,9 @@ python:
   - rpy
 java:
   - leinengin
+phylogeny:
+  - tracer
+  - beast
   #- cljr
 # ToDo -- test on 64bit with bfast
 #- dnaa

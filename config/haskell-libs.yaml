@@ -18,4 +18,4 @@ cabal:
   - bio
   - flower
   - flowsim
-  - samtools
+  #- samtools

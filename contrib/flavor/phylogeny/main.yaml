@@ -1,0 +1,9 @@
+---
+packages:
+  - minimal
+  - desktop-cloud
+  - editors
+  - phylogeny
+  # - phylogeny_testing - Debian only
+  - r
+libraries:

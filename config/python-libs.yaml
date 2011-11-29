@@ -15,7 +15,7 @@ pypi:
   - numpy
   - paste
   - pastescript
-  - pycrypto
+  #- pycrypto # build failure with 2.4
   - python-cjson
   - pyOpenSSL
   - pyyaml
@@ -34,16 +34,19 @@ pypi:
   - Twisted
   # science
   - biopython
-  - cogent
+  - bcbio-nextgen
+  #- cogent # build error with python 2.7
   - DendroPy
   - HTSeq
   - networkx
+  - pandas
   - pygr
   - pysam
   - pysparse
   - rpy2
   - rpy2-bioconductor-extensions
   - scikits.learn
+  - scikits.statsmodels
   - scipy
   - sympy
   # databases

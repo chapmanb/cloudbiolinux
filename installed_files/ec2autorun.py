@@ -247,7 +247,8 @@ def _create_basic_user_data_file():
                         'cloudman_home': CLOUDMAN_HOME,
                         'cluster_name': 'aGalaxyCloudManCluster_%s' % random.randrange(1, 9999999),
                         'role': 'master',
-                        'secret_key': None}
+                        'secret_key': None,
+                        'no_start': True}
         yaml.dump(ud_formatted, ud_file, default_flow_style=False)
     return ud_formatted
 

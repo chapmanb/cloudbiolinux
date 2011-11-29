@@ -8,19 +8,24 @@
 # details about the operating system
 ## Ubuntu
 distribution = ubuntu
-dist_name = natty
+dist_name = oneiric
 ## Centos
 #distribution = centos
 ## Debian
 #distribution = debian
 #dist_name = squeeze
 
-# Whether to clean the system and install setup scripts after finishing
-# Useful for preparing AMI but should not be run on vagrant or local machines
+# Unset to avoid CloudBioLinux customizations like setup scripts;
+# or set to different edition to get specific customizations
+edition = cloudbiolinux
+
+# Whether to clean the system for EC2 AMI preparation;
+# do not set on vagrant or local machines
 is_ec2_image = false
 
 # Global installation directory for packages and standard programs
 system_install = /usr
+
 # Local install directory for versioned software that will not
 # be included in the path by default
 local_install = ~/install
@@ -35,3 +40,5 @@ use_sudo = true
 data_files = /mnt/biodata
 galaxy_base = /mnt/biodata/galaxy
 
+# Picard home
+picard_home = /usr/share/java/picard

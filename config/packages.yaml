@@ -20,6 +20,9 @@
 # be selectively installed/ignored. See main.yaml for top level configuration.
 minimal:
   #Packages to support a minimal installation (no X!)
+  administration:
+    - sudo
+    - htop
   editors:
     - vim
     # don't put in emacs, as it pulls in X
@@ -46,14 +49,16 @@ minimal:
     - unzip
     - tar
     - less
-    - sudo
+  network:
+    - curl
+    - wget
 desktop:
   #Packages to support a remote desktop
   - gnome-panel
   - gnome-system-tools
   - synaptic
   - software-center
-  - freenx
+  - freenx-server
   - gnome-themes
   - gnome-backgrounds
   - gnome-terminal
@@ -62,6 +67,11 @@ desktop:
   - cloudbl-desktop
   - bio-linux-tutorials
   - xvfb
+  - gdm
+desktop-cloud:
+  # some special purpose VMs, such as BOINC, only require a minimal desktop
+  - lxde
+  - vnc4server
 programming:
   editors:
     - emacs
@@ -75,7 +85,6 @@ programming:
   build:
     - swig
     - cmake
-    - curl
     - libcurl4-openssl-dev
     - libxml2
     - libxml2-dev
@@ -97,7 +106,7 @@ programming:
     - libssl-dev
     - libpcre3
     - libpcre3-dev
-    - libreadline5-dev
+    - libreadline-dev
     - gcc
     - g++
     - gfortran
@@ -106,7 +115,7 @@ programming:
     - python-software-properties
   libraries:
     - libatlas-base-dev
-    - libatlas-dev
+    #- libatlas-dev
     - libblas-dev
     - liblapack-dev
     - tcl-dev
@@ -118,7 +127,6 @@ programming:
     - libboost-dev
     - libboost-python-dev
     - libboost-thread-dev
-    - boost-build
     - libopenmpi-dev 
     - libopenmpi1.3
     - openmpi-bin
@@ -141,12 +149,17 @@ programming:
     - pbuilder
     - unzip
   virtual:
-    - virtualbox-4.0
+    - virtualbox-4.1
     - dkms
   util:
+    - mc
     - tree
     - screen
     - time
+    - fdupes
+  network:
+    - lynx
+    - traceroute
   lang:
     - aspell
     - dictionaries-common
@@ -179,7 +192,7 @@ python:
     - python-distutils-extra
   wrappers:
     - python-rpy
-ruby: 
+ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
   - ruby1.8
@@ -187,7 +200,6 @@ ruby:
 r:
   - r-base
   - r-base-core
-  - r-base-core-ra
   - r-base-dev
   - r-base-html
 perl:
@@ -273,6 +285,9 @@ viz:
   - libglu1-mesa-dev
 web:
   - apache2
+boinc:
+  - boinc-client
+  - boinc-manager
 bio_general:
   - primer3
   - readseq
@@ -310,7 +325,7 @@ bio_alignment:
   - bio-linux-wise2
 bio_nextgen:
   - maq
-  - samtools
+  # - samtools # very old version
 bio_sequencing:
   - bio-linux-assembly-conversion-tools
   - bio-linux-cap3
@@ -357,6 +372,16 @@ bio_utils:
   - bio-linux-sequin # Version problem
   - bio-linux-taxinspector
   - bio-linux-themes-v5
+phylogeny_testing:
+  # new packages in testing (Debian 'wheezy')
+  all:
+    - debian-archive-keyring
+    - raxml
+    # - mrbayes-mpi broken, should eventually replace biolinux-mrbayes-multi
+phylogeny_experimental:
+  # new packages in experimental 
+  all:
+    - paml        # should replace biolinux-paml
 phylogeny:
   all:
     - phylip
@@ -365,6 +390,9 @@ phylogeny:
     - njplot
     - tree-puzzle
     #- bio-linux-arb # Broken, needs libmotif3
+    # biolinux-ape package is source (i386). It needs R - not in deps - and
+    # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
+    # - bio-linux-ape 
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem

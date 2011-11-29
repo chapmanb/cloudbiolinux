@@ -7,6 +7,7 @@ from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
+                    _java_install,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make)
 
 @_if_not_installed("faToTwoBit")
@@ -40,6 +41,15 @@ def install_bowtie(env):
           "bowtie-%s-src.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie*'"))
 
+@_if_not_installed("bowtie2")
+def install_bowtie2(env):
+    """Install the bowtie2 short read aligner, with gap support.
+    """
+    version = "2.0.0-beta3"
+    url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
+          "bowtie2-%s.zip" % (version, version)
+    _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
+
 @_if_not_installed("bwa")
 def install_bwa(env):
     version = "0.5.9"
@@ -55,16 +65,16 @@ def install_bwa(env):
 
 @_if_not_installed("bfast")
 def install_bfast(env):
-    version = "0.6.4"
-    vext = "e"
+    version = "0.7.0"
+    vext = "a"
     url = "http://downloads.sourceforge.net/project/bfast/bfast/%s/bfast-%s%s.tar.gz"\
             % (version, version, vext)
     _get_install(url, env, _configure_make)
 
 @_if_not_installed("perm")
 def install_perm(env):
-    version = "0.3.3"
-    url = "http://perm.googlecode.com/files/PerM%sSource.zip" % version
+    version = "3.6"
+    url = "http://perm.googlecode.com/files/PerM_%s_Source.tar.gz" % version
     def gcc44_makefile_patch():
         gcc_cmd = "g++44"
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
@@ -77,7 +87,7 @@ def install_perm(env):
 
 @_if_not_installed("gmap")
 def install_gmap(env):
-    version = "2010-07-27"
+    version = "2011-11-12"
     url = "http://research-pub.gene.com/gmap/src/gmap-gsnap-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -90,8 +100,8 @@ def _wget_with_cookies(ref_url, dl_url):
 
 @_if_not_installed("novoalign")
 def install_novoalign(env):
-    base_version = "V2.07.09"
-    cs_version = "V1.01.09"
+    base_version = "V2.07.14"
+    cs_version = "V1.01.14"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
@@ -120,7 +130,10 @@ def install_lastz(env):
     version = "1.02.00"
     url = "http://www.bx.psu.edu/miller_lab/dist/" \
           "lastz-%s.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"))
+    def _remove_werror(env):
+        sed("src/Makefile", " -Werror", "")
+    _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"),
+                 post_unpack_fn=_remove_werror)
 
 @_if_not_installed("MosaikAligner")
 def install_mosaik(env):
@@ -133,6 +146,13 @@ def install_mosaik(env):
     _get_install(repository, env, _chdir_src(_make_copy("ls -1 ../bin/*")))
 
 # --- Utilities
+
+@_if_not_installed("samtools")
+def install_samtools(env):
+    version = "0.1.18"
+    url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
+          "%s/samtools-%s.tar.bz2" % (version, version)
+    _get_install(url, env, _make_copy("find -perm -100 -type f"))
 
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
 def install_fastx_toolkit(env):
@@ -159,7 +179,7 @@ def install_solexaqa(env):
 
 @_if_not_installed("fastqc")
 def install_fastqc(env):
-    version = "0.9.1"
+    version = "0.10.0"
     url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
           "fastqc_v%s.zip" % version
     executable = "fastqc"
@@ -179,11 +199,6 @@ def install_fastqc(env):
 def install_bedtools(env):
     repository = "git clone git://github.com/arq5x/bedtools.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
-
-@_if_not_installed("sabre")
-def install_sabre(env):
-    repo = "git clone git://github.com/najoshi/sabre.git"
-    _get_install(repo, env, _make_copy("find -perm -100 -name 'sabre*'"))
 
 _shrec_run = """
 #!/usr/bin/perl
@@ -221,35 +236,28 @@ def install_shrec(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.49"
+    version = "1.56"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
-    install_dir = _symlinked_java_version_dir("picard", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                run("wget %s" % (url))
-                run("unzip %s" % os.path.basename(url))
-                with cd(os.path.splitext(os.path.basename(url))[0]):
-                    env.safe_sudo("mv *.jar %s" % install_dir)
+    _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.1"
+    version = "1.3"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
-    install_dir = _symlinked_java_version_dir("gatk", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                run("wget %s" % (url))
-                run("tar -xjvpf %s" % os.path.basename(url))
-                with cd(os.path.basename(url).replace(ext, "")):
-                    env.safe_sudo("mv *.jar %s" % install_dir)
+    _java_install("gatk", version, url, env)
+
+def install_gatk_queue(env):
+    version = "1.3"
+    ext = ".tar.bz2"
+    url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
+          "Queue-%s%s" % (version, ext)
+    _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
-    version = "1_9_5"
-    genomes = ["hg37.61", "mm37.61"]
+    version = "2_0_3"
+    genomes = ["GRCh37.63", "NCBIM37.63", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
@@ -276,7 +284,10 @@ def install_snpeff(env):
 @_if_not_installed("freebayes")
 def install_freebayes(env):
     repository = "git clone --recursive git://github.com/ekg/freebayes.git"
-    _get_install(repository, env, _make_copy("ls -1 bin/*"))
+    def _fix_library_order(env):
+        sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+    _get_install(repository, env, _make_copy("ls -1 bin/*"),
+                 post_unpack_fn=_fix_library_order)
 
 def _install_samtools_libs(env):
     repository = "svn co --non-interactive " \
@@ -295,25 +306,15 @@ def _install_samtools_libs(env):
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
-    version = "1.2.0"
-    def _fixseqan_configure_make(env):
-        """Upgrade local copy of SeqAn before compiling to fix errors.
-
-        http://seqanswers.com/forums/showthread.php?t=9082
-        """
-        with cd("src/SeqAn-1.1"):
-            run("wget http://www.seqan.de/uploads/media/Seqan_Release_1.2.zip")
-            run("rm -rf seqan")
-            run("unzip Seqan_Release_1.2.zip")
-        _configure_make(env)
+    version = "1.3.3"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
-    _get_install(url, env, _fixseqan_configure_make)
+    _get_install(url, env, _configure_make)
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
     # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "1.0.1"
+    version = "1.1.0"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -322,11 +323,15 @@ def install_cufflinks(env):
 @_if_not_installed("ABYSS")
 def install_abyss(env):
     # XXX check for no sparehash on non-ubuntu systems
-    version = "1.2.7"
+    version = "1.3.1"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
-    def _remove_werror(env):
+    def _remove_werror_get_boost(env):
         sed("configure", " -Werror", "")
-    _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror)
+        # http://osdir.com/ml/abyss-users-science/2011-10/msg00108.html
+        run("wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2")
+        run("tar jxf boost_1_47_0.tar.bz2")
+        run("ln -s boost_1_47_0/boost boost")
+    _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
     version = "1.2.0"
@@ -336,21 +341,28 @@ def install_transabyss(env):
 
 @_if_not_installed("velvetg")
 def install_velvet(env):
-    version = "1.0.13"
+    version = "1.1.06"
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -name 'velvet*'"))
+    def _fix_library_order(env):
+        """Fix library order problem in recent gcc versions
+        http://biostar.stackexchange.com/questions/13713/
+        error-installing-velvet-assembler-1-1-06-on-ubuntu-server
+        """
+        sed("Makefile", "Z_LIB_FILES=-lz", "Z_LIB_FILES=-lz -lm")
+    _get_install(url, env, _make_copy("find -perm -100 -name 'velvet*'"),
+                 post_unpack_fn=_fix_library_order)
 
 def install_trinity(env):
-    version = "03122011"
+    version = "r2011-10-29"
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
-          "trinityrnaseq-%s.tgz" % version
+          "trinityrnaseq_%s.tgz" % version
     _get_install_local(url, env, _make_copy())
 
 # --- ChIP-seq
 
 @_if_not_installed("macs14")
 def install_macs(env):
-    version = "1.4.0rc2"
-    url = "http://macs:chipseq@liulab.dfci.harvard.edu/MACS/src/"\
+    version = "1.4.1"
+    url = "http://macs:chipseq@liulab.dfci.harvard.edu/MACS/src/" \
           "MACS-%s.tar.gz" % version
     _get_install(url, env, _python_make)

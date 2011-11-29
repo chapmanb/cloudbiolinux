@@ -3,8 +3,7 @@
 Designed to automatically download and manage biologically associated
 data on cloud instances like Amazon EC2.
 
-Fabric (http://docs.fabfile.org) is used to manage the automation of
-a remote server.
+Fabric (http://docs.fabfile.org) manages automation of remote servers.
 
 Usage:
     fab -i key_file -H servername -f data_fabfile.py install_data
@@ -34,10 +33,11 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
 from cloudbio.biodata.dbsnp import download_dbsnp
+from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.utils import _setup_logging
 
-# -- Host specific setup for various groups of servers.
+# -- Host specific setup
 
 env.remove_old_genomes = False
 
@@ -74,6 +74,7 @@ class _DownloadHelper:
 class UCSCGenome(_DownloadHelper):
     def __init__(self, genome_name):
         _DownloadHelper.__init__(self)
+        self.data_source = "UCSC"
         self._name = genome_name
         self._url = "ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips" % \
                 genome_name
@@ -130,6 +131,7 @@ class NCBIRest(_DownloadHelper):
     """
     def __init__(self, name, refs):
         _DownloadHelper.__init__(self)
+        self.data_source = "NCBI"
         self._name = name
         self._refs = refs
         self._base_url = "http://togows.dbcls.jp/entry/ncbi-nucleotide/%s.fasta"
@@ -162,6 +164,7 @@ class EnsemblGenome(_DownloadHelper):
     def __init__(self, ensembl_section, release_number, release2, organism,
             name, convert_to_ucsc=False):
         _DownloadHelper.__init__(self)
+        self.data_source = "Ensembl"
         if ensembl_section == "standard":
             url = "ftp://ftp.ensembl.org/pub/"
         else:
@@ -187,9 +190,12 @@ class EnsemblGenome(_DownloadHelper):
 
 class BroadGenome(_DownloadHelper):
     """Retrieve genomes organized and sorted by Broad for use with GATK.
+
+    Uses the UCSC-name compatible versions of the GATK bundles.
     """
     def __init__(self, name, bundle_version, target_fasta):
         _DownloadHelper.__init__(self)
+        self.data_source = "UCSC"
         self._name = name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
@@ -203,7 +209,7 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "5974"
+BROAD_BUNDLE_VERSION = "1.2"
 DBSNP_VERSION = "132"
 
 GENOMES_SUPPORTED = [
@@ -215,6 +221,8 @@ GENOMES_SUPPORTED = [
                                             "Homo_sapiens_assembly18.fasta")),
            ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
                                             "ucsc.hg19.fasta")),
+           ("Hsapiens", "GRCh37", BroadGenome("b37", BROAD_BUNDLE_VERSION,
+                                              "human_g1k_v37.fasta")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
@@ -236,7 +244,7 @@ GENOMES_SUPPORTED = [
            ("Tguttata_Zebra_finch", "taeGut1", UCSCGenome("taeGut1")),
           ]
 
-GENOME_INDEXES_SUPPORTED = ["bowtie", "bwa", "maq", "novoalign", "novoalign-cs",
+GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
                             "ucsc", "mosaik", "eland", "bfast", "arachne"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
@@ -265,7 +273,7 @@ def upload_s3(config_file=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
     if boto is None:
-        raise ImportError("boto must be installed to upload to Amazon s3")
+        raise ImportError("install boto to upload to Amazon s3")
     if env.host != "localhost" and not env.host.startswith(socket.gethostname()):
         raise ValueError("Need to run S3 upload on a local machine")
     _check_version()
@@ -276,6 +284,7 @@ def upload_s3(config_file=CONFIG_FILE):
 
 def _install_additional_data(genomes, config):
     download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    download_transcripts(genomes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)
@@ -336,7 +345,7 @@ def _make_genome_dir():
         result = run("mkdir -p %s" % genome_dir)
     if result.failed:
         sudo("mkdir -p %s" % genome_dir)
-        sudo("chown %s %s" % (env.user, genome_dir))
+        sudo("chown -R %s %s" % (env.user, genome_dir))
     return genome_dir
 
 def _data_ngs_genomes(genomes, genome_indexes):
@@ -363,6 +372,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
         "seq" : _index_sam,
         "bwa" : _index_bwa,
         "bowtie": _index_bowtie,
+        "bowtie2": _index_bowtie2,
         "maq": _index_maq,
         "mosaik": _index_mosaik,
         "novoalign": _index_novoalign,
@@ -491,6 +501,21 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None):
                 post(full_ref_path)
     return os.path.join(dir_name, index_name)
 
+def _index_picard(ref_file):
+    """Provide a Picard style dict index file for a reference genome.
+    """
+    index_name = "%s.dict" % os.path.splitext(ref_file)[0]
+    try:
+        picard_jar = os.path.join(env.picard_home, "CreateSequenceDictionary.jar")
+    except AttributeError:
+        picard_jar = None
+    if picard_jar and os.path.exists(picard_jar) and not os.path.exists(index_name):
+        cl = ["java", "-jar", picard_jar]
+        opts = ["%s=%s" % (x, y) for x, y in [("REFERENCE", ref_file),
+                                             ("OUTPUT", index_name)]]
+        run(" ".join(cl + opts))
+    return index_name
+
 @_if_installed("faToTwoBit")
 def _index_twobit(ref_file):
     """Index reference files using 2bit for random access.
@@ -502,6 +527,11 @@ def _index_twobit(ref_file):
 def _index_bowtie(ref_file):
     dir_name = "bowtie"
     cmd = "bowtie-build -f {ref_file} {index_name}"
+    return _index_w_command(dir_name, cmd, ref_file)
+
+def _index_bowtie2(ref_file):
+    dir_name = "bowtie2"
+    cmd = "bowtie2-build {ref_file} {index_name}"
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_bwa(ref_file):
@@ -547,6 +577,7 @@ def _index_sam(ref_file):
     with cd(ref_dir):
         if not exists("%s.fai" % local_file):
             run("samtools faidx %s" % local_file)
+    _index_picard(ref_file)
     return ref_file
 
 @_if_installed("MosaikJump")

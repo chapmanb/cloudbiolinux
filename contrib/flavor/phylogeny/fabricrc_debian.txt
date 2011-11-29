@@ -1,0 +1,27 @@
+# Flavor targetting runningy Phylogeny programs in the Cloud, 
+# such as recent edititions of mrbayes-mpi, raxml, BEAST and 
+# tracer.
+#
+# This VM is used for a practical Phylogeny course.
+#
+# Copyright (C) 2011 Pjotr Prins <pjotr.prins@thebird.nl> 
+#
+edition = bionode
+edition_version = 0.93
+flavor = PhylogenyFlavor
+flavor_path = phylogeny.phylogenyflavor
+distribution = debian
+dist_name = squeeze
+nixpkgs = True
+
+# Update to the target's nearest repository:
+debian_repository=http://ftp.nl.debian.org/debian/
+
+# Global installation directory for packages and standard programs
+system_install = /usr
+local_install = ~/install
+shell_config = ~/.bashrc
+shell = /bin/bash -l -c
+# data_files = /mnt/biodata
+# galaxy_base = /mnt/biodata/galaxy
+

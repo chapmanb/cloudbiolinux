@@ -3,3 +3,4 @@ tags
 nextgen/bcbio_nextgen.egg-info/
 nextgen/build/
 nextgen/dist/
+*.pem
