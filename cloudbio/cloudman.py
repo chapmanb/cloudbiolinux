@@ -101,14 +101,14 @@ def _cleanup_ec2(env):
     # RabbitMQ fails to start if its database is embedded into the image
     # because it saves the current IP address or host name so delete it now.
     # When starting up, RabbitMQ will recreate that directory.
-    with settings(warn_only=True):
-        sudo('/etc/init.d/rabbitmq-server stop')
-        sudo('stop rabbitmq-server')
-        sudo('/etc/init.d/rabbitmq-server stop')
-    sudo('initctl reload-configuration')
-    for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
-        if exists(db_location):
-            sudo('rm -rf %s' % db_location)
+#    with settings(warn_only=True):
+#        sudo('/etc/init.d/rabbitmq-server stop')
+#        sudo('stop rabbitmq-server')
+#        sudo('/etc/init.d/rabbitmq-server stop')
+#    sudo('initctl reload-configuration')
+#    for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
+#        if exists(db_location):
+#            sudo('rm -rf %s' % db_location)
     # remove existing ssh host key pairs
     # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
     sudo("rm -f /etc/ssh/ssh_host_*")

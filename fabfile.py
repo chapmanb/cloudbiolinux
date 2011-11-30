@@ -340,13 +340,13 @@ def _clojure_library_installer(config):
     for lib in config['cljr']:
         run("cljr install %s" % lib)
 
-def _haskell_library_installer(config):
-    """Install haskell libraries using cabal.
-    """
-    run("cabal update")
-    for lib in config["cabal"]:
-        sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
-        run("cabal install %s --global %s" % (sudo_str, lib))
+#def _haskell_library_installer(config):
+#    """Install haskell libraries using cabal.
+#    """
+#    run("cabal update")
+#    for lib in config["cabal"]:
+#        sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
+#        run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
     "r-libs" : _r_library_installer,
@@ -354,7 +354,7 @@ lib_installers = {
     "ruby-libs" : _ruby_library_installer,
     "perl-libs" : _perl_library_installer,
     "clojure-libs": _clojure_library_installer,
-    "haskell-libs": _haskell_library_installer,
+    #"haskell-libs": _haskell_library_installer,
     }
 
 def install_libraries(language):

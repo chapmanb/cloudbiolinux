@@ -96,7 +96,7 @@ programming:
   lang:
     - aspell
 distributed:
-  - rabbitmq-server
+#  - rabbitmq-server
 amazon:
 python:
   meta:
@@ -123,8 +123,8 @@ java:
 erlang:
   - erlang
   - erlang-devel
-haskell:
-  - ghc
+#haskell:
+#  - ghc
 databases:
   mysql:
     - mysql

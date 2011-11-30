@@ -169,7 +169,7 @@ programming:
 # production-ready Elastic MapReduce platform:
 # http://aws.amazon.com/elasticmapreduce/
 distributed:
-  - rabbitmq-server
+#  - rabbitmq-server
   - nfs-kernel-server
   - hadoop-0.20
   - hadoop-pig
@@ -235,10 +235,10 @@ erlang:
   - erlang-examples
   - erlang-manpages
   - erlang-mode
-haskell:
-  - ghc6
-  - cabal-install
-  - c2hs
+#haskell:
+#  - ghc6
+#  - cabal-install
+#  - c2hs
 databases:
   mysql:
     - mysql-client

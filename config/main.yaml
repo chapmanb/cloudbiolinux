@@ -38,3 +38,6 @@ libraries:
   - python-libs
   - r-libs
   - ruby-libs
+  - perl-libs
+  - haskell-libs
+=======

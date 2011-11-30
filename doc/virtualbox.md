@@ -201,6 +201,16 @@ convert to raw .img by doing
     qemu-img convert -O raw CloudBioLinux-32bit-disk1.vmdk 
     CloudBioLinux-32bit-disk1.img
 
+folllowing the gparted operation we will have two partitions in our raw .img - one containing the Cloud BioLinux root filesystem partition which was reduced in size, and one being simply un-allocated space. We want to extract the former partition, which will be the one we eventually deploy to Eucalyptus using the commands:
+
+
+    sfdisk -l -uS CloudBioLinux-32bit.img 
+    Device Boot    Start       End   #sectors  Id  System
+    CloudBioLinux-32bit.img1   *      2048  34111487   34109440  83  Linux
+    ....
+
+dd if=CloudBioLinux-32bit.img of=CloudBioLinux-32bit.Eucalyptus.img skip=2048 count=34109440
+
 finally deploy to Eucalyptus via
 
     uec-publish-img CloudBioLinux-32bit-disk1.img
