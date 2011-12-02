@@ -391,6 +391,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
           ("alignseq.loc", indexes.get("ucsc", None), "seq", False, 'alignseq'),
           ("twobit.loc", indexes.get("ucsc", None), "", False, 'twobit'),
           ("bowtie_indices.loc", indexes.get("bowtie", None), "", True, 'bowtie'),
+          ("mosaik_index.loc", indexes.get("mosaik", None), "", True, "mosaik"),
           ("bwa_index.loc", indexes.get("bwa", None), "", True, 'bwa')]:
         if cur_index:
             str_parts = _build_galaxy_loc_line(gid, os.path.join(work_dir, cur_index),
@@ -486,10 +487,11 @@ def _update_loc_file(ref_file, line_parts):
 
 # ## Indexing for specific aligners
 
-def _index_w_command(dir_name, command, ref_file, pre=None, post=None):
+def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None):
     """Low level function to do the indexing and paths with an index command.
     """
     index_name = os.path.splitext(os.path.basename(ref_file))[0]
+    if ext is not None: index_name += ext
     full_ref_path = os.path.join(os.pardir, ref_file)
     if not exists(dir_name):
         run("mkdir %s" % dir_name)
@@ -512,7 +514,7 @@ def _index_picard(ref_file):
     if picard_jar and os.path.exists(picard_jar) and not os.path.exists(index_name):
         cl = ["java", "-jar", picard_jar]
         opts = ["%s=%s" % (x, y) for x, y in [("REFERENCE", ref_file),
-                                             ("OUTPUT", index_name)]]
+                                              ("OUTPUT", index_name)]]
         run(" ".join(cl + opts))
     return index_name
 
@@ -584,18 +586,16 @@ def _index_sam(ref_file):
 def _index_mosaik(ref_file):
     hash_size = 15
     dir_name = "mosaik"
-    cmd = "MosaikJump -hs {0} ".format(hash_size)
-    cmd += "-ia {ref_file} -out {index_name}"
-    def convert_to_mosaik(ref_file):
-        out_file = "{0}.dat".format(os.path.splitext(os.path.basename(ref_file))[0])
-        if not exists(out_file):
-            cmd = "MosaikBuild -fr {0} -oa {1}".format(ref_file, out_file)
+    cmd = "MosaikBuild -fr {ref_file} -oa {index_name}"
+    def create_jumpdb(ref_file):
+        jmp_base = os.path.splitext(os.path.basename(ref_file))[0]
+        dat_file = "{0}.dat".format(jmp_base)
+        if not exists("{0}_keys.jmp".format(jmp_base)):
+            cmd = "MosaikJump -hs {hash_size} -ia {ref_file} -out {index_name} -mem 4 -kd".format(
+                hash_size=hash_size, ref_file=dat_file, index_name=jmp_base)
             run(cmd)
-        return out_file
-    def rm_local(local_file):
-        run("rm -f {0}".format(local_file))
-    return _index_w_command(dir_name, cmd, ref_file, pre=convert_to_mosaik,
-                            post=rm_local)
+    return _index_w_command(dir_name, cmd, ref_file,
+                            post=create_jumpdb, ext=".dat")
 
 @_if_installed("MakeLookupTable")
 def _index_arachne(ref_file):
