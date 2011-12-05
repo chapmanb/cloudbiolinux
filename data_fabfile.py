@@ -193,10 +193,11 @@ class BroadGenome(_DownloadHelper):
 
     Uses the UCSC-name compatible versions of the GATK bundles.
     """
-    def __init__(self, name, bundle_version, target_fasta):
+    def __init__(self, name, bundle_version, target_fasta, dl_name=None):
         _DownloadHelper.__init__(self)
         self.data_source = "UCSC"
         self._name = name
+        self.dl_name = dl_name if dl_name is not None else name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
                         "{ver}/{org}/".format(ver=bundle_version, org=name)
@@ -221,8 +222,8 @@ GENOMES_SUPPORTED = [
                                             "Homo_sapiens_assembly18.fasta")),
            ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
                                             "ucsc.hg19.fasta")),
-           ("Hsapiens", "GRCh37", BroadGenome("b37", BROAD_BUNDLE_VERSION,
-                                              "human_g1k_v37.fasta")),
+           ("Hsapiens", "GRCh37", BroadGenome("GRCh37", BROAD_BUNDLE_VERSION,
+                                              "human_g1k_v37.fasta", "b37")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
@@ -591,7 +592,7 @@ def _index_mosaik(ref_file):
         jmp_base = os.path.splitext(os.path.basename(ref_file))[0]
         dat_file = "{0}.dat".format(jmp_base)
         if not exists("{0}_keys.jmp".format(jmp_base)):
-            cmd = "MosaikJump -hs {hash_size} -ia {ref_file} -out {index_name} -mem 4 -kd".format(
+            cmd = "export MOSAIK_TMP=`pwd` && MosaikJump -hs {hash_size} -ia {ref_file} -out {index_name}".format(
                 hash_size=hash_size, ref_file=dat_file, index_name=jmp_base)
             run(cmd)
     return _index_w_command(dir_name, cmd, ref_file,

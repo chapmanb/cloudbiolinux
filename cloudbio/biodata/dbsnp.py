@@ -31,7 +31,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
             run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
             for dl_name, dl_ext in to_download:
-                _download_broad_bundle(manager._name, bundle_version, dl_name, dl_ext)
+                _download_broad_bundle(manager.dl_name, bundle_version, dl_name, dl_ext)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}{ext}.vcf".format(gid=gid, name=name, ext=ext)
