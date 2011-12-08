@@ -45,7 +45,7 @@ def install_bowtie(env):
 def install_bowtie2(env):
     """Install the bowtie2 short read aligner, with gap support.
     """
-    version = "2.0.0-beta3"
+    version = "2.0.0-beta4"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
