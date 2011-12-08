@@ -100,8 +100,8 @@ def _wget_with_cookies(ref_url, dl_url):
 
 @_if_not_installed("novoalign")
 def install_novoalign(env):
-    base_version = "V2.07.14"
-    cs_version = "V1.01.14"
+    base_version = "V2.07.17"
+    cs_version = "V1.01.17"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
