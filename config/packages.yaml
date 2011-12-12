@@ -68,6 +68,9 @@ desktop:
   - bio-linux-tutorials
   - xvfb
   - gdm
+  # NX compatible window managers on 11.10; will need to remove to 10.04 support
+  - gnome-session-fallback
+  - unity-2d
 desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde

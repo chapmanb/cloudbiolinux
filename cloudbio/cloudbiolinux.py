@@ -18,6 +18,7 @@ def _freenx_scripts(env):
     if not exists(remote_login):
         put(os.path.join(install_file_dir, 'bash_login'), remote_login,
                 mode=0777)
+    _configure_gnome(env)
 
 def _cleanup_space(env):
     """Cleanup to recover space from builds and packages.
@@ -25,3 +26,12 @@ def _cleanup_space(env):
     env.logger.info("Cleaning up space from package builds")
     env.safe_sudo("rm -rf .cpanm")
     env.safe_sudo("rm -f /var/crash/*")
+
+def _configure_gnome(env):
+    """Configure NX server to use classic GNOME.
+
+    http://askubuntu.com/questions/50503/why-do-i-get-unity-instead-of-classic-when-using-nx
+    """
+    add = 'COMMAND_START_GNOME="/usr/bin/nx-session-launcher-suid gnome-session --session=gnome-classic"'
+    fname = "/etc/nxserver/node.conf"
+    append(fname, add, use_sudo=True)
