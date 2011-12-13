@@ -443,7 +443,8 @@ def _get_tool_conf(tool_name):
     """
     tool_conf = {}
     conf_file = 'tool_data_table_conf.xml'
-    tdtc = ElementTree.parse(os.path.join("installed_files", conf_file))
+    tdtc = ElementTree.parse(os.path.join(os.path.dirname(__file__),
+                                          "installed_files", conf_file))
     tables = tdtc.getiterator('table')
     for t in tables:
         if tool_name in t.attrib.get('name', ''):
@@ -477,7 +478,8 @@ def _update_loc_file(ref_file, line_parts):
         if not exists(tools_dir):
             conf_file = "tool_data_table_conf.xml"
             run("mkdir -p %s" % tools_dir)
-            put(os.path.join("installed_files", conf_file),
+            put(os.path.join(os.path.dirname(__file__),
+                             "installed_files", conf_file),
                 os.path.join(env.galaxy_base, conf_file))
         add_str = "\t".join(line_parts)
         with cd(tools_dir):
