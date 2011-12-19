@@ -1,10 +1,21 @@
 Integration test for CloudBioLinux.
 
-Try:
+When you have a base install running, you only need to supply the
+(local) IP addrees of the VM, and the password-less key for the 
+install user (who has sudo bash). The tests get invoked wiht
 
-./test_vagrant --help
+  ./test_biolinux [-i key.pub] [-u user] IPaddr [Flavor]
 
-== Testing issues ==
+For further options see
+
+  ./test_biolinux --help
+
+Alternatively try the self running test using Virtualbox and Vagrant
+with:
+
+  ./test_vagrant --help
+
+== Testing issues with Vagrant ==
 
 The test system depends on a stack of tools, including virtualbox,
 vagrant, ssh, ruby and related libraries. Things can go wrong. Here we

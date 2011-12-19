@@ -42,6 +42,7 @@ password (preferably using a key with empty password). From that point on you
 can install CloudBioLinux using the fabric file.
 
 This is also the image the test system fingerprints for further test installs. You can 
-use the ./test/test_vm.rb script to test drive the VM.
+try the ./test/test_biolinux script to test drive the VM. test_biolinux will install a 
+CloudBioLinux flavor, and check whether the installation is complete.
 
 
