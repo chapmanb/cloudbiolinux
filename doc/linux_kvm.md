@@ -37,12 +37,16 @@ the smaller net install of Debian Linux:
       qemu-system-x86_64 -cdrom debian-6.0.3-amd64-netinst.iso -hda hda.img
 
 hit ESC and type 'install fb=false'. This will fire up the installer. With the
-base install, boot the new system and set up ssh so it can be used without a
-password (preferably using a key with empty password). From that point on you
-can install CloudBioLinux using the fabric file.
+base install, boot the new system and set up ssh so it can be used on a user
+without a password (preferably using a key with empty password). Also give that
+use 'sudo bash'. This configuration is described in ./doc/private_cloud.md.
 
-This is also the image the test system fingerprints for further test installs. You can 
-try the ./test/test_biolinux script to test drive the VM. test_biolinux will install a 
-CloudBioLinux flavor, and check whether the installation is complete.
+From that point onwards you can install CloudBioLinux using the fabric file.
+
+This is also the image the test system fingerprints for further test installs.
+
+You can try the ./test/test_biolinux script to test drive the VM. test_biolinux
+will install a CloudBioLinux flavor, and check whether the installation is
+complete.
 
 
