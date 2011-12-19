@@ -37,9 +37,21 @@ the smaller net install of Debian Linux:
       qemu-system-x86_64 -cdrom debian-6.0.3-amd64-netinst.iso -hda hda.img
 
 hit ESC and type 'install fb=false'. This will fire up the installer. With the
-base install, boot the new system and set up ssh so it can be used on a user
-without a password (preferably using a key with empty password). Also give that
-use 'sudo bash'. This configuration is described in ./doc/private_cloud.md.
+base install, boot the new system 
+
+      qemu-system-x86_64 -enable-kvm -redir tcp:22000::22 -hda hda.img
+
+and set up ssh on the VM
+
+      apt-get install openssh-server
+
+so this works
+
+      ssh -p 22000 biolinux@localhost
+
+so it can be used on a user without a password (preferably using a key with
+empty password). Also give that use 'sudo bash'. This ssh and sudo
+configuration is described in ./doc/private_cloud.md.
 
 From that point onwards you can install CloudBioLinux using the fabric file.
 
@@ -50,3 +62,9 @@ will install a CloudBioLinux flavor, and check whether the installation is
 complete.
 
 
+# KVM tips
+
+KVM is powerful. Performance-wise it pays to install on a raw (LVM) partition,
+get bridging sorted, and make sure hardware acceleration is in place.
+Interesting goodies are the monitor (Crtl-Alt-2), virtsh, etc. See also
+[http://www.linux-kvm.org/page/FAQ][kvm tips].
