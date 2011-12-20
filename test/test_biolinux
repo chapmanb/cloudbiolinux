@@ -51,7 +51,7 @@ BioNode:
   :packagelist: contrib/bionode/main.yaml
 EOCONFIG
 
-$config = YAML::load(CONFIG)
+config = YAML::load(CONFIG)
 
 print "Integration test for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2012)\n"
 print "BioLinux test frame work running on Ruby "+RUBY_VERSION+"\n"
@@ -64,15 +64,15 @@ $: << path+'/testlib'
 require 'test_support'
 require 'test_biolinux'
 
-def list_boxes
+def list_boxes config
   print "BioLinux Flavors available for testing:\n\n"
-  $config.each do | flavor, properties |
+  config.each do | flavor, properties |
     print "* ", flavor,"\n"
   end
 end
 
 if ARGV.index('--list')
-  list_boxes
+  list_boxes config
   exit 0
 end
 
@@ -136,6 +136,14 @@ $flavor = 'Minimal' if not $flavor
 $port = 22 if not $port
 
 print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
+
+# Fire up the CloudBioLinux fab file - this installs the software
+# on the VM
+srcpath = File.dirname(File.dirname(__FILE__))
+fabricrc = config[$flavor][:fabricrc]
+packagelist = config[$flavor][:packagelist]
+
+run "fab -f #{srcpath}/fabfile.py -H #{$hostname} -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
 
 Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
   @ssh = ssh
