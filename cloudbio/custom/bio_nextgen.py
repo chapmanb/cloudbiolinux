@@ -256,7 +256,7 @@ def install_gatk_queue(env):
     _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
-    version = "2_0_3"
+    version = "2_0_2"
     genomes = ["GRCh37.63", "NCBIM37.63", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
