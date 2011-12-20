@@ -134,7 +134,7 @@ and CentOS.
 
 1. On your local machine, install [Fabric][3]:
 
-        sudo apt-get install python-setuptools
+        sudo apt-get install python-setuptools python-dev
         sudo easy_install fabric pyyaml
 
 2. Retrieve the cloudbiolinux code base:
