@@ -59,8 +59,12 @@ This is also the image the test system fingerprints for further test installs.
 
 You can try the ./test/test_biolinux script to test drive the VM. test_biolinux
 will install a CloudBioLinux flavor, and check whether the installation is
-complete.
+complete. Essentially with a running instance
 
+      ./test/test_biolinux -p 2222 -u biolinux 127.0.0.1
+
+(note the use of 127.0.0.1 over localhost - this is because of a bug
+in fabric).
 
 # KVM tips
 
