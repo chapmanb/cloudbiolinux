@@ -54,6 +54,23 @@ version for users familiar with Amazon is:
   your running instance from the Instances section.
 * Connect to your machine via ssh or VNC (using the Amazon PEM keys)
 
+To use bioligical data provided on Amazon, you need to use
+CloudBioLinux tools and fabric:
+
+# Using CloudBioLinux tools and fabric
+
+## Installation
+
+1. On your (local) machine, install [Fabric][3]:
+
+        sudo apt-get install python-setuptools python-dev
+        sudo easy_install fabric pyyaml
+
+2. Retrieve the cloudbiolinux code base:
+
+        git clone git://github.com/chapmanb/cloudbiolinux.git
+        cd cloudbiolinux
+
 ## Biological data
 
 We manage a repository of useful public biological data on an
@@ -129,34 +146,27 @@ the target VM is Linux, with an ssh command line.
 
 A bare Linux image launched in Amazon EC2 is configured from another
 machine, i.e.  your local desktop, using ssh and cloudbiolinux.
+See the Installation section for installing CloudBioLinux with fabric.
+
 Any cloudbiolinux distribution can be used, including Ubuntu, Debian Linux
 and CentOS.
 
-1. On your local machine, install [Fabric][3]:
+1. Go to the cloudbiolinux source and edit the `config/fabricrc.txt`,
+   to match the system you plan to install on. Specifically,
+   `distribution` and `dist_name` parameters specify details about the
+   type of target.
 
-        sudo apt-get install python-setuptools python-dev
-        sudo easy_install fabric pyyaml
-
-2. Retrieve the cloudbiolinux code base:
-
-        git clone git://github.com/chapmanb/cloudbiolinux.git
-        cd cloudbiolinux
-
-3. Edit the `config/fabricrc.txt`, to match the system you plan to
-   install on. Specifically, `distribution` and `dist_name` parameters
-   specify details about the type of target.
-
-4. Start an Amazon EC2 base instance and retrieve it's DNS hostname:
+2. Start an Amazon EC2 base instance and retrieve it's DNS hostname:
 
    - [Alestic Ubuntu images][4]
    - [Camptocamp Debian images][4b]
 
-5. From your local machine, have CloudBioLinux install your
+3. From your local machine, have CloudBioLinux install your
    Amazon instance:
 
         fab -f fabfile.py -H hostname -u username -i private_key_file install_biolinux
 
-6. When finished, use the [Amazon console][2] to create an AMI.
+4. When finished, use the [Amazon console][2] to create an AMI.
    Thereafter make it public so it can be used by others.
 
 ## Virtualbox
