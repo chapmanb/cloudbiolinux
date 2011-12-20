@@ -39,7 +39,7 @@ the smaller net install of Debian Linux:
 hit ESC and type 'install fb=false'. This will fire up the installer. With the
 base install, boot the new system 
 
-      qemu-system-x86_64 -enable-kvm -redir tcp:22000::22 -hda hda.img
+      qemu-system-x86_64 -enable-kvm -redir tcp:2222::22 -hda hda.img
 
 and set up ssh on the VM
 
@@ -47,7 +47,7 @@ and set up ssh on the VM
 
 so this works
 
-      ssh -p 22000 biolinux@localhost
+      ssh -p 2222 biolinux@localhost
 
 so it can be used on a user without a password (preferably using a key with
 empty password). Also give that use 'sudo bash'. This ssh and sudo

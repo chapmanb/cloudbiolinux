@@ -93,6 +93,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
       --continue    Continue install on an already running VM (no VM setup)
       -i            ssh key (passwordless)
       -p            ssh port (default 22)
+      --password    use password
       -u            ssh user login (user should have sudo bash)
       --list        List Flavors available for testing
       --help        Print this info
@@ -132,6 +133,7 @@ $hostname = ARGV.shift
 $flavor = ARGV.shift
 # default values
 $hostname = 'localhost' if not $hostname
+$user = 'biolinux' if not $user
 $flavor = 'Minimal' if not $flavor
 $port = 22 if not $port
 
@@ -139,11 +141,19 @@ print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
 
 # Fire up the CloudBioLinux fab file - this installs the software
 # on the VM
-srcpath = File.dirname(File.dirname(__FILE__))
-fabricrc = config[$flavor][:fabricrc]
-packagelist = config[$flavor][:packagelist]
+srcpath = File.join(File.dirname(__FILE__),"..")
+fabricrc = srcpath + '/' + config[$flavor][:fabricrc]
+packagelist = srcpath + '/' + config[$flavor][:packagelist]
 
-run "fab -f #{srcpath}/fabfile.py -H #{$hostname} -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
+fab_opts = ""
+fab_opts += " -p #{$pwd}" if $pwd
+fab_opts += " -u #{$user}" if $user
+fab_opts += " -i #{$sshkey}" if $sshkey
+fab_opts += " -H #{$hostname}"
+fab_opts += ":#{$port}" if $port
+
+
+run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
 
 Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
   @ssh = ssh
