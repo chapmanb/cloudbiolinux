@@ -1,4 +1,4 @@
-# CloudBioLinux and Vagrant
+# CloudBioLinux, VirtualBox and Vagrant
 
 This document gives some additional information on using Vagrant with BioLinux.
 [Vagrant][v1] is a convenient command line manager for VirtualBox. In conjunction
@@ -176,32 +176,48 @@ been loaded! Fix
 in the graphical login after reboot get in with user:ubuntu / pass:ubuntu
 go to System--->Administration--->Login Window to enable autologin
 
-## making a virtualbox appliance
+## VirtualBox Appliance
 
-open the Virtualbox GUI, you should see the VM added by vagrant - you can 
+Virtual Appliances are pre-assemblied VM images configured for various purposes.
+
+Open the Virtualbox GUI, you should see the VM added by vagrant - you can 
 rename it to "Cloud BioLinux 32"
-do File->Export Appliance
-distribute the .ova you get from this operation
-anyone in any OS can import the .ova with File->Import Appliance on their 
-Virtualbox
 
-## making a Eucalyptus image
+  File->Export Appliance
 
-we start with the Cloud BioLinux Virtualbox .vmdk (we can find its location 
-in the VM properties from the Virtualbox GUI). We might want to resize the 
-vmdk, since if we have set the disk of our Virtualbox VM to be 40G, we will 
-end up with a Eucalyptus image of that size. The best solution I found is 
-here (sort of a hack) :
+and distribute the .ova.
 
-http://mtnbike.org/blog/?p=29 and the same here:
+Anyone in any OS running Virtualbox can import the .ova with File->Import
+Appliance.
+
+# Making a Eucalyptus image from VirtualBox
+
+Start with the Cloud BioLinux Virtualbox .vmdk (its location is in the VM
+properties from the Virtualbox GUI). Resize the vmdk, since the size may be
+40G, and the Eucalyptus image will have that size. 
+
+Accordint to http://mtnbike.org/blog/?p=29 and the same here:
 http://www.my-guides.net/en/content/view/122/26/
 
-convert to raw .img by doing
+convert to raw .img 
 
     qemu-img convert -O raw CloudBioLinux-32bit-disk1.vmdk 
     CloudBioLinux-32bit-disk1.img
 
-finally deploy to Eucalyptus via
+deploy to Eucalyptus via
 
     uec-publish-img CloudBioLinux-32bit-disk1.img
+
+# VirtualBox, KVM or XEN?
+
+There are more ways than one to virtualize machines on Linux.
+
+Despite the attractions of vagrant and Virtualbox, as displayed here, we note
+that Linux KVM may be a better choice for virtualization and testing of
+CloudBioLinux, as Linux distributions support KVM out of the box, and KVM has
+more Unix-like control.  See also the information for using KVM in
+./doc/linux_kvm.md. 
+
+For production environments check out XEN virtualization (XEN runs Amazon EC2).
+
 

@@ -13,7 +13,7 @@ end
 def test_for_match(ssh, cmd, regex)
   res = ssh.exec!(cmd)
   if res !~ /#{regex}/
-    error(regex+" ("+cmd+") does not match "+res)
+    error(regex+" ("+cmd+") does not match")
   end
 end
 
