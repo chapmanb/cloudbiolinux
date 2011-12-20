@@ -84,13 +84,12 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
   Usage:
 
-    test_biolinux [--continue] [-i key] [-u user] hostname [flavor]
+    test_biolinux [-i key] [-u user] hostname [flavor]
 
   Where hostname can be a (local) IP address.
 
   Options:
 
-      --continue    Continue install on an already running VM (no VM setup)
       -i            ssh key (passwordless)
       -p            ssh port (default 22)
       --password    use password
@@ -109,9 +108,9 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
        $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 
-     after a fix, continue where we left off
+     after a fix, we can continue where we left off
 
-       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal --continue
+       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 
   Available flavors are:
 
@@ -132,7 +131,7 @@ end
 $hostname = ARGV.shift
 $flavor = ARGV.shift
 # default values
-$hostname = 'localhost' if not $hostname
+$hostname = '127.0.0.1' if not $hostname
 $user = 'biolinux' if not $user
 $flavor = 'Minimal' if not $flavor
 $port = 22 if not $port
@@ -152,13 +151,13 @@ fab_opts += " -i #{$sshkey}" if $sshkey
 fab_opts += " -H #{$hostname}"
 fab_opts += ":#{$port}" if $port
 
-
 run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
 
-Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
+# Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
+Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   @ssh = ssh
   @prompt = $hostname
-  @prompt = "=" if $hostname == 'localhost'
+  @prompt = "img" if $hostname == '127.0.0.1'
   def exec cmd
     print "#{@prompt}> ",cmd,"\n"
     @ssh.exec!(cmd)
@@ -174,12 +173,12 @@ Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port =>
   print lastline
   log = ssh.exec!("cat /var/log/biolinux.log")
   File.open("biolinux.log","w").write(log)
-  if lastline =~ /#{$hostname}/
+  if lastline =~ /#{$flavor}/
     print <<COMPLETE
 
   SUCCESS!
 
-  According to the tests, the CloudBioLinux installation test of '#{box_name}'
+  According to the tests, the CloudBioLinux integration test for #{$flavor}
   completed successfully!  You can check the running VM by logging in with:
 
   Enjoy!
