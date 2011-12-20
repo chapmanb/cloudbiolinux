@@ -178,12 +178,17 @@ go to System--->Administration--->Login Window to enable autologin
 
 ## VirtualBox Appliance
 
-open the Virtualbox GUI, you should see the VM added by vagrant - you can 
+Virtual Appliances are pre-assemblied VM images configured for various purposes.
+
+Open the Virtualbox GUI, you should see the VM added by vagrant - you can 
 rename it to "Cloud BioLinux 32"
-do File->Export Appliance
-distribute the .ova you get from this operation
-anyone in any OS can import the .ova with File->Import Appliance on their 
-Virtualbox
+
+  File->Export Appliance
+
+and distribute the .ova.
+
+Anyone in any OS running Virtualbox can import the .ova with File->Import
+Appliance.
 
 # Making a Eucalyptus image from VirtualBox
 
