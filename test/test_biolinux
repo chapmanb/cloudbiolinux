@@ -2,64 +2,72 @@
 #
 # Integration testing of BioLinux targets
 #
-#   Installs a Biolinux flavor on a bare VM. The script wraps up with some tests.
+#   Tests a Biolinux flavor on a running VM. First fabric is invoked
+#   with the flavor. Integration tests for the flavor follow.
+#
+# The integration test aims to catch inconsistencies in the installation,
+# and can be run to test changes in the source tree.
+#
+# Requirements:
+#
+#   gem install net-ssh
 #
 # For more information see:
 #
 #   ./test/test_biolinux --help
 #   ./test/test_biolinux --list
 #
-# See also the document in ./doc/linux_kvm.md
+# See also the hacking documents in ./doc/
 
 require 'rubygems'
+require 'yaml'
+require 'optparse'
+
+begin
+  require 'net/ssh'
+  # require 'net/scp'
+rescue LoadError
+  $stderr.print "Please install net-ssh with 'gem install net-ssh'"
+  exit 1
+end
 
 # Available CloudBioLinux testing Flavors - this could be read from a YAML file.
-FLAVOR = {
-        'Minimal' =>
-           { 
-             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
-             :packagelist => 'contrib/minimal/main.yaml'
-           },
-        'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
-           { 
-             :fabricrc    => 'contrib/flavor/boinc/fabricrc_debian.txt',
-             :packagelist => 'contrib/flavor/boinc/main.yaml'
-           },
-        'Phylogeny' =>  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
-           { 
-             :fabricrc    => 'contrib/flavor/phylogeny/fabricrc_debian.txt',
-             :packagelist => 'contrib/flavor/phylogeny/main.yaml',
-             :call_test   => 'test_phylogeny_flavor'
-           },
-        'BioNode' =>
-           { 
-             :fabricrc    => 'contrib/bionode/fabricrc_bionode.txt',
-             :packagelist => 'contrib/bionode/main.yaml'
-           },
-}
+CONFIG = <<EOCONFIG
+---
+Minimal:
+  :fabricrc: contrib/minimal/fabricrc_debian.txt
+  :packagelist: contrib/minimal/main.yaml
+Boinc:     
+  # Boinc is a Minimal flavor for running Boinc clients
+  :fabricrc:    contrib/flavor/boinc/fabricrc_debian.txt
+  :packagelist: contrib/flavor/boinc/main.yaml
+Phylogeny:  
+  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
+  :fabricrc:    contrib/flavor/phylogeny/fabricrc_debian.txt
+  :packagelist: contrib/flavor/phylogeny/main.yaml
+  :call_test:   test_phylogeny_flavor
+BioNode: 
+  :fabricrc:    contrib/bionode/fabricrc_bionode.txt
+  :packagelist: contrib/bionode/main.yaml
+EOCONFIG
+
+$config = YAML::load(CONFIG)
 
 print "Integration test for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2012)\n"
 print "BioLinux test frame work running on Ruby "+RUBY_VERSION+"\n"
 
-# find location of test files
+# find location of tests
 path = File.dirname(__FILE__)
 $: << path+'/testlib'
+
+# load libraries
+require 'test_support'
 require 'test_biolinux'
-
-def run cmd
-  print "--> ",cmd
-  system(cmd)  # don't use backticks for fab!
-end
-
-def error msg
-  $stderr.print "FATAL ERROR: ",msg
-  exit 1
-end
 
 def list_boxes
   print "BioLinux Flavors available for testing:\n\n"
-  FLAVOR.each do | edition, properties |
-    print "* ", edition, " (",properties[:url],")\n"
+  $config.each do | flavor, properties |
+    print "* ", flavor,"\n"
   end
 end
 
@@ -68,7 +76,7 @@ if ARGV.index('--list')
   exit 0
 end
 
-if ARGV.index('-h') or ARGV.index('--help')
+if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
     Note this testing framework is under development, and is meant to
@@ -76,15 +84,19 @@ if ARGV.index('-h') or ARGV.index('--help')
 
   Usage:
 
-    test_biolinux [--continue] [-i key] [-u user] [name]
+    test_biolinux [--continue] [-i key] [-u user] hostname [flavor]
+
+  Where hostname can be a (local) IP address.
 
   Options:
 
-      -i            ssh key
       --continue    Continue install on an already running VM (no VM setup)
+      -i            ssh key (passwordless)
+      -p            ssh port (default 22)
+      -u            ssh user login (user should have sudo bash)
       --list        List Flavors available for testing
       --help        Print this info
-      name          The target test Flavor name (default is 'Minimal')
+      flavor        The test Flavor name (default is 'Minimal')
 
   Example:
 
@@ -94,11 +106,11 @@ if ARGV.index('-h') or ARGV.index('--help')
 
      test Minimal edition - this will pull the remote box to local disk once
 
-       $cloudbiolinux/test/test_biolinux IP Minimal
+       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 
      after a fix, continue where we left off
 
-       $cloudbiolinux/test/test_biolinux Minimal --continue
+       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal --continue
 
   Available flavors are:
 
@@ -107,36 +119,54 @@ USAGE
   exit 0
 end
 
-$stderr.print "ERROR: Sorry, this test script is not yet functional\n"
-exit 1
+OptionParser.new do |o|
+  o.on('-i sshkey') { |sshkey| $sshkey = sshkey }
+  o.on('-p port') { |port| $port = port }
+  o.on('-u user') { |user| $user = user }
+  o.on('--password pwd') { |pwd| $pwd = pwd }
+  o.on('--continue') { |continue| $continue = continue }
+  o.parse!
+end
 
-begin
-  vagrant.primary_vm.ssh.execute do |ssh|
-    # copy package list
-    File.open("dpkg.lst","w").write(ssh.exec!("dpkg -l"))
-    # Do we have ruby and tools?
-    test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
-    test_for_match(ssh,"/usr/bin/rdoc -v", "RDoc")
-    test_in_path(ssh,"gem")
-    # Make sure Ruby 1.9.1 is in Minimal
-    # test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
-    # Run flavor/edition specific tests
-    eval(call_test+'(vagrant)') if call_test
-    if test_for_completed_install(ssh,vagrant_hostname,box_name)
-      print <<COMPLETE
+$hostname = ARGV.shift
+$flavor = ARGV.shift
+# default values
+$hostname = 'localhost' if not $hostname
+$flavor = 'Minimal' if not $flavor
+$port = 22 if not $port
+
+print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
+
+Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
+  @ssh = ssh
+  @prompt = $hostname
+  @prompt = "=" if $hostname == 'localhost'
+  def exec cmd
+    print "#{@prompt}> ",cmd,"\n"
+    @ssh.exec!(cmd)
+  end
+  print "logged in!\n"
+  dpkg = exec("dpkg -l")
+  File.open("dpkg.lst","w").write(dpkg)
+  test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
+  # test_in_path(ssh,"gem")
+
+  # test for completed install
+  lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
+  print lastline
+  log = ssh.exec!("cat /var/log/biolinux.log")
+  File.open("biolinux.log","w").write(log)
+  if lastline =~ /#{$hostname}/
+    print <<COMPLETE
 
   SUCCESS!
 
-  The BioLinux installation test of '#{box_name}' completed successfully!
-  You can check the running VM by logging in with:
-
-    cd ./#{testname}
-    vagrant ssh
+  According to the tests, the CloudBioLinux installation test of '#{box_name}'
+  completed successfully!  You can check the running VM by logging in with:
 
   Enjoy!
 COMPLETE
     exit 0
-    end
   end
   print <<INCOMPLETE
 

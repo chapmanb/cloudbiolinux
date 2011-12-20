@@ -3,9 +3,13 @@
 # Integration testing of BioLinux targets
 #
 #   test_vagrant makes use of virtualbox + vagrant, installing a Biolinux
-#   flavor on a bare VM. The script wraps up with some tests.
+#   flavor on a bare VM, starting from an image download. The script wraps up
+#   with some tests.
 #
-# For more information see:
+# You may want to use the ./test/test_biolinux instead - which will test
+# an installed VM (flavor).
+#
+# For more information on test_vagrant see:
 #
 #   ./test/test_vagrant --help
 #   ./test/test_vagrant --list
