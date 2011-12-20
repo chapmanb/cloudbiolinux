@@ -1,10 +1,20 @@
-#! /usr/bin/ruby
+#! /usr/bin/env ruby
 #
-# Integration testing of BioLinux targets - see
+# Integration testing of BioLinux targets
+#
+#   test_vagrant makes use of virtualbox + vagrant, installing a Biolinux
+#   flavor on a bare VM, starting from an image download. The script wraps up
+#   with some tests.
+#
+# You may want to use the ./test/test_biolinux instead - which will test
+# an installed VM (flavor).
+#
+# For more information on test_vagrant see:
 #
 #   ./test/test_vagrant --help
 #   ./test/test_vagrant --list
 #
+# See also the document in ./doc/virtualbox.md
 
 require 'rubygems'
 
@@ -72,7 +82,7 @@ if ARGV.index('-h') or ARGV.index('--help')
 
     Note this testing framework is under development, and is meant to
     work on Debian-type systems. It requires vagrant, virtualbox, wget,
-    md5sum.
+    md5sum. 
 
   Usage:
 

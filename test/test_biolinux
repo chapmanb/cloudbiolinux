@@ -1,0 +1,198 @@
+#! /usr/bin/env ruby
+#
+# Integration testing of BioLinux targets
+#
+#   Tests a Biolinux flavor on a running VM. First fabric is invoked
+#   with the flavor. Integration tests for the flavor follow.
+#
+# The integration test aims to catch inconsistencies in the installation,
+# and can be run to test changes in the source tree.
+#
+# Requirements:
+#
+#   gem install net-ssh
+#
+# For more information see:
+#
+#   ./test/test_biolinux --help
+#   ./test/test_biolinux --list
+#
+# See also the hacking documents in ./doc/
+
+require 'rubygems'
+require 'yaml'
+require 'optparse'
+
+begin
+  require 'net/ssh'
+  # require 'net/scp'
+rescue LoadError
+  $stderr.print "Please install net-ssh with 'gem install net-ssh'"
+  exit 1
+end
+
+# Available CloudBioLinux testing Flavors - this could be read from a YAML file.
+CONFIG = <<EOCONFIG
+---
+Minimal:
+  :fabricrc: contrib/minimal/fabricrc_debian.txt
+  :packagelist: contrib/minimal/main.yaml
+Boinc:     
+  # Boinc is a Minimal flavor for running Boinc clients
+  :fabricrc:    contrib/flavor/boinc/fabricrc_debian.txt
+  :packagelist: contrib/flavor/boinc/main.yaml
+Phylogeny:  
+  # Phylogeny is a Minimal flavor for running Phylogenetic software in the Cloud
+  :fabricrc:    contrib/flavor/phylogeny/fabricrc_debian.txt
+  :packagelist: contrib/flavor/phylogeny/main.yaml
+  :call_test:   test_phylogeny_flavor
+BioNode: 
+  :fabricrc:    contrib/bionode/fabricrc_bionode.txt
+  :packagelist: contrib/bionode/main.yaml
+EOCONFIG
+
+config = YAML::load(CONFIG)
+
+print "Integration test for CloudBioLinux (by Pjotr Prins and Brad Chapman, 2012)\n"
+print "BioLinux test frame work running on Ruby "+RUBY_VERSION+"\n"
+
+# find location of tests
+path = File.dirname(__FILE__)
+$: << path+'/testlib'
+
+# load libraries
+require 'test_support'
+require 'test_biolinux'
+
+def list_boxes config
+  print "BioLinux Flavors available for testing:\n\n"
+  config.each do | flavor, properties |
+    print "* ", flavor,"\n"
+  end
+end
+
+if ARGV.index('--list')
+  list_boxes config
+  exit 0
+end
+
+if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
+  print <<USAGE
+
+    Note this testing framework is under development, and is meant to
+    work on Debian-type systems.
+
+  Usage:
+
+    test_biolinux [-i key] [-u user] hostname [flavor]
+
+  Where hostname can be a (local) IP address.
+
+  Options:
+
+      -i            ssh key (passwordless)
+      -p            ssh port (default 22)
+      --password    use password
+      -u            ssh user login (user should have sudo bash)
+      --list        List Flavors available for testing
+      --help        Print this info
+      flavor        The test Flavor name (default is 'Minimal')
+
+  Example:
+
+     cd to VM directory
+
+       cd ~/my_test_vms/
+
+     test Minimal edition - this will pull the remote box to local disk once
+
+       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
+
+     after a fix, we can continue where we left off
+
+       $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
+
+  Available flavors are:
+
+USAGE
+  list_boxes
+  exit 0
+end
+
+OptionParser.new do |o|
+  o.on('-i sshkey') { |sshkey| $sshkey = sshkey }
+  o.on('-p port') { |port| $port = port }
+  o.on('-u user') { |user| $user = user }
+  o.on('--password pwd') { |pwd| $pwd = pwd }
+  o.on('--continue') { |continue| $continue = continue }
+  o.parse!
+end
+
+$hostname = ARGV.shift
+$flavor = ARGV.shift
+# default values
+$hostname = '127.0.0.1' if not $hostname
+$user = 'biolinux' if not $user
+$flavor = 'Minimal' if not $flavor
+$port = 22 if not $port
+
+print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
+
+# Fire up the CloudBioLinux fab file - this installs the software
+# on the VM
+srcpath = File.join(File.dirname(__FILE__),"..")
+fabricrc = srcpath + '/' + config[$flavor][:fabricrc]
+packagelist = srcpath + '/' + config[$flavor][:packagelist]
+
+fab_opts = ""
+fab_opts += " -p #{$pwd}" if $pwd
+fab_opts += " -u #{$user}" if $user
+fab_opts += " -i #{$sshkey}" if $sshkey
+fab_opts += " -H #{$hostname}"
+fab_opts += ":#{$port}" if $port
+
+run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:packagelist=#{packagelist},environment=biolinux-test"
+
+# Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
+Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
+  @ssh = ssh
+  @prompt = $hostname
+  @prompt = "img" if $hostname == '127.0.0.1'
+  def exec cmd
+    print "#{@prompt}> ",cmd,"\n"
+    @ssh.exec!(cmd)
+  end
+  print "logged in!\n"
+  dpkg = exec("dpkg -l")
+  File.open("dpkg.lst","w").write(dpkg)
+  test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
+  # test_in_path(ssh,"gem")
+
+  # test for completed install
+  lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
+  print lastline
+  log = ssh.exec!("cat /var/log/biolinux.log")
+  File.open("biolinux.log","w").write(log)
+  if lastline =~ /#{$flavor}/
+    print <<COMPLETE
+
+  SUCCESS!
+
+  According to the tests, the CloudBioLinux integration test for #{$flavor}
+  completed successfully!  You can check the running VM by logging in with:
+
+  Enjoy!
+COMPLETE
+    exit 0
+  end
+  print <<INCOMPLETE
+
+  FAILURE!
+
+  Somehow the test did not complete.
+
+INCOMPLETE
+  exit 1
+end
+
+
