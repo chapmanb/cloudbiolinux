@@ -130,9 +130,6 @@ programming:
     - libboost-dev
     - libboost-python-dev
     - libboost-thread-dev
-    - libopenmpi-dev 
-    - libopenmpi1.3
-    - openmpi-bin
     - libgd2-xpm
     - libgd2-xpm-dev
     - libgnomecanvas2-0
@@ -181,6 +178,12 @@ distributed:
   - hadoop-0.20-native
   - hadoop-0.20-pipes
   - hadoop-0.20-source
+  - libopenmpi-dev 
+  - libopenmpi1.3
+  - openmpi-bin
+  - libmpich2-3
+  - libmpich2-dev
+  - mpich2
 amazon:
   - s3cmd
   - euca2ools
