@@ -177,6 +177,16 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
+@_if_not_installed("vcftools")
+def install_vcftools(env):
+    version = "0.1.7"
+    url = "http://downloads.sourceforge.net/project/vcftools/vcftools_{v}.tar.gz".format(
+        v=version)
+    def _vcf_make(env):
+        env.safe_sudo("PREFIX={dir} make install".format(dir=env.system_install))
+        env.safe_sudo("make clean")
+    _get_install(url, env, _vcf_make)
+
 @_if_not_installed("fastqc")
 def install_fastqc(env):
     version = "0.10.0"

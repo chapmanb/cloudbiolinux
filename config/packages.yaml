@@ -331,6 +331,7 @@ bio_alignment:
   - bio-linux-wise2
 bio_nextgen:
   - maq
+  - plink
   # - samtools # very old version
 bio_sequencing:
   - bio-linux-assembly-conversion-tools
