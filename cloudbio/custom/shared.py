@@ -156,7 +156,7 @@ def _java_install(pname, version, url, env, install_fn=None):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     if install_fn is not None:
-                        install_fn(env)
+                        install_fn(env, install_dir)
                     else:
                         env.safe_sudo("mv *.jar %s" % install_dir)
 
