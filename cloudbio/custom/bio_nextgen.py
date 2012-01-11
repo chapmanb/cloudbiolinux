@@ -45,7 +45,7 @@ def install_bowtie(env):
 def install_bowtie2(env):
     """Install the bowtie2 short read aligner, with gap support.
     """
-    version = "2.0.0-beta4"
+    version = "2.0.0-beta5"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
@@ -246,28 +246,28 @@ def install_shrec(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.56"
+    version = "1.59"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.3"
+    version = "1.4-8-g63b7a70"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
-    version = "1.3"
+    version = "1.4-8-g63b7a70"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "Queue-%s%s" % (version, ext)
     _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
-    version = "2_0_2"
-    genomes = ["GRCh37.63", "NCBIM37.63", "athalianaTair10"]
+    version = "2_0_5"
+    genomes = ["GRCh37.64", "NCBIM37.64", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
