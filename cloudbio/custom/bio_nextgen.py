@@ -189,6 +189,14 @@ def install_vcftools(env):
         env.safe_sudo("make clean")
     _get_install(url, env, _vcf_make)
 
+@_if_not_installed("vtools")
+def install_varianttools(env):
+    version = "1.0.1"
+    version_ext = "a"
+    url = "http://downloads.sourceforge.net/project/varianttools/" \
+          "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
+    _get_install(url, env, _python_make)
+
 @_if_not_installed("fastqc")
 def install_fastqc(env):
     version = "0.10.0"
