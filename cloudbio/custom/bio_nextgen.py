@@ -183,7 +183,9 @@ def install_vcftools(env):
     url = "http://downloads.sourceforge.net/project/vcftools/vcftools_{v}.tar.gz".format(
         v=version)
     def _vcf_make(env):
-        env.safe_sudo("PREFIX={dir} make install".format(dir=env.system_install))
+        env.safe_sudo("make install PREFIX={dir}".format(dir=env.system_install))
+        for perl_module in ["FaSlice.pm", "Vcf.pm", "VcfStats.pm"]:
+            env.safe_sudo("cp perl/%s %s/lib/perl5" % (perl_module, env.system_install))
         env.safe_sudo("make clean")
     _get_install(url, env, _vcf_make)
 
