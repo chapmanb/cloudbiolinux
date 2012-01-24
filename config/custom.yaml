@@ -36,6 +36,8 @@ bio_nextgen:
     - transabyss
     - trinity
     - velvet
+  sv:
+    - hydra
   chip:
     - macs
   needs_64bit:

@@ -386,3 +386,13 @@ def install_macs(env):
     url = "http://macs:chipseq@liulab.dfci.harvard.edu/MACS/src/" \
           "MACS-%s.tar.gz" % version
     _get_install(url, env, _python_make)
+
+# --- Structural variation
+@_if_not_installed("hydra")
+def install_hydra(env):
+    version = "0.5.3"
+    url = "http://hydra-sv.googlecode.com/files/Hydra.v{}.tar.gz".format(version)
+    def clean_libs(env):
+        run("make clean")
+    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
+                 post_unpack_fn=clean_libs)

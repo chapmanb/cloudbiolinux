@@ -70,7 +70,8 @@ def _safe_dir_name(dir_name, need_dir=True):
             return check
     # still couldn't find it, it's a nasty one
     for check_part in (dir_name.split("-")[0].split("_")[0],
-                       dir_name.split("-")[-1].split("_")[-1]):
+                       dir_name.split("-")[-1].split("_")[-1],
+                       dir_name.split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
             dirs = run("ls -d1 *%s*/" % check_part).split("\n")
