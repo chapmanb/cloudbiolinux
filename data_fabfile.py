@@ -200,7 +200,7 @@ class BroadGenome(_DownloadHelper):
         self.dl_name = dl_name if dl_name is not None else name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
-                        "{ver}/{org}/".format(ver=bundle_version, org=name)
+                        "{ver}/{org}/".format(ver=bundle_version, org=self.dl_name)
 
     def download(self, seq_dir):
         org_file = "%s.fa" % self._name
@@ -514,7 +514,7 @@ def _index_picard(ref_file):
         picard_jar = os.path.join(env.picard_home, "CreateSequenceDictionary.jar")
     except AttributeError:
         picard_jar = None
-    if picard_jar and os.path.exists(picard_jar) and not os.path.exists(index_name):
+    if picard_jar and exists(picard_jar) and not exists(index_name):
         cl = ["java", "-jar", picard_jar]
         opts = ["%s=%s" % (x, y) for x, y in [("REFERENCE", ref_file),
                                               ("OUTPUT", index_name)]]
