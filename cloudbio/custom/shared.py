@@ -75,7 +75,7 @@ def _safe_dir_name(dir_name, need_dir=True):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
             dirs = run("ls -d1 *%s*/" % check_part).split("\n")
-            dirs = [x for x in dirs if "cannot access" not in x]
+            dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
         if len(dirs) == 1:
             return dirs[0]
     if need_dir:
