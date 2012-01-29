@@ -256,7 +256,7 @@ def install_shrec(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.59"
+    version = "1.60"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
