@@ -44,6 +44,7 @@ bio_nextgen:
     - ucsc_tools
     - bfast
     - novoalign
+    - plink_seq
 cloudman:
   - nginx
   - proftpd

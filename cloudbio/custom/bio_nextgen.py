@@ -197,6 +197,16 @@ def install_varianttools(env):
           "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
     _get_install(url, env, _python_make)
 
+@_if_not_installed("pseq")
+def install_plink_seq(env):
+    version = "0.07"
+    url = "http://atgu.mgh.harvard.edu/plinkseq/dist/" \
+          "plinkseq-{}-x86_64.tar.gz".format(version)
+    def _plink_copy(env):
+        for x in ["pseq"]:
+            env.safe_sudo("cp {} {}/bin".format(x, env.system_install))
+    _get_install(url, env, _plink_copy)
+
 @_if_not_installed("fastqc")
 def install_fastqc(env):
     version = "0.10.0"
