@@ -201,10 +201,10 @@ def install_varianttools(env):
 def install_plink_seq(env):
     version = "0.07"
     url = "http://atgu.mgh.harvard.edu/plinkseq/dist/" \
-          "plinkseq-{}-x86_64.tar.gz".format(version)
+          "plinkseq-{0}-x86_64.tar.gz".format(version)
     def _plink_copy(env):
         for x in ["pseq"]:
-            env.safe_sudo("cp {} {}/bin".format(x, env.system_install))
+            env.safe_sudo("cp {0} {1}/bin".format(x, env.system_install))
     _get_install(url, env, _plink_copy)
 
 @_if_not_installed("fastqc")
@@ -401,7 +401,7 @@ def install_macs(env):
 @_if_not_installed("hydra")
 def install_hydra(env):
     version = "0.5.3"
-    url = "http://hydra-sv.googlecode.com/files/Hydra.v{}.tar.gz".format(version)
+    url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),

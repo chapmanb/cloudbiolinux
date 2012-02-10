@@ -41,5 +41,5 @@ def install_bio4j(env):
     def _install_fn(env, install_dir):
         targets = ["conf", "doc", "jars", "lib", "README"]
         for x in targets:
-            env.safe_sudo("mv {} {}".format(x, install_dir))
+            env.safe_sudo("mv {0} {1}".format(x, install_dir))
     _java_install("bio4j", version, url, env, install_fn=_install_fn)
