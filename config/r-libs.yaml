@@ -1,7 +1,7 @@
 ---
 # Configuration file defining R specific libraries that are installed 
 # via CRAN and Bioconductor.
-cranrepo: http://software.rc.fas.harvard.edu/mirrors/R/
+cranrepo: http://watson.nci.nih.gov/cran_mirror/
 cran:
  - abind
  - ape
