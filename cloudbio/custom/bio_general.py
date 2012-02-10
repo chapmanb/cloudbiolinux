@@ -31,3 +31,15 @@ def install_pgdspider(env):
         run("chmod a+x {0}".format(exe_file))
         env.safe_sudo("mv {exe} {bin}".format(exe=exe_file, bin=bin_dir))
     _java_install("PGDSpider", version, url, env, install_fn=_install_fn)
+
+def install_bio4j(env):
+    """Bio4j graph based database: http://www.bio4j.com/
+    """
+    version = "0.7"
+    url = "https://s3-eu-west-1.amazonaws.com/bio4j-public/releases/" \
+          "{v}/bio4j-{v}.zip".format(v=version)
+    def _install_fn(env, install_dir):
+        targets = ["conf", "doc", "jars", "lib", "README"]
+        for x in targets:
+            env.safe_sudo("mv {} {}".format(x, install_dir))
+    _java_install("bio4j", version, url, env, install_fn=_install_fn)

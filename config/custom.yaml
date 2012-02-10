@@ -3,6 +3,7 @@
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
 bio_general:
+ - bio4j
  - emboss
  - pgdspider
 bio_nextgen:
