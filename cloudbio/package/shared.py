@@ -34,7 +34,13 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
             elif isinstance(cur_info, dict):
                 for key, val in cur_info.iteritems():
                     # if we are okay, propagate with the top level key
-                    if key != 'needs_64bit' or is_64bit:
+                    if key == 'needs_64bit':
+                        if is_64bit:
+                            data.append((cur_key, val))
+                    elif key.startswith(env.distribution):
+                        if key.endswith(env.dist_name):
+                            data.append((cur_key, val))
+                    else:
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)

@@ -54,23 +54,25 @@ minimal:
     - wget
 desktop:
   #Packages to support a remote desktop
-  - gnome-panel
-  - gnome-system-tools
-  - synaptic
-  - software-center
-  - freenx-server
-  - gnome-themes
-  - gnome-backgrounds
-  - gnome-terminal
-  - firefox
-  - evince
-  - cloudbl-desktop
-  - bio-linux-tutorials
-  - xvfb
-  - gdm
-  # NX compatible window managers on 11.10; will need to remove to 10.04 support
-  - gnome-session-fallback
-  - unity-2d
+  all:
+    - gnome-panel
+    - gnome-system-tools
+    - synaptic
+    - software-center
+    - freenx-server
+    - gnome-themes
+    - gnome-backgrounds
+    - gnome-terminal
+    - firefox
+    - evince
+    - cloudbl-desktop
+    - bio-linux-tutorials
+    - xvfb
+    - gdm
+  # NX compatible window managers on 11.10; only for oneiric
+  ubuntu_oneiric:
+    - gnome-session-fallback
+    - unity-2d
 desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
@@ -169,21 +171,24 @@ programming:
 # production-ready Elastic MapReduce platform:
 # http://aws.amazon.com/elasticmapreduce/
 distributed:
-  - rabbitmq-server
-  - nfs-kernel-server
-  - hadoop-0.20
-  - hadoop-pig
-  - hadoop-hive
-  - libhdfs0-dev
-  - hadoop-0.20-native
-  - hadoop-0.20-pipes
-  - hadoop-0.20-source
-  - libopenmpi-dev 
-  - libopenmpi1.3
-  - openmpi-bin
-  - libmpich2-3
-  - libmpich2-dev
-  - mpich2
+  all:
+    - rabbitmq-server
+    - nfs-kernel-server
+    - hadoop-0.20
+    - hadoop-pig
+    - hadoop-hive
+    - libhdfs0-dev
+    - hadoop-0.20-native
+    - hadoop-0.20-pipes
+    - hadoop-0.20-source
+    - libopenmpi-dev 
+    - libopenmpi1.3
+    - openmpi-bin
+  # only for oneiric 11.10
+  ubuntu_oneiric:
+    - libmpich2-3
+    - libmpich2-dev
+    - mpich2
 amazon:
   - s3cmd
   - euca2ools
