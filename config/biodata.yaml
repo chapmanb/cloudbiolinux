@@ -40,6 +40,8 @@ genomes:
     name: S cerevisiae (sacCer2)
   - dbkey: WS210
     name: C elegans (WS210)
+  - dbkey: unknown
+    name: unknown 
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in data_fabfile.py
