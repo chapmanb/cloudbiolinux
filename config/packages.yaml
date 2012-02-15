@@ -339,6 +339,7 @@ bio_alignment:
 bio_nextgen:
   - maq
   - plink
+  - last-align
   # - samtools # very old version
 bio_sequencing:
   - bio-linux-assembly-conversion-tools

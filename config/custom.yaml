@@ -15,8 +15,10 @@ bio_nextgen:
     - lastz
     - mosaik
     - perm
+    - stampy
   utilitites:
     - bedtools
+    - dwgsim
     - fastqc
     - fastx_toolkit
     - solexaqa
@@ -24,6 +26,7 @@ bio_nextgen:
     - vcftools
   analysis:
     - cufflinks
+    - echo
     - freebayes
     - gatk
     - gatk_queue
@@ -39,6 +42,8 @@ bio_nextgen:
     - velvet
   sv:
     - hydra
+  variant:
+    - crisp
   chip:
     - macs
   needs_64bit:
