@@ -63,16 +63,18 @@ def _validate_target_distribution(dist):
 
 def _setup_ubuntu():
     env.logger.info("Ubuntu setup")
+    env.python_version_ext = "2.6"
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     sources = [
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
+      "deb http://no.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
+      "deb http://no.archive.ubuntu.com/ubuntu/ %s multiverse",
+      "deb http://no.archive.ubuntu.com/ubuntu/ %s-updates universe",
+      "deb http://no.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/", # lastest R versions
+      "deb http://cran.uib.no/bin/linux/ubuntu %s/", # lastest R versions
+#      "deb http://software.rc.fas.harvard.edu/mirrors/R/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
