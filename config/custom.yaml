@@ -44,6 +44,8 @@ bio_nextgen:
     - hydra
   variant:
     - crisp
+    - tassel
+    - stacks
   chip:
     - macs
   needs_64bit:

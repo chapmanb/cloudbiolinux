@@ -446,3 +446,37 @@ def install_crisp(env):
     _get_install(url, env, _make_copy("ls -1 CRISP.py crisp_to_vcf.py",
                                       premake_cmd=_make_executable,
                                       do_make=False))
+
+@_if_not_installed("start_tassel.pl")
+def install_tassel(env):
+    """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
+    http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&Itemid=119
+    """
+    version = "3.0"
+    url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
+    executables = ["start_tassel.pl", "run_pipeline.pl"]
+    install_dir = _symlinked_java_version_dir("tassel", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % (url))
+                run("unzip %s" % os.path.basename(url))
+                with cd("tassel{0}_standalone".format(version)):
+                    for x in executables:
+                        sed(x, "^my \$top.*;",
+                            "use FindBin qw($RealBin); my $top = $RealBin;")
+                        env.safe_sudo("chmod a+rwx %s" % x)
+                    env.safe_sudo("mv * %s" % install_dir)
+                for x in executables:
+                    env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, x,
+                                                             env.system_install, x))
+
+@_if_not_installed("ustacks")
+def install_stacks(env):
+    """Stacks: build loci out of a set of short-read sequenced samples.
+    http://creskolab.uoregon.edu/stacks/
+    """
+    version = "0.998"
+    url = "http://creskolab.uoregon.edu/stacks/source/" \
+          "stacks-{0}.tar.gz".format(version)
+    _get_install(url, env, _configure_make)
