@@ -40,7 +40,7 @@ directory.
 CloudBioLinux has ready-made images for Amazon EC2 and VirtualBox.
 Also a repository of biological data is available.
 
-It should be noted, at least 15GB free space is required on the disk.
+It should be noted, at least 13GB free space is required on the disk.
 
 ## Amazon
 
