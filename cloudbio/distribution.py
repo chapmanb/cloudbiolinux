@@ -63,8 +63,11 @@ def _validate_target_distribution(dist):
 
 def _setup_ubuntu():
     env.logger.info("Ubuntu setup")
-    env.python_version_ext = "2.6"
     shared_sources = _setup_deb_general()
+    env.python_version_ext = "2.6"
+    env.ruby_version_ext = "1.8"
+    # TODO: python 3.2 should be installed manually, the PPA package is 3-minimal which is not working with variantools
+    # TODO: latest version of rubygem should be installed manually, apt-get won't let you update it
     # package information. This is ubuntu/debian based and could be generalized.
     sources = [
       "deb http://no.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
