@@ -40,6 +40,8 @@ directory.
 CloudBioLinux has ready-made images for Amazon EC2 and VirtualBox.
 Also a repository of biological data is available.
 
+It should be noted, at least 13GB free space is required on the disk.
+
 ## Amazon
 
 See the 'Getting Started with CloudBioLinux' guide on the
@@ -105,7 +107,7 @@ to a local or [cloud-based][bd3] Galaxy server.
 
 ## VirtualBox with vagrant
 
-Vagrant allows easy deploying and connecting to VirtualBox images. The 
+Vagrant allows easy deploying and connecting to VirtualBox images. The
 setup is ideal for runnig CloudBioLinux on a desktop computer.
 Install [VirtualBox 4.0][v2] and [vagrant][v1]. Then add the pre-built
 CloudLinux VirtualBox images and start it up:
@@ -133,8 +135,8 @@ no passwords needed! Get root with
 Through Vagrant additional facilities are available, such as a shared
 network drive.  It is also possible to tweak the image (e.g. RAM/CPU
 settings, and getting the all important guest additions) by firing up
-virtualbox itself. For more information, see the BioLinux 
-[Vagrant documentation][doc], as well as the 
+virtualbox itself. For more information, see the BioLinux
+[Vagrant documentation][doc], as well as the
 documentation on the [Vagrant website][v1].
 
 # Building an image from scratch using CloudBioLinux

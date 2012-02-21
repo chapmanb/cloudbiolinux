@@ -17,5 +17,6 @@ cabal:
   # bioinformatics
   - bio
   - flower
+  # FIXME: Fails in Lucid, if the source is downloaded separately and installed according to the README the issue won't appread
   - flowsim
   #- samtools

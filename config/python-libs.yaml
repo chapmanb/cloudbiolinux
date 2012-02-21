@@ -42,7 +42,9 @@ pypi:
   - pandas
   - pygr
   - pysam
-  - pysparse
+  # easy_install is not working for this package, but apt-get install python-pysparse is fine.
+  # TODO: debug it
+  #- pysparse
   - rpy2
   - rpy2-bioconductor-extensions
   - scikits.learn

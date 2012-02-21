@@ -322,11 +322,26 @@ def _ruby_library_installer(config):
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
-    with _make_tmp_dir() as tmp_dir:
-        with cd(tmp_dir):
-            run("wget --no-check-certificate http://xrl.us/cpanm")
-            run("chmod a+rwx cpanm")
-            env.safe_sudo("mv cpanm %s/bin" % env.system_install)
+
+    # TODO: Re-write using confirm button
+    # No need to prevent TOCTTOU, nothing critical is going to be touched
+    if not os.path.isfile("%s/bin/cpanm" % env.system_install):
+        with _make_tmp_dir() as tmp_dir:
+            with cd(tmp_dir):
+                cpanm_header = ''
+                while cpanm_header.find('perl') == -1:
+                    run("wget --no-check-certificate http://xrl.us/cpanm -O cpanm")
+                    cpanm_header = run('head -n 1 cpanm')
+
+                run("chmod a+rwx cpanm")
+                env.safe_sudo("mv cpanm %s/bin" % env.system_install)
+
+    # TODO: Check cpanm file, making sure it is a legitimate perl file, not an HTML page.
+    #    cpanm_file = open("%s/bin/cpanm" % env.system_install, 'r')
+    #    cpanm_header = cpanm_file.readline()
+    #    if cpanm_header.find('perl') == -1:
+        # Retry to download the file
+
     sudo_str = "--sudo" if env.use_sudo else ""
     for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that

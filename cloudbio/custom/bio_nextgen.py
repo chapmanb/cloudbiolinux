@@ -203,7 +203,10 @@ def install_varianttools(env):
     version_ext = "a"
     url = "http://downloads.sourceforge.net/project/varianttools/" \
           "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
+    # Just a work around for now, not sure how compatible is python3.2 in Lucid.
+    orig_python_ver, env.python_version_ext= env.python_version_ext, "3.2"
     _get_install(url, env, _python_make)
+    env.python_version_ext=orig_python_ver
 
 @_if_not_installed("pseq")
 def install_plink_seq(env):
