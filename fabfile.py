@@ -323,6 +323,7 @@ def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
 
+    # TODO: Re-write using confirm button
     # No need to prevent TOCTTOU, nothing critical is going to be touched
     if not os.path.isfile("%s/bin/cpanm" % env.system_install):
         with _make_tmp_dir() as tmp_dir:
@@ -330,8 +331,7 @@ def _perl_library_installer(config):
                 cpanm_header = ''
                 while cpanm_header.find('perl') == -1:
                     run("wget --no-check-certificate http://xrl.us/cpanm -O cpanm")
-                    cpanm_file = open("%s/bin/cpanm" % env.system_install)
-                    cpanm_header = cpanm_file.readline()
+                    cpanm_header = run('head -n 1 cpanm')
 
                 run("chmod a+rwx cpanm")
                 env.safe_sudo("mv cpanm %s/bin" % env.system_install)
