@@ -40,9 +40,11 @@ pypi:
   - HTSeq
   - networkx
   - pandas
+  - pybedtools
   - pygr
   - pysam
   - pysparse
+  - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
   - scikits.learn
