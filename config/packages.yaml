@@ -73,6 +73,8 @@ desktop:
   ubuntu_oneiric:
     - gnome-session-fallback
     - unity-2d
+  ubuntu_lucid:
+    - rubygems
 desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
@@ -181,7 +183,7 @@ distributed:
     - hadoop-0.20-native
     - hadoop-0.20-pipes
     - hadoop-0.20-source
-    - libopenmpi-dev 
+    - libopenmpi-dev
     - libopenmpi1.3
     - openmpi-bin
   # only for oneiric 11.10
@@ -306,7 +308,7 @@ bio_general:
   - readseq
   - bio-linux-taverna
   - bio-linux-xcut
-  - emboss 
+  - emboss
   - emboss-data
   - emboss-lib
   - ugene
@@ -393,7 +395,7 @@ phylogeny_testing:
     - raxml
     # - mrbayes-mpi broken, should eventually replace biolinux-mrbayes-multi
 phylogeny_experimental:
-  # new packages in experimental 
+  # new packages in experimental
   all:
     - paml        # should replace biolinux-paml
 phylogeny:
@@ -406,7 +408,7 @@ phylogeny:
     #- bio-linux-arb # Broken, needs libmotif3
     # biolinux-ape package is source (i386). It needs R - not in deps - and
     # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
-    # - bio-linux-ape 
+    # - bio-linux-ape
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem
