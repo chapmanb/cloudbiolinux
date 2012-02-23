@@ -324,7 +324,8 @@ def _perl_library_installer(config):
     """
     with _make_tmp_dir() as tmp_dir:
         with cd(tmp_dir):
-            run("wget --no-check-certificate http://xrl.us/cpanm")
+            run("wget --no-check-certificate -O cpanm "
+                "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
             run("chmod a+rwx cpanm")
             env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""

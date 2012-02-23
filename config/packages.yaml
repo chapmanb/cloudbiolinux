@@ -186,6 +186,7 @@ distributed:
     - libopenmpi-dev
     - libopenmpi1.3
     - openmpi-bin
+    - libzmq-dev
   # only for oneiric 11.10
   ubuntu_oneiric:
     - libmpich2-3

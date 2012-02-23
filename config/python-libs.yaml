@@ -30,6 +30,7 @@ pypi:
   - Pyrex
   - virtualenv
   # concurrency/web
+  - pyzmq
   - tornado
   - Twisted
   # science
