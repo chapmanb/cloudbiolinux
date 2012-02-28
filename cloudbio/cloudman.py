@@ -11,7 +11,7 @@ description     "Start CloudMan contextualization script"
 start on runlevel [2345]
 
 task
-exec python %s
+exec python %s 2> %s.err
 """
 import os
 
@@ -51,7 +51,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
     with open( cloudman_boot_file, 'w' ) as f:
-        print >> f, cm_upstart % remote
+        print >> f, cm_upstart % (remote, os.path.splitext(remote)[0])
     remote_file = '/etc/init/%s' % cloudman_boot_file
     put(cloudman_boot_file, remote_file, use_sudo=777)
     os.remove(cloudman_boot_file)
@@ -62,20 +62,20 @@ def _configure_sge(env):
     if not exists(sge_root):
         sudo("mkdir -p %s" % sge_root)
         sudo("chown sgeadmin:sgeadmin %s" % sge_root)
-    # link our installed SGE to CloudMan's expected directory
-    sge_package_dir = "/opt/galaxy/pkg"
-    sge_dir = "ge6.2u5"
-    sudo("mkdir -p %s" % sge_package_dir)
-    if not exists(os.path.join(sge_package_dir, sge_dir)):
-        sudo("ln -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
 
 def _configure_nfs(env):
     nfs_dir = "/export/data"
     cloudman_dir = "/mnt/galaxyData/export"
-    sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
-    sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
-    with settings(warn_only=True):
+    if not exists(nfs_dir):
+        # For the case of rerunning this script, ensure the nfs_dir does
+        # not exist (exists() method does not recognize it as a file because
+        # by default it points to a non-existing dir/file).
+        with settings(warn_only=True):
+            run('rm -rf {0}'.format(nfs_dir))
+        sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
         run("ln -s %s %s" % (cloudman_dir, nfs_dir))
+    sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
+    # Setup /etc/exports paths, to be used as NFS mount points
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
                 '/mnt/galaxyData    *(rw,sync,no_root_squash,subtree_check,no_wdelay)',
                 '/mnt/galaxyIndices *(rw,sync,no_root_squash,no_subtree_check)',
@@ -83,13 +83,22 @@ def _configure_nfs(env):
                 '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
                 '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
     append('/etc/exports', exports, use_sudo=True)
+    # Create a symlink for backward compatibility where all of CloudMan's
+    # stuff is expected to be in /opt/galaxy
+    old_dir = '/opt/galaxy'
+    # Because stow is used, the equivalent to CloudMan's expected path
+    # is actually the parent of the install_dir so use it for the symlink
+    new_dir = os.path.dirname(env.install_dir)
+    if not exists(old_dir) and exists(new_dir):
+        sudo('ln -s {0} {1}'.format(new_dir, old_dir))
 
 def _cleanup_ec2(env):
     """Clean up any extra files after building.
     """
     env.logger.info("Cleaning up for EC2 AMI creation")
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
-              "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir]
+              "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir,
+              "%s/ec2autorun.err"  % env.install_dir, "%s/ec2autorun.log" % env.install_dir]
     for fname in fnames:
         sudo("rm -f %s" % fname)
     rmdirs = ["/mnt/galaxyData", "/mnt/cm", "/tmp/cm"]
@@ -97,7 +106,6 @@ def _cleanup_ec2(env):
         sudo("rm -rf %s" % rmdir)
     # Stop Apache from starting automatically at boot (it conflicts with Galaxy's nginx)
     sudo('/usr/sbin/update-rc.d -f apache2 remove')
-
     # RabbitMQ fails to start if its database is embedded into the image
     # because it saves the current IP address or host name so delete it now.
     # When starting up, RabbitMQ will recreate that directory.

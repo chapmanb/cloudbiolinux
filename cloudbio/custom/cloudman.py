@@ -52,10 +52,9 @@ def install_nginx(env):
         sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
         sudo('tar xvzf %s' % nginx_errdoc_file)
 
-    cloudman_default_dir = "/opt/galaxy/sbin"
-    sudo("mkdir -p %s" % cloudman_default_dir)
-    if not exists("%s/nginx" % cloudman_default_dir):
-        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    sudo("mkdir -p %s" % env.install_dir)
+    if not exists("%s/nginx" % env.install_dir):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
 
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.

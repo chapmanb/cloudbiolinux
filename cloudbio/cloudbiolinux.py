@@ -9,6 +9,8 @@ def _freenx_scripts(env):
     """
     setup_script = "setupnx.sh"
     remote_setup = "%s/bin/%s" % (env.system_install, setup_script)
+    if not exists(os.path.dirname(remote_setup)):
+        sudo('mkdir -p {0}'.format(os.path.dirname(remote_setup)))
     install_file_dir = os.path.join(env.config_dir, os.pardir, "installed_files")
     if not exists(remote_setup):
         put(os.path.join(install_file_dir, setup_script), setup_script,
