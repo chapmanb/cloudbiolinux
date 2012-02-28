@@ -11,7 +11,7 @@ description     "Start CloudMan contextualization script"
 start on runlevel [2345]
 
 task
-exec python %s
+exec python %s 2> %s.err
 """
 import os
 
@@ -51,7 +51,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
     with open( cloudman_boot_file, 'w' ) as f:
-        print >> f, cm_upstart % remote
+        print >> f, cm_upstart % (remote, os.path.splitext(remote)[0])
     remote_file = '/etc/init/%s' % cloudman_boot_file
     put(cloudman_boot_file, remote_file, use_sudo=777)
     os.remove(cloudman_boot_file)
@@ -97,7 +97,8 @@ def _cleanup_ec2(env):
     """
     env.logger.info("Cleaning up for EC2 AMI creation")
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
-              "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir]
+              "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir,
+              "%s/ec2autorun.err"  % env.install_dir, "%s/ec2autorun.log" % env.install_dir]
     for fname in fnames:
         sudo("rm -f %s" % fname)
     rmdirs = ["/mnt/galaxyData", "/mnt/cm", "/tmp/cm"]
