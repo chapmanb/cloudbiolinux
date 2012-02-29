@@ -15,13 +15,17 @@ exec python %s 2> %s.err
 """
 import os
 
-from fabric.api import sudo, run, put
+from fabric.api import sudo, run, put, cd
 from fabric.contrib.files import exists, settings, contains, append
 
+from cloudbio.custom.shared import _make_tmp_dir
+
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
+CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 
 def _configure_cloudman(env, use_repo_autorun=False):
     _setup_users(env)
+    _setup_env(env)
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
     _configure_nfs(env)
@@ -38,6 +42,18 @@ def _setup_users(env):
     _add_user('galaxy', '1001')
     _add_user('sgeadmin')
     _add_user('postgres')
+
+def _setup_env(env):
+    """ Setup the system environment required to run CloudMan. This primarily
+        refers to installing required Python dependencies (ie, libraries) as
+        defined in CloudMan's requirements.txt file.
+    """
+    reqs_file = 'requirements.txt'
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
+            run("wget --output-document=%s %s" % (reqs_file, url))
+            sudo("pip install --requirement={0}".format(reqs_file))
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
