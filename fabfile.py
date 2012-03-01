@@ -17,6 +17,7 @@ Requires:
 """
 import os
 import sys
+from datetime import datetime
 
 from fabric.main import load_settings
 from fabric.api import *
@@ -136,6 +137,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     post-installation settings.
     """
     _setup_logging(env)
+    time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -172,6 +174,30 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
         _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _cleanup_ec2(env)
+    _print_time_stats("Config", "end", time_start)
+
+def _print_time_stats(action, event, prev_time=None):
+    """ A convenience method for displaying time event during configuration.
+    
+    :type action: string
+    :param action: Indicates type of action (eg, Config, Lib install, Pkg install)
+    
+    :type event: string
+    :param event: The monitoring event (eg, start, stop)
+    
+    :type prev_time: datetime
+    :param prev_time: A timeststamp of a previous event. If provided, duration between
+                      the time the method is called and the time stamp is included in
+                      the printout
+                      
+    :rtype: datetime
+    :return: A datetime timestamp of when the method was called
+    """
+    time = datetime.utcnow()
+    s = "{0} {1} time: {2}".format(action, event, time)
+    if prev_time: s += "; duration: {0}".format(str(time-prev_time))
+    env.logger.info(s)
+    return time
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -190,14 +216,25 @@ def _custom_installs(to_install):
 
 def install_custom(p, automated=False, pkg_to_group=None):
     """Install a single custom package by name.
-
     This method fetches names from custom.yaml that delegate to a method
-    in the custom/name.py program.
-
-    fab install_custom_package:package_name
+    in the custom/name.py program. Alternatively, if a program install method is
+    defined in approapriate package, it will be called directly (see param p).
+    
+    Usage: fab [-i key] [-u user] -H host install_custom:program_name
+    
+    :type p:  string
+    :param p: A name of a custom program to install. This has to be either a name
+              that is listed in custom.yaml as a subordinate to a group name or a
+              program name whose install method is defined in either cloudbio or
+              custom packages (eg, install_cloudman).
+    
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded and reading of
+                      the custom.yaml is skipped.
     """
     _setup_logging(env)
-    env.logger.info("Install custom software packages")
+    p = p.lower() # All packages are listed in custom.yaml are in lower case
+    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
         _parse_fabricrc()
         _setup_edition(env)
@@ -207,7 +244,11 @@ def install_custom(p, automated=False, pkg_to_group=None):
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
     try:
         env.logger.debug("Import %s" % p)
-        mod = __import__("cloudbio.custom.%s" % pkg_to_group[p],
+        # Allow direct calling of a program install method, even if the program
+        # is not listed in the custom list (ie, not contained as a key value in
+        # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
+        mod_name = pkg_to_group[p] if p in pkg_to_group else p
+        mod = __import__("cloudbio.custom.%s" % mod_name,
                          fromlist=["cloudbio", "custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %
@@ -221,6 +262,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
     fn(env)
+    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
 
 def _read_main_config(yaml_file=None):
     """Pull a list of groups to install based on our main configuration YAML.
