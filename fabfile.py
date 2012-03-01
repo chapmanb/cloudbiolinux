@@ -213,7 +213,11 @@ def install_custom(p, automated=False, pkg_to_group=None):
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
     try:
         env.logger.debug("Import %s" % p)
-        mod = __import__("cloudbio.custom.%s" % pkg_to_group[p],
+        # Allow direct calling of a program install method, even if the program
+        # is not listed in the custom list (ie, not contained as a key value in
+        # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
+        mod_name = pkg_to_group[p] if p in pkg_to_group else p
+        mod = __import__("cloudbio.custom.%s" % mod_name,
                          fromlist=["cloudbio", "custom"])
     except ImportError:
         raise ImportError("Need to write a %s module in custom." %

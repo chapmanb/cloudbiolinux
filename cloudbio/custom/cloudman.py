@@ -9,9 +9,20 @@ from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, settings, hide, contains, append, sed
 
 from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.cloudman import _configure_cloudman
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
+
+def install_cloudman(env):
+    """ A meta method for installing all of CloudMan components
+        Allows CloudMan and all of its dependencies to be installed via:
+        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
+    """
+    _configure_cloudman(env, use_repo_autorun=True)
+    install_nginx(env)
+    install_proftpd(env)
+    install_sge(env)
 
 def install_nginx(env):
     version = "0.7.67"

@@ -57,7 +57,7 @@ def _setup_env(env):
             # Get and install requried Python libraries
             url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
             run("wget --output-document=%s %s" % (reqs_file, url))
-            sudo("pip install --requirement={0}".format(reqs_file))
+            sudo("pip install --upgrade --requirement={0}".format(reqs_file))
     # Get and install required system packages
     if env.distribution in ["debian", "ubuntu"]:
         conf_file = 'config.yaml'    
