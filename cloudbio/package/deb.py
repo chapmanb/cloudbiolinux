@@ -5,27 +5,43 @@ from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
 
-def _apt_packages(to_install):
-    """Install packages available via apt-get.
+def _apt_packages(to_install=None, pkg_list=None):
+    """ Install packages available via apt-get.
+        Note that the two arguments cannot be used together.
+    
+    :type to_install:  list
+    :param to_install: A list of strings (ie, groups) present in the main config
+                       file that will be used to filter out specific packages to
+                       be installed.
+    
+    :type pkg_list:  list
+    :param pkg_list: An explicit list of packages to install. No other files, 
+                     flavors, or editions are considered.
     """
-    env.logger.info("Update and install all packages")
-    pkg_config_file = os.path.join(env.config_dir, "packages.yaml")
-    subs_pkg_config_file = os.path.join(env.config_dir, "packages-%s.yaml" %
-                                   env.distribution)
-    if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
+    env.logger.info("Update the system")
     sudo("apt-get update") # Always update
-    env.edition.apt_upgrade_system()
-    # Retrieve final package names
-    (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
-                                      subs_pkg_config_file)
-    # At this point allow the Edition to rewrite the package list - 
-    # this is shared within and between editions.
-    # Ref:  https://github.com/chapmanb/cloudbiolinux/pull/10#issuecomment-1616423
-    packages = env.edition.rewrite_config_items("packages", packages)
+    if to_install is not None:
+        env.logger.info("Install all packages")
+        pkg_config_file = os.path.join(env.config_dir, "packages.yaml")
+        subs_pkg_config_file = os.path.join(env.config_dir, "packages-%s.yaml" %
+                                       env.distribution)
+        if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
+        env.edition.apt_upgrade_system()
+        # Retrieve final package names
+        (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
+                                          subs_pkg_config_file)
+        # At this point allow the Edition to rewrite the package list - 
+        # this is shared within and between editions.
+        # Ref:  https://github.com/chapmanb/cloudbiolinux/pull/10#issuecomment-1616423
+        packages = env.edition.rewrite_config_items("packages", packages)
 
-    # At this point allow the Flavor to rewrite the package list
-    packages = env.flavor.rewrite_config_items("packages", packages)
-
+        # At this point allow the Flavor to rewrite the package list
+        packages = env.flavor.rewrite_config_items("packages", packages)
+    elif pkg_list is not None:
+        env.logger.info("Install specific packages")
+        packages = pkg_list
+    else:
+        raise ValueError("Need a file with packages or a list of packages")
     # A single line install is much faster - note that there is a max
     # for the command line size, so we do 30 at a time
     group_size = 30

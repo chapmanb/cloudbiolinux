@@ -14,13 +14,16 @@ task
 exec python %s 2> %s.err
 """
 import os
+import urllib
 
 from fabric.api import sudo, run, put, cd
 from fabric.contrib.files import exists, settings, contains, append
 
 from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.package.deb import _apt_packages
 
-REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
+MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 
 def _configure_cloudman(env, use_repo_autorun=False):
@@ -51,15 +54,26 @@ def _setup_env(env):
     reqs_file = 'requirements.txt'
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
+            # Get and install requried Python libraries
             url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
             run("wget --output-document=%s %s" % (reqs_file, url))
             sudo("pip install --requirement={0}".format(reqs_file))
+    # Get and install required system packages
+    if env.distribution in ["debian", "ubuntu"]:
+        conf_file = 'config.yaml'    
+        url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
+        cf = urllib.urlretrieve(url)
+        (packages, _) = _yaml_to_packages(cf[0], 'cloudman')
+        _apt_packages(pkg_list=packages)
+    elif env.distibution in ["centos"]:
+        env.logger.warn("No CloudMan system package dependencies for CentOS")
+        pass
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
     remote = os.path.join(env.install_dir, "bin", script)
     if use_repo_autorun:
-        url = os.path.join(REPO_ROOT_URL, script)
+        url = os.path.join(MI_REPO_ROOT_URL, script)
         sudo("wget --output-document=%s %s" % (remote, url))
     else:
         install_file_dir = os.path.join(env.config_dir, os.pardir, "installed_files")
