@@ -137,8 +137,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     post-installation settings.
     """
     _setup_logging(env)
-    time_start = datetime.utcnow()
-    env.logger.info("Config start time: {0}".format(time_start))
+    time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -175,9 +174,30 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
         _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _cleanup_ec2(env)
-    end_time = datetime.utcnow()
-    env.logger.info("Config end time: {0}; duration: {1}".format(end_time, str(end_time-time_start)))
+    _print_time_stats("Config", "end", time_start)
 
+def _print_time_stats(action, event, prev_time=None):
+    """ A convenience method for displaying time event during configuration.
+    
+    :type action: string
+    :param action: Indicates type of action (eg, Config, Lib install, Pkg install)
+    
+    :type event: string
+    :param event: The monitoring event (eg, start, stop)
+    
+    :type prev_time: datetime
+    :param prev_time: A timeststamp of a previous event. If provided, duration between
+                      the time the method is called and the time stamp is included in
+                      the printout
+                      
+    :rtype: datetime
+    :return: A datetime timestamp of when the method was called
+    """
+    time = datetime.utcnow()
+    s = "{0} {1} time: {2}".format(action, event, time)
+    if prev_time: s += "; duration: {0}".format(str(time-prev_time))
+    env.logger.info(s)
+    return time
 
 def _check_fabric_version():
     """Checks for fabric version installed
@@ -213,6 +233,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
                       the custom.yaml is skipped.
     """
     _setup_logging(env)
+    time_start = _print_time_stats("Custom install for %s" % p, "start")
     env.logger.info("Install custom software packages")
     if not automated:
         _parse_fabricrc()
@@ -241,6 +262,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
     fn(env)
+    _print_time_stats("Custom install for %s" % p, "end", time_start)
 
 def _read_main_config(yaml_file=None):
     """Pull a list of groups to install based on our main configuration YAML.
