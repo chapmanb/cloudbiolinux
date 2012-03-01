@@ -48,6 +48,7 @@ def _apt_packages(to_install=None, pkg_list=None):
     i = 0
     env.logger.info("Updating %i packages" % len(packages))
     while i < len(packages):
+        env.logger.info("Package install progress: {0}/{1}".format(i, len(packages)))
         sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
         i += group_size
     sudo("apt-get clean")
