@@ -233,8 +233,8 @@ def install_custom(p, automated=False, pkg_to_group=None):
                       the custom.yaml is skipped.
     """
     _setup_logging(env)
-    time_start = _print_time_stats("Custom install for %s" % p, "start")
-    env.logger.info("Install custom software packages")
+    p = p.lower() # All packages are listed in custom.yaml are in lower case
+    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
         _parse_fabricrc()
         _setup_edition(env)
@@ -262,7 +262,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
     fn(env)
-    _print_time_stats("Custom install for %s" % p, "end", time_start)
+    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
 
 def _read_main_config(yaml_file=None):
     """Pull a list of groups to install based on our main configuration YAML.
