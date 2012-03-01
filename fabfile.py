@@ -196,11 +196,21 @@ def _custom_installs(to_install):
 
 def install_custom(p, automated=False, pkg_to_group=None):
     """Install a single custom package by name.
-
     This method fetches names from custom.yaml that delegate to a method
-    in the custom/name.py program.
-
-    fab install_custom_package:package_name
+    in the custom/name.py program. Alternatively, if a program install method is
+    defined in approapriate package, it will be called directly (see param p).
+    
+    Usage: fab [-i key] [-u user] -H host install_custom:program_name
+    
+    :type p:  string
+    :param p: A name of a custom program to install. This has to be either a name
+              that is listed in custom.yaml as a subordinate to a group name or a
+              program name whose install method is defined in either cloudbio or
+              custom packages (eg, install_cloudman).
+    
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded and reading of
+                      the custom.yaml is skipped.
     """
     _setup_logging(env)
     env.logger.info("Install custom software packages")
