@@ -176,6 +176,7 @@ distributed:
   all:
     - rabbitmq-server
     - nfs-kernel-server
+    - nfs-common
     - hadoop-0.20
     - hadoop-pig
     - hadoop-hive
@@ -206,6 +207,7 @@ python:
     - python-distutils-extra
     - python3
     - python3-dev
+    - python-pip
   wrappers:
     - python-rpy
 ruby:
@@ -228,8 +230,8 @@ perl:
   - parrot-devel
 java:
   - sun-java6-bin
-  - sun-java6-jre
-  - sun-java6-jdk
+  # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
+  # - sun-java6-jdk Package 'sun-java6-jdk' has no installation candidate
   - openjdk-6-jdk
   - openjdk-6-jre
   - ant
