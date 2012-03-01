@@ -17,6 +17,7 @@ Requires:
 """
 import os
 import sys
+from datetime import datetime
 
 from fabric.main import load_settings
 from fabric.api import *
@@ -136,6 +137,8 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     post-installation settings.
     """
     _setup_logging(env)
+    time_start = datetime.utcnow()
+    env.logger.info("Config start time: {0}".format(time_start))
     _check_fabric_version()
     _parse_fabricrc()
     _setup_edition(env)
@@ -172,6 +175,9 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
         _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _cleanup_ec2(env)
+    end_time = datetime.utcnow()
+    env.logger.info("Config end time: {0}; duration: {1}".format(end_time, str(end_time-time_start)))
+
 
 def _check_fabric_version():
     """Checks for fabric version installed
