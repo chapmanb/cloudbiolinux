@@ -255,6 +255,8 @@ GENOMES_SUPPORTED = [
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
                "Arabidopsis_thaliana", "TAIR9")),
+           ("Athaliana", "tair9", EnsemblGenome("plants", "6", "",
+               "Arabidopsis_thaliana", "TAIR9")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
            ("Celegans", "WS210", EnsemblGenome("standard", "60", "60",
                "Caenorhabditis_elegans", "WS210")),
