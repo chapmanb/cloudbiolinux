@@ -229,11 +229,13 @@ perl:
   - parrot
   - parrot-devel
 java:
-  - sun-java6-bin
+  # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
   # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
   # - sun-java6-jdk Package 'sun-java6-jdk' has no installation candidate
   - openjdk-6-jdk
   - openjdk-6-jre
+  - openjdk-7-jdk
+  - openjdk-7-jre
   - ant
   - libbiojava-java
   - libbiojava-java-demos
@@ -352,11 +354,11 @@ bio_sequencing:
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
-  - bio-linux-mira
-  - bio-linux-mira-3rd-party
   - bio-linux-staden
   - bio-linux-stars
   # Install problems with emboss: - bio-linux-msatfinder
+  #- bio-linux-mira # need mira-assembler but gone from repo
+  #- bio-linux-mira-3rd-party
 bio_annotation:
   - mcl
   - tigr-glimmer
