@@ -54,7 +54,8 @@ gems:
   - vagrant
   - mysql
   - do_mysql
-  - sqlite3-ruby
+  # sqlite3-ruby is renamed with sqlite3
+  - sqlite3
   # Problems building on 1.9.1
   #- dm-ferret-adapter
   #- dm-sweatshop

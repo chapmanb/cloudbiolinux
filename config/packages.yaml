@@ -73,6 +73,8 @@ desktop:
   ubuntu_oneiric:
     - gnome-session-fallback
     - unity-2d
+  ubuntu_lucid:
+    - rubygems
 desktop-cloud:
   # some special purpose VMs, such as BOINC, only require a minimal desktop
   - lxde
@@ -174,6 +176,7 @@ distributed:
   all:
     - rabbitmq-server
     - nfs-kernel-server
+    - nfs-common
     - hadoop-0.20
     - hadoop-pig
     - hadoop-hive
@@ -181,9 +184,10 @@ distributed:
     - hadoop-0.20-native
     - hadoop-0.20-pipes
     - hadoop-0.20-source
-    - libopenmpi-dev 
+    - libopenmpi-dev
     - libopenmpi1.3
     - openmpi-bin
+    - libzmq-dev
   # only for oneiric 11.10
   ubuntu_oneiric:
     - libmpich2-3
@@ -203,6 +207,7 @@ python:
     - python-distutils-extra
     - python3
     - python3-dev
+    - python-pip
   wrappers:
     - python-rpy
 ruby:
@@ -224,11 +229,13 @@ perl:
   - parrot
   - parrot-devel
 java:
-  - sun-java6-bin
-  - sun-java6-jre
-  - sun-java6-jdk
+  # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
+  # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
+  # - sun-java6-jdk Package 'sun-java6-jdk' has no installation candidate
   - openjdk-6-jdk
   - openjdk-6-jre
+  - openjdk-7-jdk
+  - openjdk-7-jre
   - ant
   - libbiojava-java
   - libbiojava-java-demos
@@ -306,7 +313,7 @@ bio_general:
   - readseq
   - bio-linux-taverna
   - bio-linux-xcut
-  - emboss 
+  - emboss
   - emboss-data
   - emboss-lib
   - ugene
@@ -339,17 +346,19 @@ bio_alignment:
 bio_nextgen:
   - maq
   - plink
+  - last-align
+  - tabix
   # - samtools # very old version
 bio_sequencing:
   - bio-linux-assembly-conversion-tools
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
-  - bio-linux-mira
-  - bio-linux-mira-3rd-party
   - bio-linux-staden
   - bio-linux-stars
   # Install problems with emboss: - bio-linux-msatfinder
+  #- bio-linux-mira # need mira-assembler but gone from repo
+  #- bio-linux-mira-3rd-party
 bio_annotation:
   - mcl
   - tigr-glimmer
@@ -393,7 +402,7 @@ phylogeny_testing:
     - raxml
     # - mrbayes-mpi broken, should eventually replace biolinux-mrbayes-multi
 phylogeny_experimental:
-  # new packages in experimental 
+  # new packages in experimental
   all:
     - paml        # should replace biolinux-paml
 phylogeny:
@@ -406,7 +415,7 @@ phylogeny:
     #- bio-linux-arb # Broken, needs libmotif3
     # biolinux-ape package is source (i386). It needs R - not in deps - and
     # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
-    # - bio-linux-ape 
+    # - bio-linux-ape
     - bio-linux-coalesce
     - bio-linux-dendroscope
     - bio-linux-fastDNAml # Version problem

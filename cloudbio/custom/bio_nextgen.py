@@ -85,6 +85,14 @@ def install_perm(env):
             sed("makefile", "g\+\+", gcc_cmd)
     _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
 
+def install_stampy(env):
+    base_version = "1.0.15"
+    revision = "1360"
+    version = "{0}r{1}".format(base_version, revision)
+    url = "http://www.well.ox.ac.uk/~gerton/software/Stampy/" \
+          "stampy-{0}.tgz".format(version)
+    _get_install_local(url, env, _make_copy(), dir_name="stampy-{0}".format(base_version))
+
 @_if_not_installed("gmap")
 def install_gmap(env):
     version = "2011-11-12"
@@ -207,6 +215,21 @@ def install_plink_seq(env):
             env.safe_sudo("cp {0} {1}/bin".format(x, env.system_install))
     _get_install(url, env, _plink_copy)
 
+@_if_not_installed("dwgsim")
+def install_dwgsim(env):
+    version = "0.1.8"
+    samtools_version = "0.1.18"
+    url = "http://downloads.sourceforge.net/project/dnaa/dwgsim/" \
+          "dwgsim-{0}.tar.gz".format(version)
+    samtools_url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
+                   "{ver}/samtools-{ver}.tar.bz2".format(ver=samtools_version)
+    def _get_samtools(env):
+        run("wget {0}".format(samtools_url))
+        run("tar jxf samtools-{0}.tar.bz2".format(samtools_version))
+        run("ln -s samtools-{0} samtools".format(samtools_version))
+    _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
+                 post_unpack_fn=_get_samtools)
+
 @_if_not_installed("fastqc")
 def install_fastqc(env):
     version = "0.10.0"
@@ -262,6 +285,12 @@ def install_shrec(env):
                         append(shrec_script, line, use_sudo=env.use_sudo)
                 env.safe_sudo("chmod a+rwx %s" % shrec_script)
                 env.safe_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
+
+def install_echo(env):
+    version = "1_11"
+    url = "http://downloads.sourceforge.net/project/uc-echo/source%20release/" \
+          "echo_v{0}.tgz".format(version)
+    _get_install_local(url, env, _make_copy())
 
 # -- Analysis
 
@@ -336,7 +365,7 @@ def _install_samtools_libs(env):
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
-    version = "1.3.3"
+    version = "1.4.1"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -344,7 +373,7 @@ def install_tophat(env):
 def install_cufflinks(env):
     # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "1.1.0"
+    version = "1.3.0"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -406,3 +435,48 @@ def install_hydra(env):
         run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
+
+@_if_not_installed("CRISP.py")
+def install_crisp(env):
+    version = "5"
+    url = "https://sites.google.com/site/vibansal/software/crisp/" \
+          "CRISP-linux-v{0}.tar.gz".format(version)
+    def _make_executable():
+        run("chmod a+x *.py")
+    _get_install(url, env, _make_copy("ls -1 CRISP.py crisp_to_vcf.py",
+                                      premake_cmd=_make_executable,
+                                      do_make=False))
+
+@_if_not_installed("start_tassel.pl")
+def install_tassel(env):
+    """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
+    http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&Itemid=119
+    """
+    version = "3.0"
+    url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
+    executables = ["start_tassel.pl", "run_pipeline.pl"]
+    install_dir = _symlinked_java_version_dir("tassel", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % (url))
+                run("unzip %s" % os.path.basename(url))
+                with cd("tassel{0}_standalone".format(version)):
+                    for x in executables:
+                        sed(x, "^my \$top.*;",
+                            "use FindBin qw($RealBin); my $top = $RealBin;")
+                        env.safe_sudo("chmod a+rwx %s" % x)
+                    env.safe_sudo("mv * %s" % install_dir)
+                for x in executables:
+                    env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, x,
+                                                             env.system_install, x))
+
+@_if_not_installed("ustacks")
+def install_stacks(env):
+    """Stacks: build loci out of a set of short-read sequenced samples.
+    http://creskolab.uoregon.edu/stacks/
+    """
+    version = "0.998"
+    url = "http://creskolab.uoregon.edu/stacks/source/" \
+          "stacks-{0}.tar.gz".format(version)
+    _get_install(url, env, _configure_make)
