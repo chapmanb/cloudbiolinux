@@ -66,6 +66,13 @@ def install_nginx(env):
     sudo("mkdir -p %s" % env.install_dir)
     if not exists("%s/nginx" % env.install_dir):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
+    # If the guessed symlinking did not work, force it now
+    cloudman_default_dir = "/opt/galaxy/sbin"
+    if not exists(cloudman_default_dir):
+        sudo("mkdir -p %s" % cloudman_default_dir)
+    if not exists(os.path.join(cloudman_default_dir, "nginx")):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    env.logger.debug("Nginx installed")
 
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.
@@ -119,6 +126,7 @@ def install_proftpd(env):
                 sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, proftpd_conf_file), conf_url))
                 sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
                 sudo("cd %s; stow proftpd" % env.install_dir)
+    env.logger.debug("ProFTPd installed")
 
 def install_sge(env):
     out_dir = "ge6.2u5"
@@ -131,3 +139,4 @@ def install_sge(env):
             run("wget %s" % url)
             sudo("chown %s %s" % (env.user, install_dir))
             run("tar -C %s -xvzf %s" % (install_dir, os.path.split(url)[1]))
+    env.logger.debug("SGE setup")
