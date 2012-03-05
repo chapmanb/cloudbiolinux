@@ -52,13 +52,6 @@ def _setup_env(env):
         refers to installing required Python dependencies (ie, libraries) as
         defined in CloudMan's requirements.txt file.
     """
-    reqs_file = 'requirements.txt'
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            # Get and install requried Python libraries
-            url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
-            run("wget --output-document=%s %s" % (reqs_file, url))
-            sudo("pip install --upgrade --requirement={0}".format(reqs_file))
     # Get and install required system packages
     if env.distribution in ["debian", "ubuntu"]:
         conf_file = 'config.yaml'    
@@ -69,6 +62,13 @@ def _setup_env(env):
     elif env.distibution in ["centos"]:
         env.logger.warn("No CloudMan system package dependencies for CentOS")
         pass
+    reqs_file = 'requirements.txt'
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            # Get and install requried Python libraries
+            url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
+            run("wget --output-document=%s %s" % (reqs_file, url))
+            sudo("pip install --upgrade --requirement={0}".format(reqs_file))
     env.logger.debug("Done setting up CloudMan's environment")
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
@@ -97,6 +97,13 @@ def _configure_sge(env):
     if not exists(sge_root):
         sudo("mkdir -p %s" % sge_root)
         sudo("chown sgeadmin:sgeadmin %s" % sge_root)
+    # Link our installed SGE to CloudMan's expected directory
+    sge_package_dir = "/opt/galaxy/pkg"
+    sge_dir = "ge6.2u5"
+    if not exists(os.path.join(sge_package_dir, sge_dir)):
+        sudo("mkdir -p %s" % sge_package_dir)
+    if not exists(os.path.join(sge_package_dir, sge_dir)):
+        sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
     env.logger.debug("Done configuring CloudMan SGE")
 
 def _configure_nfs(env):
