@@ -19,13 +19,29 @@ class SealFlavor(Flavor):
 			env.logger.info("Hello from SealFlavor.  Package list:\n")
 			for package in packages:
 				env.logger.info("Selected: "+name+" "+package)
+			packages.extend([
+			  "ant",
+			  "ant-junit",
+			  "ant-nodeps",
+			  "java-1.6.0-openjdk",
+			  "protobuf-c",
+			  "protobuf-compiler",
+			  "protobuf-python",
+			  "python",
+			  "python-devel",
+			  "junit4",
+			  "boost-python-devel",
+			  "gcc-c++",
+			  "openssl-devel",
+				])
+
 			if sys.version_info < (2,7):
 				# for versions of Python prior to 2.7 we need to add importlib
 				# and argparse
-				packages += [ 
+				packages.extend([ 
 					"python-importlib",
 					"python-argparse"
-				]
+				])
 		return packages
 
 	def post_install(self):

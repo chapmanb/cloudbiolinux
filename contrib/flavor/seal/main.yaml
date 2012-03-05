@@ -1,17 +1,17 @@
 ---
 packages:
 #  # - minimal : skip, as we don't need the build system
- - ant
- - ant-junit
- - ant-nodeps
- - java-1.6.0-openjdk
- - protobuf-c
- - protobuf-compiler
- - protobuf-python
- - python
- - python-devel
- - junit4
- - boost-python-devel
- - gcc-c++
- - openssl-devel
+# - ant
+# - ant-junit
+# - ant-nodeps
+# - java-1.6.0-openjdk
+# - protobuf-c
+# - protobuf-compiler
+# - protobuf-python
+# - python
+# - python-devel
+# - junit4
+# - boost-python-devel
+# - gcc-c++
+# - openssl-devel
 libraries:
