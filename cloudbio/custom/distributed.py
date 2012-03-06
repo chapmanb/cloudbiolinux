@@ -14,12 +14,19 @@ def install_pydoop(env):
     http://pydoop.sourceforge.net/docs/installation.html
     """
     hadoop_version = "0.20.2"
-    pydoop_version = "0.3.7_rc1"
+    
+    # pydoop versions are major.minor.bugfix-appendage
+    pydoop_version = map(str, (0,5,2,"rc1") )
+    pydoop_minor = ".".join(pydoop_version[0:2])
+    pydoop_version_string = ".".join(pydoop_version[0:3])
+    if len(pydoop_version) > 3:
+        pydoop_version_string += "-%s" % '-'.join(pydoop_version[3:])
+
     ubuntu_hadoop_src = "/usr/src/hadoop-0.20"
     hadoop_url = "http://apache.mirrors.hoobly.com/hadoop/core/" \
             "hadoop-%s/hadoop-%s.tar.gz" % (hadoop_version, hadoop_version)
     pydoop_url ="http://downloads.sourceforge.net/project/pydoop/" \
-                "Pydoop-%s/pydoop-%s.tar.gz" % (pydoop_version, pydoop_version)
+                "Pydoop-%s/pydoop-%s.tar.gz" % ( pydoop_minor, pydoop_version_string)
     java_home = env.java_home if env.has_key("java_home") else os.environ["JAVA_HOME"]
     pyext = env.python_version_ext if env.has_key("python_version_ext") else ""
 
