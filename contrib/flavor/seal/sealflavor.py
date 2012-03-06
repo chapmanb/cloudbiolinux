@@ -15,6 +15,7 @@ class SealFlavor(Flavor):
 		self.name = "Seal Flavor"
 
 	def rewrite_config_items(self, name, packages):
+		env.logger.info("SealFlavor#rewrite_config_items:  config item name %s" % name)
 		if name == 'packages':
 			env.logger.info("Hello from SealFlavor.  Package list:\n")
 			for package in packages:
@@ -42,7 +43,10 @@ class SealFlavor(Flavor):
 					"python-importlib",
 					"python-argparse"
 				])
-		return packages
+			return packages
+		elif name == 'custom':
+			env.logger.debug("rewrite_config_items for custom.  packages is: %s" % str(packages))
+			return packages + [ 'pydoop' ]
 
 	def post_install(self):
 		env.logger.info("Starting post-install")

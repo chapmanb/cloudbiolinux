@@ -20,8 +20,10 @@ def _yum_packages(to_install):
         sudo("yum -y install %s" % package)
 
 def _setup_yum_bashrc():
+    return
     """Fix the user bashrc to update compilers.
     """
+    # XXX:  this is not very flexible, and malicious :-)  It causes our builds to fail in Scientific Linux
     to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
                   "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
     fname = run("ls %s" % env.shell_config)
