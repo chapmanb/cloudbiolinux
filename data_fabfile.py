@@ -28,29 +28,19 @@ try:
 except ImportError:
     boto = None
 
-# use local cloudbio directory
+# preferentially use local cloudbio directory
 for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
+# allow partial use without cloudbiolinux installed or present
 try:
     from cloudbio.biodata.dbsnp import download_dbsnp
-except ImportError:
-    download_dbsnp = None
-
-try:
     from cloudbio.biodata.rnaseq import download_transcripts
-except ImportError:
-    download_transcripts = None
-
-try:
     from cloudbio.distribution import _setup_distribution_environment
-except ImportError:
-    _setup_distribution_environment = None
-
-try:
     from cloudbio.utils import _setup_logging
 except ImportError:
-    _setup_logging = None
+    download_dbsnp, download_transcripts, _setup_distribution_environment, _setup_logging = \
+                    (None, None, None, None)
 
 # -- Host specific setup
 
