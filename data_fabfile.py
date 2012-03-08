@@ -277,7 +277,7 @@ def install_data(config_file=CONFIG_FILE, do_setup_environment=True):
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def install_data_s3(config_file=CONFIG_FILEm do_setup_environment=True):
+def install_data_s3(config_file=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
     """
     _check_version()
