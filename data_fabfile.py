@@ -32,10 +32,25 @@ except ImportError:
 for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
-from cloudbio.biodata.dbsnp import download_dbsnp
-from cloudbio.biodata.rnaseq import download_transcripts
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging
+try:
+    from cloudbio.biodata.dbsnp import download_dbsnp
+except ImportError:
+    download_dbsnp = None
+
+try:
+    from cloudbio.biodata.rnaseq import download_transcripts
+except ImportError:
+    download_transcripts = None
+
+try:
+    from cloudbio.distribution import _setup_distribution_environment
+except ImportError:
+    _setup_distribution_environment = None
+
+try:
+    from cloudbio.utils import _setup_logging
+except ImportError:
+    _setup_logging = None
 
 # -- Host specific setup
 
@@ -252,20 +267,22 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
 
 # -- Fabric instructions
 
-def install_data(config_file=CONFIG_FILE):
+def install_data(config_file=CONFIG_FILE, do_setup_environment=True):
     """Main entry point for installing useful biological data.
     """
     _check_version()
-    setup_environment()
+    if do_setup_environment:
+        setup_environment()
     genomes, genome_indexes, config = _get_genomes(config_file)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def install_data_s3(config_file=CONFIG_FILE):
+def install_data_s3(config_file=CONFIG_FILEm do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
     """
     _check_version()
-    setup_environment()
+    if do_setup_environment:
+        setup_environment()
     genomes, genome_indexes, config = _get_genomes(config_file)
     _download_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
@@ -284,8 +301,10 @@ def upload_s3(config_file=CONFIG_FILE):
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
 
 def _install_additional_data(genomes, config):
-    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
-    download_transcripts(genomes, env)
+    if download_dbsnp is not None:
+        download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    if download_transcripts is not None:
+        download_transcripts(genomes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)
