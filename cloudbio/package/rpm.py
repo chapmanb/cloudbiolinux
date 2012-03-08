@@ -34,7 +34,10 @@ def _setup_yum_bashrc():
 def _setup_yum_sources():
     """Add additional useful yum repositories.
     """
-    repos = ["http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm"]
+    repos = [
+      "http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm",
+      "http://archive.cloudera.com/redhat/6/x86_64/cdh/cdh3-repository-1.0-1.noarch.rpm"
+    ]
     for repo in repos:
         with settings(warn_only=True):
             sudo("rpm -Uvh %s" % repo)
