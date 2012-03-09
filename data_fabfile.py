@@ -18,7 +18,10 @@ import logging
 from contextlib import contextmanager
 from xml.etree import ElementTree
 
-import yaml
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 from fabric.main import load_settings
 from fabric.api import *
@@ -260,27 +263,27 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
 
 # -- Fabric instructions
 
-def install_data(config_file=CONFIG_FILE, do_setup_environment=True):
+def install_data(config_source=CONFIG_FILE, do_setup_environment=True):
     """Main entry point for installing useful biological data.
     """
     _check_version()
     if do_setup_environment:
         setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def install_data_s3(config_file=CONFIG_FILE, do_setup_environment=True):
+def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
     """
     _check_version()
     if do_setup_environment:
         setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _download_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def upload_s3(config_file=CONFIG_FILE):
+def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
     if boto is None:
@@ -289,7 +292,7 @@ def upload_s3(config_file=CONFIG_FILE):
         raise ValueError("Need to run S3 upload on a local machine")
     _check_version()
     setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
 
@@ -309,9 +312,14 @@ def _check_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or better")
 
-def _get_genomes(config_file):
-    with open(config_file) as in_handle:
-        config = yaml.load(in_handle)
+def _get_genomes(config_source):
+    if isinstance(config_source, dict):
+        config = config_source
+    else:
+        if yaml is None:
+            raise ImportError("install yaml to read configuration from %s" % config_source)
+        with open(config_source) as in_handle:
+            config = yaml.load(in_handle)
     genomes = []
     for g in config["genomes"]:
         ginfo = None
