@@ -18,7 +18,10 @@ import logging
 from contextlib import contextmanager
 from xml.etree import ElementTree
 
-import yaml
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 from fabric.main import load_settings
 from fabric.api import *
@@ -28,14 +31,19 @@ try:
 except ImportError:
     boto = None
 
-# use local cloudbio directory
+# preferentially use local cloudbio directory
 for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
-from cloudbio.biodata.dbsnp import download_dbsnp
-from cloudbio.biodata.rnaseq import download_transcripts
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging
+# allow partial use without cloudbiolinux installed or present
+try:
+    from cloudbio.biodata.dbsnp import download_dbsnp
+    from cloudbio.biodata.rnaseq import download_transcripts
+    from cloudbio.distribution import _setup_distribution_environment
+    from cloudbio.utils import _setup_logging
+except ImportError:
+    download_dbsnp, download_transcripts, _setup_distribution_environment, _setup_logging = \
+                    (None, None, None, None)
 
 # -- Host specific setup
 
@@ -52,6 +60,9 @@ def _add_defaults():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     env.config_dir = os.path.join(os.path.dirname(__file__), "config")
+    conf_file = "tool_data_table_conf.xml"
+    env.tool_data_table_conf_file = os.path.join(os.path.dirname(__file__),
+                                                 "installed_files", conf_file)
     if not env.has_key("distribution"):
         config_file = os.path.join(env.config_dir, "fabricrc.txt")
         if os.path.exists(config_file):
@@ -271,25 +282,27 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config", "biodata.yaml")
 
 # -- Fabric instructions
 
-def install_data(config_file=CONFIG_FILE):
+def install_data(config_source=CONFIG_FILE, do_setup_environment=True):
     """Main entry point for installing useful biological data.
     """
     _check_version()
-    setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    if do_setup_environment:
+        setup_environment()
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def install_data_s3(config_file=CONFIG_FILE):
+def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
     """
     _check_version()
-    setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    if do_setup_environment:
+        setup_environment()
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _download_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _install_additional_data(genomes, config)
 
-def upload_s3(config_file=CONFIG_FILE):
+def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
     if boto is None:
@@ -298,13 +311,15 @@ def upload_s3(config_file=CONFIG_FILE):
         raise ValueError("Need to run S3 upload on a local machine")
     _check_version()
     setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_file)
+    genomes, genome_indexes, config = _get_genomes(config_source)
     _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
     _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
 
 def _install_additional_data(genomes, config):
-    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
-    download_transcripts(genomes, env)
+    if download_dbsnp is not None:
+        download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    if download_transcripts is not None:
+        download_transcripts(genomes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)
@@ -316,9 +331,14 @@ def _check_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or better")
 
-def _get_genomes(config_file):
-    with open(config_file) as in_handle:
-        config = yaml.load(in_handle)
+def _get_genomes(config_source):
+    if isinstance(config_source, dict):
+        config = config_source
+    else:
+        if yaml is None:
+            raise ImportError("install yaml to read configuration from %s" % config_source)
+        with open(config_source) as in_handle:
+            config = yaml.load(in_handle)
     genomes = []
     for g in config["genomes"]:
         ginfo = None
@@ -461,9 +481,7 @@ def _get_tool_conf(tool_name):
     those as a dict.
     """
     tool_conf = {}
-    conf_file = 'tool_data_table_conf.xml'
-    tdtc = ElementTree.parse(os.path.join(os.path.dirname(__file__),
-                                          "installed_files", conf_file))
+    tdtc = ElementTree.parse(env.tool_data_table_conf_file)
     tables = tdtc.getiterator('table')
     for t in tables:
         if tool_name in t.attrib.get('name', ''):
@@ -495,11 +513,9 @@ def _update_loc_file(ref_file, line_parts):
     if env.galaxy_base is not None:
         tools_dir = os.path.join(env.galaxy_base, "tool-data")
         if not exists(tools_dir):
-            conf_file = "tool_data_table_conf.xml"
             run("mkdir -p %s" % tools_dir)
-            put(os.path.join(os.path.dirname(__file__),
-                             "installed_files", conf_file),
-                os.path.join(env.galaxy_base, conf_file))
+            put(env.tool_data_table_conf_file,
+                os.path.join(env.galaxy_base, "tool_data_table_conf.xml"))
         add_str = "\t".join(line_parts)
         with cd(tools_dir):
             if not exists(ref_file):

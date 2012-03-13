@@ -121,12 +121,17 @@ def _get_install(url, env, make_command, post_unpack_fn=None):
                     post_unpack_fn(env)
                 make_command(env)
 
-def _get_install_local(url, env, make_command):
+def _get_install_local(url, env, make_command, dir_name=None):
     """Build and install in a local directory.
     """
     (_, test_name, _) = _get_expected_file(url)
     test1 = os.path.join(env.local_install, test_name)
-    test2, _ = test1.rsplit("-", 1)
+    if dir_name is not None:
+        test2 = os.path.join(env.local_install, dir_name)
+    elif "-" in test1:
+        test2, _ = test1.rsplit("-", 1)
+    else:
+        test2 = os.path.join(env.local_install, test_name.split("_")[0])
     if not exists(test1) and not exists(test2):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):

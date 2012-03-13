@@ -9,9 +9,20 @@ from fabric.contrib.console import confirm
 from fabric.contrib.files import exists, settings, hide, contains, append, sed
 
 from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.cloudman import _configure_cloudman
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
+
+def install_cloudman(env):
+    """ A meta method for installing all of CloudMan components
+        Allows CloudMan and all of its dependencies to be installed via:
+        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
+    """
+    _configure_cloudman(env, use_repo_autorun=True)
+    install_nginx(env)
+    install_proftpd(env)
+    install_sge(env)
 
 def install_nginx(env):
     version = "0.7.67"
@@ -52,10 +63,16 @@ def install_nginx(env):
         sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
         sudo('tar xvzf %s' % nginx_errdoc_file)
 
+    sudo("mkdir -p %s" % env.install_dir)
+    if not exists("%s/nginx" % env.install_dir):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
+    # If the guessed symlinking did not work, force it now
     cloudman_default_dir = "/opt/galaxy/sbin"
-    sudo("mkdir -p %s" % cloudman_default_dir)
-    if not exists("%s/nginx" % cloudman_default_dir):
+    if not exists(cloudman_default_dir):
+        sudo("mkdir -p %s" % cloudman_default_dir)
+    if not exists(os.path.join(cloudman_default_dir, "nginx")):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    env.logger.debug("Nginx installed")
 
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.
@@ -109,6 +126,7 @@ def install_proftpd(env):
                 sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, proftpd_conf_file), conf_url))
                 sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
                 sudo("cd %s; stow proftpd" % env.install_dir)
+    env.logger.debug("ProFTPd installed")
 
 def install_sge(env):
     out_dir = "ge6.2u5"
@@ -121,3 +139,4 @@ def install_sge(env):
             run("wget %s" % url)
             sudo("chown %s %s" % (env.user, install_dir))
             run("tar -C %s -xvzf %s" % (install_dir, os.path.split(url)[1]))
+    env.logger.debug("SGE setup")

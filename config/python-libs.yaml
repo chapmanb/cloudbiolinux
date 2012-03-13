@@ -30,6 +30,7 @@ pypi:
   - Pyrex
   - virtualenv
   # concurrency/web
+  - pyzmq
   - tornado
   - Twisted
   # science
@@ -40,9 +41,13 @@ pypi:
   - HTSeq
   - networkx
   - pandas
+  - pybedtools
   - pygr
   - pysam
-  - pysparse
+  # easy_install is not working for this package, but apt-get install python-pysparse is fine.
+  # TODO: debug it
+  #- pysparse
+  - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
   - scikits.learn
