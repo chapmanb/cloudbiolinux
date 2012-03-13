@@ -21,7 +21,7 @@ bio_nextgen:
     - dwgsim
     - fastqc
     - fastx_toolkit
-    - solexaqa
+    # - solexaqa
     - varianttools
     - vcftools
   analysis:

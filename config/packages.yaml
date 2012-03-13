@@ -85,6 +85,7 @@ programming:
     - emacs-goodies-el
     - emacsen-common
     - exuberant-ctags
+    - gedit
   documentation:
     - texlive-latex-base
     - texlive-latex-recommended
@@ -344,6 +345,7 @@ bio_alignment:
   - bio-linux-squint
   - bio-linux-wise2
 bio_nextgen:
+  - fastx-toolkit
   - maq
   - plink
   - last-align
