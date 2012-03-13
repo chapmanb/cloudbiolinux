@@ -1,0 +1,15 @@
+edition = minimal
+#edition_version = 0.10
+flavor = SealFlavor
+flavor_path = seal.sealflavor
+distribution = centos
+#dist_name = 
+
+# Global installation directory for packages and standard programs
+system_install = /usr
+local_install = ~/install
+shell_config = ~/.bashrc
+shell = /bin/bash -l -c
+# data_files = /mnt/biodata
+# galaxy_base = /mnt/biodata/galaxy
+

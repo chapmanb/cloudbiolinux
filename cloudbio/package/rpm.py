@@ -20,8 +20,10 @@ def _yum_packages(to_install):
         sudo("yum -y install %s" % package)
 
 def _setup_yum_bashrc():
+    return
     """Fix the user bashrc to update compilers.
     """
+    # XXX:  this is not very flexible, and malicious :-)  It causes our builds to fail in Scientific Linux
     to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
                   "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
     fname = run("ls %s" % env.shell_config)
@@ -32,7 +34,10 @@ def _setup_yum_bashrc():
 def _setup_yum_sources():
     """Add additional useful yum repositories.
     """
-    repos = ["http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm"]
+    repos = [
+      "http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm",
+      "http://archive.cloudera.com/redhat/6/x86_64/cdh/cdh3-repository-1.0-1.noarch.rpm"
+    ]
     for repo in repos:
         with settings(warn_only=True):
             sudo("rpm -Uvh %s" % repo)

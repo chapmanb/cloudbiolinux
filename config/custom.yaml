@@ -59,7 +59,6 @@ cloudman:
   - sge
 distributed:
   - mahout
-  - pydoop
 python:
   - bx-python
   - matplotlib
@@ -73,3 +72,6 @@ phylogeny:
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma
+customsealdist:
+  - pydoop
+  - seal

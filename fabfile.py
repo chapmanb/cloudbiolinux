@@ -153,7 +153,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
             _setup_apt_automation()
             _add_apt_gpg_keys()
             _apt_packages(pkg_install)
-        elif env.distibution in ["centos"]:
+        elif env.distribution in ["centos"]:
             _setup_yum_sources()
             _yum_packages(pkg_install)
             _setup_yum_bashrc()
