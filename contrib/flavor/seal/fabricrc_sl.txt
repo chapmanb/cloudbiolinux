@@ -2,7 +2,7 @@ edition = minimal
 #edition_version = 0.10
 flavor = SealFlavor
 flavor_path = seal.sealflavor
-distribution = centos
+distribution = scientificlinux
 #dist_name = 
 
 # Global installation directory for packages and standard programs

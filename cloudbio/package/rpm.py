@@ -8,7 +8,11 @@ from cloudbio.package.shared import _yaml_to_packages
 def _yum_packages(to_install):
     """Install rpm packages available via yum.
     """
-    pkg_config = os.path.join(env.config_dir, "packages-yum.yaml")
+    if env.distribution == "scientificlinux":
+        package_file = "packages-scientificlinux.yaml"
+    else:
+        package_file = "packages-yum.yaml"
+    pkg_config = os.path.join(env.config_dir, package_file)
     with settings(warn_only=True):
         sudo("yum check-update")
     sudo("yum -y upgrade")
@@ -20,16 +24,15 @@ def _yum_packages(to_install):
         sudo("yum -y install %s" % package)
 
 def _setup_yum_bashrc():
-    return
     """Fix the user bashrc to update compilers.
     """
-    # XXX:  this is not very flexible, and malicious :-)  It causes our builds to fail in Scientific Linux
-    to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
-                  "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
-    fname = run("ls %s" % env.shell_config)
-    for line in to_include:
-        if not contains(fname, line.split("=")[0]):
-            append(fname, line)
+    if env.distribution in ["centos"]:
+        to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
+                      "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
+        fname = run("ls %s" % env.shell_config)
+        for line in to_include:
+            if not contains(fname, line.split("=")[0]):
+                append(fname, line)
 
 def _setup_yum_sources():
     """Add additional useful yum repositories.

@@ -172,23 +172,3 @@ bio_utils:
 phylogeny:
   all:
   needs_64bit:
-sealdist:
-  - ant
-  - ant-junit
-  - ant-nodeps
-  - java-1.6.0-openjdk
-  - hadoop-0.20
-  - hadoop-0.20-native
-  - hadoop-0.20-pipes
-  - hadoop-0.20-source
-  - hadoop-0.20-libhdfs
-  - python
-  - python-devel
-  - boost-python-devel
-  - protobuf-c
-  - protobuf-compiler
-  - protobuf-python
-  - junit4
-  - gcc-c++
-  - openssl-devel
-  - python-pip

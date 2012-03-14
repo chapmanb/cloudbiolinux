@@ -1,5 +1,7 @@
 ---
 packages:
-  - sealdist
-  - customsealdist
+  - distributed
+  - java
+  - programming
+  - python
 libraries:

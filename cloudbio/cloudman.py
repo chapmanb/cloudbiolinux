@@ -59,7 +59,7 @@ def _setup_env(env):
         cf = urllib.urlretrieve(url)
         (packages, _) = _yaml_to_packages(cf[0], 'cloudman')
         _apt_packages(pkg_list=packages)
-    elif env.distibution in ["centos"]:
+    elif env.distibution in ["centos", "scientificlinux"]:
         env.logger.warn("No CloudMan system package dependencies for CentOS")
         pass
     reqs_file = 'requirements.txt'
