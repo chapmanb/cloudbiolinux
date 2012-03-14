@@ -32,8 +32,3 @@ def install_seal(env):
 
     export_str = "export JAVA_HOME='%s'" % java_home
     env.safe_sudo("%s && pip-python install seal" % export_str)
-
-def install_mahout(env):
-    # ToDo setup mahout, must be checked out from repo ATM:
-    # https://cwiki.apache.org/MAHOUT/mahoutec2.html
-    pass

@@ -58,7 +58,8 @@ cloudman:
   - proftpd
   - sge
 distributed:
-  - mahout
+  - pydoop
+  - seal
 python:
   - bx-python
   - matplotlib
@@ -72,6 +73,3 @@ phylogeny:
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma
-customsealdist:
-  - pydoop
-  - seal
