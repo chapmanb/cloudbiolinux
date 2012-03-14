@@ -82,6 +82,22 @@ class _DownloadHelper:
         """
         return exists(fname) or exists(os.path.join(seq_dir, fname))
 
+class UnknownGenome(object):
+    """ Non existing genomes (yet to be sequenced/assembled) need a definition
+        for downstream processing semantics.
+    """
+    def __init__(self):
+        self._name = "unknown"
+        return None
+
+    def ucsc_name(self):
+        return self._name
+
+    def download(self, seq_dir):
+        run("echo '>unknown genome' > /tmp/unknown")
+        run("echo dummy_genome >> /tmp/unknown")
+        return "unknown", ["/tmp/unknown"]
+
 class UCSCGenome(_DownloadHelper):
     def __init__(self, genome_name):
         _DownloadHelper.__init__(self)
@@ -153,7 +169,7 @@ class NCBIRest(_DownloadHelper):
             for ref in self._refs:
                 run("wget %s" % (self._base_url % ref))
                 run("ls -l")
-                run("sed -i.bak -r -e '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
+                run("sed -rie .bak '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
                     ref))
                 # sed in Fabric does not cd properly?
                 #sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
@@ -239,6 +255,8 @@ GENOMES_SUPPORTED = [
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
                "Arabidopsis_thaliana", "TAIR9")),
+           ("Athaliana", "tair9", EnsemblGenome("plants", "6", "",
+               "Arabidopsis_thaliana", "TAIR9")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
            ("Celegans", "WS210", EnsemblGenome("standard", "60", "60",
                "Caenorhabditis_elegans", "WS210")),
@@ -254,6 +272,7 @@ GENOMES_SUPPORTED = [
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
            ("Tguttata_Zebra_finch", "taeGut1", UCSCGenome("taeGut1")),
+           ("unknown", "unknown", UnknownGenome()), # Accounts for non-existant genomes (yet to be assembled)
           ]
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
