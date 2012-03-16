@@ -295,20 +295,20 @@ def install_echo(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.60"
+    version = "1.64"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.4-8-g63b7a70"
+    version = "1.5-3-gbb2c10b"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
-    version = "1.4-8-g63b7a70"
+    version = "1.5-3-gbb2c10b"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "Queue-%s%s" % (version, ext)
