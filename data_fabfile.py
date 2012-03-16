@@ -221,8 +221,8 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "1.2"
-DBSNP_VERSION = "132"
+BROAD_BUNDLE_VERSION = "1.5"
+DBSNP_VERSION = "135"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),

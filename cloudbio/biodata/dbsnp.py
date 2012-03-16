@@ -8,7 +8,7 @@ Retrieves dbSNP plus training data for variant recalibration:
   - dbsnp_132.hg19.vcf.gz
   - hapmap_3.3.hg19.sites.vcf
   - 1000G_omni2.5.hg19.sites.vcf
-  - indels_mills_devine.hg19.sites.vcf
+  - Mills_and_1000G_gold_standard.indels.hg19.sites.vcf
 """
 import os
 
@@ -22,7 +22,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
     to_download = [("dbsnp_{ver}".format(ver=dbsnp_version), ""),
                    ("hapmap_3.3", ".sites"),
                    ("1000G_omni2.5", ".sites"),
-                   ("Mills_Devine_2hit.indels", ".sites")]
+                   ("Mills_and_1000G_gold_standard.indels", ".sites")]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
