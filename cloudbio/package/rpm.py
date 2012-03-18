@@ -8,7 +8,11 @@ from cloudbio.package.shared import _yaml_to_packages
 def _yum_packages(to_install):
     """Install rpm packages available via yum.
     """
-    pkg_config = os.path.join(env.config_dir, "packages-yum.yaml")
+    if env.distribution == "scientificlinux":
+        package_file = "packages-scientificlinux.yaml"
+    else:
+        package_file = "packages-yum.yaml"
+    pkg_config = os.path.join(env.config_dir, package_file)
     with settings(warn_only=True):
         sudo("yum check-update")
     sudo("yum -y upgrade")
@@ -22,17 +26,21 @@ def _yum_packages(to_install):
 def _setup_yum_bashrc():
     """Fix the user bashrc to update compilers.
     """
-    to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
-                  "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
-    fname = run("ls %s" % env.shell_config)
-    for line in to_include:
-        if not contains(fname, line.split("=")[0]):
-            append(fname, line)
+    if env.distribution in ["centos"]:
+        to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
+                      "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
+        fname = run("ls %s" % env.shell_config)
+        for line in to_include:
+            if not contains(fname, line.split("=")[0]):
+                append(fname, line)
 
 def _setup_yum_sources():
     """Add additional useful yum repositories.
     """
-    repos = ["http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm"]
+    repos = [
+      "http://download.fedora.redhat.com/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm",
+      "http://archive.cloudera.com/redhat/6/x86_64/cdh/cdh3-repository-1.0-1.noarch.rpm"
+    ]
     for repo in repos:
         with settings(warn_only=True):
             sudo("rpm -Uvh %s" % repo)

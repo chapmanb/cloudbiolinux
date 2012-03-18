@@ -1,0 +1,23 @@
+programming:
+  - protobuf-c
+  - protobuf-compiler
+  - protobuf-python
+  - gcc-c++
+  - openssl-devel
+java:
+  - ant
+  - ant-junit
+  - ant-nodeps
+  - java-1.6.0-openjdk
+  - junit4
+python:
+  - python
+  - python-devel
+  - boost-python-devel
+  - python-pip
+distributed:
+  - hadoop-0.20
+  - hadoop-0.20-native
+  - hadoop-0.20-pipes
+  - hadoop-0.20-source
+  - hadoop-0.20-libhdfs

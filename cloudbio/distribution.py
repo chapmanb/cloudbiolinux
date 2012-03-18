@@ -21,6 +21,8 @@ def _setup_distribution_environment():
         _setup_ubuntu()
     elif env.distribution == "centos":
         _setup_centos()
+    elif env.distribution == "scientificlinux":
+        _setup_scientificlinux()
     elif env.distribution == "debian":
         _setup_debian()
     else:
@@ -111,6 +113,12 @@ def _setup_centos():
     env.logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     env.ruby_version_ext = ""
+    if not env.has_key("java_home"):
+        env.java_home = "/etc/alternatives/java_sdk"
+
+def _setup_scientificlinux():
+    env.logger.info("ScientificLinux setup")
+    env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 

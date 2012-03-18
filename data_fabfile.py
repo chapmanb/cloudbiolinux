@@ -153,7 +153,7 @@ class NCBIRest(_DownloadHelper):
             for ref in self._refs:
                 run("wget %s" % (self._base_url % ref))
                 run("ls -l")
-                run("sed -i.bak -r -e '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
+                run("sed -rie .bak '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
                     ref))
                 # sed in Fabric does not cd properly?
                 #sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
@@ -221,8 +221,8 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "1.2"
-DBSNP_VERSION = "132"
+BROAD_BUNDLE_VERSION = "1.5"
+DBSNP_VERSION = "135"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
