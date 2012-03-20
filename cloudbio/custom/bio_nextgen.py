@@ -301,14 +301,14 @@ def install_picard(env):
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.5-3-gbb2c10b"
+    version = "1.5-12-gd0056d6"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
-    version = "1.5-3-gbb2c10b"
+    version = "1.5-12-gd0056d6"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "Queue-%s%s" % (version, ext)
