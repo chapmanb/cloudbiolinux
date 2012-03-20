@@ -24,6 +24,7 @@ except ImportError:
 from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
+from fabric.context_managers import path
 try:
     import boto
 except ImportError:
@@ -267,9 +268,11 @@ def install_data(config_source=CONFIG_FILE, do_setup_environment=True):
     _check_version()
     if do_setup_environment:
         setup_environment()
-    genomes, genome_indexes, config = _get_genomes(config_source)
-    _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
-    _install_additional_data(genomes, config)
+    # Append a potentially custom system install path to PATH so tools are found
+    with path(os.path.join(env.system_install, 'bin')):
+        genomes, genome_indexes, config = _get_genomes(config_source)
+        _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
+        _install_additional_data(genomes, config)
 
 def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
