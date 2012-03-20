@@ -12,9 +12,7 @@ import os
 import sys
 import operator
 import socket
-import glob
 import subprocess
-import logging
 from contextlib import contextmanager
 from xml.etree import ElementTree
 
@@ -321,6 +319,8 @@ def _get_genomes(config_source):
         with open(config_source) as in_handle:
             config = yaml.load(in_handle)
     genomes = []
+    env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"\
+        .format(config_source, ', '.join(g['name'] for g in config['genomes'])))
     for g in config["genomes"]:
         ginfo = None
         for info in GENOMES_SUPPORTED:
@@ -375,6 +375,8 @@ def _data_ngs_genomes(genomes, genome_indexes):
     genome_dir = _make_genome_dir()
     for organism, genome, manager in genomes:
         cur_dir = os.path.join(genome_dir, organism, genome)
+        env.logger.info("Processing genome {0} and putting it to {1}"\
+            .format(organism, cur_dir))
         if not exists(cur_dir):
             run('mkdir -p %s' % cur_dir)
         with cd(cur_dir):
@@ -689,6 +691,7 @@ def _download_genomes(genomes, genome_indexes):
         if not exists(org_dir):
             run('mkdir -p %s' % org_dir)
         for idx in genome_indexes:
+            env.logger.info("Downloading genome {0} to {1}".format(orgname, org_dir))
             with cd(org_dir):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
