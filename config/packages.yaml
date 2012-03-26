@@ -115,12 +115,16 @@ programming:
     - libpcre3
     - libpcre3-dev
     - libreadline-dev
+    - mime-support
     - gcc
     - g++
     - gfortran
     - stow
     - rsync
     - python-software-properties
+  filesystem:
+    - libfuse-dev
+    - fuse-utils
   libraries:
     - libatlas-base-dev
     #- libatlas-dev

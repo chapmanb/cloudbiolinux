@@ -60,6 +60,8 @@ cloudman:
 distributed:
   - pydoop
   - seal
+system:
+  - s3fs
 python:
   - bx-python
   - matplotlib
