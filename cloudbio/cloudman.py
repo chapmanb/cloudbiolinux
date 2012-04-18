@@ -11,7 +11,7 @@ description     "Start CloudMan contextualization script"
 start on runlevel [2345]
 
 task
-exec python %s 2> %s.err
+exec python %s 2> %s.log
 """
 import os
 import urllib
@@ -26,7 +26,7 @@ from cloudbio.package.deb import _apt_packages
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 
-def _configure_cloudman(env, use_repo_autorun=False):
+def _configure_cloudman(env, use_repo_autorun=True):
     _setup_users(env)
     _setup_env(env)
     _configure_ec2_autorun(env, use_repo_autorun)
@@ -71,7 +71,7 @@ def _setup_env(env):
             sudo("pip install --upgrade --requirement={0}".format(reqs_file))
     env.logger.debug("Done setting up CloudMan's environment")
 
-def _configure_ec2_autorun(env, use_repo_autorun=False):
+def _configure_ec2_autorun(env, use_repo_autorun=True):
     script = "ec2autorun.py"
     remote = os.path.join(env.install_dir, "bin", script)
     if not exists(os.path.dirname(remote)):

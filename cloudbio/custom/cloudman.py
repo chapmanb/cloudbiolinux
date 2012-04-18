@@ -4,9 +4,8 @@ From Enis Afgan: https://bitbucket.org/afgane/mi-deployment
 """
 import os, contextlib
 
-from fabric.api import sudo, run, env, cd, put, local
-from fabric.contrib.console import confirm
-from fabric.contrib.files import exists, settings, hide, contains, append, sed
+from fabric.api import sudo, run, cd 
+from fabric.contrib.files import exists, settings, hide, contains, sed
 
 from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.cloudman import _configure_cloudman
@@ -31,8 +30,9 @@ def install_nginx(env):
     install_dir = os.path.join(env.install_dir, "nginx")
     remote_conf_dir = os.path.join(install_dir, "conf")
 
-    # skip install if already present
+    # Skip install if already present
     if exists(remote_conf_dir) and contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
+        env.logger.debug("Nginx already installed; not installing it again.")
         return
 
     with _make_tmp_dir() as work_dir:
