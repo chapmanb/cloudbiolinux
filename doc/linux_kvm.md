@@ -28,6 +28,9 @@ and add your user to the kvm group. E.g.
 
       adduser user kvm
 
+Note that not all machines support virtualization, and if they do you may need
+to switch it on in the BIOS (especially true on older hardware).
+
 # Create a bare VM
 
 Download a live installation image file. For example from
