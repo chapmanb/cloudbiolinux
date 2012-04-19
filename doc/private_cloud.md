@@ -42,7 +42,7 @@ command, and add the line
 
        user ALL=NOPASSWD: /bin/bash
 
-where user is your Fabric username. Alternatively add user to the sudo
+where user is your VM user login name. Alternatively add user to the sudo
 group.
 
 Now try:
