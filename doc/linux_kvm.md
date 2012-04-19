@@ -1,9 +1,21 @@
 # CloudBioLinux and Linux KVM
 
 This document gives some additional information on using BioLinux on Linux KVM.
+KVM is a nice virtualization environment, it is part of the Linux effort, and
+comes with brilliant tools. A 64-bit Linux can run both 32-bit and 64-bit VMs.
+
+Linux VMs are useful - especially when you deal with software upgrade paths. A VM 
+can act like a try-before-you-buy environment. But it is more that that - you
+can move VMs from one machine to another, share machines with multiple
+installed systems, etc. If you can install Linux for a server, it is probably
+a good idea to use KVM. And it just comes out of the box...
 
 In conjunction with the BioLinux fabric environment, any KMV VM can be
-bootstrapped.
+bootstrapped. Here we start from a basic Debian/Ubuntu/Mint installation. With
+Debian you can install from a fresh download of
+[stable](http://www.debian.org/releases/stable/) version burning it on a CDROM.
+The default install will do on, say, a 6GB partition - so the rest can be used
+for LVM partitioning. Select ssh and the standard system utilities.
 
 # Install KVM
 
