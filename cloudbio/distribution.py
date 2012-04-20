@@ -31,6 +31,9 @@ def _setup_distribution_environment():
     _cloudman_compatibility(env)
     _setup_nixpkgs()
     _configure_sudo(env)
+    # allow us to check for packages only available on 64bit machines
+    machine = run("uname -m")
+    env.is_64bit = machine.find("_64") > 0
 
 def _configure_sudo(env):
     """Setup env variable and safe_sudo supporting non-privileged users.

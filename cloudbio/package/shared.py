@@ -7,9 +7,6 @@ from fabric.contrib.files import *
 def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     """Read a list of packages from a nested YAML configuration file.
     """
-    # allow us to check for packages only available on 64bit machines
-    machine = run("uname -m")
-    is_64bit = machine.find("_64") > 0
     env.logger.info("Reading %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
@@ -35,7 +32,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                 for key, val in cur_info.iteritems():
                     # if we are okay, propagate with the top level key
                     if key == 'needs_64bit':
-                        if is_64bit:
+                        if env.is_64bit:
                             data.append((cur_key, val))
                     elif key.startswith(env.distribution):
                         if key.endswith(env.dist_name):
