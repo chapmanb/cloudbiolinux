@@ -1,8 +1,9 @@
 # CloudBioLinux and Linux KVM
 
 This document gives some additional information on using BioLinux on Linux KVM.
-KVM is a nice virtualization environment, it is part of the Linux effort, and
-comes with brilliant tools. A 64-bit Linux can run both 32-bit and 64-bit VMs.
+KVM is a nice virtualization environment, it is part of the Linux effort, will
+work with the default Linux kernel, and comes with brilliant tools. A 64-bit
+Linux can run both 32-bit and 64-bit VMs.
 
 Linux VMs are useful - especially when you deal with software upgrade paths. A VM 
 can act like a try-before-you-buy environment. But it is more that that - you
@@ -28,8 +29,14 @@ and add your user to the kvm group. E.g.
 
       adduser user kvm
 
+For non-Debian systems see, for example, [OpenSuse](http://doc.opensuse.org/documentation/html/openSUSE/opensuse-kvm/cha.kvm.requires.html).
+
 Note that not all machines support virtualization, and if they do you may need
-to switch it on in the BIOS (especially true on older hardware).
+to switch it on in the BIOS (especially true on older hardware). Check for CPU support with:
+
+  egrep --color '(vmx|svm)' /proc/cpuinfo
+
+Also note that on older Linux installations may need a kernel upgrade.
 
 # Create a bare VM
 
