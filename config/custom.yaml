@@ -72,9 +72,9 @@ phylogeny:
   - tracer
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
-#vcr:
-cloudvigor:
+vcr:
   - cloudvigor
+  - test_cloudvigor
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

@@ -1,16 +1,9 @@
-#
-# cloud-install-fabfile.py
-#
-
 import os.path, re
 from fabric.api import cd, env, hide, local, run, settings, sudo, task
 from fabric.network import disconnect_all
 
-
-
-
-@task
-def install_cloudvigor():
+    
+def install_cloudvigor(env):
     try:
         _initialize_script()
         _initialize_host()
@@ -19,38 +12,7 @@ def install_cloudvigor():
     finally:
         disconnect_all()
 
-@task
-def clean_all():
-    try:
-        _initialize_script()
-        _initialize_host()
-        _remove_vigor()
-        _remove_tools()
-        _remove_dir(env.SCRATCH_DIR)
-    finally:
-        disconnect_all()
-
-@task(default=True)
-def help():
-    print("""
-    Targets:
-        install         - Initializes the VM, creates appropriate resources,
-                            and installs VIGOR pipeline.
-
-        clean_all       - Removes this VIGOR installation and all related
-                            resources. (Does not return the VM to
-                            pre-initialization state.)
-
-        run_tests       - Runs tests using the VIGOR pipeline and sample data.
-
-        validate_tests  - Compares the test output from these tests to a
-                            curated copy of the test output.
-
-        help            - This text.
-        \n""")
-
-@task
-def run_tests():
+def install_test_cloudvigor():
     try:
         _initialize_script()
 
@@ -137,13 +99,12 @@ def run_tests():
     finally:
         disconnect_all()
 
-@task
-def validate_tests():
+def install_validate_vigor():
     print("here0")
     try:
         _initialize_script()
-        _install_tarfile(env.AMAZONS3_URL, "vigor-20111129code-test-output-lserver.tgz",
-                         env.VIGOR_VALIDATION_TEST_DATA_DIR)
+        _install_package(env.AMAZONS3_URL, "vigor-20111129code-test-output-lserver.tgz",
+                         env.VIGOR_VALIDATION_TEST_DATA_DIR, True)
         with settings(hide("running","stdout")):
             results = run("""diff -qr %(VIGOR_VALIDATION_TEST_DATA_DIR)s \
                           %(VIGOR_TEST_OUTPUT_DIR)s \
@@ -191,18 +152,20 @@ def _initialize_host():
 
 def _initialize_script():
 
+#    machine = run("uname -m")
+#    print(machine)
+#    if machine.find("_64"):
+#        env.ARCH = 'x64-linux'
+#    else:
+#        env.ARCH = 'ia32-linux'
+
+    env.ARCH = 'ia32-linux'
 
     env.ROOT_DIR = '/usr/local'
     env.SCRATCH_DIR = '/usr/local/scratch'
     env.AMAZONS3_URL = 'https://s3.amazonaws.com/VIGOR-GSC'
-    #env.BLAST_NAME = 'blast-2.2.15'
-    #env.BLAST_ARCH = 'x64-linux'
     env.BLAST_NAME = 'blast-2.2.15'
-    env.BLAST_ARCH = 'ia32-linux'
-    #env.CLUSTALW_NAME = 'clustalw-2.1'
-    #env.CLUSTAL_ARCH= 'linux-x86_64-libcppstatic'
     env.CLUSTALW_NAME = 'clustalw-1.83'
-    env.CLUSTALW_ARCH = 'linux-ia32'
     env.VIGOR_NAME = 'vigor-GSCcloud-release-20111129'
     env.VIGOR_SAMPLE_DATA_TAR_FILENAME = 'vigor-sample-data.tgz'
 
@@ -215,31 +178,29 @@ def _initialize_script():
     print("BLAST_NAME[%(BLAST_NAME)s]" % env)
     print("CLUSTALW_NAME[%(CLUSTALW_NAME)s]" % env)
     print("VIGOR_NAME[%(VIGOR_NAME)s]" % env)
-    print("VIGOR_SAMPLE_DATA_TAR_FILENAME[%(VIGOR_SAMPLE_DATA_TAR_FILENAME)s]"
-          % env)
+    print("VIGOR_SAMPLE_DATA_TAR_FILENAME[%(VIGOR_SAMPLE_DATA_TAR_FILENAME)s]" % env)
+    print("ARCH[%(ARCH)s]" % env)
+          
     env.HOME = os.path.join("/home", env.user)
 
     env.TOOLS_DIR = os.path.join(env.ROOT_DIR, "tools")
     env.VIGOR_RUNTIME_DIR = os.path.join(env.TOOLS_DIR, "vigor")
     env.VIGOR_SCRATCH_DIR = os.path.join(env.SCRATCH_DIR, "vigor")
     env.VIGOR_TEMPSPACE_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "tempspace")
-    env.VIGOR_SAMPLE_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR,
-                                              "sample-data")
+    env.VIGOR_SAMPLE_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "sample-data")
     env.VIGOR_TAR_FILENAME = "%(VIGOR_NAME)s.tgz" % env
-    env.VIGOR_TEST_OUTPUT_DIR = os.path.join(env.VIGOR_SCRATCH_DIR,
-                                              "test-output")
-    env.VIGOR_VALIDATION_TEST_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR,
-                                                      "validate-test-data")
+    env.VIGOR_TEST_OUTPUT_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "test-output")
+    env.VIGOR_VALIDATION_TEST_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "validate-test-data")
     env.BLAST_DIR = os.path.join(env.TOOLS_DIR, "blast")
     env.CLUSTALW_DIR = os.path.join(env.TOOLS_DIR, "clustalw")
     env.EXE_DIR = "/usr/local/bin"
-    env.BLAST_TAR_FILENAME = "%(BLAST_NAME)s-%(BLAST_ARCH)s.tar.gz" % env
-    env.CLUSTALW_TAR_FILENAME = "%(CLUSTALW_NAME)s-%(CLUSTALW_ARCH)s.tar.gz" % env
+    env.BLAST_TAR_FILENAME = "%(BLAST_NAME)s-%(ARCH)s.tar.gz" % env
+    env.CLUSTALW_TAR_FILENAME = "%(CLUSTALW_NAME)s-%(ARCH)s.deb" % env
 
 def _install_blast():
     print("    Installing blast...")
     _create_tools_dir()
-    _install_tarfile(env.AMAZONS3_URL, env.BLAST_TAR_FILENAME, env.BLAST_DIR)
+    _install_package(env.AMAZONS3_URL, env.BLAST_TAR_FILENAME, env.BLAST_DIR, True)
     if not _path_exists(os.path.join(env.EXE_DIR, "blastall")):
         sudo("ln -s %s %s"
             % (os.path.join(env.BLAST_DIR, env.BLAST_NAME, "bin", "*"),
@@ -248,13 +209,13 @@ def _install_blast():
 def _install_clustalw():
     print("    Installing clustalw...")
     _create_tools_dir()
-    _install_tarfile(env.AMAZONS3_URL, env.CLUSTALW_TAR_FILENAME,
-                     env.CLUSTALW_DIR)
+    _install_package(env.AMAZONS3_URL, env.CLUSTALW_TAR_FILENAME,
+                     env.CLUSTALW_DIR, False)
     if not _path_exists(os.path.join(env.EXE_DIR, "clustalw")):
-        if re.search("64", env.CLUSTALW_ARCH):
+        if re.search("64", env.ARCH):
             clustalw_filespec = (
                 os.path.join(env.CLUSTALW_DIR,
-                             "%s-%s" % (env.CLUSTALW_NAME, env.CLUSTALW_ARCH),
+                             "%s-%s" % (env.CLUSTALW_NAME, env.ARCH),
                              "clustalw2"))
             sudo("ln -s %s %s" % (clustalw_filespec, env.EXE_DIR))
             sudo("ln -s %s %s" % (clustalw_filespec,
@@ -268,23 +229,23 @@ def _install_tools():
     print("Install tools...")
     _create_tools_dir()
     _install_blast()
-    #_install_clustalw()
+    _install_clustalw()
 
 def _install_vigor():
     print("Installing VIGOR...")
     _create_vigor_tempspace_dir()
     _create_vigor_scratch_dir()
     _install_vigor_sample_data()
-    _install_tarfile(env.AMAZONS3_URL, env.VIGOR_TAR_FILENAME,
-                     env.VIGOR_RUNTIME_DIR)
+    _install_package(env.AMAZONS3_URL, env.VIGOR_TAR_FILENAME,
+                     env.VIGOR_RUNTIME_DIR, True)
     sudo("chmod 755 %s" % os.path.join(env.VIGOR_RUNTIME_DIR, "*.pl"))
     if not _path_exists(os.path.join(env.EXE_DIR, "perl")):
         sudo("ln -s %s %s" % ("/usr/bin/perl", env.EXE_DIR))
 
 def _install_vigor_sample_data():
     print("    Installing VIGOR sample data...")
-    _install_tarfile(env.AMAZONS3_URL, env.VIGOR_SAMPLE_DATA_TAR_FILENAME,
-                 env.VIGOR_SAMPLE_DATA_DIR)
+    _install_package(env.AMAZONS3_URL, env.VIGOR_SAMPLE_DATA_TAR_FILENAME,
+                 env.VIGOR_SAMPLE_DATA_DIR, True)
     sudo("find %(VIGOR_SAMPLE_DATA_DIR)s -type f -exec chmod ugo-w {} \;"
          % env)
     sudo("find %(VIGOR_SAMPLE_DATA_DIR)s -type d -exec chmod 555 {} \;"
@@ -319,15 +280,19 @@ def _remove_vigor():
 
 # Utility methods.
 
-def _install_tarfile(download_url, tar_filename, install_dir):
+def _install_package(download_url, filename, install_dir, tar):
     if not _path_is_dir(install_dir):
         sudo("mkdir -p %s" % install_dir)
     with cd(install_dir):
-        if not _path_exists(os.path.join(install_dir, tar_filename)):
+        if not _path_exists(os.path.join(install_dir, filename)):
             sudo("""wget --no-host-directories --cut-dirs=1 \
                  --directory-prefix=%s %s/%s"""
-                % (install_dir, download_url, tar_filename))
-            sudo("tar xvfz %s" % tar_filename)
+                % (install_dir, download_url, filename))
+            if tar:
+                sudo("tar xvfz %s" % filename)
+            else: 
+                sudo("dpkg -x %s %s" % (filename,install_dir))
+                sudo("cp %s/usr/bin/* %s" % (install_dir,install_dir))
     sudo("chown -R %s:%s %s" % (env.user, env.user, install_dir))
     sudo("find %s -type d -exec chmod 755 {} \;" % install_dir)
 
