@@ -12,7 +12,7 @@ def install_cloudvigor(env):
     finally:
         disconnect_all()
 
-def install_test_cloudvigor():
+def install_test_cloudvigor(env):
     try:
         _initialize_script()
 
@@ -152,14 +152,12 @@ def _initialize_host():
 
 def _initialize_script():
 
-#    machine = run("uname -m")
-#    print(machine)
-#    if machine.find("_64"):
-#        env.ARCH = 'x64-linux'
-#    else:
-#        env.ARCH = 'ia32-linux'
+    machine = run("uname -m")
 
-    env.ARCH = 'ia32-linux'
+    if machine.find('64')>0:
+        env.ARCH = 'x64-linux'
+    else:
+        env.ARCH = 'ia32-linux'
 
     env.ROOT_DIR = '/usr/local'
     env.SCRATCH_DIR = '/usr/local/scratch'
@@ -212,15 +210,6 @@ def _install_clustalw():
     _install_package(env.AMAZONS3_URL, env.CLUSTALW_TAR_FILENAME,
                      env.CLUSTALW_DIR, False)
     if not _path_exists(os.path.join(env.EXE_DIR, "clustalw")):
-        if re.search("64", env.ARCH):
-            clustalw_filespec = (
-                os.path.join(env.CLUSTALW_DIR,
-                             "%s-%s" % (env.CLUSTALW_NAME, env.ARCH),
-                             "clustalw2"))
-            sudo("ln -s %s %s" % (clustalw_filespec, env.EXE_DIR))
-            sudo("ln -s %s %s" % (clustalw_filespec,
-                                  os.path.join(env.EXE_DIR, "clustalw")))
-        else:
             sudo("ln -s %s %s"
                  % (os.path.join(env.CLUSTALW_DIR, env.CLUSTALW_NAME, "clustalw"),
                     env.EXE_DIR))
@@ -292,7 +281,8 @@ def _install_package(download_url, filename, install_dir, tar):
                 sudo("tar xvfz %s" % filename)
             else: 
                 sudo("dpkg -x %s %s" % (filename,install_dir))
-                sudo("cp %s/usr/bin/* %s" % (install_dir,install_dir))
+                sudo("mkdir %s/%s" % (install_dir, env.CLUSTALW_NAME))
+                sudo("cp %s/usr/bin/* %s/%s" % (install_dir,install_dir,env.CLUSTALW_NAME))
     sudo("chown -R %s:%s %s" % (env.user, env.user, install_dir))
     sudo("find %s -type d -exec chmod 755 {} \;" % install_dir)
 
