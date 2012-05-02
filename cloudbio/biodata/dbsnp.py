@@ -49,7 +49,7 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.
     """
-    base_url = "https://s3.amazonaws.com/biodata/variants/"
+    base_url = "https://s3.amazonaws.com/biodata/variants"
     base_name = "background-diversity-1000g.vcf"
     if gid in ["GRCh37"] and not exists("{0}.gz".format(base_name)):
         for ext in ["gz", "gz.tbi"]:
