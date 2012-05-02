@@ -248,7 +248,7 @@ def install_fastqc(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
-@_if_not_installed("intersectBed")
+@_if_not_installed("bedtools")
 def install_bedtools(env):
     repository = "git clone git://github.com/arq5x/bedtools.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
