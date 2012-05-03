@@ -12,7 +12,7 @@ def install_cloudvigor(env):
     finally:
         disconnect_all()
 
-def install_test_cloudvigor(env):
+def install_testcloudvigor(env):
     try:
         _initialize_script()
 
@@ -99,7 +99,7 @@ def install_test_cloudvigor(env):
     finally:
         disconnect_all()
 
-def install_validate_vigor():
+def install_validatevigor(env):
     print("here0")
     try:
         _initialize_script()
@@ -113,6 +113,18 @@ def install_validate_vigor():
             print("\n\nValidation Failed:\n\n%s\n" % results)
     finally:
         disconnect_all()
+
+
+def install_cleanall(env):
+    try:
+        _initialize_script()
+        _initialize_host()
+        _remove_vigor()
+        _remove_tools()
+        _remove_dir(env.SCRATCH_DIR)
+    finally:
+        disconnect_all()
+
 
 def _create_scratch_dir():
     if not _path_is_dir(env.VIGOR_SCRATCH_DIR):
