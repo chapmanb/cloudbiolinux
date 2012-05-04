@@ -71,7 +71,12 @@ java:
 phylogeny:
   - tracer
   - beast
-  #- cljr
+#Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
+vcr:
+  - cloudvigor
+  - testcloudvigor
+  - validatevigor 
+  - cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma
