@@ -106,7 +106,7 @@ def install_validatevigor(env):
         _install_package(env.AMAZONS3_URL, "vigor-20111129code-test-output-lserver.tgz",
                          env.VIGOR_VALIDATION_TEST_DATA_DIR, True)
         with settings(hide("running","stdout")):
-            results = run("""diff -qr %(VIGOR_VALIDATION_TEST_DATA_DIR)s \
+            results = run("""diff -Bwr %(VIGOR_VALIDATION_TEST_DATA_DIR)s \
                           %(VIGOR_TEST_OUTPUT_DIR)s \
                           || echo 'VALIDATION FAILED'""" % env)
         if results:
@@ -173,7 +173,8 @@ def _initialize_script():
 
     env.ROOT_DIR = '/usr/local'
     env.SCRATCH_DIR = '/usr/local/scratch'
-    env.AMAZONS3_URL = 'https://s3.amazonaws.com/VIGOR-GSC'
+    #env.AMAZONS3_URL = 'https://s3.amazonaws.com/VIGOR-GSC'
+    env.AMAZONS3_URL = 'https://github.com/downloads/JCVI-Cloud/cloudbiolinux'
     env.BLAST_NAME = 'blast-2.2.15'
     env.CLUSTALW_NAME = 'clustalw-1.83'
     env.VIGOR_NAME = 'vigor-GSCcloud-release-20111129'
