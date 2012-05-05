@@ -365,7 +365,7 @@ def _install_samtools_libs(env):
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
-    version = "1.4.1"
+    version = "2.0.0"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
