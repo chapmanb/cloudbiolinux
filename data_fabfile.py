@@ -40,9 +40,10 @@ try:
     from cloudbio.biodata.rnaseq import download_transcripts
     from cloudbio.distribution import _setup_distribution_environment
     from cloudbio.utils import _setup_logging
+    do_additional = True
 except ImportError:
-    download_dbsnp, download_transcripts, _setup_distribution_environment, _setup_logging = \
-                    (None, None, None, None)
+    do_additional, _setup_distribution_environment, _setup_logging = \
+                   (None, None, None)
 
 # -- Host specific setup
 
@@ -271,8 +272,9 @@ def install_data(config_source=CONFIG_FILE, do_setup_environment=True):
     # Append a potentially custom system install path to PATH so tools are found
     with path(os.path.join(env.system_install, 'bin')):
         genomes, genome_indexes, config = _get_genomes(config_source)
-        _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
-        _install_additional_data(genomes, config)
+        genome_indexes += DEFAULT_GENOME_INDEXES
+        _data_ngs_genomes(genomes, genome_indexes)
+        _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
@@ -281,8 +283,9 @@ def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     if do_setup_environment:
         setup_environment()
     genomes, genome_indexes, config = _get_genomes(config_source)
-    _download_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
-    _install_additional_data(genomes, config)
+    genome_indexes += DEFAULT_GENOME_INDEXES
+    _download_genomes(genomes, genome_indexes)
+    _install_additional_data(genomes, genome_indexes, config)
 
 def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
@@ -294,14 +297,17 @@ def upload_s3(config_source=CONFIG_FILE):
     _check_version()
     setup_environment()
     genomes, genome_indexes, config = _get_genomes(config_source)
-    _data_ngs_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
-    _upload_genomes(genomes, genome_indexes + DEFAULT_GENOME_INDEXES)
+    genome_indexes += DEFAULT_GENOME_INDEXES
+    _data_ngs_genomes(genomes, genome_indexes)
+    _upload_genomes(genomes, genome_indexes)
 
-def _install_additional_data(genomes, config):
-    if download_dbsnp is not None:
-        download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
-    if download_transcripts is not None:
-        download_transcripts(genomes, env)
+def _install_additional_data(genomes, genome_indexes, config):
+    if not do_additional:
+        return
+    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    download_transcripts(genomes, env)
+    for custom in config.get("custom", []):
+        _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]
         _data_liftover(lift_over_genomes)
@@ -423,6 +429,48 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
             str_parts = _build_galaxy_loc_line(gid, os.path.join(work_dir, cur_index),
                                                config, prefix, new_style, tool_name)
             _update_loc_file(ref_index_file, str_parts)
+
+class CustomMaskManager:
+    """Create a custom genome based on masking an existing genome.
+    """
+    def __init__(self, custom, config):
+        assert custom.has_key("mask")
+        self._custom = custom
+        self.config = config
+ 
+    def download(self, seq_dir):
+        base_seq = os.path.join(os.pardir, self._custom["base"],
+                                "seq", "{0}.fa".format(self._custom["base"]))
+        assert exists(base_seq)
+        mask_file = os.path.basename(self._custom["mask"])
+        ready_mask = apply("{0}-complement{1}".format, os.path.splitext(mask_file))
+        out_fasta = "{0}.fa".format(self._custom["dbkey"])
+        if not exists(os.path.join(seq_dir, out_fasta)):
+            if not exists(mask_file):
+                run("wget {0}".format(self._custom["mask"]))
+            if not exists(ready_mask):
+                run("bedtools complement -i {i} -g {g}.fai > {o}".format(
+                    i=mask_file, g=base_seq, o=ready_mask))
+            if not exists(out_fasta):
+                run("bedtools maskfasta -fi {fi} -bed {bed} -fo {fo}".format(
+                    fi=base_seq, bed=ready_mask, fo=out_fasta))
+        return out_fasta, [mask_file, ready_mask]
+
+def _prep_custom_genome(custom, genomes, genome_indexes, env):
+    """Prepare a custom genome derived from existing genome.
+    Allows creation of masked genomes for specific purposes.
+    """
+    cur_org = None
+    cur_manager = None
+    for org, gid, manager in genomes:
+        if gid == custom["base"]:
+            cur_org = org
+            cur_manager = manager
+            break
+    assert cur_org is not None
+    _data_ngs_genomes([[cur_org, custom["dbkey"],
+                        CustomMaskManager(custom, cur_manager.config)]],
+                      genome_indexes)
 
 class LocCols(object):
     # Hold all possible .loc file column fields making sure the local
@@ -694,7 +742,7 @@ def _download_genomes(genomes, genome_indexes):
         if not exists(org_dir):
             run('mkdir -p %s' % org_dir)
         for idx in genome_indexes:
-            env.logger.info("Downloading genome {0} to {1}".format(orgname, org_dir))
+            env.logger.info("Downloading genome {0} to {1}".format(gid, org_dir))
             with cd(org_dir):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
