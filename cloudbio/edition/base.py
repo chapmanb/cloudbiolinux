@@ -73,11 +73,12 @@ class CloudBioLinux(Edition):
         self.name = "CloudBioLinux Edition"
         self.short_name = "cloudbiolinux"
         
-    def post_install(self):
+    def post_install(self, pkg_install=[]):
         """Add scripts for starting FreeNX and CloudMan.
         """
         _freenx_scripts(self.env)
-        _configure_cloudman(self.env)
+        if 'cloudman' in pkg_install:
+            _configure_cloudman(self.env)
 
 class BioNode(Edition):
     """BioNode specialization of BioLinux

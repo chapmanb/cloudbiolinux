@@ -108,8 +108,8 @@ def _wget_with_cookies(ref_url, dl_url):
 
 @_if_not_installed("novoalign")
 def install_novoalign(env):
-    base_version = "V2.07.17"
-    cs_version = "V1.01.17"
+    base_version = "V2.08.01"
+    cs_version = "V1.02.01"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
@@ -248,7 +248,7 @@ def install_fastqc(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
-@_if_not_installed("intersectBed")
+@_if_not_installed("bedtools")
 def install_bedtools(env):
     repository = "git clone git://github.com/arq5x/bedtools.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
@@ -365,7 +365,7 @@ def _install_samtools_libs(env):
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
-    version = "1.4.1"
+    version = "2.0.0"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 

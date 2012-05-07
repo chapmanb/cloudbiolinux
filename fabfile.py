@@ -168,7 +168,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
-        env.edition.post_install()
+        env.edition.post_install(pkg_install=pkg_install)
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
@@ -242,6 +242,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
         _create_local_paths()
         pkg_config = os.path.join(env.config_dir, "custom.yaml")
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+
     try:
         env.logger.debug("Import %s" % p)
         # Allow direct calling of a program install method, even if the program
