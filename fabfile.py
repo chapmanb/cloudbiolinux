@@ -168,7 +168,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
-        env.edition.post_install()
+        env.edition.post_install(pkg_install=pkg_install)
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
