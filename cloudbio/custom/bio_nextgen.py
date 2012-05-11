@@ -295,13 +295,13 @@ def install_echo(env):
 # -- Analysis
 
 def install_picard(env):
-    version = "1.64"
+    version = "1.68"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.5-12-gd0056d6"
+    version = "1.6-5-g557da77"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
