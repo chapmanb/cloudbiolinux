@@ -24,7 +24,7 @@ def install_cloudman(env):
     install_sge(env)
 
 def install_nginx(env):
-    version = "0.7.67"
+    version = "1.2.0"
     url = "http://nginx.org/download/nginx-%s.tar.gz" % version
 
     install_dir = os.path.join(env.install_dir, "nginx")
@@ -43,7 +43,7 @@ def install_nginx(env):
             run("tar xvzf %s" % os.path.split(url)[1])
             with cd("nginx-%s" % version):
                 run("./configure --prefix=%s --with-ipv6 %s "
-                    "--user=galaxy --group=galaxy "
+                    "--user=galaxy --group=galaxy --with-debug "
                     "--with-http_ssl_module --with-http_gzip_static_module" %
                     (install_dir, module_flags))
                 sed("objs/Makefile", "-Werror", "")
@@ -72,12 +72,12 @@ def install_nginx(env):
         sudo("mkdir -p %s" % cloudman_default_dir)
     if not exists(os.path.join(cloudman_default_dir, "nginx")):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
-    env.logger.debug("Nginx installed")
+    env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
 
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.
     """
-    upload_module_version = "2.0.12"
+    upload_module_version = "2.2.0"
     chunk_module_version = "0.22"
     chunk_git_version = "b46dd27"
     modules = []
