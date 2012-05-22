@@ -36,6 +36,7 @@ pypi:
   # science
   - biopython
   - bcbio-nextgen
+  - ruffus
   #- cogent # build error with python 2.7
   - DendroPy
   - HTSeq
