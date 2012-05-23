@@ -45,9 +45,9 @@ def install_bowtie(env):
 def install_bowtie2(env):
     """Install the bowtie2 short read aligner, with gap support.
     """
-    version = "2.0.0-beta5"
+    version = "2.0.0-beta6"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
-          "bowtie2-%s.zip" % (version, version)
+          "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
 @_if_not_installed("bwa")
@@ -207,9 +207,9 @@ def install_varianttools(env):
 
 @_if_not_installed("pseq")
 def install_plink_seq(env):
-    version = "0.07"
+    version = "0.08"
     url = "http://atgu.mgh.harvard.edu/plinkseq/dist/" \
-          "plinkseq-{0}-x86_64.tar.gz".format(version)
+          "version-{v}/plinkseq-{v}-x86_64.tar.gz".format(v=version)
     def _plink_copy(env):
         for x in ["pseq"]:
             env.safe_sudo("cp {0} {1}/bin".format(x, env.system_install))
@@ -232,7 +232,7 @@ def install_dwgsim(env):
 
 @_if_not_installed("fastqc")
 def install_fastqc(env):
-    version = "0.10.0"
+    version = "0.10.1"
     url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
           "fastqc_v%s.zip" % version
     executable = "fastqc"
@@ -362,27 +362,57 @@ def _install_samtools_libs(env):
     if not exists(check_dir):
         _get_install(repository, env, _samtools_lib_install)
 
+def _install_boost(env):
+    version = "1.49.0"
+    url = "http://downloads.sourceforge.net/project/boost/boost" \
+          "/%s/boost_%s.tar.bz2" % (version, version.replace(".", "_"))
+    check_version = "_".join(version.split(".")[:2])
+    boost_dir = os.path.join(env.system_install, "boost")
+    boost_version_file = os.path.join(boost_dir, "include", "boost", "version.hpp")
+    def _boost_build(env):
+        run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
+        run("./b2")
+        env.safe_sudo("./b2 install")
+    if not exists(boost_version_file) or not contains(boost_version_file, check_version):
+        _get_install(url, env, _boost_build)
+        thread_lib = "libboost_thread.so.%s" % version
+        final_lib = os.path.join(env.system_install, "lib", thread_lib)
+        orig_lib = os.pth.join(boost_dir, "lib", thread_lib)
+        if not exists(final_lib):
+            env.safe_sudo("ln -s %s %s" % (orig_lib, final_lib))
+
+def _cufflinks_configure_make(env):
+    orig_eigen = "%s/include/eigen3" % env.system_install
+    need_eigen = "%s/include/eigen3/include" % env.system_install
+    if not exists(need_eigen):
+        env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
+    run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
+        " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
+    run("make")
+    env.safe_sudo("make install")
+
 @_if_not_installed("tophat")
 def install_tophat(env):
     _install_samtools_libs(env)
+    _install_boost(env)
     version = "2.0.0"
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
-    _get_install(url, env, _configure_make)
+    _get_install(url, env, _cufflinks_configure_make)
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
-    # XXX problems on CentOS with older default version of boost libraries
     _install_samtools_libs(env)
-    version = "1.3.0"
+    _install_boost(env)
+    version = "2.0.0"
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
-    _get_install(url, env, _configure_make)
+    _get_install(url, env, _cufflinks_configure_make)
 
 # --- Assembly
 
 @_if_not_installed("ABYSS")
 def install_abyss(env):
     # XXX check for no sparehash on non-ubuntu systems
-    version = "1.3.1"
+    version = "1.3.3"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
     def _remove_werror_get_boost(env):
         sed("configure", " -Werror", "")
@@ -393,14 +423,15 @@ def install_abyss(env):
     _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
-    version = "1.2.0"
+    version = "1.3.2"
+    ext = "_20120516"
     url = "http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss/" \
-          "releases/%s/trans-ABySS-v%s.tar.gz" % (version, version)
+          "releases/%s/trans-ABySS-v%s%s.tar.gz" % (version, version, ext)
     _get_install_local(url, env, _make_copy(do_make=False))
 
 @_if_not_installed("velvetg")
 def install_velvet(env):
-    version = "1.1.06"
+    version = "1.2.05"
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
         """Fix library order problem in recent gcc versions
@@ -412,17 +443,17 @@ def install_velvet(env):
                  post_unpack_fn=_fix_library_order)
 
 def install_trinity(env):
-    version = "r2011-10-29"
+    version = "r2012-05-18"
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
-          "trinityrnaseq_%s.tgz" % version
+          "trinityrnaseq_%s.tar.gz" % version
     _get_install_local(url, env, _make_copy())
 
 # --- ChIP-seq
 
 @_if_not_installed("macs14")
 def install_macs(env):
-    version = "1.4.1"
-    url = "http://macs:chipseq@liulab.dfci.harvard.edu/MACS/src/" \
+    version = "1.4.2"
+    url = "https://github.com/downloads/taoliu/MACS/" \
           "MACS-%s.tar.gz" % version
     _get_install(url, env, _python_make)
 

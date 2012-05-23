@@ -122,6 +122,7 @@ programming:
     - stow
     - rsync
     - python-software-properties
+    - protobuf-compiler
   filesystem:
     - libfuse-dev
     - fuse-utils
@@ -130,6 +131,7 @@ programming:
     #- libatlas-dev
     - libblas-dev
     - liblapack-dev
+    - libeigen3-dev
     - tcl-dev
     - tk-dev
     - imagemagick
@@ -369,8 +371,6 @@ bio_sequencing:
 bio_annotation:
   - mcl
   - tigr-glimmer
-  - bio-linux-act
-  - bio-linux-artemis
   - bio-linux-big-blast
   - bio-linux-cd-hit
   - bio-linux-estscan
@@ -381,6 +381,8 @@ bio_annotation:
   - bio-linux-transterm-hp
   - bio-linux-trnascan
   - bio-linux-tetra
+  # Conflict: - bio-linux-act
+  # Conflict: - bio-linux-artemis
   # 500Mb of disk: - bio-linux-priam
   # Package broken: - bio-linux-yamap
 bio_microarray:

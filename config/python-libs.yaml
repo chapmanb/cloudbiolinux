@@ -38,7 +38,7 @@ pypi:
   - biopython
   - bcbio-nextgen
   - ruffus
-  - cogent
+  #- cogent
   - DendroPy
   - HTSeq
   - networkx
