@@ -15,13 +15,14 @@ pypi:
   - numpy
   - paste
   - pastescript
-  #- pycrypto # build failure with 2.4
+  - pycrypto
   - python-cjson
   - pyOpenSSL
   - pyyaml
   - routes
   - simplejson
   - sphinx
+  - StarCluster 
   - webhelpers
   - webob
   - xlrd
@@ -37,7 +38,7 @@ pypi:
   - biopython
   - bcbio-nextgen
   - ruffus
-  #- cogent # build error with python 2.7
+  - cogent
   - DendroPy
   - HTSeq
   - networkx
@@ -45,9 +46,6 @@ pypi:
   - pybedtools
   - pygr
   - pysam
-  # easy_install is not working for this package, but apt-get install python-pysparse is fine.
-  # TODO: debug it
-  #- pysparse
   - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
@@ -73,3 +71,4 @@ pypi:
 ## compile problems
   #- tables
   #- pygraphviz
+  #- pysparse
