@@ -29,6 +29,7 @@ CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 def _configure_cloudman(env, use_repo_autorun=True):
     _setup_users(env)
     _setup_env(env)
+    _configure_logrotate(env)
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
     _configure_nfs(env)
@@ -70,6 +71,16 @@ def _setup_env(env):
             run("wget --output-document=%s %s" % (reqs_file, url))
             sudo("pip install --upgrade --requirement={0}".format(reqs_file))
     env.logger.debug("Done setting up CloudMan's environment")
+
+def _configure_logrotate(env):
+    """
+    Add logrotate config file, which will automatically rotate CloudMan's log
+    """
+    conf_file = "cloudman.logrotate"
+    remote = '/etc/logrotate.d/cloudman'
+    url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
+    sudo("wget --output-document=%s %s" % (remote, url))
+    env.logger.debug("----- Added logrotate file to {0} -----".format(remote))
 
 def _configure_ec2_autorun(env, use_repo_autorun=True):
     script = "ec2autorun.py"
