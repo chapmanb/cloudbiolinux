@@ -102,6 +102,7 @@ def install_proftpd(env):
     remote_conf_dir = os.path.join(install_dir, "etc")
     # skip install if already present
     if exists(remote_conf_dir):
+        env.logger.debug("ProFTPd seems to already be installed in {0}".format(install_dir))
         return
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
@@ -116,19 +117,25 @@ def install_proftpd(env):
                 sudo("make")
                 sudo("make install")
                 sudo("make clean")
-                # Get init.d startup script
-                initd_script = 'proftpd'
-                initd_url = os.path.join(REPO_ROOT_URL, 'conf_files', initd_script)
-                sudo("wget --output-document=%s %s" % (os.path.join('/etc/init.d', initd_script), initd_url))
-                sudo("chmod 755 %s" % os.path.join('/etc/init.d', initd_script))
-                # Get configuration files
-                proftpd_conf_file = 'proftpd.conf'
-                welcome_msg_file = 'welcome_msg.txt'
-                conf_url = os.path.join(REPO_ROOT_URL, 'conf_files', proftpd_conf_file)
-                welcome_url = os.path.join(REPO_ROOT_URL, 'conf_files', welcome_msg_file)
-                sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, proftpd_conf_file), conf_url))
-                sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
-                sudo("cd %s; stow proftpd" % env.install_dir)
+    # Get the init.d startup script
+    initd_script = 'proftpd.initd'
+    initd_url = os.path.join(REPO_ROOT_URL, 'conf_files', initd_script)
+    remote_file = "/etc/init.d/proftpd"
+    sudo("wget --output-document=%s %s" % (remote_file, initd_url))
+    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    sudo("chmod 755 %s" % remote_file)
+    # Set the configuration file
+    conf_file = 'proftpd.conf'
+    conf_url = os.path.join(REPO_ROOT_URL, 'conf_files', conf_file)
+    remote_file = os.path.join(remote_conf_dir, conf_file)
+    sudo("wget --output-document=%s %s" % (remote_file, conf_url))
+    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    # Get the custom welcome msg file
+    welcome_msg_file = 'welcome_msg.txt'
+    welcome_url = os.path.join(REPO_ROOT_URL, 'conf_files', welcome_msg_file)
+    sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
+    # Stow
+    sudo("cd %s; stow proftpd" % env.install_dir)
     env.logger.debug("----- ProFTPd %s installed to %s -----" % (version, install_dir))
 
 def install_sge(env):
