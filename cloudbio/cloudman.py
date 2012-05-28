@@ -70,6 +70,11 @@ def _setup_env(env):
             url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
             run("wget --output-document=%s %s" % (reqs_file, url))
             sudo("pip install --upgrade --requirement={0}".format(reqs_file))
+    # Add a custom vimrc
+    vimrc_url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', 'vimrc')
+    remote_file = '/etc/vim/vimrc'
+    sudo("wget --output-document=%s %s" % (remote_file, vimrc_url))
+    env.logger.debug("Added a custom vimrc to {0}".format(remote_file))
     env.logger.debug("Done setting up CloudMan's environment")
 
 def _configure_logrotate(env):
