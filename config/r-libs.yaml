@@ -38,11 +38,13 @@ cran:
  - hwriter
  - kernlab
  - kernsmooth
+ - knitr
  - lattice
  - latticeExtra
  - leaps
  - lmtest
  - maptree
+ - markdown
  - mass
  - matrix
  - mclust
