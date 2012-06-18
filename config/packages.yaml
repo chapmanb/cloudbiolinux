@@ -60,7 +60,6 @@ desktop:
     - synaptic
     - software-center
     - freenx-server
-    - gnome-themes
     - gnome-backgrounds
     - gnome-terminal
     - firefox
@@ -188,7 +187,6 @@ distributed:
     - hadoop-pig
     - hadoop-hive
     - libhdfs0-dev
-    - hadoop-0.20-native
     - hadoop-0.20-pipes
     - hadoop-0.20-source
     - libopenmpi-dev
@@ -319,12 +317,12 @@ boinc:
 bio_general:
   - primer3
   - readseq
-  - bio-linux-taverna
   - bio-linux-xcut
   - emboss
   - emboss-data
   - emboss-lib
   - ugene
+  # - bio-linux-taverna # Broken graphviz dependency
 bio_search:
   - blast2
   - hmmer

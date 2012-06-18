@@ -52,7 +52,6 @@ pypi:
   - scikits.learn
   - scikits.statsmodels
   - scipy
-  - sympy
   # databases
   - CouchDB
   - h5py
@@ -72,3 +71,4 @@ pypi:
   #- tables
   #- pygraphviz
   #- pysparse
+  #- sympy

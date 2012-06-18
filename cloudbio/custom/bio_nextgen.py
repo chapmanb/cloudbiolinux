@@ -301,14 +301,14 @@ def install_picard(env):
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    version = "1.6-5-g557da77"
+    version = "1.6-11-g3b2fab9"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTK-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
-    version = "1.5-12-gd0056d6"
+    version = "1.6-11-g3b2fab9"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "Queue-%s%s" % (version, ext)
@@ -377,7 +377,7 @@ def _install_boost(env):
         _get_install(url, env, _boost_build)
         thread_lib = "libboost_thread.so.%s" % version
         final_lib = os.path.join(env.system_install, "lib", thread_lib)
-        orig_lib = os.pth.join(boost_dir, "lib", thread_lib)
+        orig_lib = os.path.join(boost_dir, "lib", thread_lib)
         if not exists(final_lib):
             env.safe_sudo("ln -s %s %s" % (orig_lib, final_lib))
 
