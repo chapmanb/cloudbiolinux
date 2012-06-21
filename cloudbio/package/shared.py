@@ -41,8 +41,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
                         data.append((cur_key, val))
             else:
                 raise ValueError(cur_info)
-    env.logger.debug("Packages:")
-    env.logger.debug(",".join(packages))
+    env.logger.debug("Packages to install: {0}".format(",".join(packages)))
     return packages, pkg_to_group
 
 def _filter_subs_packages(initial, subs):
