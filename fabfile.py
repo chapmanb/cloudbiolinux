@@ -113,7 +113,7 @@ def _setup_flavor(flavor, environment=None):
 # ### Shared installation targets for all platforms
 
 def install_biolinux(target=None, packagelist=None, flavor=None, environment=None,
-        pkg_config_file_path='./config/'):
+        pkg_config_file_path=None):
     """
     Main entry point for installing BioLinux on a remote server.
 
