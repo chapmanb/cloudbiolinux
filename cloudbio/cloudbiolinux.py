@@ -33,7 +33,8 @@ def _configure_gnome(env):
     """Configure NX server to use classic GNOME.
 
     http://askubuntu.com/questions/50503/why-do-i-get-unity-instead-of-classic-when-using-nx
+    http://notepad2.blogspot.com/2012/04/install-freenx-server-on-ubuntu-1110.html
     """
-    add = 'COMMAND_START_GNOME="/usr/bin/nx-session-launcher-suid gnome-session --session=gnome-classic"'
+    add = 'COMMAND_START_GNOME="gnome-session --session gnome-fallback"'
     fname = "/etc/nxserver/node.conf"
     append(fname, add, use_sudo=True)

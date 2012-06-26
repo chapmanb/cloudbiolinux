@@ -64,11 +64,12 @@ desktop:
     - gnome-terminal
     - firefox
     - evince
+    - ubuntu-desktop
     - cloudbl-desktop
     - bio-linux-tutorials
     - xvfb
     - gdm
-  # NX compatible window managers on 11.10; only for oneiric
+  # NX compatible window managers on Ubuntu 11.10+
   ubuntu_oneiric:
     - gnome-session-fallback
     - unity-2d
