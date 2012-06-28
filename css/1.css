@@ -14,12 +14,12 @@ body {
 #wrapper1 {
 	background:#1e1e1e;
 	padding:0 10px 10px 10px;
-	width:800px;
+	width:900px;
 	margin:0 auto;
 }
 
 #wrapper2 {
-	width:780px;
+	width:880px;
 	background:url(../images/wrapper2.jpg) bottom repeat-x #fff;
 	border-left:1px solid #000;
 	border-right:1px solid #000;
@@ -102,7 +102,7 @@ p.description {
 	line-height:25px;
 	border-top:4px solid #003C64;
         float: left;
-        width: 580px;
+        width: 680px;
 }
 p.description a {
 	color:#fff;
