@@ -26,6 +26,7 @@ pypi:
   - webhelpers
   - webob
   - xlrd
+  - yolk
   # build
   - cython
   - Pyrex
