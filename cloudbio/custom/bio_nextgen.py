@@ -12,7 +12,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
 
 @_if_not_installed("faToTwoBit")
 def install_ucsc_tools(env):
-    """Install useful executables from UCSC.
+    """Useful executables from UCSC.
 
     todo: install from source to handle 32bit and get more programs
     http://hgdownload.cse.ucsc.edu/admin/jksrc.zip
@@ -34,7 +34,8 @@ def install_ucsc_tools(env):
 
 @_if_not_installed("bowtie")
 def install_bowtie(env):
-    """Install the bowtie short read aligner.
+    """The bowtie short read aligner.
+    http://bowtie-bio.sourceforge.net/index.shtml
     """
     version = "0.12.7"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
@@ -43,7 +44,8 @@ def install_bowtie(env):
 
 @_if_not_installed("bowtie2")
 def install_bowtie2(env):
-    """Install the bowtie2 short read aligner, with gap support.
+    """bowtie2 short read aligner, with gap support.
+    http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
     version = "2.0.0-beta6"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
@@ -52,6 +54,9 @@ def install_bowtie2(env):
 
 @_if_not_installed("bwa")
 def install_bwa(env):
+    """BWA:  aligns short nucleotide sequences against a long reference sequence.
+    http://bio-bwa.sourceforge.net/
+    """
     version = "0.5.9"
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
@@ -65,6 +70,9 @@ def install_bwa(env):
 
 @_if_not_installed("bfast")
 def install_bfast(env):
+    """BFAST: Blat-like Fast Accurate Search Tool.
+    http://sourceforge.net/apps/mediawiki/bfast/index.php?title=Main_Page
+    """
     version = "0.7.0"
     vext = "a"
     url = "http://downloads.sourceforge.net/project/bfast/bfast/%s/bfast-%s%s.tar.gz"\
@@ -73,6 +81,9 @@ def install_bfast(env):
 
 @_if_not_installed("perm")
 def install_perm(env):
+    """Efficient mapping of short sequences accomplished with periodic full sensitive spaced seeds.
+    https://code.google.com/p/perm/
+    """
     version = "3.6"
     url = "http://perm.googlecode.com/files/PerM_%s_Source.tar.gz" % version
     def gcc44_makefile_patch():
@@ -86,6 +97,9 @@ def install_perm(env):
     _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
 
 def install_stampy(env):
+    """Stampy: mapping of short reads from illumina sequencing machines onto a reference genome.
+    http://www.well.ox.ac.uk/project-stampy
+    """
     base_version = "1.0.15"
     revision = "1360"
     version = "{0}r{1}".format(base_version, revision)
@@ -95,6 +109,9 @@ def install_stampy(env):
 
 @_if_not_installed("gmap")
 def install_gmap(env):
+    """GMAP and GSNAP: A Genomic Mapping and Alignment Program for mRNA EST and short reads.
+    http://research-pub.gene.com/gmap/
+    """
     version = "2011-11-12"
     url = "http://research-pub.gene.com/gmap/src/gmap-gsnap-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
@@ -108,6 +125,9 @@ def _wget_with_cookies(ref_url, dl_url):
 
 @_if_not_installed("novoalign")
 def install_novoalign(env):
+    """Novoalign short read aligner using Needleman-Wunsch algorithm with affine gap penalties.
+    http://www.novocraft.com/main/index.php
+    """
     base_version = "V2.08.01"
     cs_version = "V1.02.01"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
@@ -135,6 +155,9 @@ def install_novoalign(env):
 
 @_if_not_installed("lastz")
 def install_lastz(env):
+    """LASTZ sequence alignment program.
+    http://www.bx.psu.edu/miller_lab/dist/README.lastz-1.02.00/README.lastz-1.02.00a.html
+    """
     version = "1.02.00"
     url = "http://www.bx.psu.edu/miller_lab/dist/" \
           "lastz-%s.tar.gz" % version
@@ -145,6 +168,10 @@ def install_lastz(env):
 
 @_if_not_installed("MosaikAligner")
 def install_mosaik(env):
+    """MOSAIK: reference-guided aligner for next-generation sequencing technologies
+    http://code.google.com/p/mosaik-aligner/
+    """
+    version = "github"
     repository = "git clone git://github.com/wanpinglee/MOSAIK.git"
     def _chdir_src(work_cmd):
         def do_work(env):
@@ -157,6 +184,9 @@ def install_mosaik(env):
 
 @_if_not_installed("samtools")
 def install_samtools(env):
+    """SAM Tools provide various utilities for manipulating alignments in the SAM format.
+    http://samtools.sourceforge.net/
+    """
     version = "0.1.18"
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
@@ -164,6 +194,9 @@ def install_samtools(env):
 
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
 def install_fastx_toolkit(env):
+    """FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing.
+    http://hannonlab.cshl.edu/fastx_toolkit/
+    """
     version = "0.0.13"
     gtext_version = "0.6"
     url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
@@ -176,6 +209,9 @@ def install_fastx_toolkit(env):
 
 @_if_not_installed("SolexaQA.pl")
 def install_solexaqa(env):
+    """SolexaQA creates visual representations of data quality from FASTQ files.
+    http://solexaqa.sourceforge.net/
+    """
     version = "1.4"
     url = "http://downloads.sourceforge.net/project/solexaqa/src/" \
             "SolexaQA_v.%s.pl.zip" % version
@@ -187,6 +223,9 @@ def install_solexaqa(env):
 
 @_if_not_installed("vcftools")
 def install_vcftools(env):
+    """Work with VCF files, such as those generated by the 1000 Genomes Project.
+    http://vcftools.sourceforge.net/
+    """
     version = "0.1.7"
     url = "http://downloads.sourceforge.net/project/vcftools/vcftools_{v}.tar.gz".format(
         v=version)
@@ -199,6 +238,9 @@ def install_vcftools(env):
 
 @_if_not_installed("vtools")
 def install_varianttools(env):
+    """Annotation, selection, and analysis of variants in the context of next-gen sequencing analysis.
+    http://varianttools.sourceforge.net/
+    """
     version = "1.0.1"
     version_ext = "a"
     url = "http://downloads.sourceforge.net/project/varianttools/" \
@@ -207,6 +249,9 @@ def install_varianttools(env):
 
 @_if_not_installed("pseq")
 def install_plink_seq(env):
+    """A toolset for working with human genetic variation data.
+    http://atgu.mgh.harvard.edu/plinkseq/
+    """
     version = "0.08"
     url = "http://atgu.mgh.harvard.edu/plinkseq/dist/" \
           "version-{v}/plinkseq-{v}-x86_64.tar.gz".format(v=version)
@@ -217,6 +262,9 @@ def install_plink_seq(env):
 
 @_if_not_installed("dwgsim")
 def install_dwgsim(env):
+    """DWGSIM: simulating NGS data and evaluating mappings and variant calling.
+    http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Main_Page
+    """
     version = "0.1.8"
     samtools_version = "0.1.18"
     url = "http://downloads.sourceforge.net/project/dnaa/dwgsim/" \
@@ -232,6 +280,9 @@ def install_dwgsim(env):
 
 @_if_not_installed("fastqc")
 def install_fastqc(env):
+    """A quality control tool for high throughput sequence data.
+    http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+    """
     version = "0.10.1"
     url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
           "fastqc_v%s.zip" % version
@@ -250,6 +301,10 @@ def install_fastqc(env):
 
 @_if_not_installed("bedtools")
 def install_bedtools(env):
+    """A flexible suite of utilities for comparing genomic features.
+    https://code.google.com/p/bedtools/
+    """
+    version = "github"
     repository = "git clone git://github.com/arq5x/bedtools.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
 
@@ -270,6 +325,9 @@ system("java -cp $RealBin @java_args Shrec @args");
 
 @_if_not_installed("shrec")
 def install_shrec(env):
+    """Shrec is a bioinformatics tool for error correction of HTS read data.
+    http://sourceforge.net/projects/shrec-ec/
+    """
     version = "2.2"
     url = "http://downloads.sourceforge.net/project/shrec-ec/SHREC%%20%s/bin.zip" % version
     install_dir = _symlinked_java_version_dir("shrec", version, env)
@@ -287,6 +345,9 @@ def install_shrec(env):
                 env.safe_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
 
 def install_echo(env):
+    """ECHO: A reference-free short-read error correction algorithm
+    http://uc-echo.sourceforge.net/
+    """
     version = "1_11"
     url = "http://downloads.sourceforge.net/project/uc-echo/source%20release/" \
           "echo_v{0}.tgz".format(version)
@@ -295,12 +356,18 @@ def install_echo(env):
 # -- Analysis
 
 def install_picard(env):
+    """Command-line utilities that manipulate BAM files with a Java API.
+    http://picard.sourceforge.net/
+    """
     version = "1.68"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
+    """GATK: library for writing efficient analysis tools using next-generation sequencing data 
+    http://www.broadinstitute.org/gsa/wiki/index.php/Home_Page
+    """
     version = "1.6-11-g3b2fab9"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
@@ -308,6 +375,9 @@ def install_gatk(env):
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
+    """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
+    http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
+    """
     version = "1.6-11-g3b2fab9"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
@@ -315,6 +385,9 @@ def install_gatk_queue(env):
     _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):
+    """Variant annotation and effect prediction tool.
+    http://snpeff.sourceforge.net/
+    """
     version = "2_0_5"
     genomes = ["GRCh37.64", "NCBIM37.64", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
@@ -342,6 +415,10 @@ def install_snpeff(env):
 
 @_if_not_installed("freebayes")
 def install_freebayes(env):
+    """Bayesian haplotype-based polymorphism discovery and genotyping.
+    https://github.com/ekg/freebayes
+    """
+    version = "github"
     repository = "git clone --recursive git://github.com/ekg/freebayes.git"
     def _fix_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
@@ -393,6 +470,9 @@ def _cufflinks_configure_make(env):
 
 @_if_not_installed("tophat")
 def install_tophat(env):
+    """TopHat is a fast splice junction mapper for RNA-Seq reads
+    http://tophat.cbcb.umd.edu/
+    """
     _install_samtools_libs(env)
     _install_boost(env)
     version = "2.0.0"
@@ -401,6 +481,9 @@ def install_tophat(env):
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
+    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    http://cufflinks.cbcb.umd.edu/
+    """
     _install_samtools_libs(env)
     _install_boost(env)
     version = "2.0.0"
@@ -411,6 +494,9 @@ def install_cufflinks(env):
 
 @_if_not_installed("ABYSS")
 def install_abyss(env):
+    """Assembly By Short Sequences - a de novo, parallel, paired-end sequence assembler.
+    http://www.bcgsc.ca/platform/bioinfo/software/abyss
+    """
     # XXX check for no sparehash on non-ubuntu systems
     version = "1.3.3"
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
@@ -423,6 +509,9 @@ def install_abyss(env):
     _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
+    """Analyze ABySS multi-k-assembled shotgun transcriptome data.
+    http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss
+    """
     version = "1.3.2"
     ext = "_20120516"
     url = "http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss/" \
@@ -431,6 +520,9 @@ def install_transabyss(env):
 
 @_if_not_installed("velvetg")
 def install_velvet(env):
+    """Sequence assembler for very short reads.
+    http://www.ebi.ac.uk/~zerbino/velvet/
+    """
     version = "1.2.05"
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
@@ -443,6 +535,9 @@ def install_velvet(env):
                  post_unpack_fn=_fix_library_order)
 
 def install_trinity(env):
+    """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
+    http://trinityrnaseq.sourceforge.net/
+    """
     version = "r2012-05-18"
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
           "trinityrnaseq_%s.tar.gz" % version
@@ -452,6 +547,9 @@ def install_trinity(env):
 
 @_if_not_installed("macs14")
 def install_macs(env):
+    """Model-based Analysis for ChIP-Seq.
+    http://liulab.dfci.harvard.edu/MACS/
+    """
     version = "1.4.2"
     url = "https://github.com/downloads/taoliu/MACS/" \
           "MACS-%s.tar.gz" % version
@@ -460,6 +558,9 @@ def install_macs(env):
 # --- Structural variation
 @_if_not_installed("hydra")
 def install_hydra(env):
+    """Hydra detects structural variation breakpoints in both unique and duplicated genomic regions.
+    https://code.google.com/p/hydra-sv/
+    """
     version = "0.5.3"
     url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
@@ -469,6 +570,9 @@ def install_hydra(env):
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):
+    """Detect SNPs and short indels from pooled sequencing data.
+    https://sites.google.com/site/vibansal/software/crisp/
+    """
     version = "5"
     url = "https://sites.google.com/site/vibansal/software/crisp/" \
           "CRISP-linux-v{0}.tar.gz".format(version)

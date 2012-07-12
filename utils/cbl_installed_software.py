@@ -12,7 +12,6 @@ Run from the top level of the cloudbiolinux source directory:
 import os
 import collections
 import inspect
-import ast
 import urllib2
 import subprocess
 

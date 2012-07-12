@@ -14,7 +14,7 @@ CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 def install_cloudman(env):
-    """ A meta method for installing all of CloudMan components
+    """ A meta method for installing all of CloudMan components.
         Allows CloudMan and all of its dependencies to be installed via:
         fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
     """
@@ -24,6 +24,9 @@ def install_cloudman(env):
     install_sge(env)
 
 def install_nginx(env):
+    """Nginx open source web server.
+    http://www.nginx.org/
+    """
     version = "1.2.0"
     url = "http://nginx.org/download/nginx-%s.tar.gz" % version
 
@@ -95,6 +98,9 @@ def _get_nginx_modules(env):
     return modules
 
 def install_proftpd(env):
+    """Highly configurable GPL-licensed FTP server software.
+    http://proftpd.org/
+    """
     version = "1.3.4a"
     postgres_ver = "9.1"
     url = "ftp://ftp.tpnet.pl/pub/linux/proftpd/distrib/source/proftpd-%s.tar.gz" % version
@@ -139,6 +145,8 @@ def install_proftpd(env):
     env.logger.debug("----- ProFTPd %s installed to %s -----" % (version, install_dir))
 
 def install_sge(env):
+    """Sun Grid Engine.
+    """
     out_dir = "ge6.2u5"
     url = "%s/ge62u5_lx24-amd64.tar.gz" % CDN_ROOT_URL
     install_dir = env.install_dir

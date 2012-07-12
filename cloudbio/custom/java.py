@@ -9,7 +9,7 @@ from shared import (_if_not_installed, _make_tmp_dir)
 
 @_if_not_installed("cljr")
 def install_cljr(env):
-    """Install the clojure package manager cljr
+    """Clojure package manager, cljr.
 
     http://github.com/liebke/cljr
     """
@@ -20,7 +20,8 @@ def install_cljr(env):
 
 @_if_not_installed("lein")
 def install_leinengin(env):
-    """Standard clojure build tool: http://github.com/technomancy/leiningen
+    """Clojure tool for project configuration and automation.
+    http://github.com/technomancy/leiningen
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
