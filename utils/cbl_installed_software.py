@@ -20,6 +20,21 @@ def main():
         os.makedirs(out_dir)
     write_debian_pkg_info(out_dir)
     write_python_pkg_info(out_dir)
+    write_r_pkg_info(out_dir)
+
+# ## R packages
+
+def _get_r_pkg_info():
+    out = subprocess.check_output(["Rscript", "-e",
+                                   "subset(installed.packages(), select=c(Version))"])
+    for line in out.split("\n")[1:]:
+        print line
+
+def write_r_pkg_info(out_dir):
+    out_file = os.path.join(out_dir, "r-packages.yaml")
+    if not os.path.exists(out_file):
+        pkgs = _get_r_pkg_info()
+    return out_file
 
 # ## Python packages
 
