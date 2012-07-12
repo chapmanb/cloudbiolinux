@@ -1,0 +1,3 @@
+[submodule "manifest"]
+	path = manifest
+	url = git://github.com/chapmanb/cloudbiolinux.git
