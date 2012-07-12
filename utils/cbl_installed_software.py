@@ -86,7 +86,7 @@ def get_r_pkg_info():
 	if len(pkg)>0:
             yield {"name": pkg[0], "version": pkg[1],
                    "description": pkg[2],
-                   "homepage_uri": (pkg[3],'')[pkg[3]=='NA']}
+                   "homepage_uri": (pkg[3],'')[pkg[3]=='NA'] if len(pkg) > 3 else ""}
 
 def write_r_pkg_info(out_dir):
     out_file = os.path.join(out_dir, "r-packages.yaml")
