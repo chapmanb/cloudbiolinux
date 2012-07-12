@@ -1,8 +1,8 @@
 *.pyc
 tags
-nextgen/bcbio_nextgen.egg-info/
-nextgen/build/
-nextgen/dist/
+cloudbiolinux.egg-info/
+build/
+dist/
 *.pem
 dpkg.lst
 *.log

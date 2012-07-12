@@ -70,7 +70,7 @@ CloudBioLinux tools and fabric:
 
 2. Retrieve the cloudbiolinux code base:
 
-        git clone git://github.com/chapmanb/cloudbiolinux.git
+        git clone --recursive git://github.com/chapmanb/cloudbiolinux.git
         cd cloudbiolinux
 
 ## Biological data

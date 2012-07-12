@@ -1,6 +1,7 @@
 """Reusable decorators and functions for custom installations.
 """
 import os
+import functools
 from contextlib import contextmanager
 
 from fabric.api import *
@@ -12,6 +13,7 @@ def _if_not_installed(pname):
     """Decorator that checks if a callable program is installed.
     """
     def argcatcher(func):
+        functools.wraps(func)
         def decorator(*args, **kwargs):
             with settings(
                     hide('warnings', 'running', 'stdout', 'stderr'),
@@ -26,6 +28,7 @@ def _if_not_python_lib(library):
     """Decorator that checks if a python library is installed.
     """
     def argcatcher(func):
+        functools.wraps(func)
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
                 pyver = env.python_version_ext if env.has_key("python_version_ext") else ""
