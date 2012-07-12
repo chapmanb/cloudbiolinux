@@ -15,7 +15,7 @@ import yaml
 import yolk.yolklib, yolk.metadata
 
 def main():
-    out_dir = os.path.join(os.getcwd(), "cblsoftware")
+    out_dir = os.path.join(os.getcwd(), "manifest")
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     write_debian_pkg_info(out_dir)
