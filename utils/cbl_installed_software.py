@@ -76,16 +76,26 @@ def write_custom_pkg_info(out_dir):
 
 # ## R packages
 
-def _get_r_pkg_info():
-    out = subprocess.check_output(["Rscript", "-e",
-                                   "subset(installed.packages(), select=c(Version))"])
+def get_r_pkg_info():
+    r_command = "options(width=10000); subset(installed.packages(fields=c('Title', 'URL')), select=c('Version', 'Title','URL'))"
+    out = subprocess.check_output(["Rscript", "-e",r_command])
+    pkg_raw_list = []
     for line in out.split("\n")[1:]:
-        print line
+	pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
+    for pkg in pkg_raw_list:
+	if len(pkg)>0:
+            yield {"name": pkg[0], "version": pkg[1],
+                   "description": pkg[2],
+                   "homepage_uri": (pkg[3],'')[pkg[3]=='NA']}
 
 def write_r_pkg_info(out_dir):
     out_file = os.path.join(out_dir, "r-packages.yaml")
     if not os.path.exists(out_file):
-        pkgs = _get_r_pkg_info()
+        out = {}
+        for pkg in get_r_pkg_info():
+            out[pkg["name"]] = pkg
+        with open(out_file, "w") as out_handle:
+            out_handle.write(yaml.dump(out, default_flow_style=False, allow_unicode=False))
     return out_file
 
 # ## Python packages
