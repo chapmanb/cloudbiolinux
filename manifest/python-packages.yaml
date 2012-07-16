@@ -1,0 +1,846 @@
+BeautifulSoup:
+  description: HTML/XML parser for quick-turnaround applications like screen-scraping.
+  homepage_uri: http://www.crummy.com/software/BeautifulSoup/
+  name: BeautifulSoup
+  version: 3.2.1
+Brlapi:
+  description: Python BrlAPI
+  homepage_uri: http://mielke.cc/brltty/
+  name: Brlapi
+  version: 0.5.6
+Cheetah:
+  description: Cheetah is a template engine and code generation tool.
+  homepage_uri: http://www.cheetahtemplate.org/
+  name: Cheetah
+  version: 2.4.4
+CouchDB:
+  description: Python library for working with CouchDB
+  homepage_uri: http://code.google.com/p/couchdb-python/
+  name: CouchDB
+  version: '0.8'
+Cython:
+  description: The Cython compiler for writing C extensions for the Python language.
+  homepage_uri: http://www.cython.org
+  name: Cython
+  version: '0.16'
+DendroPy:
+  description: 'A Python library for phylogenetics and phylogenetic computing: reading,
+    writing, simulation, processing and manipulation of phylogenetic trees (phylogenies)
+    and characters.'
+  homepage_uri: http://packages.python.org/DendroPy/
+  name: DendroPy
+  version: 3.11.0
+Fabric:
+  description: Fabric is a simple, Pythonic tool for remote execution and deployment.
+  homepage_uri: http://fabfile.org
+  name: Fabric
+  version: 1.4.2
+GnuPGInterface:
+  description: GnuPG interactions with file handles
+  homepage_uri: http://py-gnupg.sourceforge.net/
+  name: GnuPGInterface
+  version: 0.3.2
+HTSeq:
+  description: A framework to process and analyze data from high-throughput sequencing
+    (HTS) assays
+  homepage_uri: http://www-huber.embl.de/users/anders/HTSeq/
+  name: HTSeq
+  version: 0.5.3p7
+Jinja2:
+  description: A small but fast and easy to use stand-alone template engine written
+    in pure python.
+  homepage_uri: http://jinja.pocoo.org/
+  name: Jinja2
+  version: '2.6'
+Landscape Client:
+  description: Landscape Client
+  homepage_uri: http://landscape.canonical.com
+  name: Landscape Client
+  version: 12.04.2
+Logbook:
+  description: A logging replacement for Python
+  homepage_uri: http://logbook.pocoo.org/
+  name: Logbook
+  version: '0.3'
+M2Crypto:
+  description: 'M2Crypto: A Python crypto and SSL toolkit'
+  homepage_uri: http://chandlerproject.org/Projects/MeTooCrypto
+  name: M2Crypto
+  version: 0.21.1
+MACS:
+  description: Model Based Analysis for ChIP-Seq data
+  homepage_uri: http://liulab.dfci.harvard.edu/MACS/
+  name: MACS
+  version: 1.4.2
+Magic file extensions:
+  description: libmagic Python bindings
+  homepage_uri: UNKNOWN
+  name: Magic file extensions
+  version: '0.2'
+Mako:
+  description: A super-fast templating language that borrows the  best ideas from
+    the existing templating languages.
+  homepage_uri: http://www.makotemplates.org/
+  name: Mako
+  version: 0.7.0
+MarkupSafe:
+  description: Implements a XML/HTML/XHTML Markup safe string for Python
+  homepage_uri: http://dev.pocoo.org/
+  name: MarkupSafe
+  version: '0.15'
+MySQL-python:
+  description: Python interface to MySQL
+  homepage_uri: http://sourceforge.net/projects/mysql-python
+  name: MySQL-python
+  version: 1.2.3
+PAM:
+  description: Python bindings for PAM
+  homepage_uri: UNKNOWN
+  name: PAM
+  version: 0.4.2
+PIL:
+  description: Python Imaging Library
+  homepage_uri: http://www.pythonware.com/products/pil
+  name: PIL
+  version: 1.1.7
+Paste:
+  description: Tools for using a Web Server Gateway Interface stack
+  homepage_uri: http://pythonpaste.org
+  name: Paste
+  version: 1.7.5.1
+PasteDeploy:
+  description: Load, configure, and compose WSGI applications and servers
+  homepage_uri: http://pythonpaste.org/deploy/
+  name: PasteDeploy
+  version: 1.5.0
+PasteScript:
+  description: A pluggable command-line frontend, including commands to setup package
+    file layouts
+  homepage_uri: http://pythonpaste.org/script/
+  name: PasteScript
+  version: 1.7.5
+PyVCF:
+  description: Variant Call Format (VCF) parser for Python
+  homepage_uri: https://github.com/jamescasbon/PyVCF
+  name: PyVCF
+  version: 0.4.6
+PyYAML:
+  description: YAML parser and emitter for Python
+  homepage_uri: http://pyyaml.org/wiki/PyYAML
+  name: PyYAML
+  version: '3.10'
+Pygments:
+  description: Pygments is a syntax highlighting package written in Python.
+  homepage_uri: http://pygments.org/
+  name: Pygments
+  version: '1.5'
+Pyrex:
+  description: UNKNOWN
+  homepage_uri: http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/
+  name: Pyrex
+  version: 0.9.9
+Pyste:
+  description: Pyste - Python Semi-Automatic Exporter
+  homepage_uri: http://www.boost.org/libs/python/pyste/index.html
+  name: Pyste
+  version: 0.9.10
+Python:
+  description: A high-level object-oriented programming language
+  homepage_uri: http://www.python.org/2.7
+  name: Python
+  version: 2.7.3
+Routes:
+  description: Routing Recognition and Generation Tools
+  homepage_uri: http://routes.groovie.org/
+  name: Routes
+  version: 1.12.3
+SQLAlchemy:
+  description: Database Abstraction Library
+  homepage_uri: http://www.sqlalchemy.org
+  name: SQLAlchemy
+  version: 0.7.8
+Sphinx:
+  description: Python documentation generator
+  homepage_uri: http://sphinx.pocoo.org/
+  name: Sphinx
+  version: 1.1.3
+StarCluster:
+  description: StarCluster is a utility for creating and managing computing clusters
+    hosted on Amazon's Elastic Compute Cloud (EC2).
+  homepage_uri: http://web.mit.edu/starcluster
+  name: StarCluster
+  version: 0.93.3
+Twisted:
+  description: An asynchronous networking framework written in Python
+  homepage_uri: http://twistedmatrix.com/
+  name: Twisted
+  version: 12.1.0
+Twisted Core:
+  description: The core parts of the Twisted networking framework
+  homepage_uri: http://twistedmatrix.com/
+  name: Twisted Core
+  version: 11.1.0
+Twisted Names:
+  description: A Twisted DNS implementation.
+  homepage_uri: http://twistedmatrix.com/trac/wiki/TwistedNames
+  name: Twisted Names
+  version: 11.1.0
+Twisted Web:
+  description: Twisted web server, programmable in Python.
+  homepage_uri: http://twistedmatrix.com/trac/wiki/TwistedWeb
+  name: Twisted Web
+  version: 11.1.0
+VTK:
+  description: The Visualization Toolkit
+  homepage_uri: http://www.vtk.org/
+  name: VTK
+  version: 5.8.0
+WebHelpers:
+  description: Web Helpers
+  homepage_uri: http://webhelpers.groovie.org/
+  name: WebHelpers
+  version: '1.3'
+WebOb:
+  description: WSGI request and response object
+  homepage_uri: http://webob.org/
+  name: WebOb
+  version: 1.2b2
+adium-theme-ubuntu:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: adium-theme-ubuntu
+  version: 0.3.2
+amqplib:
+  description: AMQP Client Library
+  homepage_uri: http://code.google.com/p/py-amqplib/
+  name: amqplib
+  version: 1.0.2
+anyjson:
+  description: Wraps the best available JSON implementation available in a common
+    interface
+  homepage_uri: http://bitbucket.org/runeh/anyjson
+  name: anyjson
+  version: 0.3.1
+apptools:
+  description: application tools
+  homepage_uri: http://code.enthought.com/projects/app_tools.php
+  name: apptools
+  version: 4.0.0
+apt-xapian-index:
+  description: Xapian index of Debian packages
+  homepage_uri: http://www.enricozini.org/sw/apt-xapian-index/
+  name: apt-xapian-index
+  version: '0.44'
+apturl:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: apturl
+  version: 0.5.1ubuntu3
+argparse:
+  description: Python command-line parsing library
+  homepage_uri: ''
+  name: argparse
+  version: 1.2.1
+bcbio-nextgen:
+  description: Automated, distributed next-gen sequencing pipeline; includes Galaxy
+    interaction
+  homepage_uri: https://github.com/chapmanb/bcbb/tree/master/nextgen
+  name: bcbio-nextgen
+  version: '0.2'
+biopython:
+  description: Freely available tools for computational molecular biology.
+  homepage_uri: http://www.biopython.org/
+  name: biopython
+  version: '1.59'
+boto:
+  description: Amazon Web Services Library
+  homepage_uri: https://github.com/boto/boto/
+  name: boto
+  version: 2.5.1
+bx-python:
+  description: Tools for manipulating biological data, particularly multiple sequence
+    alignments
+  homepage_uri: http://bitbucket.org/james_taylor/bx-python/wiki/Home
+  name: bx-python
+  version: 0.7.1
+bzr:
+  description: Friendly distributed version control system
+  homepage_uri: http://bazaar.canonical.com/
+  name: bzr
+  version: 2.5.0
+celery:
+  description: Distributed Task Queue
+  homepage_uri: http://celeryproject.org
+  name: celery
+  version: 2.5.5
+chardet:
+  description: Universal encoding detector
+  homepage_uri: http://chardet.feedparser.org/
+  name: chardet
+  version: 2.0.1
+cloud-init:
+  description: EC2 initialisation magic
+  homepage_uri: http://launchpad.net/cloud-init/
+  name: cloud-init
+  version: 0.6.3
+command-not-found:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: command-not-found
+  version: 0.2.44
+configglue:
+  description: Glue to stick OptionParser and ConfigParser together
+  homepage_uri: https://launchpad.net/configglue
+  name: configglue
+  version: '1.0'
+configobj:
+  description: Config file reading, writing and validation.
+  homepage_uri: http://www.voidspace.org.uk/python/configobj.html
+  name: configobj
+  version: 4.7.2
+debtagshw:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: debtagshw
+  version: '0.1'
+decorator:
+  description: Better living through Python with decorators
+  homepage_uri: http://pypi.python.org/pypi/decorator
+  name: decorator
+  version: 3.3.1
+defer:
+  description: Simple framework for asynchronous programming
+  homepage_uri: http://launchpad.net/python-defer
+  name: defer
+  version: 1.0.2
+devscripts:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: devscripts
+  version: 2.11.6ubuntu1.2
+dirspec:
+  description: XDG Base and User directories implementation
+  homepage_uri: https://launchpad.net/dirspec
+  name: dirspec
+  version: 3.0.0
+distribute:
+  description: Easily download, build, install, upgrade, and uninstall Python packages
+  homepage_uri: http://packages.python.org/distribute
+  name: distribute
+  version: 0.6.19
+docutils:
+  description: Docutils -- Python Documentation Utilities
+  homepage_uri: http://docutils.sourceforge.net/
+  name: docutils
+  version: 0.9.1
+duplicity:
+  description: Encrypted backup using rsync algorithm
+  homepage_uri: http://duplicity.nongnu.org/index.html
+  name: duplicity
+  version: 0.6.18
+envisage:
+  description: extensible application framework
+  homepage_uri: http://code.enthought.com/projects/envisage/
+  name: envisage
+  version: 4.0.0
+euca2ools:
+  description: Elastic Utility Computing Architecture Command Line Tools
+  homepage_uri: http://open.eucalyptus.com
+  name: euca2ools
+  version: 2.0.0
+gnuplot-py:
+  description: A Python interface to the gnuplot plotting program.
+  homepage_uri: http://gnuplot-py.sourceforge.net
+  name: gnuplot-py
+  version: '1.8'
+h5py:
+  description: Read and write HDF5 files from Python
+  homepage_uri: http://h5py.alfven.org
+  name: h5py
+  version: 2.0.1
+httplib2:
+  description: A comprehensive HTTP client library.
+  homepage_uri: http://code.google.com/p/httplib2/
+  name: httplib2
+  version: 0.7.2
+ipython:
+  description: 'IPython: Productive Interactive Computing'
+  homepage_uri: http://ipython.org
+  name: ipython
+  version: 0.12.1
+jockey:
+  description: UI for managing third-party and non-free drivers
+  homepage_uri: https://launchpad.net/jockey
+  name: jockey
+  version: 0.9.7
+keyring:
+  description: Store and access your passwords safely.
+  homepage_uri: http://bitbucket.org/kang/python-keyring-lib
+  name: keyring
+  version: 0.7.1
+kombu:
+  description: Messaging Framework for Python
+  homepage_uri: http://github.com/ask/kombu/
+  name: kombu
+  version: 2.1.8
+language-selector:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: language-selector
+  version: '0.1'
+launchpadlib:
+  description: Script Launchpad through its web services interfaces.  Officially supported.
+  homepage_uri: https://help.launchpad.net/API/launchpadlib
+  name: launchpadlib
+  version: 1.9.12
+lazr.restfulclient:
+  description: A programmable client library that takes advantage of the commonalities
+    among
+  homepage_uri: https://launchpad.net/lazr.restfulclient
+  name: lazr.restfulclient
+  version: 0.12.0
+lazr.uri:
+  description: A self-contained, easily reusable library for parsing, manipulating,
+  homepage_uri: https://launchpad.net/lazr.uri
+  name: lazr.uri
+  version: 1.0.3
+louis:
+  description: Python bindings for liblouis
+  homepage_uri: ''
+  name: louis
+  version: 2.3.0
+lxml:
+  description: Powerful and Pythonic XML processing library combining libxml2/libxslt
+    with the ElementTree API.
+  homepage_uri: http://lxml.de/
+  name: lxml
+  version: 2.3.4
+matplotlib:
+  description: Python plotting package
+  homepage_uri: http://matplotlib.sourceforge.net
+  name: matplotlib
+  version: 1.0.1
+mayavi:
+  description: The Mayavi scientific data 3-dimensional visualizer.
+  homepage_uri: http://code.enthought.com/projects/mayavi/
+  name: mayavi
+  version: 4.0.0
+mercurial:
+  description: Scalable distributed SCM
+  homepage_uri: http://mercurial.selenic.com/
+  name: mercurial
+  version: 2.0.2
+networkx:
+  description: Python package for creating and manipulating graphs and networks
+  homepage_uri: http://networkx.lanl.gov/
+  name: networkx
+  version: 1.7rc1
+nose:
+  description: nose extends unittest to make testing easier
+  homepage_uri: http://readthedocs.org/docs/nose/
+  name: nose
+  version: 1.1.2
+numpy:
+  description: 'NumPy: array processing for numbers, strings, records, and objects.'
+  homepage_uri: http://numpy.scipy.org
+  name: numpy
+  version: 1.6.2
+nvidia-common:
+  description: Find obsolete NVIDIA drivers
+  homepage_uri: http://www.albertomilone.com
+  name: nvidia-common
+  version: 0.0.0
+oauth:
+  description: Library for OAuth version 1.0a.
+  homepage_uri: http://code.google.com/p/oauth
+  name: oauth
+  version: 1.0.1
+oca:
+  description: Bindings for XMLRPC OpenNebula Cloud API
+  homepage_uri: https://github.com/lukaszo/python-oca
+  name: oca
+  version: 0.2.3
+onboard:
+  description: Simple On-screen Keyboard
+  homepage_uri: http://launchpad.net/onboard/
+  name: onboard
+  version: 0.97.1
+oneconf:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: oneconf
+  version: 0.2.8.1
+pandas:
+  description: Powerful data structures for data analysis and statistics
+  homepage_uri: http://pandas.pydata.org
+  name: pandas
+  version: 0.7.3
+paramiko:
+  description: SSH2 protocol library
+  homepage_uri: http://www.lag.net/paramiko/
+  name: paramiko
+  version: 1.7.7.1
+pexpect:
+  description: Pexpect is a pure Python Expect. It allows easy control of other applications.
+  homepage_uri: http://pexpect.sourceforge.net/
+  name: pexpect
+  version: '2.3'
+pip:
+  description: pip installs packages. Python packages. An easy_install replacement
+  homepage_uri: http://www.pip-installer.org
+  name: pip
+  version: '1.1'
+piston-mini-client:
+  description: A package to consume Django-Piston web services
+  homepage_uri: https://launchpad.net/piston-mini-client
+  name: piston-mini-client
+  version: 0.7.2
+protobuf:
+  description: Protocol Buffers
+  homepage_uri: http://code.google.com/p/protobuf/
+  name: protobuf
+  version: 2.4.1
+psycopg2:
+  description: Python-PostgreSQL Database Adapter
+  homepage_uri: http://initd.org/psycopg/
+  name: psycopg2
+  version: 2.4.5
+pyOpenSSL:
+  description: Python wrapper module around the OpenSSL library
+  homepage_uri: http://pyopenssl.sourceforge.net/
+  name: pyOpenSSL
+  version: '0.13'
+pyasn1:
+  description: ASN.1 types and codecs
+  homepage_uri: http://sourceforge.net/projects/pyasn1/
+  name: pyasn1
+  version: 0.0.13b
+pybedtools:
+  description: Wrapper around BEDTools for bioinformatics work
+  homepage_uri: none
+  name: pybedtools
+  version: 0.6.1
+pycrypto:
+  description: Cryptographic modules for Python.
+  homepage_uri: http://www.pycrypto.org/
+  name: pycrypto
+  version: '2.6'
+pycups:
+  description: Python bindings for libcups
+  homepage_uri: http://cyberelk.net/tim/software/pycups/
+  name: pycups
+  version: 1.9.61
+pycurl:
+  description: PycURL -- cURL library module for Python
+  homepage_uri: http://pycurl.sourceforge.net/
+  name: pycurl
+  version: 7.19.0
+pydoop:
+  description: 'Pydoop: a Python MapReduce and HDFS API for Hadoop'
+  homepage_uri: http://pydoop.sourceforge.net
+  name: pydoop
+  version: 0.6.0
+pydot:
+  description: Python interface to Graphviz's Dot
+  homepage_uri: http://code.google.com/p/pydot/
+  name: pydot
+  version: 1.0.28
+pyface:
+  description: traits-capable windowing framework
+  homepage_uri: http://code.enthought.com/projects/traits_gui
+  name: pyface
+  version: 4.0.0
+pygooglechart:
+  description: A complete Python wrapper for the Google Chart API
+  homepage_uri: http://pygooglechart.slowchop.com/
+  name: pygooglechart
+  version: 0.3.0
+pygr:
+  description: Pygr, a Python graph-database toolkit oriented primarily on bioinformatics
+  homepage_uri: http://code.google.com/p/pygr/
+  name: pygr
+  version: 0.8.2
+pyinotify:
+  description: Linux filesystem events monitoring
+  homepage_uri: http://github.com/seb-m/pyinotify
+  name: pyinotify
+  version: 0.9.2
+pymongo:
+  description: Python driver for MongoDB <http://www.mongodb.org>
+  homepage_uri: http://github.com/mongodb/mongo-python-driver
+  name: pymongo
+  version: '2.2'
+pyparsing:
+  description: Python parsing module
+  homepage_uri: http://pyparsing.wikispaces.com/
+  name: pyparsing
+  version: 1.5.6
+pysam:
+  description: pysam
+  homepage_uri: http://code.google.com/p/pysam/
+  name: pysam
+  version: '0.6'
+pyserial:
+  description: Python Serial Port Extension
+  homepage_uri: http://pyserial.sourceforge.net/
+  name: pyserial
+  version: '2.5'
+pysmbc:
+  description: Python bindings for libsmbclient
+  homepage_uri: http://cyberelk.net/tim/software/pysmbc/
+  name: pysmbc
+  version: 1.0.13
+pysqlite:
+  description: DB-API 2.0 interface for SQLite 3.x
+  homepage_uri: http://pysqlite.googlecode.com/
+  name: pysqlite
+  version: 2.6.3
+python-apt:
+  description: Python bindings for APT
+  homepage_uri: UNKNOWN
+  name: python-apt
+  version: 0.8.3ubuntu7
+python-cjson:
+  description: Fast JSON encoder/decoder for Python
+  homepage_uri: http://ag-projects.com/
+  name: python-cjson
+  version: 1.0.5
+python-dateutil:
+  description: Extensions to the standard python 2.3+ datetime module
+  homepage_uri: http://labix.org/python-dateutil
+  name: python-dateutil
+  version: '1.5'
+python-debian:
+  description: Debian package related modules
+  homepage_uri: http://packages.debian.org/sid/python-debian
+  name: python-debian
+  version: 0.1.21ubuntu1
+python-distutils-extra:
+  description: Add support for i18n, documentation and icons to distutils
+  homepage_uri: UNKNOWN
+  name: python-distutils-extra
+  version: '2.32'
+python-virtkey:
+  description: python extension for emulating keypresses and getting keyboard layout
+  homepage_uri: https://launchpad.net/python-virtkey/
+  name: python-virtkey
+  version: 0.60.0
+pyxdg:
+  description: PyXDG contains implementations of freedesktop.org standards in python.
+  homepage_uri: http://cvs.freedesktop.org/cgi-bin/viewcvs.cgi/pyxdg/
+  name: pyxdg
+  version: '0.19'
+pyzmq:
+  description: Python bindings for 0MQ.
+  homepage_uri: http://github.com/zeromq/pyzmq
+  name: pyzmq
+  version: 2.2.0
+reportlab:
+  description: The Reportlab Toolkit
+  homepage_uri: http://www.reportlab.com/
+  name: reportlab
+  version: '2.5'
+repoze.lru:
+  description: A tiny LRU cache implementation and decorator
+  homepage_uri: http://www.repoze.org
+  name: repoze.lru
+  version: '0.5'
+rhythmbox-ubuntuone:
+  description: Ubuntu One Rhythmbox plug-in
+  homepage_uri: https://launchpad.net/rhythmbox-ubuntuone
+  name: rhythmbox-ubuntuone
+  version: 3.0.0
+rpy:
+  description: Python interface to the R language
+  homepage_uri: http://rpy.sourceforge.net
+  name: rpy
+  version: 1.0.3
+rpy2:
+  description: ''
+  homepage_uri: ''
+  name: rpy2
+  version: 2.2.6dev-20120618
+rpy2-bioconductor-extensions:
+  description: Bioconductor-specific extensions for rpy2
+  homepage_uri: no url yet
+  name: rpy2-bioconductor-extensions
+  version: 0.2.5-dev
+ruffus:
+  description: Light-weight Python Computational Pipeline Management
+  homepage_uri: http://ruffus.googlecode.com
+  name: ruffus
+  version: '2.2'
+scikits.learn:
+  description: A set of python modules for machine learning and data mining
+  homepage_uri: http://scikit-learn.sourceforge.net
+  name: scikits.learn
+  version: 0.8.1
+scikits.statsmodels:
+  description: Statistical computations and models for use with SciPy
+  homepage_uri: http://statsmodels.sourceforge.net/
+  name: scikits.statsmodels
+  version: 0.3.1
+scipy:
+  description: 'SciPy: Scientific Library for Python'
+  homepage_uri: http://www.scipy.org
+  name: scipy
+  version: 0.10.1
+seal:
+  description: 'Seal: Sequence Alignment on Hadoop.'
+  homepage_uri: http://www.crs4.it
+  name: seal
+  version: devel-20120618
+sessioninstaller:
+  description: APT based installer using PackageKit session DBus API
+  homepage_uri: UNKNOWN
+  name: sessioninstaller
+  version: 0.0.0
+setuptools:
+  description: xxxx
+  homepage_uri: xxx
+  name: setuptools
+  version: 0.6c11
+simplejson:
+  description: Simple, fast, extensible JSON encoder/decoder for Python
+  homepage_uri: http://github.com/simplejson/simplejson
+  name: simplejson
+  version: 2.5.2
+software-center-aptd-plugins:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: software-center-aptd-plugins
+  version: 0.0.0
+ssh:
+  description: SSH2 protocol library
+  homepage_uri: UNKNOWN
+  name: ssh
+  version: 1.7.14
+system-service:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: system-service
+  version: 0.1.6
+tornado:
+  description: Tornado is an open source version of the scalable, non-blocking web
+    server and and tools that power FriendFeed
+  homepage_uri: http://www.tornadoweb.org/
+  name: tornado
+  version: '2.3'
+traits:
+  description: explicitly typed attributes for Python
+  homepage_uri: http://code.enthought.com/projects/traits
+  name: traits
+  version: 4.0.0
+traitsui:
+  description: 'traitsui: traits-capable user interfaces'
+  homepage_uri: https://github.com/enthought/traitsui
+  name: traitsui
+  version: 4.0.1
+ubuntuone-couch:
+  description: Ubuntu One CouchDB
+  homepage_uri: https://launchpad.net/ubuntuone-couch
+  name: ubuntuone-couch
+  version: 0.3.0
+ubuntuone-installer:
+  description: Ubuntu One Installer
+  homepage_uri: https://launchpad.net/ubuntuone-installer
+  name: ubuntuone-installer
+  version: 3.0.0
+ubuntuone-storage-protocol:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: ubuntuone-storage-protocol
+  version: 3.0.0
+ufw:
+  description: front-end for Linux firewalling
+  homepage_uri: https://launchpad.net/ufw
+  name: ufw
+  version: 0.31.1-1
+unattended-upgrades:
+  description: UNKNOWN
+  homepage_uri: UNKNOWN
+  name: unattended-upgrades
+  version: '0.1'
+unity-lens-video:
+  description: UNKNOWN
+  homepage_uri: http://launchpad.net/~davidc3
+  name: unity-lens-video
+  version: 0.3.5
+unity-scope-video-remote:
+  description: UNKNOWN
+  homepage_uri: http://launchpad.net/onehundredscopes
+  name: unity-scope-video-remote
+  version: 0.3.5
+usb-creator:
+  description: Ubuntu startup disk creator
+  homepage_uri: UNKNOWN
+  name: usb-creator
+  version: 0.2.23
+variant_tools:
+  description: 'Variant tools: an integrated annotation and analysis package for next-gen
+    sequencing data'
+  homepage_uri: http://varianttools.sourceforge.net
+  name: variant_tools
+  version: 1.0.1a
+vboxapi:
+  description: Python interface to VirtualBox
+  homepage_uri: http://www.virtualbox.org
+  name: vboxapi
+  version: '1.0'
+virtualenv:
+  description: Virtual Python Environment builder
+  homepage_uri: http://www.virtualenv.org
+  name: virtualenv
+  version: 1.7.1.2
+wadllib:
+  description: Navigate HTTP resources using WADL files as guides.
+  homepage_uri: https://launchpad.net/wadllib
+  name: wadllib
+  version: 1.3.0
+workerpool:
+  description: Module for distributing jobs to a pool of worker threads.
+  homepage_uri: http://code.google.com/p/workerpool/
+  name: workerpool
+  version: 0.9.2
+wsgiref:
+  description: WSGI (PEP 333) Reference Library
+  homepage_uri: ''
+  name: wsgiref
+  version: 0.1.2
+wxPython:
+  description: Cross platform GUI toolkit for Python
+  homepage_uri: http://wxPython.org/
+  name: wxPython
+  version: 2.8.12.1
+wxPython-common:
+  description: Cross platform GUI toolkit for Python
+  homepage_uri: http://wxPython.org/
+  name: wxPython-common
+  version: 2.8.12.1
+xdiagnose:
+  description: Analysis tools for troubleshooting X.org problems
+  homepage_uri: http://launchpad.net/xdiagnose
+  name: xdiagnose
+  version: '2.5'
+xkit:
+  description: library for the manipulation of the xorg.conf
+  homepage_uri: https://launchpad.net/x-kit
+  name: xkit
+  version: 0.0.0
+xlrd:
+  description: Library for developers to extract data from Microsoft Excel (tm) spreadsheet
+    files
+  homepage_uri: http://www.lexicon.net/sjmachin/xlrd.htm
+  name: xlrd
+  version: 0.7.8
+yolk:
+  description: Command-line tool for querying PyPI and Python packages installed on
+    your system.
+  homepage_uri: https://github.com/cakebread/yolk
+  name: yolk
+  version: 0.4.3
+zope.interface:
+  description: Interfaces for Python
+  homepage_uri: http://pypi.python.org/pypi/zope.interface
+  name: zope.interface
+  version: 3.6.1

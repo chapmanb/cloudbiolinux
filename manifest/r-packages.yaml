@@ -1,0 +1,1275 @@
+AnnotationDbi:
+  description: Annotation Database Interface
+  homepage_uri: ''
+  name: AnnotationDbi
+  version: 1.18.1
+ArrayExpress:
+  description: 'Access the ArrayExpress Microarray Database at EBI and build\nBioconductor
+    data structures: ExpressionSet, AffyBatch,\nNChannelSet'
+  homepage_uri: ''
+  name: ArrayExpress
+  version: 1.16.0
+ArrayTools:
+  description: geneChip Analysis Package
+  homepage_uri: ''
+  name: ArrayTools
+  version: 1.16.0
+BSgenome:
+  description: Infrastructure for Biostrings-based genome data packages
+  homepage_uri: ''
+  name: BSgenome
+  version: 1.24.0
+BSgenome.Ecoli.NCBI.20080805:
+  description: Escherichia coli full genomes
+  homepage_uri: ''
+  name: BSgenome.Ecoli.NCBI.20080805
+  version: 1.3.17
+BSgenome.Scerevisiae.UCSC.sacCer2:
+  description: Saccharomyces cerevisiae (Yeast) full genome (UCSC version sacCer2)
+  homepage_uri: ''
+  name: BSgenome.Scerevisiae.UCSC.sacCer2
+  version: 1.3.17
+BayesPeak:
+  description: Bayesian Analysis of ChIP-seq Data
+  homepage_uri: ''
+  name: BayesPeak
+  version: 1.8.0
+BeadDataPackR:
+  description: Compression of Illumina BeadArray data
+  homepage_uri: ''
+  name: BeadDataPackR
+  version: 1.8.0
+BiasedUrn:
+  description: Biased Urn model distributions
+  homepage_uri: http://www.agner.org/random/ http://www.r-project.org
+  name: BiasedUrn
+  version: '1.04'
+Biobase:
+  description: 'Biobase: Base functions for Bioconductor'
+  homepage_uri: ''
+  name: Biobase
+  version: 2.16.0
+BiocGenerics:
+  description: Generic functions for Bioconductor
+  homepage_uri: ''
+  name: BiocGenerics
+  version: 0.2.0
+BiocInstaller:
+  description: Install/Update Bioconductor and CRAN Packages
+  homepage_uri: ''
+  name: BiocInstaller
+  version: 1.4.6
+BiodiversityR:
+  description: GUI for biodiversity and community ecology analysis
+  homepage_uri: http://www.r-project.org,\nhttp://www.worldagroforestry.org/resources/databases/tree-diversity-analysis
+  name: BiodiversityR
+  version: '1.6'
+Biostrings:
+  description: String objects representing biological sequences, and matching\nalgorithms
+  homepage_uri: ''
+  name: Biostrings
+  version: 2.24.1
+CNAnorm:
+  description: A normalization method for Copy Number Aberration in cancer\nsamples
+  homepage_uri: http://www.r-project.org,
+  name: CNAnorm
+  version: 1.2.0
+CSAR:
+  description: Statistical tools for the analysis of ChIP-seq data
+  homepage_uri: ''
+  name: CSAR
+  version: 1.8.0
+Cairo:
+  description: R graphics device using cairo graphics library for creating\nhigh-quality
+    bitmap (PNG, JPEG, TIFF), vector (PDF, SVG,\nPostScript) and display (X11 and
+    Win32) output.
+  homepage_uri: http://www.rforge.net/Cairo/
+  name: Cairo
+  version: 1.5-1
+Category:
+  description: Category Analysis
+  homepage_uri: ''
+  name: Category
+  version: 2.22.0
+ChIPpeakAnno:
+  description: Batch annotation of the peaks identified from either ChIP-seq,\nChIP-chip
+    experiments or any experiments resulted in large\nnumber of chromosome ranges.
+  homepage_uri: ''
+  name: ChIPpeakAnno
+  version: 2.4.0
+ChIPseqR:
+  description: Identifying Protein Binding Sites in High-Throughput Sequencing\nData
+  homepage_uri: ''
+  name: ChIPseqR
+  version: 1.10.0
+ChIPsim:
+  description: Simulation of ChIP-seq experiments
+  homepage_uri: ''
+  name: ChIPsim
+  version: 1.10.0
+DBI:
+  description: R Database Interface
+  homepage_uri: ''
+  name: DBI
+  version: 0.2-5
+DEGseq:
+  description: Identify Differentially Expressed Genes from RNA-seq data
+  homepage_uri: ''
+  name: DEGseq
+  version: 1.10.0
+DESeq:
+  description: Differential gene expression analysis based on the negative\nbinomial
+    distribution
+  homepage_uri: http://www-huber.embl.de/users/anders/DESeq
+  name: DESeq
+  version: 1.8.3
+DEXSeq:
+  description: Inference of differential exon usage in RNA-Seq
+  homepage_uri: ''
+  name: DEXSeq
+  version: 1.2.0
+DNAcopy:
+  description: DNA copy number data analysis
+  homepage_uri: ''
+  name: DNAcopy
+  version: 1.30.0
+DiffBind:
+  description: Differential Binding Analysis of ChIP-Seq peak data
+  homepage_uri: ''
+  name: DiffBind
+  version: 1.2.0
+DynDoc:
+  description: Dynamic document tools
+  homepage_uri: ''
+  name: DynDoc
+  version: 1.34.0
+EDASeq:
+  description: Exploratory Data Analysis and Normalization for RNA-Seq
+  homepage_uri: ''
+  name: EDASeq
+  version: 1.2.0
+GEOquery:
+  description: Get data from NCBI Gene Expression Omnibus (GEO)
+  homepage_uri: http://watson.nci.nih.gov/~sdavis
+  name: GEOquery
+  version: 2.23.5
+GGBase:
+  description: GGBase infrastructure for genetics of gene expression package\nGGtools
+  homepage_uri: ''
+  name: GGBase
+  version: 3.18.0
+GGtools:
+  description: software and data for analyses in genetics of gene expression
+  homepage_uri: ''
+  name: GGtools
+  version: 4.4.0
+GO.db:
+  description: A set of annotation maps describing the entire Gene Ontology
+  homepage_uri: ''
+  name: GO.db
+  version: 2.7.1
+GOFunction:
+  description: 'GO-function: deriving biologcially relevant functions from\nstatistically
+    significant functions'
+  homepage_uri: ''
+  name: GOFunction
+  version: 1.2.0
+GOstats:
+  description: Tools for manipulating GO and microarrays.
+  homepage_uri: ''
+  name: GOstats
+  version: 2.22.0
+GSEABase:
+  description: Gene set enrichment data structures and methods
+  homepage_uri: ''
+  name: GSEABase
+  version: 1.18.0
+GWASExactHW:
+  description: Exact Hardy-Weinburg testing for Genome Wide Association Studies
+  homepage_uri: ''
+  name: GWASExactHW
+  version: '1.0'
+GenomicFeatures:
+  description: Tools for making and manipulating transcript centric annotations
+  homepage_uri: ''
+  name: GenomicFeatures
+  version: 1.8.1
+GenomicRanges:
+  description: Representation and manipulation of genomic intervals
+  homepage_uri: ''
+  name: GenomicRanges
+  version: 1.8.6
+HH:
+  description: 'Statistical Analysis and Data Display: Heiberger and Holland'
+  homepage_uri: ''
+  name: HH
+  version: 2.3-15
+HilbertVis:
+  description: Hilbert curve visualization
+  homepage_uri: http://www.ebi.ac.uk/~anders/hilbert
+  name: HilbertVis
+  version: 1.14.0
+Hmisc:
+  description: Harrell Miscellaneous
+  homepage_uri: http://biostat.mc.vanderbilt.edu/wiki/Main/Hmisc,\nhttp://biostat.mc.vanderbilt.edu/trac/Hmisc
+  name: Hmisc
+  version: 3.9-3
+IRanges:
+  description: Infrastructure for manipulating intervals on sequences
+  homepage_uri: ''
+  name: IRanges
+  version: 1.14.3
+Iso:
+  description: Functions to perform isotonic regression.
+  homepage_uri: http://www.math.unb.ca/~rolf/
+  name: Iso
+  version: 0.0-10
+KEGG.db:
+  description: A set of annotation maps for KEGG
+  homepage_uri: ''
+  name: KEGG.db
+  version: 2.7.1
+KernSmooth:
+  description: Functions for kernel smoothing for Wand & Jones (1995)
+  homepage_uri: ''
+  name: KernSmooth
+  version: 2.23-7
+LowRankQP:
+  description: Low Rank Quadratic Programming
+  homepage_uri: ''
+  name: LowRankQP
+  version: 1.0.1
+MASS:
+  description: Support Functions and Datasets for Venables and Ripley's MASS
+  homepage_uri: http://www.stats.ox.ac.uk/pub/MASS4/
+  name: MASS
+  version: 7.3-18
+MEDIPS:
+  description: MeDIP-Seq data analysis
+  homepage_uri: ''
+  name: MEDIPS
+  version: 1.6.0
+Matrix:
+  description: Sparse and Dense Matrix Classes and Methods
+  homepage_uri: http://Matrix.R-forge.R-project.org/
+  name: Matrix
+  version: 1.0-7
+MotIV:
+  description: Motif Identification and Validation
+  homepage_uri: ''
+  name: MotIV
+  version: 1.10.0
+NMF:
+  description: Algorithms and framework for Nonnegative Matrix Factorization\n(NMF).
+  homepage_uri: http://nmf.r-forge.r-project.org
+  name: NMF
+  version: 0.5.06
+PICS:
+  description: Probabilistic inference of ChIP-seq
+  homepage_uri: ''
+  name: PICS
+  version: 1.10.0
+R.methodsS3:
+  description: Utility function for defining S3 methods
+  homepage_uri: http://www.braju.com/R/
+  name: R.methodsS3
+  version: 1.2.2
+R2HTML:
+  description: HTML exportation for R objects
+  homepage_uri: http://www.r-project.org
+  name: R2HTML
+  version: '2.2'
+R453Plus1Toolbox:
+  description: A package for importing and analyzing data from Roche's Genome\nSequencer
+    System.
+  homepage_uri: ''
+  name: R453Plus1Toolbox
+  version: 1.6.1
+RBGL:
+  description: An interface to the BOOST graph library
+  homepage_uri: http://www.bioconductor.org
+  name: RBGL
+  version: 1.32.0
+RColorBrewer:
+  description: ColorBrewer palettes
+  homepage_uri: ''
+  name: RColorBrewer
+  version: 1.0-5
+RCurl:
+  description: General network (HTTP/FTP/...) client interface for R
+  homepage_uri: http://www.omegahat.org/RCurl
+  name: RCurl
+  version: 1.91-1
+RMySQL:
+  description: R interface to the MySQL database
+  homepage_uri: http://biostat.mc.vanderbilt.edu/RMySQL,\nhttps://github.com/jeffreyhorner/RMySQL
+  name: RMySQL
+  version: 0.9-3
+RSQLite:
+  description: SQLite interface for R
+  homepage_uri: ''
+  name: RSQLite
+  version: 0.11.1
+RSQLite.extfuns:
+  description: Math and String Extension Functions for RSQLite
+  homepage_uri: http://www.sqlite.org/contrib/
+  name: RSQLite.extfuns
+  version: 0.0.1
+Rcpp:
+  description: Seamless R and C++ Integration
+  homepage_uri: http://dirk.eddelbuettel.com/code/rcpp.html,\nhttp://romainfrancois.blog.free.fr/index.php?category/R-package/Rcpp
+  name: Rcpp
+  version: 0.9.10
+Rgraphviz:
+  description: Provides plotting capabilities for R graph objects
+  homepage_uri: ''
+  name: Rgraphviz
+  version: 1.34.1
+Rmpi:
+  description: Interface (Wrapper) to MPI (Message-Passing Interface)
+  homepage_uri: http://www.stats.uwo.ca/faculty/yu/Rmpi
+  name: Rmpi
+  version: 0.5-9
+Rolexa:
+  description: Statistical analysis of Solexa sequencing data
+  homepage_uri: ''
+  name: Rolexa
+  version: 1.12.0
+Rsamtools:
+  description: Binary alignment (BAM), variant call (BCF), or tabix file import
+  homepage_uri: http://bioconductor.org/packages/release/bioc/html/Rsamtools.html
+  name: Rsamtools
+  version: 1.8.5
+SRAdb:
+  description: A compilation of metadata from NCBI SRA and tools
+  homepage_uri: http://watson.nci.nih.gov/
+  name: SRAdb
+  version: 1.10.0
+SVGAnnotation:
+  description: Tools for post-processing SVG plots created in R
+  homepage_uri: ''
+  name: SVGAnnotation
+  version: 0.9-0
+ShortRead:
+  description: Classes and methods for high-throughput short-read sequencing\ndata.
+  homepage_uri: ''
+  name: ShortRead
+  version: 1.14.4
+SparseM:
+  description: Sparse Linear Algebra
+  homepage_uri: http://www.econ.uiuc.edu/~roger/research/sparse/sparse.html
+  name: SparseM
+  version: '0.96'
+TeachingDemos:
+  description: Demonstrations for teaching and learning
+  homepage_uri: ''
+  name: TeachingDemos
+  version: '2.8'
+VariantAnnotation:
+  description: Annotation of Genetic Variants
+  homepage_uri: ''
+  name: VariantAnnotation
+  version: 1.2.8
+XML:
+  description: Tools for parsing and generating XML within R and S-Plus.
+  homepage_uri: http://www.omegahat.org/RSXML
+  name: XML
+  version: 3.9-4
+abind:
+  description: Combine multi-dimensional arrays
+  homepage_uri: ''
+  name: abind
+  version: 1.4-0
+affy:
+  description: Methods for Affymetrix Oligonucleotide Arrays
+  homepage_uri: ''
+  name: affy
+  version: 1.34.0
+affyPLM:
+  description: Methods for fitting probe-level models
+  homepage_uri: http://bmbolstad.com
+  name: affyPLM
+  version: 1.32.0
+affyQCReport:
+  description: QC Report Generation for affyBatch objects
+  homepage_uri: ''
+  name: affyQCReport
+  version: 1.34.0
+affydata:
+  description: Affymetrix Data for Demonstration Purpose
+  homepage_uri: ''
+  name: affydata
+  version: 1.11.16
+affyio:
+  description: Tools for parsing Affymetrix data files
+  homepage_uri: ''
+  name: affyio
+  version: 1.24.0
+affylmGUI:
+  description: GUI for affy analysis using limma package
+  homepage_uri: http://bioinf.wehi.edu.au/affylmGUI/
+  name: affylmGUI
+  version: 1.30.0
+akima:
+  description: Interpolation of irregularly spaced data
+  homepage_uri: ''
+  name: akima
+  version: 0.5-7
+amap:
+  description: Another Multidimensional Analysis Package
+  homepage_uri: http://mulcyber.toulouse.inra.fr/projects/amap/
+  name: amap
+  version: 0.8-7
+annaffy:
+  description: Annotation tools for Affymetrix biological metadata
+  homepage_uri: ''
+  name: annaffy
+  version: 1.28.0
+annotate:
+  description: Annotation for microarrays
+  homepage_uri: ''
+  name: annotate
+  version: 1.34.0
+ape:
+  description: Analyses of Phylogenetics and Evolution
+  homepage_uri: http://ape.mpl.ird.fr/
+  name: ape
+  version: 3.0-4
+aplpack:
+  description: 'Another Plot PACKage: stem.leaf, bagplot, faces, spin3R, and\nsome
+    slider functions'
+  homepage_uri: http://www.wiwi.uni-bielefeld.de/com/wolf/software/aplpack.html
+  name: aplpack
+  version: 1.2.6
+aroma.light:
+  description: Light-weight methods for normalization and visualization of\nmicroarray
+    data using only basic R data types
+  homepage_uri: http://www.aroma-project.org/
+  name: aroma.light
+  version: 1.24.0
+arrayQualityMetrics:
+  description: Quality metrics on microarray data sets
+  homepage_uri: ''
+  name: arrayQualityMetrics
+  version: 3.12.0
+ash:
+  description: David Scott's ASH routines
+  homepage_uri: ''
+  name: ash
+  version: 1.0-13
+base:
+  description: The R Base Package
+  homepage_uri: ''
+  name: base
+  version: 2.15.0
+baySeq:
+  description: Empirical Bayesian analysis of patterns of differential\nexpression
+    in count data
+  homepage_uri: ''
+  name: baySeq
+  version: 1.10.0
+beadarray:
+  description: Quality assessment and low-level analysis for Illumina BeadArray\ndata
+  homepage_uri: ''
+  name: beadarray
+  version: 2.6.0
+biglm:
+  description: bounded memory linear and generalized linear models
+  homepage_uri: ''
+  name: biglm
+  version: '0.8'
+bigmemory:
+  description: Manage massive matrices with shared memory and memory-mapped\nfiles
+  homepage_uri: http://www.bigmemory.org
+  name: bigmemory
+  version: 4.2.11
+bioDist:
+  description: Different distance measures
+  homepage_uri: ''
+  name: bioDist
+  version: 1.28.0
+biomaRt:
+  description: Interface to BioMart databases (e.g. Ensembl, COSMIC ,Wormbase\nand
+    Gramene)
+  homepage_uri: ''
+  name: biomaRt
+  version: 2.12.0
+bit:
+  description: A class for vectors of 1-bit booleans
+  homepage_uri: http://ff.r-forge.r-project.org/
+  name: bit
+  version: 1.1-8
+bitops:
+  description: Functions for Bitwise operations
+  homepage_uri: ''
+  name: bitops
+  version: 1.0-4.1
+boot:
+  description: Bootstrap Functions (originally by Angelo Canty for S)
+  homepage_uri: ''
+  name: boot
+  version: 1.3-4
+caTools:
+  description: 'Tools: moving window statistics, GIF, Base64, ROC AUC, etc.'
+  homepage_uri: ''
+  name: caTools
+  version: '1.13'
+car:
+  description: Companion to Applied Regression
+  homepage_uri: https://r-forge.r-project.org/projects/car/,\nhttp://CRAN.R-project.org/package=car,\nhttp://socserv.socsci.mcmaster.ca/jfox/Books/Companion/index.html
+  name: car
+  version: 2.0-12
+chipseq:
+  description: 'chipseq: A package for analyzing chipseq data'
+  homepage_uri: ''
+  name: chipseq
+  version: 1.6.0
+chron:
+  description: Chronological objects which can handle dates and times
+  homepage_uri: ''
+  name: chron
+  version: 2.3-42
+class:
+  description: Functions for Classification
+  homepage_uri: http://www.stats.ox.ac.uk/pub/MASS4/
+  name: class
+  version: 7.3-3
+cluster:
+  description: Cluster Analysis Extended Rousseeuw et al.
+  homepage_uri: ''
+  name: cluster
+  version: 1.14.2
+cn.mops:
+  description: cn.mops - Mixture of Poissons for CNV detection in NGS data
+  homepage_uri: http://www.bioinf.jku.at/software/cnmops/cnmops.html
+  name: cn.mops
+  version: 1.2.5
+codetools:
+  description: Code Analysis Tools for R
+  homepage_uri: ''
+  name: codetools
+  version: 0.2-8
+coin:
+  description: Conditional Inference Procedures in a Permutation Test Framework
+  homepage_uri: ''
+  name: coin
+  version: 1.0-21
+colorspace:
+  description: Color Space Manipulation
+  homepage_uri: ''
+  name: colorspace
+  version: 1.1-1
+compiler:
+  description: The R Compiler Package
+  homepage_uri: ''
+  name: compiler
+  version: 2.15.0
+cummeRbund:
+  description: Analysis, exploration, manipulation, and visualization of\nCufflinks
+    high-throughput sequencing data.
+  homepage_uri: ''
+  name: cummeRbund
+  version: 1.2.0
+datasets:
+  description: The R Datasets Package
+  homepage_uri: ''
+  name: datasets
+  version: 2.15.0
+date:
+  description: Functions for handling dates
+  homepage_uri: ''
+  name: date
+  version: 1.2-32
+devtools:
+  description: Tools to make developing R code easier
+  homepage_uri: ''
+  name: devtools
+  version: '0.6'
+dichromat:
+  description: Color schemes for dichromats
+  homepage_uri: ''
+  name: dichromat
+  version: 1.2-4
+digest:
+  description: Create cryptographic hash digests of R objects
+  homepage_uri: http://dirk.eddelbuettel.com/code/digest.html
+  name: digest
+  version: 0.5.2
+edgeR:
+  description: Empirical analysis of digital gene expression data in R
+  homepage_uri: ''
+  name: edgeR
+  version: 2.6.7
+effects:
+  description: Effect Displays for Linear, Generalized Linear,\nMultinomial-Logit,
+    Proportional-Odds Logit Models and\nMixed-Effects Models
+  homepage_uri: http://www.r-project.org, http://socserv.socsci.mcmaster.ca/jfox/
+  name: effects
+  version: 2.1-1
+evaluate:
+  description: Parsing and evaluation tools that provide more details than the\ndefault.
+  homepage_uri: ''
+  name: evaluate
+  version: 0.4.2
+exomeCopy:
+  description: CNV detection from exome sequencing read depth
+  homepage_uri: ''
+  name: exomeCopy
+  version: 1.2.0
+fBasics:
+  description: Rmetrics - Markets and Basic Statistics
+  homepage_uri: http://www.rmetrics.org
+  name: fBasics
+  version: '2160.81'
+ff:
+  description: memory-efficient storage of large data on disk and fast access\nfunctions
+  homepage_uri: http://ff.r-forge.r-project.org/
+  name: ff
+  version: 2.2-7
+flashClust:
+  description: Implementation of optimal hierarchical clustering
+  homepage_uri: ''
+  name: flashClust
+  version: 1.01-1
+foreign:
+  description: Read Data Stored by Minitab, S, SAS, SPSS, Stata, Systat, dBase,\n...
+  homepage_uri: ''
+  name: foreign
+  version: 0.8-50
+formatR:
+  description: Format R Code Automatically
+  homepage_uri: https://github.com/yihui/formatR/wiki
+  name: formatR
+  version: '0.4'
+gage:
+  description: Generally Applicable Gene-set Enrichment for Pathway Analysis
+  homepage_uri: http://www.biomedcentral.com/1471-2105/10/161
+  name: gage
+  version: 2.6.0
+gcrma:
+  description: Background Adjustment Using Sequence Information
+  homepage_uri: ''
+  name: gcrma
+  version: 2.28.0
+gdata:
+  description: Various R programming tools for data manipulation
+  homepage_uri: ''
+  name: gdata
+  version: 2.10.6
+gee:
+  description: Generalized Estimation Equation solver
+  homepage_uri: ''
+  name: gee
+  version: 4.13-18
+geneLenDataBase:
+  description: Lengths of mRNA transcripts for a number of genomes
+  homepage_uri: ''
+  name: geneLenDataBase
+  version: 0.99.9
+genefilter:
+  description: 'genefilter: methods for filtering genes from microarray\nexperiments'
+  homepage_uri: ''
+  name: genefilter
+  version: 1.38.0
+geneplotter:
+  description: Graphics related functions for Bioconductor
+  homepage_uri: ''
+  name: geneplotter
+  version: 1.34.0
+genomeIntervals:
+  description: Operations on genomic intervals
+  homepage_uri: ''
+  name: genomeIntervals
+  version: 1.12.0
+genoset:
+  description: Provides classes similar to ExpressionSet for copy number\nanalysis
+  homepage_uri: ''
+  name: genoset
+  version: 1.6.0
+ggplot2:
+  description: An implementation of the Grammar of Graphics
+  homepage_uri: http://had.co.nz/ggplot2/
+  name: ggplot2
+  version: 0.9.1
+girafe:
+  description: Genome Intervals and Read Alignments for Functional Exploration
+  homepage_uri: ''
+  name: girafe
+  version: 1.8.0
+globaltest:
+  description: Testing groups of covariates/features for association with a\nresponse
+    variable, with applications to gene set testing
+  homepage_uri: http://www.msbi.nl/goeman
+  name: globaltest
+  version: 5.10.0
+goseq:
+  description: Gene Ontology analyser for RNA-seq and other length biased data
+  homepage_uri: ''
+  name: goseq
+  version: 1.8.0
+gplots:
+  description: Various R programming tools for plotting data
+  homepage_uri: ''
+  name: gplots
+  version: 2.11.0
+grDevices:
+  description: The R Graphics Devices and Support for Colours and Fonts
+  homepage_uri: ''
+  name: grDevices
+  version: 2.15.0
+graph:
+  description: 'graph: A package to handle graph data structures'
+  homepage_uri: ''
+  name: graph
+  version: 1.34.0
+graphics:
+  description: The R Graphics Package
+  homepage_uri: ''
+  name: graphics
+  version: 2.15.0
+grid:
+  description: The Grid Graphics Package
+  homepage_uri: ''
+  name: grid
+  version: 2.15.0
+gsubfn:
+  description: Utilities for strings and function arguments.
+  homepage_uri: http://gsubfn.googlecode.com
+  name: gsubfn
+  version: 0.6-3
+gtools:
+  description: Various R programming tools
+  homepage_uri: ''
+  name: gtools
+  version: 2.6.2
+hdf5:
+  description: HDF5
+  homepage_uri: ''
+  name: hdf5
+  version: 1.6.9
+hdrcde:
+  description: Highest density regions and conditional density estimation
+  homepage_uri: http://www.robjhyndman.com/software/hdrcde
+  name: hdrcde
+  version: '2.16'
+hexbin:
+  description: Hexagonal Binning Routines
+  homepage_uri: ''
+  name: hexbin
+  version: 1.26.0
+hgu95av2.db:
+  description: Affymetrix Human Genome U95 Set annotation data (chip hgu95av2)
+  homepage_uri: ''
+  name: hgu95av2.db
+  version: 2.7.1
+highlight:
+  description: Syntax highlighter
+  homepage_uri: http://r-forge.r-project.org/projects/highlight/,\nhttp://romainfrancois.blog.free.fr/index.php?category/R-package/highlight
+  name: highlight
+  version: 0.3.1
+htSeqTools:
+  description: Quality Control, Visualization and Processing for\nHigh-Throughput
+    Sequencing data
+  homepage_uri: ''
+  name: htSeqTools
+  version: 1.2.0
+hwriter:
+  description: HTML Writer - Outputs R objects in HTML format
+  homepage_uri: http://www.embl.de/~gpau/hwriter/
+  name: hwriter
+  version: '1.3'
+impute:
+  description: 'impute: Imputation for microarray data'
+  homepage_uri: ''
+  name: impute
+  version: 1.30.0
+intervals:
+  description: Tools for working with points and intervals
+  homepage_uri: ''
+  name: intervals
+  version: 0.13.3
+kernlab:
+  description: Kernel-based Machine Learning Lab
+  homepage_uri: ''
+  name: kernlab
+  version: 0.9-14
+knitr:
+  description: A general-purpose package for dynamic report generation in R
+  homepage_uri: http://yihui.name/knitr/
+  name: knitr
+  version: '0.6'
+ks:
+  description: Kernel smoothing
+  homepage_uri: http://www.mvstat.net/tduong
+  name: ks
+  version: 1.8.8
+labeling:
+  description: Axis Labeling
+  homepage_uri: ''
+  name: labeling
+  version: '0.1'
+lattice:
+  description: Lattice Graphics
+  homepage_uri: http://lattice.r-forge.r-project.org/
+  name: lattice
+  version: 0.20-6
+latticeExtra:
+  description: Extra Graphical Utilities Based on Lattice
+  homepage_uri: http://latticeextra.r-forge.r-project.org/
+  name: latticeExtra
+  version: 0.6-19
+leaps:
+  description: regression subset selection
+  homepage_uri: ''
+  name: leaps
+  version: '2.9'
+limSolve:
+  description: Solving Linear Inverse Models
+  homepage_uri: ''
+  name: limSolve
+  version: 1.5.3
+limma:
+  description: Linear Models for Microarray Data
+  homepage_uri: http://bioinf.wehi.edu.au/limma
+  name: limma
+  version: 3.12.1
+lmtest:
+  description: Testing Linear Regression Models
+  homepage_uri: ''
+  name: lmtest
+  version: 0.9-30
+locfit:
+  description: Local Regression, Likelihood and Density Estimation.
+  homepage_uri: ''
+  name: locfit
+  version: 1.5-8
+lpSolve:
+  description: Interface to Lp_solve v. 5.5 to solve linear/integer programs
+  homepage_uri: ''
+  name: lpSolve
+  version: 5.6.6
+lumi:
+  description: BeadArray Specific Methods for Illumina Methylation and\nExpression
+    Microarrays
+  homepage_uri: ''
+  name: lumi
+  version: 2.8.0
+makecdfenv:
+  description: CDF Environment Maker
+  homepage_uri: ''
+  name: makecdfenv
+  version: 1.34.0
+maptree:
+  description: Mapping, pruning, and graphing tree models
+  homepage_uri: http://www.epa.gov/wed/pages/staff/white/
+  name: maptree
+  version: 1.4-6
+markdown:
+  description: Markdown rendering for R
+  homepage_uri: ''
+  name: markdown
+  version: 0.5.1
+marray:
+  description: Exploratory analysis for two-color spotted microarray data
+  homepage_uri: http://www.maths.usyd.edu.au/u/jeany/
+  name: marray
+  version: 1.34.0
+matrixStats:
+  description: Methods that apply to rows and columns of a matrix
+  homepage_uri: ''
+  name: matrixStats
+  version: 0.5.0
+mclust:
+  description: Model-Based Clustering / Normal Mixture Modeling
+  homepage_uri: http://www.stat.washington.edu/research/reports/2006/tr504.pdf
+  name: mclust
+  version: 3.4.11
+memoise:
+  description: Memoise functions
+  homepage_uri: ''
+  name: memoise
+  version: '0.1'
+methods:
+  description: Formal Methods and Classes
+  homepage_uri: ''
+  name: methods
+  version: 2.15.0
+methylumi:
+  description: Handle Illumina methylation data
+  homepage_uri: ''
+  name: methylumi
+  version: 2.2.0
+mgcv:
+  description: Mixed GAM Computation Vehicle with GCV/AIC/REML smoothness\nestimation
+  homepage_uri: ''
+  name: mgcv
+  version: 1.7-18
+misc3d:
+  description: Miscellaneous 3D Plots
+  homepage_uri: ''
+  name: misc3d
+  version: 0.8-2
+modeltools:
+  description: Tools and Classes for Statistical Models
+  homepage_uri: ''
+  name: modeltools
+  version: 0.2-19
+multcomp:
+  description: Simultaneous Inference in General Parametric Models
+  homepage_uri: The publishers web page is\nhttp://www.crcpress.com/product/isbn/9781584885740
+  name: multcomp
+  version: 1.2-12
+multicore:
+  description: Parallel processing of R code on machines with multiple cores or\nCPUs
+  homepage_uri: http://www.rforge.net/multicore/
+  name: multicore
+  version: 0.1-7
+multtest:
+  description: Resampling-based multiple hypothesis testing
+  homepage_uri: ''
+  name: multtest
+  version: 2.12.0
+munsell:
+  description: Munsell colour system
+  homepage_uri: ''
+  name: munsell
+  version: '0.3'
+mvtnorm:
+  description: Multivariate Normal and t Distributions
+  homepage_uri: ''
+  name: mvtnorm
+  version: 0.9-9992
+nleqslv:
+  description: Solve systems of non linear equations
+  homepage_uri: ''
+  name: nleqslv
+  version: 1.9.3
+nlme:
+  description: Linear and Nonlinear Mixed Effects Models
+  homepage_uri: ''
+  name: nlme
+  version: 3.1-104
+nnet:
+  description: Feed-forward Neural Networks and Multinomial Log-Linear Models
+  homepage_uri: http://www.stats.ox.ac.uk/pub/MASS4/
+  name: nnet
+  version: 7.3-1
+numDeriv:
+  description: Accurate Numerical Derivatives
+  homepage_uri: http:http://optimizer.r-forge.r-project.org/
+  name: numDeriv
+  version: 2012.3-1
+oneChannelGUI:
+  description: A graphical interface designed to facilitate analysis of\nmicroarrays
+    and miRNA/RNA-seq data on laptops.
+  homepage_uri: http://www.bioinformatica.unito.it/oneChannelGUI/
+  name: oneChannelGUI
+  version: 1.22.7
+org.Hs.eg.db:
+  description: Genome wide annotation for Human
+  homepage_uri: ''
+  name: org.Hs.eg.db
+  version: 2.7.1
+pamr:
+  description: 'Pam: prediction analysis for microarrays'
+  homepage_uri: ''
+  name: pamr
+  version: '1.54'
+parallel:
+  description: Support for Parallel computation in R
+  homepage_uri: ''
+  name: parallel
+  version: 2.15.0
+parser:
+  description: Detailed R source code parser
+  homepage_uri: http://www.r-enthusiasts.com
+  name: parser
+  version: 0.0-14
+permute:
+  description: Functions for generating restricted permutations of data
+  homepage_uri: http://vegan.r-forge.r-project.org/
+  name: permute
+  version: 0.7-0
+pi0:
+  description: Estimating the proportion of true null hypotheses for FDR
+  homepage_uri: ''
+  name: pi0
+  version: 1.3-200
+plotrix:
+  description: Various plotting functions
+  homepage_uri: ''
+  name: plotrix
+  version: 3.4-1
+plyr:
+  description: Tools for splitting, applying and combining data
+  homepage_uri: http://had.co.nz/plyr
+  name: plyr
+  version: 1.7.1
+preprocessCore:
+  description: A collection of pre-processing functions
+  homepage_uri: ''
+  name: preprocessCore
+  version: 1.18.0
+proto:
+  description: Prototype object-based programming
+  homepage_uri: http://r-proto.googlecode.com
+  name: proto
+  version: 0.3-9.2
+quadprog:
+  description: Functions to solve Quadratic Programming Problems.
+  homepage_uri: ''
+  name: quadprog
+  version: 1.5-4
+qvalue:
+  description: Q-value estimation for false discovery rate control
+  homepage_uri: ''
+  name: qvalue
+  version: 1.30.0
+rGADEM:
+  description: de novo motif discovery
+  homepage_uri: ''
+  name: rGADEM
+  version: 2.4.0
+relimp:
+  description: Relative Contribution of Effects in a Regression Model
+  homepage_uri: http://go.warwick.ac.uk/relimp, http://go.warwick.ac.uk/dfirth
+  name: relimp
+  version: 1.0-3
+reshape:
+  description: Flexibly reshape data.
+  homepage_uri: http://had.co.nz/reshape
+  name: reshape
+  version: 0.8.4
+reshape2:
+  description: 'Flexibly reshape data: a reboot of the reshape package.'
+  homepage_uri: http://had.co.nz/reshape
+  name: reshape2
+  version: 1.2.1
+rgl:
+  description: 3D visualization device system (OpenGL)
+  homepage_uri: http://rgl.neoscientists.org
+  name: rgl
+  version: 0.92.880
+rjson:
+  description: JSON for R
+  homepage_uri: ''
+  name: rjson
+  version: 0.2.8
+rnaSeqMap:
+  description: rnaSeq secondary analyses
+  homepage_uri: ''
+  name: rnaSeqMap
+  version: 2.10.0
+rpart:
+  description: Recursive Partitioning
+  homepage_uri: \nhttp://mayoresearch.mayo.edu/mayo/research/biostat/splusfunctions.cfm
+  name: rpart
+  version: 3.1-53
+rtracklayer:
+  description: R interface to genome browsers and their annotation tracks
+  homepage_uri: ''
+  name: rtracklayer
+  version: 1.16.1
+samr:
+  description: 'SAM: Significance Analysis of Microarrays'
+  homepage_uri: http://www-stat.stanford.edu/~tibs/SAM
+  name: samr
+  version: '2.0'
+sandwich:
+  description: Robust Covariance Matrix Estimators
+  homepage_uri: ''
+  name: sandwich
+  version: 2.2-9
+scales:
+  description: Scale functions for graphics.
+  homepage_uri: ''
+  name: scales
+  version: 0.2.1
+scatterplot3d:
+  description: 3D Scatter Plot
+  homepage_uri: ''
+  name: scatterplot3d
+  version: 0.3-33
+segmentSeq:
+  description: Methods for identifying small RNA loci from high-throughput\nsequencing
+    data
+  homepage_uri: ''
+  name: segmentSeq
+  version: 1.8.0
+seqLogo:
+  description: Sequence logos for DNA sequence alignments
+  homepage_uri: ''
+  name: seqLogo
+  version: 1.22.0
+setRNG:
+  description: Set (Normal) Random Number Generator and Seed
+  homepage_uri: http://distr.r-forge.r-project.org/
+  name: setRNG
+  version: 2011.11-2
+siggenes:
+  description: Multiple testing using SAM and Efron's empirical Bayes\napproaches
+  homepage_uri: ''
+  name: siggenes
+  version: 1.30.0
+simpleaffy:
+  description: Very simple high level analysis of Affymetrix data
+  homepage_uri: http://www.bioconductor.org,\nhttp://bioinformatics.picr.man.ac.uk/simpleaffy/
+  name: simpleaffy
+  version: 2.32.0
+sm:
+  description: Smoothing methods for nonparametric regression and density\nestimation
+  homepage_uri: http://www.stats.gla.ac.uk/~adrian/sm
+  name: sm
+  version: 2.2-4.1
+snow:
+  description: Simple Network of Workstations
+  homepage_uri: ''
+  name: snow
+  version: 0.3-9
+snowfall:
+  description: Easier cluster computing (based on snow).
+  homepage_uri: ''
+  name: snowfall
+  version: '1.84'
+snpStats:
+  description: SnpMatrix and XSnpMatrix classes and methods
+  homepage_uri: http://www-gene.cimr.cam.ac.uk/clayton
+  name: snpStats
+  version: 1.6.0
+spatial:
+  description: Functions for Kriging and Point Pattern Analysis
+  homepage_uri: http://www.stats.ox.ac.uk/pub/MASS4/
+  name: spatial
+  version: 7.3-3
+splines:
+  description: Regression Spline Functions and Classes
+  homepage_uri: ''
+  name: splines
+  version: 2.15.0
+splots:
+  description: Visualization of high-throughput assays in microtitre plate or\nslide
+    format
+  homepage_uri: ''
+  name: splots
+  version: 1.22.0
+sqldf:
+  description: Perform SQL Selects on R Data Frames
+  homepage_uri: http://sqldf.googlecode.com
+  name: sqldf
+  version: 0.4-6.4
+stabledist:
+  description: Stable Distribution Functions
+  homepage_uri: http://www.rmetrics.org
+  name: stabledist
+  version: 0.6-4
+statmod:
+  description: Statistical Modeling
+  homepage_uri: http://www.statsci.org/r
+  name: statmod
+  version: 1.4.14
+stats:
+  description: The R Stats Package
+  homepage_uri: ''
+  name: stats
+  version: 2.15.0
+stats4:
+  description: Statistical Functions using S4 Classes
+  homepage_uri: ''
+  name: stats4
+  version: 2.15.0
+stringr:
+  description: Make it easier to work with strings.
+  homepage_uri: ''
+  name: stringr
+  version: '0.6'
+strucchange:
+  description: Testing, Monitoring, and Dating Structural Changes
+  homepage_uri: ''
+  name: strucchange
+  version: 1.4-7
+survival:
+  description: Survival analysis, including penalised likelihood.
+  homepage_uri: http://r-forge.r-project.org
+  name: survival
+  version: 2.36-14
+tcltk:
+  description: Tcl/Tk Interface
+  homepage_uri: ''
+  name: tcltk
+  version: 2.15.0
+timeDate:
+  description: Rmetrics - Chronological and Calendarical Objects
+  homepage_uri: http://www.rmetrics.org
+  name: timeDate
+  version: '2160.95'
+timeSeries:
+  description: Rmetrics - Financial Time Series Objects
+  homepage_uri: http://www.rmetrics.org
+  name: timeSeries
+  version: '2160.94'
+timsac:
+  description: TIMe Series Analysis and Control package
+  homepage_uri: ''
+  name: timsac
+  version: 1.2.7
+tkWidgets:
+  description: R based tk widgets
+  homepage_uri: ''
+  name: tkWidgets
+  version: 1.34.0
+tools:
+  description: Tools for Package Development
+  homepage_uri: ''
+  name: tools
+  version: 2.15.0
+utils:
+  description: The R Utils Package
+  homepage_uri: ''
+  name: utils
+  version: 2.15.0
+vegan:
+  description: Community Ecology Package
+  homepage_uri: http://cran.r-project.org, http://vegan.r-forge.r-project.org/
+  name: vegan
+  version: 2.0-3
+vsn:
+  description: Variance stabilization and calibration for microarray data
+  homepage_uri: http://www.r-project.org, http://www.ebi.ac.uk/huber
+  name: vsn
+  version: 3.24.0
+widgetTools:
+  description: Creates an interactive tcltk widget
+  homepage_uri: ''
+  name: widgetTools
+  version: 1.34.0
+xmapcore:
+  description: Core access to the xmap database (installed separately)
+  homepage_uri: http://xmap.picr.man.ac.uk, http://www.bioconductor.org
+  name: xmapcore
+  version: 1.10.0
+xtable:
+  description: Export tables to LaTeX or HTML
+  homepage_uri: http://xtable.r-forge.r-project.org/
+  name: xtable
+  version: 1.7-0
+yacca:
+  description: Yet Another Canonical Correlation Analysis Package
+  homepage_uri: ''
+  name: yacca
+  version: '1.1'
+yaml:
+  description: Methods to convert R data to YAML and back
+  homepage_uri: ''
+  name: yaml
+  version: 2.1.4
+zlibbioc:
+  description: An R packaged zlib-1.2.5
+  homepage_uri: http://bioconductor.org/packages/release/bioc/html/Zlibbioc.html
+  name: zlibbioc
+  version: 1.2.0
+zoo:
+  description: S3 Infrastructure for Regular and Irregular Time Series (Z's\nordered
+    observations)
+  homepage_uri: http://zoo.R-Forge.R-project.org/
+  name: zoo
+  version: 1.7-7
