@@ -615,3 +615,20 @@ def install_stacks(env):
     url = "http://creskolab.uoregon.edu/stacks/source/" \
           "stacks-{0}.tar.gz".format(version)
     _get_install(url, env, _configure_make)
+
+@_if_not_installed("sambamba")
+def install_sambamba(env):
+    """Library for working with SAM/BAM formats written in D programming language
+    https://github.com/lomereiter/sambamba/wiki
+    """
+    version = "0.1.0"
+    url = "http://cloud.github.com/downloads/lomereiter/sambamba/"\
+          "sambamba-{0}_amd64.deb".format(version)
+    if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget {0}".format(url))
+                env.safe_sudo("sudo dpkg -i {0}".format(
+                        os.path.basename(url)))
+        
+    
