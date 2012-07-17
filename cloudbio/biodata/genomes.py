@@ -266,8 +266,6 @@ def upload_s3(config_source):
     _upload_genomes(genomes, genome_indexes)
 
 def _install_additional_data(genomes, genome_indexes, config):
-    if not do_additional:
-        return
     download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
     download_transcripts(genomes, env)
     for custom in config.get("custom", []):
@@ -287,9 +285,10 @@ def _get_genomes(config_source):
         with open(config_source) as in_handle:
             config = yaml.load(in_handle)
     genomes = []
+    genomes_config = config["genomes"] or []
     env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"\
-        .format(config_source, ', '.join(g['name'] for g in config['genomes'])))
-    for g in config["genomes"]:
+        .format(config_source, ', '.join(g['name'] for g in genomes_config)))
+    for g in genomes_config:
         ginfo = None
         for info in GENOMES_SUPPORTED:
             if info[1] == g["dbkey"]:
@@ -299,7 +298,8 @@ def _get_genomes(config_source):
         name, gid, manager = ginfo
         manager.config = g
         genomes.append((name, gid, manager))
-    return genomes, config["genome_indexes"], config
+    indexes = config["genome_indexes"] or []
+    return genomes, indexes, config
 
 # == Decorators and context managers
 
