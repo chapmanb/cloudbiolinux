@@ -16,7 +16,8 @@ def _pip_cmd(env):
 
 @_if_not_python_lib("pydoop")
 def install_pydoop(env):
-    """Install pydoop; provides Hadoop access for Python.
+    """pydoop; provides Hadoop access for Python.
+    http://pydoop.sourceforge.net/docs/
     """
     java_home = env.java_home if env.has_key("java_home") else os.environ["JAVA_HOME"]
     export_str = "export JAVA_HOME=%s" % (java_home)

@@ -79,8 +79,8 @@ def _setup_ubuntu():
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
-      "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
+      "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu %s main", # Free-NX
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 

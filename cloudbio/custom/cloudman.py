@@ -14,7 +14,7 @@ CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 def install_cloudman(env):
-    """ A meta method for installing all of CloudMan components
+    """ A meta method for installing all of CloudMan components.
         Allows CloudMan and all of its dependencies to be installed via:
         fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
     """
@@ -24,7 +24,10 @@ def install_cloudman(env):
     install_sge(env)
 
 def install_nginx(env):
-    version = "0.7.67"
+    """Nginx open source web server.
+    http://www.nginx.org/
+    """
+    version = "1.2.0"
     url = "http://nginx.org/download/nginx-%s.tar.gz" % version
 
     install_dir = os.path.join(env.install_dir, "nginx")
@@ -43,7 +46,7 @@ def install_nginx(env):
             run("tar xvzf %s" % os.path.split(url)[1])
             with cd("nginx-%s" % version):
                 run("./configure --prefix=%s --with-ipv6 %s "
-                    "--user=galaxy --group=galaxy "
+                    "--user=galaxy --group=galaxy --with-debug "
                     "--with-http_ssl_module --with-http_gzip_static_module" %
                     (install_dir, module_flags))
                 sed("objs/Makefile", "-Werror", "")
@@ -72,12 +75,12 @@ def install_nginx(env):
         sudo("mkdir -p %s" % cloudman_default_dir)
     if not exists(os.path.join(cloudman_default_dir, "nginx")):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
-    env.logger.debug("Nginx installed")
+    env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
 
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.
     """
-    upload_module_version = "2.0.12"
+    upload_module_version = "2.2.0"
     chunk_module_version = "0.22"
     chunk_git_version = "b46dd27"
     modules = []
@@ -95,13 +98,17 @@ def _get_nginx_modules(env):
     return modules
 
 def install_proftpd(env):
-    version = "1.3.3d"
-    postgres_ver = "8.4"
-    url = "ftp://mirrors.ibiblio.org/proftpd/distrib/source/proftpd-%s.tar.gz" % version
+    """Highly configurable GPL-licensed FTP server software.
+    http://proftpd.org/
+    """
+    version = "1.3.4a"
+    postgres_ver = "9.1"
+    url = "ftp://ftp.tpnet.pl/pub/linux/proftpd/distrib/source/proftpd-%s.tar.gz" % version
     install_dir = os.path.join(env.install_dir, 'proftpd')
     remote_conf_dir = os.path.join(install_dir, "etc")
     # skip install if already present
     if exists(remote_conf_dir):
+        env.logger.debug("ProFTPd seems to already be installed in {0}".format(install_dir))
         return
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
@@ -109,26 +116,37 @@ def install_proftpd(env):
             with settings(hide('stdout')):
                 run("tar xvzf %s" % os.path.split(url)[1])
             with cd("proftpd-%s" % version):
-                run("CFLAGS='-I/usr/include/postgresql' ./configure --prefix=%s --disable-auth-file --disable-ncurses --disable-ident --disable-shadow --enable-openssl --with-modules=mod_sql:mod_sql_postgres:mod_sql_passwd --with-libraries=/usr/lib/postgres/%s/lib" % (install_dir, postgres_ver))
+                run("CFLAGS='-I/usr/include/postgresql' ./configure --prefix=%s " \
+                    "--disable-auth-file --disable-ncurses --disable-ident --disable-shadow " \
+                    "--enable-openssl --with-modules=mod_sql:mod_sql_postgres:mod_sql_passwd " \
+                    "--with-libraries=/usr/lib/postgresql/%s/lib" % (install_dir, postgres_ver))
                 sudo("make")
                 sudo("make install")
                 sudo("make clean")
-                # Get init.d startup script
-                initd_script = 'proftpd'
-                initd_url = os.path.join(REPO_ROOT_URL, 'conf_files', initd_script)
-                sudo("wget --output-document=%s %s" % (os.path.join('/etc/init.d', initd_script), initd_url))
-                sudo("chmod 755 %s" % os.path.join('/etc/init.d', initd_script))
-                # Get configuration files
-                proftpd_conf_file = 'proftpd.conf'
-                welcome_msg_file = 'welcome_msg.txt'
-                conf_url = os.path.join(REPO_ROOT_URL, 'conf_files', proftpd_conf_file)
-                welcome_url = os.path.join(REPO_ROOT_URL, 'conf_files', welcome_msg_file)
-                sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, proftpd_conf_file), conf_url))
-                sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
-                sudo("cd %s; stow proftpd" % env.install_dir)
-    env.logger.debug("ProFTPd installed")
+    # Get the init.d startup script
+    initd_script = 'proftpd.initd'
+    initd_url = os.path.join(REPO_ROOT_URL, 'conf_files', initd_script)
+    remote_file = "/etc/init.d/proftpd"
+    sudo("wget --output-document=%s %s" % (remote_file, initd_url))
+    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    sudo("chmod 755 %s" % remote_file)
+    # Set the configuration file
+    conf_file = 'proftpd.conf'
+    conf_url = os.path.join(REPO_ROOT_URL, 'conf_files', conf_file)
+    remote_file = os.path.join(remote_conf_dir, conf_file)
+    sudo("wget --output-document=%s %s" % (remote_file, conf_url))
+    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    # Get the custom welcome msg file
+    welcome_msg_file = 'welcome_msg.txt'
+    welcome_url = os.path.join(REPO_ROOT_URL, 'conf_files', welcome_msg_file)
+    sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
+    # Stow
+    sudo("cd %s; stow proftpd" % env.install_dir)
+    env.logger.debug("----- ProFTPd %s installed to %s -----" % (version, install_dir))
 
 def install_sge(env):
+    """Sun Grid Engine.
+    """
     out_dir = "ge6.2u5"
     url = "%s/ge62u5_lx24-amd64.tar.gz" % CDN_ROOT_URL
     install_dir = env.install_dir

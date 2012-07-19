@@ -5,25 +5,35 @@ from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
 
-def _apt_packages(to_install=None, pkg_list=None):
-    """ Install packages available via apt-get.
-        Note that the two arguments cannot be used together.
-    
+def _apt_packages(to_install=None, pkg_list=None, pkg_config_file_path=None):
+    """ 
+    Install packages available via apt-get.
+    Note that ``to_install`` and ``pkg_list`` arguments cannot be used simultaneously.
+
     :type to_install:  list
-    :param to_install: A list of strings (ie, groups) present in the main config
-                       file that will be used to filter out specific packages to
-                       be installed.
-    
+    :param to_install: A list of strings (ie, groups) present in the ``main.yaml``
+                       config file that will be used to filter out the specific
+                       packages to be installed.
+
     :type pkg_list:  list
-    :param pkg_list: An explicit list of packages to install. No other files, 
+    :param pkg_list: An explicit list of packages to install. No other files,
                      flavors, or editions are considered.
+
+    :type pkg_config_file_path:  string
+    :param pkg_config_file_path: Allows a custom path to be specified where
+                                 ``packages.yaml`` and ``packages-[dist].yaml``
+                                 are stored. Note that the file names cannot
+                                 be customized, only the path.
     """
     env.logger.info("Update the system")
     sudo("apt-get update") # Always update
     if to_install is not None:
-        env.logger.info("Install all packages")
-        pkg_config_file = os.path.join(env.config_dir, "packages.yaml")
-        subs_pkg_config_file = os.path.join(env.config_dir, "packages-%s.yaml" %
+        env.logger.info("Will install all packages (as listed in packages*.yaml "
+                "files in {0})".format(pkg_config_file_path))
+        if pkg_config_file_path is None:
+            pkg_config_file_path = env.config_dir
+        pkg_config_file = os.path.join(pkg_config_file_path, "packages.yaml")
+        subs_pkg_config_file = os.path.join(pkg_config_file_path, "packages-%s.yaml" %
                                        env.distribution)
         if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
         env.edition.apt_upgrade_system()
@@ -38,7 +48,7 @@ def _apt_packages(to_install=None, pkg_list=None):
         # At this point allow the Flavor to rewrite the package list
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
-        env.logger.info("Install specific packages")
+        env.logger.info("Will install specific packages: {0}".format(pkg_list))
         packages = pkg_list
     else:
         raise ValueError("Need a file with packages or a list of packages")
@@ -46,7 +56,7 @@ def _apt_packages(to_install=None, pkg_list=None):
     # for the command line size, so we do 30 at a time
     group_size = 30
     i = 0
-    env.logger.info("Updating %i packages" % len(packages))
+    env.logger.info("Installing %i packages" % len(packages))
     while i < len(packages):
         env.logger.info("Package install progress: {0}/{1}".format(i, len(packages)))
         sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))

@@ -112,16 +112,24 @@ def _setup_flavor(flavor, environment=None):
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None, packagelist=None, flavor=None, environment=None):
-    """Main entry point for installing Biolinux on a remote server.
+def install_biolinux(target=None, packagelist=None, flavor=None, environment=None,
+        pkg_config_file_path=None):
+    """
+    Main entry point for installing BioLinux on a remote server.
 
-    This allows a different main package list (the main YAML file is passed in),
-    and/or use of Flavor. So you can say:
+    ``packagelist`` should point to a top level file (eg, ``main.yaml``) listing
+    all the package categories that should be installed. This allows a different
+    package list and/or use of Flavor. So you can say::
 
       install_biolinux:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
 
-    Both packagelist and flavor, as well as the Edition, can also be passed in
-    through the fabricrc file.
+    ``pkg_config_file_path`` can be used to specify a path where a custom
+    ``packages.yaml`` and ``packages-[dist].yaml`` are located, allowing fine-
+    grained (i.e., individual package) customization. Otherwise, default
+    to ``./contrib`` where the CBL files are defined.
+
+    Both ``packagelist`` and ``flavor``, as well as the Edition, can also be
+    passed in through the ``fabricrc`` file.
 
     target can also be supplied on the fab CLI. Special targets are:
 
@@ -131,9 +139,9 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
 
-    environment allows adding additional information on the command line -
-    usually for defining environments, for example environment=testing, or
-    environment=production, will set the deployment environment and tune
+    ``environment`` allows adding additional information on the command line -
+    usually for defining environments, for example ``environment=testing``, or
+    ``environment=production``, will set the deployment environment and tune
     post-installation settings.
     """
     _setup_logging(env)
@@ -144,15 +152,16 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     _setup_flavor(flavor, environment)
     _setup_distribution_environment() # get parameters for distro, packages etc.
     _create_local_paths()
-    env.logger.info("packagelist=%s" % packagelist)
-    pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
-    env.logger.info("Target=%s" % target)
+    env.logger.debug("Meta-package list is '%s'" % packagelist)
+    env.logger.debug("File path for explicit packages is '%s'" % pkg_config_file_path)
+    env.logger.debug("Target is '%s'" % target)
+    pkg_install, lib_install = _read_main_config(packagelist) # read main yaml
     if target is None or target == "packages":
         if env.distribution in ["debian", "ubuntu"]:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
-            _apt_packages(pkg_install)
+            _apt_packages(pkg_install, pkg_config_file_path=pkg_config_file_path)
         elif env.distribution in ["centos", "scientificlinux"]:
             _setup_yum_sources()
             _yum_packages(pkg_install)
@@ -278,9 +287,8 @@ def _read_main_config(yaml_file=None):
     packages = packages if packages else []
     libraries = full_data['libraries']
     libraries = libraries if libraries else []
-    env.logger.info("Meta-package information")
-    env.logger.info(",".join(packages))
-    env.logger.info(",".join(libraries))
+    env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
+            "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
     return packages, sorted(libraries)
 
 # ### Library specific installation code

@@ -9,7 +9,8 @@ from cloudbio.custom.shared import _if_not_installed, _make_tmp_dir
 
 @_if_not_installed("tracer")
 def install_tracer(env):
-    """Tracer tool for phylogeny
+    """A program for analysing results from Bayesian MCMC programs such as BEAST & MrBayes.
+    http://beast.bio.ed.ac.uk/main_page
     """
     install_dir = os.path.join(env.system_install, "bioinf")
     final_exe = os.path.join(env.system_install, "bin", "tracer")
@@ -26,7 +27,8 @@ def install_tracer(env):
 
 @_if_not_installed("beast")
 def install_beast(env):
-    """BEAST for phylogeny
+    """BEAST: Bayesian MCMC analysis of molecular sequences.
+    http://beast.bio.ed.ac.uk/main_page
     """
     install_dir = os.path.join(env.system_install, "bioinf")
     final_exe = os.path.join(env.system_install, "bin", "beast")

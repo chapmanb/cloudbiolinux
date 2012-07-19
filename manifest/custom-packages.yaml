@@ -1,0 +1,296 @@
+abyss:
+  description: Assembly By Short Sequences - a de novo, parallel, paired-end sequence
+    assembler.
+  homepage_uri: http://www.bcgsc.ca/platform/bioinfo/software/abyss
+  name: abyss
+  version: 1.3.3
+beast:
+  description: 'BEAST: Bayesian MCMC analysis of molecular sequences.'
+  homepage_uri: http://beast.bio.ed.ac.uk/main_page
+  name: beast
+  version: ''
+bedtools:
+  description: A flexible suite of utilities for comparing genomic features.
+  homepage_uri: https://code.google.com/p/bedtools/
+  name: bedtools
+  version: github
+bfast:
+  description: 'BFAST: Blat-like Fast Accurate Search Tool.'
+  homepage_uri: http://sourceforge.net/apps/mediawiki/bfast/index.php?title=Main_Page
+  name: bfast
+  version: 0.7.0
+bio4j:
+  description: Bio4j graph based database built on Neo4j with UniProt, GO, RefSeq
+    and more.
+  homepage_uri: http://www.bio4j.com/
+  name: bio4j
+  version: '0.7'
+bowtie:
+  description: The bowtie short read aligner.
+  homepage_uri: http://bowtie-bio.sourceforge.net/index.shtml
+  name: bowtie
+  version: 0.12.7
+bowtie2:
+  description: bowtie2 short read aligner, with gap support.
+  homepage_uri: http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+  name: bowtie2
+  version: 2.0.0-beta6
+bwa:
+  description: 'BWA:  aligns short nucleotide sequences against a long reference sequence.'
+  homepage_uri: http://bio-bwa.sourceforge.net/
+  name: bwa
+  version: 0.5.9
+bx_python:
+  description: Tools for manipulating biological data, particularly multiple sequence
+    alignments
+  homepage_uri: https://bitbucket.org/james_taylor/bx-python/wiki/Home
+  name: bx_python
+  version: bitbucket
+cljr:
+  description: Clojure package manager, cljr.
+  homepage_uri: http://github.com/liebke/cljr
+  name: cljr
+  version: ''
+cloudman:
+  description: ' A meta method for installing all of CloudMan components.'
+  homepage_uri: ''
+  name: cloudman
+  version: ''
+crisp:
+  description: Detect SNPs and short indels from pooled sequencing data.
+  homepage_uri: https://sites.google.com/site/vibansal/software/crisp/
+  name: crisp
+  version: '5'
+cufflinks:
+  description: Cufflinks assembles transcripts, estimates their abundances, and tests
+    for differential expression and regulation in RNA-Seq samples.
+  homepage_uri: http://cufflinks.cbcb.umd.edu/
+  name: cufflinks
+  version: 2.0.0
+dwgsim:
+  description: 'DWGSIM: simulating NGS data and evaluating mappings and variant calling.'
+  homepage_uri: http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Main_Page
+  name: dwgsim
+  version: 0.1.8
+echo:
+  description: 'ECHO: A reference-free short-read error correction algorithm'
+  homepage_uri: http://uc-echo.sourceforge.net/
+  name: echo
+  version: '1_11'
+emboss:
+  description: 'EMBOSS: A high-quality package of free, Open Source software for molecular
+    biology.'
+  homepage_uri: http://emboss.sourceforge.net/
+  name: emboss
+  version: 6.3.1
+fastqc:
+  description: A quality control tool for high throughput sequence data.
+  homepage_uri: http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+  name: fastqc
+  version: 0.10.1
+fastx_toolkit:
+  description: 'FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ
+    files preprocessing.'
+  homepage_uri: http://hannonlab.cshl.edu/fastx_toolkit/
+  name: fastx_toolkit
+  version: 0.0.13
+freebayes:
+  description: Bayesian haplotype-based polymorphism discovery and genotyping.
+  homepage_uri: https://github.com/ekg/freebayes
+  name: freebayes
+  version: github
+gatk:
+  description: 'GATK: library for writing efficient analysis tools using next-generation
+    sequencing data '
+  homepage_uri: http://www.broadinstitute.org/gsa/wiki/index.php/Home_Page
+  name: gatk
+  version: 1.6-11-g3b2fab9
+gatk_queue:
+  description: Command-line scripting framework for defining multi-stage genomic analysis
+    pipelines.
+  homepage_uri: http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
+  name: gatk_queue
+  version: 1.6-11-g3b2fab9
+gmap:
+  description: 'GMAP and GSNAP: A Genomic Mapping and Alignment Program for mRNA EST
+    and short reads.'
+  homepage_uri: http://research-pub.gene.com/gmap/
+  name: gmap
+  version: '2011-11-12'
+hydra:
+  description: Hydra detects structural variation breakpoints in both unique and duplicated
+    genomic regions.
+  homepage_uri: https://code.google.com/p/hydra-sv/
+  name: hydra
+  version: 0.5.3
+lastz:
+  description: LASTZ sequence alignment program.
+  homepage_uri: http://www.bx.psu.edu/miller_lab/dist/README.lastz-1.02.00/README.lastz-1.02.00a.html
+  name: lastz
+  version: 1.02.00
+leinengin:
+  description: Clojure tool for project configuration and automation.
+  homepage_uri: http://github.com/technomancy/leiningen
+  name: leinengin
+  version: ''
+macs:
+  description: Model-based Analysis for ChIP-Seq.
+  homepage_uri: http://liulab.dfci.harvard.edu/MACS/
+  name: macs
+  version: 1.4.2
+matplotlib:
+  description: matplotlib is a python 2D plotting library which produces publication
+    quality figures
+  homepage_uri: http://matplotlib.sourceforge.net/
+  name: matplotlib
+  version: 1.0.1
+mosaik:
+  description: 'MOSAIK: reference-guided aligner for next-generation sequencing technologies'
+  homepage_uri: http://code.google.com/p/mosaik-aligner/
+  name: mosaik
+  version: github
+nginx:
+  description: Nginx open source web server.
+  homepage_uri: http://www.nginx.org/
+  name: nginx
+  version: 1.2.0
+novoalign:
+  description: Novoalign short read aligner using Needleman-Wunsch algorithm with
+    affine gap penalties.
+  homepage_uri: http://www.novocraft.com/main/index.php
+  name: novoalign
+  version: V2.08.01
+perm:
+  description: Efficient mapping of short sequences accomplished with periodic full
+    sensitive spaced seeds.
+  homepage_uri: https://code.google.com/p/perm/
+  name: perm
+  version: '3.6'
+pgdspider:
+  description: PGDSpider format conversion for population genetics programs.
+  homepage_uri: http://www.cmpg.unibe.ch/software/PGDSpider/
+  name: pgdspider
+  version: 2.0.1.2
+picard:
+  description: Command-line utilities that manipulate BAM files with a Java API.
+  homepage_uri: http://picard.sourceforge.net/
+  name: picard
+  version: '1.68'
+plink_seq:
+  description: A toolset for working with human genetic variation data.
+  homepage_uri: http://atgu.mgh.harvard.edu/plinkseq/
+  name: plink_seq
+  version: '0.08'
+proftpd:
+  description: Highly configurable GPL-licensed FTP server software.
+  homepage_uri: http://proftpd.org/
+  name: proftpd
+  version: 1.3.4a
+pydoop:
+  description: pydoop; provides Hadoop access for Python.
+  homepage_uri: http://pydoop.sourceforge.net/docs/
+  name: pydoop
+  version: ''
+rpy:
+  description: RPy is a very simple, yet robust, Python interface to the R Programming
+    Language.
+  homepage_uri: http://rpy.sourceforge.net/
+  name: rpy
+  version: 1.0.3
+s3fs:
+  description: FUSE-based file system backed by Amazon S3.
+  homepage_uri: https://code.google.com/p/s3fs/
+  name: s3fs
+  version: '1.61'
+samtools:
+  description: SAM Tools provide various utilities for manipulating alignments in
+    the SAM format.
+  homepage_uri: http://samtools.sourceforge.net/
+  name: samtools
+  version: 0.1.18
+seal:
+  description: 'Install seal: process high-throughput sequencing with Hadoop.'
+  homepage_uri: http://biodoop-seal.sf.net/
+  name: seal
+  version: ''
+sge:
+  description: Sun Grid Engine.
+  homepage_uri: ''
+  name: sge
+  version: ''
+shrec:
+  description: Shrec is a bioinformatics tool for error correction of HTS read data.
+  homepage_uri: http://sourceforge.net/projects/shrec-ec/
+  name: shrec
+  version: '2.2'
+snpeff:
+  description: Variant annotation and effect prediction tool.
+  homepage_uri: http://snpeff.sourceforge.net/
+  name: snpeff
+  version: '2_0_5'
+solexaqa:
+  description: SolexaQA creates visual representations of data quality from FASTQ
+    files.
+  homepage_uri: http://solexaqa.sourceforge.net/
+  name: solexaqa
+  version: '1.4'
+stacks:
+  description: 'Stacks: build loci out of a set of short-read sequenced samples.'
+  homepage_uri: http://creskolab.uoregon.edu/stacks/
+  name: stacks
+  version: '0.998'
+stampy:
+  description: 'Stampy: mapping of short reads from illumina sequencing machines onto
+    a reference genome.'
+  homepage_uri: http://www.well.ox.ac.uk/project-stampy
+  name: stampy
+  version: 1.0.15
+tassel:
+  description: 'TASSEL: evaluate traits associations, evolutionary patterns, and linkage
+    disequilibrium.'
+  homepage_uri: http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&Itemid=119
+  name: tassel
+  version: '3.0'
+tophat:
+  description: TopHat is a fast splice junction mapper for RNA-Seq reads
+  homepage_uri: http://tophat.cbcb.umd.edu/
+  name: tophat
+  version: 2.0.0
+tracer:
+  description: A program for analysing results from Bayesian MCMC programs such as
+    BEAST & MrBayes.
+  homepage_uri: http://beast.bio.ed.ac.uk/main_page
+  name: tracer
+  version: ''
+transabyss:
+  description: Analyze ABySS multi-k-assembled shotgun transcriptome data.
+  homepage_uri: http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss
+  name: transabyss
+  version: 1.3.2
+trinity:
+  description: Efficient and robust de novo reconstruction of transcriptomes from
+    RNA-seq data.
+  homepage_uri: http://trinityrnaseq.sourceforge.net/
+  name: trinity
+  version: r2012-05-18
+ucsc_tools:
+  description: Useful executables from UCSC.
+  homepage_uri: http://hgdownload.cse.ucsc.edu/admin/jksrc.zip
+  name: ucsc_tools
+  version: ''
+varianttools:
+  description: Annotation, selection, and analysis of variants in the context of next-gen
+    sequencing analysis.
+  homepage_uri: http://varianttools.sourceforge.net/
+  name: varianttools
+  version: 1.0.1
+vcftools:
+  description: Work with VCF files, such as those generated by the 1000 Genomes Project.
+  homepage_uri: http://vcftools.sourceforge.net/
+  name: vcftools
+  version: 0.1.7
+velvet:
+  description: Sequence assembler for very short reads.
+  homepage_uri: http://www.ebi.ac.uk/~zerbino/velvet/
+  name: velvet
+  version: 1.2.05

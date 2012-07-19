@@ -8,7 +8,7 @@
 # details about the operating system
 ## Ubuntu
 distribution = ubuntu
-dist_name = oneiric
+dist_name = precise
 ## Centos
 #distribution = centos
 ## Debian
