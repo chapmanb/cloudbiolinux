@@ -295,18 +295,26 @@ def _get_default_bucket_url(ud=None):
     log.debug("Default bucket url: %s" % bucket_url)
     return bucket_url
 
+def _user_exists(username):
+    """ Check if the given username exists as a system user
+    """
+    with open('/etc/passwd', 'r') as f:
+        ep = f.read()
+    return ep.find(username) > 0
+
 def _handle_freenx(passwd):
-    user = "ubuntu"
-    log.info("Setting up password-based login for user '{0}'".format(user))
-    p1 = subprocess.Popen(["echo", "%s:%s" % (user, passwd)], stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(["chpasswd"], stdin=p1.stdout, stdout=subprocess.PIPE)
-    p1.stdout.close()
-    p2.communicate()[0]
-    cl = ["sed", "-i", "s/^PasswordAuthentication .*/PasswordAuthentication yes/",
-          "/etc/ssh/sshd_config"]
-    subprocess.check_call(cl)
-    cl = ["/usr/sbin/service", "ssh", "reload"]
-    subprocess.check_call(cl)
+    for user in ["ubuntu", "galaxy"]:
+        if _user_exists(user):
+            log.info("Setting up password-based login for user '{0}'".format(user))
+            p1 = subprocess.Popen(["echo", "%s:%s" % (user, passwd)], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(["chpasswd"], stdin=p1.stdout, stdout=subprocess.PIPE)
+            p1.stdout.close()
+            p2.communicate()[0]
+            cl = ["sed", "-i", "s/^PasswordAuthentication .*/PasswordAuthentication yes/",
+                  "/etc/ssh/sshd_config"]
+            subprocess.check_call(cl)
+            cl = ["/usr/sbin/service", "ssh", "reload"]
+            subprocess.check_call(cl)
     # Check if FreeNX is installed on the image before trying to configure it
     cl = "/usr/bin/dpkg --get-selections | /bin/grep freenx"
     retcode = subprocess.call(cl, shell=True)
