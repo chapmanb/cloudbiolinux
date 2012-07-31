@@ -15,6 +15,7 @@ from urlparse import urlparse
 from boto.s3.key import Key
 from boto.s3.connection import S3Connection
 from boto.exception import S3ResponseError
+from boto.s3.connection import OrdinaryCallingFormat
 
 logging.getLogger('boto').setLevel(logging.INFO) # Only log boto messages >=INFO
 log = None
@@ -91,14 +92,32 @@ def _isurl(path):
     scheme, netloc, upath, uparams, uquery, ufrag = urlparse(path)
     return bool(scheme and netloc)
 
-def _get_s3_conn(access_key, secret_key):
-    log.debug('Establishing boto S3 connection')
+def _get_s3_conn(ud):
     try:
-        s3_conn = S3Connection(access_key, secret_key)
-        log.debug('Got boto S3 connection.')
+        if 'cloud_type' in ud and ud['cloud_type'] != 'ec2':
+            # If the user has specified a cloud type other than EC2,
+            # create an s3 connection using the info from their user data
+            log.debug('Establishing boto S3 connection to a custom Object Store')
+            try:
+                s3_conn = S3Connection(aws_access_key_id=ud['access_key'],
+                        aws_secret_access_key=ud['secret_key'],
+                        is_secure=ud.get('is_secure', True),
+                        host=ud.get('s3_host', ''),
+                        port=ud.get('s3_port', 8888),
+                        calling_format=OrdinaryCallingFormat(),
+                        path=ud.get('s3_conn_path', '/'))
+            except S3ResponseError, e:
+                log.error("Trouble connecting to a custom Object Store. User data: {0}; Exception: {1}"\
+                    .format(ud, e))
+        else:
+            # Use the default Amazon S3 connection
+            log.debug('Establishing boto S3 connection to Amazon')
+            s3_conn = S3Connection(ud['access_key'], ud['secret_key'])
     except Exception, e:
         log.error("Exception getting S3 connection: %s" % e)
+        return None
     return s3_conn
+    
 
 def _bucket_exists(s3_conn, bucket_name):
     bucket = None
@@ -212,7 +231,7 @@ def _get_boot_script(ud):
     else:
         default_bucket_name = DEFAULT_BUCKET_NAME
     if ud.has_key('bucket_cluster') and ud['access_key'] is not None and ud['secret_key'] is not None:
-        s3_conn = _get_s3_conn(ud['access_key'], ud['secret_key'])
+        s3_conn = _get_s3_conn(ud)
         # Check if cluster bucket exists or use the default one
         if not _bucket_exists(s3_conn, ud['bucket_cluster']) or \
            not _remote_file_exists(s3_conn, ud['bucket_cluster'], ud['boot_script_name']):
@@ -235,7 +254,7 @@ def _get_boot_script(ud):
             DEFAULT_BOOT_SCRIPT_NAME)
         if got_boot_script:
             os.chmod(os.path.join(LOCAL_PATH, DEFAULT_BOOT_SCRIPT_NAME), 0744)
-    # If did not get boot script, fall back on the publicly available one
+    # If did not get the boot script, fall back on the publicly available one
     if not got_boot_script or use_default_bucket:
         boot_script_url = os.path.join(_get_default_bucket_url(ud), ud.get('boot_script_name', 
             DEFAULT_BOOT_SCRIPT_NAME))
@@ -245,9 +264,9 @@ def _get_boot_script(ud):
         got_boot_script = _get_file_from_url(boot_script_url)
     if got_boot_script:
         log.debug("Saved boot script to '%s'" % os.path.join(LOCAL_PATH, DEFAULT_BOOT_SCRIPT_NAME))
-        # Save downloaded boot script to cluster bucket for future invocations
+        # Save the downloaded boot script to cluster bucket for future invocations
         if ud.has_key('bucket_cluster') and ud['bucket_cluster']:
-            s3_conn = _get_s3_conn(ud['access_key'], ud['secret_key'])
+            s3_conn = _get_s3_conn(ud)
             if _bucket_exists(s3_conn, ud['bucket_cluster']) and \
                not _remote_file_exists(s3_conn, ud['bucket_cluster'], ud['boot_script_name']):
                 _save_file_to_bucket(s3_conn, ud['bucket_cluster'], ud['boot_script_name'], \
@@ -295,18 +314,28 @@ def _get_default_bucket_url(ud=None):
     log.debug("Default bucket url: %s" % bucket_url)
     return bucket_url
 
+def _user_exists(username):
+    """ Check if the given username exists as a system user
+    """
+    with open('/etc/passwd', 'r') as f:
+        ep = f.read()
+    return ep.find(username) > 0
+
+def _allow_password_logins(passwd):
+    for user in ["ubuntu", "galaxy"]:
+        if _user_exists(user):
+            log.info("Setting up password-based login for user '{0}'".format(user))
+            p1 = subprocess.Popen(["echo", "%s:%s" % (user, passwd)], stdout=subprocess.PIPE)
+            p2 = subprocess.Popen(["chpasswd"], stdin=p1.stdout, stdout=subprocess.PIPE)
+            p1.stdout.close()
+            p2.communicate()[0]
+            cl = ["sed", "-i", "s/^PasswordAuthentication .*/PasswordAuthentication yes/",
+                  "/etc/ssh/sshd_config"]
+            subprocess.check_call(cl)
+            cl = ["/usr/sbin/service", "ssh", "reload"]
+            subprocess.check_call(cl)
+
 def _handle_freenx(passwd):
-    user = "ubuntu"
-    log.info("Setting up password-based login for user '{0}'".format(user))
-    p1 = subprocess.Popen(["echo", "%s:%s" % (user, passwd)], stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(["chpasswd"], stdin=p1.stdout, stdout=subprocess.PIPE)
-    p1.stdout.close()
-    p2.communicate()[0]
-    cl = ["sed", "-i", "s/^PasswordAuthentication .*/PasswordAuthentication yes/",
-          "/etc/ssh/sshd_config"]
-    subprocess.check_call(cl)
-    cl = ["/usr/sbin/service", "ssh", "reload"]
-    subprocess.check_call(cl)
     # Check if FreeNX is installed on the image before trying to configure it
     cl = "/usr/bin/dpkg --get-selections | /bin/grep freenx"
     retcode = subprocess.call(cl, shell=True)
@@ -331,7 +360,7 @@ def _handle_empty():
     _create_basic_user_data_file() # This file is expected by CloudMan
     # Get & run boot script
     file_url = os.path.join(_get_default_bucket_url(), DEFAULT_BOOT_SCRIPT_NAME)
-    log.debug("Resorting to the default bucket to get boot script: %s" % file_url)
+    log.debug("Resorting to the default bucket to get the boot script: %s" % file_url)
     _get_file_from_url(file_url)
     _run_boot_script(DEFAULT_BOOT_SCRIPT_NAME)
 
@@ -348,7 +377,11 @@ def _handle_yaml(user_data):
     # Handle bad user data as a string
     if ud == user_data:
         return _handle_empty()
-    # Handle freenx passwords and the case with only a password sent
+    # Allow password based logins. Do so also in case only NX is being setup.
+    if "freenxpass" in ud or "password" in ud:
+        passwd = ud.get("freenxpass", None) or ud.get("password", None)
+        _allow_password_logins(passwd)
+    # Handle freenx passwords and the case with only a NX password sent
     if "freenxpass" in ud:
         _handle_freenx(ud["freenxpass"])
         if len(ud) == 1:
