@@ -321,7 +321,7 @@ def _user_exists(username):
         ep = f.read()
     return ep.find(username) > 0
 
-def _handle_freenx(passwd):
+def _allow_password_logins(passwd):
     for user in ["ubuntu", "galaxy"]:
         if _user_exists(user):
             log.info("Setting up password-based login for user '{0}'".format(user))
@@ -334,6 +334,8 @@ def _handle_freenx(passwd):
             subprocess.check_call(cl)
             cl = ["/usr/sbin/service", "ssh", "reload"]
             subprocess.check_call(cl)
+
+def _handle_freenx(passwd):
     # Check if FreeNX is installed on the image before trying to configure it
     cl = "/usr/bin/dpkg --get-selections | /bin/grep freenx"
     retcode = subprocess.call(cl, shell=True)
@@ -358,7 +360,7 @@ def _handle_empty():
     _create_basic_user_data_file() # This file is expected by CloudMan
     # Get & run boot script
     file_url = os.path.join(_get_default_bucket_url(), DEFAULT_BOOT_SCRIPT_NAME)
-    log.debug("Resorting to the default bucket to get boot script: %s" % file_url)
+    log.debug("Resorting to the default bucket to get the boot script: %s" % file_url)
     _get_file_from_url(file_url)
     _run_boot_script(DEFAULT_BOOT_SCRIPT_NAME)
 
@@ -375,7 +377,11 @@ def _handle_yaml(user_data):
     # Handle bad user data as a string
     if ud == user_data:
         return _handle_empty()
-    # Handle freenx passwords and the case with only a password sent
+    # Allow password based logins. Do so also in case only NX is being setup.
+    if "freenxpass" in ud or "password" in ud:
+        passwd = ud.get("freenxpass", None) or ud.get("password", None)
+        _allow_password_logins(passwd)
+    # Handle freenx passwords and the case with only a NX password sent
     if "freenxpass" in ud:
         _handle_freenx(ud["freenxpass"])
         if len(ud) == 1:
