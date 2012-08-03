@@ -4,10 +4,12 @@ From Enis Afgan: https://bitbucket.org/afgane/mi-deployment
 """
 import os, contextlib
 
+from string import Template
+
 from fabric.api import sudo, run, cd 
 from fabric.contrib.files import exists, settings, hide, contains, sed
 
-from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.custom.shared import _make_tmp_dir, _write_to_file, _get_installed_file_contents
 from cloudbio.cloudman import _configure_cloudman
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
@@ -55,9 +57,12 @@ def install_nginx(env):
                 sudo("cd %s; stow nginx" % env.install_dir)
 
     nginx_conf_file = 'nginx.conf'
-    url = os.path.join(REPO_ROOT_URL, nginx_conf_file)
-    with cd(remote_conf_dir):
-        sudo("wget --output-document=%s/%s %s" % (remote_conf_dir, nginx_conf_file, url))
+    template = Template(_get_installed_file_contents(env, "nginx.conf.template"))
+    conf_file_contents = template.substitute(galaxy_home=env.get("galaxy_home", "/mnt/galaxyTools/galaxy-central"))
+    _write_to_file(conf_file_contents, os.path.join(remote_conf_dir, nginx_conf_file), mode=0755)
+    #url = os.path.join(REPO_ROOT_URL, nginx_conf_file)
+    #with cd(remote_conf_dir):
+    #    sudo("wget --output-document=%s/%s %s" % (remote_conf_dir, nginx_conf_file, url))
 
     nginx_errdoc_file = 'nginx_errdoc.tar.gz'
     url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)

@@ -442,6 +442,81 @@ phylogeny:
     - bio-linux-treeview # Version problem
   needs_64bit:
     - bio-linux-fasttree
+## Package lists imported from mi-deployment.
+cloudman:
+  all:
+    # Required to install CloudMan-required Python libraries
+    - python-pip
+    # Required for communication between instances
+    - rabbitmq-server
+    # Required to handle data volumes (including LVM support)
+    - lvm2
+    - dmsetup 
+    - mdadm
+    - reiserfsprogs
+    - xfsprogs
+    # Required to compile nginx
+    - build-essential
+    #- gcc ## included in minimal
+    - libpcre3-dev
+    - libssl-dev
+    - stow
+    # Required for cluster-wide NFS file system
+    - nfs-kernel-server
+    - nfs-common
+    # Enable OpenMPI
+    - libopenmpi-dev
+    - libopenmpi1.3
+    - openmpi-bin
+    - openmpi-common
+    # Needed to enable updates for Galaxy
+    # - mercurial ## Included in minimal
+    # Required for compiling ProFTPd (must match installed PostgreSQL version!)
+    - postgresql-server-dev-9.1
+    # Actually not sure what of the following is really needed
+    - libboost-all-dev
+    - libreadline6-dev
+    # Required for s3fs
+    - libfuse-dev
+    - pkg-config
+    - fuse-utils
+    - libcurl4-openssl-dev
+    - libxml2-dev
+    - mime-support    
+galaxy:
+  all:
+    - postgresql
+    - gfortran
+    - default-jdk
+    - python-rpy
+    - xvfb
+    # Parallel file download (used by the Galaxy ObjectStore)
+    - axel
+    # Required by Freebayes
+    - cmake
+    # Required by BWA
+    - zlib1g-dev
+    # Required by Samtools
+    - libncurses5-dev
+    # Required by Compute q-values
+    - liblzma-dev
+    - r-base
+    - r-base-core
+    - r-base-dev
+    - r-cran-lattice
+    - r-cran-qvalue
+    # Required by HVIS
+    - r-bioc-hilbertvis
+    # Required by various R modules
+    - tcl-dev
+    # Required by various R modules
+    - tk-dev
+    # Required by RGalaxy
+    - imagemagick
+    - pdfjam
+    - python-scipy
+    - libsparsehash-dev
+
 # To do -- in Deb Med but not propogated
 # squizz
 # biomaj

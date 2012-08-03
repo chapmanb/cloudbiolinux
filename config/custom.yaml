@@ -58,6 +58,9 @@ cloudman:
   - nginx
   - proftpd
   - sge
+galaxy:
+  - galaxy_webapp
+  - galaxy_tools
 distributed:
   - pydoop
   - seal

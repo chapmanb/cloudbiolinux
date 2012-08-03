@@ -1,11 +1,14 @@
 """Reusable decorators and functions for custom installations.
 """
+import tempfile
 import os
 import functools
 from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
+
+CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
 # -- decorators and context managers
 
@@ -174,3 +177,31 @@ def _python_make(env):
     env.safe_sudo("python%s setup.py install --skip-build" % env.python_version_ext)
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
+
+
+def _get_installed_file_contents(env, local_file):
+    path = os.path.join('installed_files', local_file)
+    if not os.path.exists(path):
+        # If using cloudbiolinux as a library, this won't be available,
+        # download the file from github instead
+        f = NamedTemporaryFile(delete=False)
+        cloudbiolinx_repo_url = env.get("cloudbiolinux_repo_url", CBL_REPO_ROOT_URL)
+        url = os.path.join(cloudbiolinx_repo_url, 'installed_files', local_file)
+        urllib.urlretrieve(url, f.name)
+        path = f.name
+        return open(path, "r").read()
+    else:
+        return open(path, "r").read()
+
+
+def _write_to_file(contents, path, mode):
+    """
+    Use fabric to write string contents to remote file specified by path.
+    """
+    fd, local_path = tempfile.mkstemp()
+    try:
+        os.write(fd, contents)
+        put(local_path, path, use_sudo=True, mode=mode)
+        os.close(fd)
+    finally:
+        os.unlink(local_path)

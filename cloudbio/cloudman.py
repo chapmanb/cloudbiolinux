@@ -17,36 +17,23 @@ import os
 import urllib
 
 from fabric.api import sudo, run, put, cd
-from fabric.contrib.files import exists, settings, contains, append
+from fabric.contrib.files import exists, settings, append
 
-from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.custom.shared import _make_tmp_dir, _write_to_file
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package.deb import _apt_packages
+from cloudbio.galaxy import _setup_users
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 
-def _configure_cloudman(env, use_repo_autorun=True):
+def _configure_cloudman(env, use_repo_autorun=False):
     _setup_users(env)
     _setup_env(env)
     _configure_logrotate(env)
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
     _configure_nfs(env)
-
-def _setup_users(env):
-    def _add_user(username, uid=None):
-        """ Add user with username to the system """
-        if not contains('/etc/passwd', "%s:" % username):
-            uid_str = "--uid %s" % uid if uid else ""
-            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' \
-                 '-c"Galaxy-required user" %s --user-group %s' % \
-                     (username, uid_str, username))
-    # Must specify uid for 'galaxy' user because of the configuration for proFTPd
-    _add_user('galaxy', '1001')
-    _add_user('sgeadmin')
-    _add_user('postgres')
-    env.logger.debug("Done setting up CloudMan users")
 
 def _setup_env(env):
     """ Setup the system environment required to run CloudMan. This primarily
@@ -55,7 +42,7 @@ def _setup_env(env):
     """
     # Get and install required system packages
     if env.distribution in ["debian", "ubuntu"]:
-        conf_file = 'config.yaml'    
+        conf_file = 'config.yaml'
         url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
         cf = urllib.urlretrieve(url)
         (packages, _) = _yaml_to_packages(cf[0], 'cloudman')
@@ -87,7 +74,7 @@ def _configure_logrotate(env):
     sudo("wget --output-document=%s %s" % (remote, url))
     env.logger.debug("----- Added logrotate file to {0} -----".format(remote))
 
-def _configure_ec2_autorun(env, use_repo_autorun=True):
+def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
     remote = os.path.join(env.install_dir, "bin", script)
     if not exists(os.path.dirname(remote)):
@@ -100,12 +87,10 @@ def _configure_ec2_autorun(env, use_repo_autorun=True):
         put(os.path.join(install_file_dir, script), remote, mode=0777, use_sudo=True)
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
-    with open( cloudman_boot_file, 'w' ) as f:
-        print >> f, cm_upstart % (remote, os.path.splitext(remote)[0])
     remote_file = '/etc/init/%s' % cloudman_boot_file
-    put(cloudman_boot_file, remote_file, use_sudo=777)
-    os.remove(cloudman_boot_file)
+    _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode=777)
     env.logger.debug("Done configuring CloudMan ec2_autorun")
+
 
 def _configure_sge(env):
     """This method only sets up the environment for SGE w/o actually setting up SGE"""
@@ -135,10 +120,13 @@ def _configure_nfs(env):
         sudo("ln -s %s %s" % (cloudman_dir, nfs_dir))
     sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
     # Setup /etc/exports paths, to be used as NFS mount points
+    galaxy_data_mount = env.get("galaxy_data_mount", "/mnt/galaxyData")
+    galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
+    galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
-                '/mnt/galaxyData    *(rw,sync,no_root_squash,subtree_check,no_wdelay)',
-                '/mnt/galaxyIndices *(rw,sync,no_root_squash,no_subtree_check)',
-                '/mnt/galaxyTools   *(rw,sync,no_root_squash,no_subtree_check)',
+                '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
+                '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
+                '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
                 '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
                 '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
     append('/etc/exports', exports, use_sudo=True)
