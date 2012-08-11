@@ -371,6 +371,7 @@ bio_sequencing:
 bio_annotation:
   - mcl
   - tigr-glimmer
+  - bio-linux-artemis
   - bio-linux-big-blast
   - bio-linux-cd-hit
   - bio-linux-estscan
@@ -382,7 +383,6 @@ bio_annotation:
   - bio-linux-trnascan
   - bio-linux-tetra
   # Conflict: - bio-linux-act
-  # Conflict: - bio-linux-artemis
   # 500Mb of disk: - bio-linux-priam
   # Package broken: - bio-linux-yamap
 bio_microarray:
@@ -421,7 +421,7 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    #- bio-linux-arb # Broken, needs libmotif3
+    - bio-linux-arb
     # biolinux-ape package is source (i386). It needs R - not in deps - and
     # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
     # - bio-linux-ape
