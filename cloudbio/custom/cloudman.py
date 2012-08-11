@@ -6,10 +6,11 @@ import os, contextlib
 
 from string import Template
 
-from fabric.api import sudo, run, cd 
+from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists, settings, hide, contains, sed
 
-from cloudbio.custom.shared import _make_tmp_dir, _write_to_file, _get_installed_file_contents
+from cloudbio.galaxy.utils import _read_boolean
+from cloudbio.custom.shared import _make_tmp_dir, _write_to_file, _get_installed_file
 from cloudbio.cloudman import _configure_cloudman
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
@@ -56,13 +57,9 @@ def install_nginx(env):
                 sudo("make install")
                 sudo("cd %s; stow nginx" % env.install_dir)
 
+    conf_file_contents = _get_nginx_conf_contents(env)
     nginx_conf_file = 'nginx.conf'
-    template = Template(_get_installed_file_contents(env, "nginx.conf.template"))
-    conf_file_contents = template.substitute(galaxy_home=env.get("galaxy_home", "/mnt/galaxyTools/galaxy-central"))
     _write_to_file(conf_file_contents, os.path.join(remote_conf_dir, nginx_conf_file), mode=0755)
-    #url = os.path.join(REPO_ROOT_URL, nginx_conf_file)
-    #with cd(remote_conf_dir):
-    #    sudo("wget --output-document=%s/%s %s" % (remote_conf_dir, nginx_conf_file, url))
 
     nginx_errdoc_file = 'nginx_errdoc.tar.gz'
     url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)
@@ -82,25 +79,68 @@ def install_nginx(env):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
     env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
 
+
+def _get_nginx_conf_contents(env):
+    # Give deployer chance to specify concrete nginx.conf file,
+    # barring that allow a nginx conf template path to be specified
+    # otherwise go with default cloudman template.
+    if env.get("nginx_conf_path", None):
+        conf_file_contents = open(env["nginx_conf_path"], "r").read()
+    else:
+        template_path = env.get("nginx_conf_template_path", _get_installed_file(env, "nginx.conf.template"))
+        template = Template(open(template_path, "r").read())
+        conf_parameters = {
+            "galaxy_home": env.get("galaxy_home", "/mnt/galaxyTools/galaxy-central")
+        }
+        conf_file_contents = template.substitute(conf_parameters)
+    return conf_file_contents
+
+
 def _get_nginx_modules(env):
     """Retrieve add-on modules compiled along with nginx.
     """
+    modules = {
+        "upload": True,
+        "chunk": True,
+        "ldap": False
+    }
+
+    module_dirs = []
+
+    for module, enabled_by_default in modules.iteritems():
+        enabled = _read_boolean(env, "nginx_enable_module_%s" % module, enabled_by_default)
+        if enabled:
+            module_dirs.append(eval("_get_nginx_module_%s" % module)(env))
+
+    return module_dirs
+
+
+def _get_nginx_module_upload(env):
     upload_module_version = "2.2.0"
-    chunk_module_version = "0.22"
-    chunk_git_version = "b46dd27"
-    modules = []
     upload_url = "http://www.grid.net.ru/nginx/download/" \
                  "nginx_upload_module-%s.tar.gz" % upload_module_version
     run("wget %s" % upload_url)
     upload_fname = os.path.split(upload_url)[1]
-    modules.append(upload_fname.rsplit(".", 2)[0])
     run("tar -xvzpf %s" % upload_fname)
+    return upload_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_chunk(env):
+    chunk_module_version = "0.22"
+    chunk_git_version = "b46dd27"
+
     chunk_url = "https://github.com/agentzh/chunkin-nginx-module/tarball/v%s" % chunk_module_version
     chunk_fname = "agentzh-chunkin-nginx-module-%s.tar.gz" % (chunk_git_version)
     run("wget -O %s %s" % (chunk_fname, chunk_url))
     run("tar -xvzpf %s" % chunk_fname)
-    modules.append(chunk_fname.rsplit(".", 2)[0])
-    return modules
+    return chunk_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_ldap(env):
+    run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
+    run("git clone https://code.google.com/p/nginx-auth-ldap/")
+    return "nginx-auth-ldap"
+
 
 def install_proftpd(env):
     """Highly configurable GPL-licensed FTP server software.

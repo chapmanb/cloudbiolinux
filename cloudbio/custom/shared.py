@@ -179,7 +179,7 @@ def _python_make(env):
         env.safe_sudo("rm -rf %s" % clean)
 
 
-def _get_installed_file_contents(env, local_file):
+def _get_installed_file(env, local_file):
     path = os.path.join('installed_files', local_file)
     if not os.path.exists(path):
         # If using cloudbiolinux as a library, this won't be available,
@@ -189,9 +189,11 @@ def _get_installed_file_contents(env, local_file):
         url = os.path.join(cloudbiolinx_repo_url, 'installed_files', local_file)
         urllib.urlretrieve(url, f.name)
         path = f.name
-        return open(path, "r").read()
-    else:
-        return open(path, "r").read()
+    return path
+
+
+def _get_installed_file_contents(env, local_file):
+    return open(_get_installed_file(env, local_file), "r").read()
 
 
 def _write_to_file(contents, path, mode):
