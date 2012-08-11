@@ -322,6 +322,7 @@ bio_general:
   - emboss
   - emboss-data
   - emboss-lib
+  - jemboss
   - ugene
   # - bio-linux-taverna # Broken graphviz dependency
 bio_search:
