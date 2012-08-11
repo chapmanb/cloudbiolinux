@@ -359,29 +359,29 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.68"
+    version = "1.74"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
 def install_gatk(env):
-    """GATK: library for writing efficient analysis tools using next-generation sequencing data 
-    http://www.broadinstitute.org/gsa/wiki/index.php/Home_Page
+    """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
+    http://www.broadinstitute.org/gatk/
     """
-    version = "1.6-11-g3b2fab9"
+    version = "2.0-34-g6d0be9b"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
-          "GenomeAnalysisTK-%s%s" % (version, ext)
+          "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
 def install_gatk_queue(env):
     """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
     http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
     """
-    version = "1.6-11-g3b2fab9"
+    version = "2.0-34-g6d0be9b"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
-          "Queue-%s%s" % (version, ext)
+          "QueueLite-%s%s" % (version, ext)
     _java_install("gatk_queue", version, url, env)
 
 def install_snpeff(env):

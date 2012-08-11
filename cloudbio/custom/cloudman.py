@@ -18,7 +18,7 @@ def install_cloudman(env):
         Allows CloudMan and all of its dependencies to be installed via:
         fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
     """
-    _configure_cloudman(env, use_repo_autorun=True)
+    _configure_cloudman(env, use_repo_autorun=False)
     install_nginx(env)
     install_proftpd(env)
     install_sge(env)

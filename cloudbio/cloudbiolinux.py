@@ -37,4 +37,5 @@ def _configure_gnome(env):
     """
     add = 'COMMAND_START_GNOME="gnome-session --session gnome-fallback"'
     fname = "/etc/nxserver/node.conf"
-    append(fname, add, use_sudo=True)
+    if exists("/etc/nxserver/"):
+        append(fname, add, use_sudo=True)
