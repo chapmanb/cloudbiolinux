@@ -199,7 +199,7 @@ def install_bfast(env, version):
     url = "http://downloads.sourceforge.net/project/bfast/bfast/%s/bfast-%s%s.tar.gz"\
             % (major_version, version)
     pkg_name = 'bfast'
-    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, "%s%s" % (version))
+    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, "%s" % (version))
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             run("wget %s" % (url))
