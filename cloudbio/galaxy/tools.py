@@ -17,12 +17,12 @@ def _install_tools(env, tools_conf=None):
     if not tools_conf:
         tools_conf = _load_tools_conf(env)
 
-    if _read_boolean(env, "galaxy_install_dependencies", True):
+    if _read_boolean(env, "galaxy_install_dependencies", False):
        # Need to ensure the install dir exists and is owned by env.galaxy_user
         _setup_install_dir(env)
         _install_applications(env, tools_conf)
 
-    if _read_boolean(env, "galaxy_install_r_packages", True):
+    if _read_boolean(env, "galaxy_install_r_packages", False):
         _install_r_packages(tools_conf)
 
 
