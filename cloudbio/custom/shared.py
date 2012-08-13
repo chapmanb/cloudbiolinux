@@ -95,7 +95,7 @@ def _fetch_and_unpack(url, need_dir=True):
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url)
         if not exists(tar_file):
-            run("wget --no-check-certificate %s" % url)
+            run("wget --no-check-certificate '%s'" % url)
         run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
