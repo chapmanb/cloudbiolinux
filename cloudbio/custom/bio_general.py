@@ -13,7 +13,7 @@ def install_emboss(env):
     http://emboss.sourceforge.net/
     Emboss target for platforms without packages (CentOS -- rpm systems).
     """
-    version = "6.3.1"
+    version = env.get("tool_version", "6.3.1")
     url = "ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 

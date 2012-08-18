@@ -1,5 +1,8 @@
 import yaml
 
+from cloudbio.custom.bio_general import *
+from cloudbio.custom.bio_nextgen import *
+from cloudbio.custom.shared import _set_default_config
 from cloudbio.galaxy.applications import *
 from cloudbio.galaxy.r import _install_r_packages
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
@@ -47,5 +50,48 @@ def _install_applications(env, tools_conf):
     """Install external tools (galaxy tool dependencies).
     """
     applications = tools_conf["applications"] or {}
-    for (name, version) in applications.iteritems():
-        eval("install_%s" % name)(env, version)
+    for (name, versions) in applications.iteritems():
+        if type(versions) is str:
+            versions = [versions]
+        for version in versions:
+            tool_env = _build_tool_env(env, name, version)
+            eval("install_%s" % name)(tool_env)
+            _install_galaxy_config(tool_env)
+
+
+def _build_tool_env(env, name, version):
+    """ Build new env to have tool installed for Galaxy instead of into /usr. """
+    tool_env = {"tool_version": version,
+                "galaxy_tool_install": True}
+    for key, value in env.iteritems():
+        tool_env[key] = value
+    tool_env["system_install"] = os.path.join(env.galaxy_tools_dir, name, version)
+    return AttributeDict(tool_env)
+
+
+class AttributeDict(dict):
+    """
+    Dictionary that allows attribute access to values.
+
+    This is needed because cloudbio.custom.* accesses env extensively via
+    attributes (e.g. env.system_install).
+
+    http://stackoverflow.com/questions/4984647/accessing-dict-keys-like-an-attribute-in-python
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+
+def _install_galaxy_config(tool_env):
+    """
+    Setup galaxy tool config files (env.sh-es) and default version
+    symbolic links.
+    """
+    install_dir = tool_env["system_install"]
+    bin_dir = os.path.join(install_dir, "bin")
+    env_path = os.path.join(install_dir, "env.sh")
+    if exists(bin_dir) and not exists(env_path):
+        # Standard bin install, just add it to path
+        sudo("echo 'PATH=%s/bin:$PATH' > %s/env.sh" % (install_dir, install_dir))
+        sudo("chmod +x %s/env.sh" % install_dir)
+    _set_default_config(tool_env, install_dir)
