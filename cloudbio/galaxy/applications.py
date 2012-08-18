@@ -50,7 +50,7 @@ def install_fastx_toolkit(env):
 
 
 ## TODO: Rework to use more of custom enhancements
-@_if_not_installed(None)
+@_if_not_installed("maq")
 def install_maq(env):
     version = env["tool_version"]
     url = "http://downloads.sourceforge.net/project/maq/maq/%s/maq-%s.tar.bz2" \
@@ -58,7 +58,7 @@ def install_maq(env):
     _get_install(url, env, _configure_make)
 
 
-@_if_not_installed(None)
+@_if_not_installed("macs14")
 def install_macs(env):
     from cloudbio.custom.bio_nextgen  import install_macs as cbl_install_macs
     install_dir = env.system_install
@@ -68,7 +68,7 @@ def install_macs(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("tophat")
 def install_tophat(env):
     version = env.tool_version
     url = 'http://tophat.cbcb.umd.edu/downloads/tophat-%s.Linux_x86_64.tar.gz' % version
@@ -85,7 +85,7 @@ def install_tophat(env):
                 install_cmd("mv * %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("cufflinks")
 def install_cufflinks(env):
     version = env.tool_version
     url = 'http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.Linux_x86_64.tar.gz' % version
@@ -101,7 +101,7 @@ def install_cufflinks(env):
                 install_cmd("mv * %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("megablast")
 def install_megablast(env):
     version = env.tool_version
     url = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/%s/blast-%s-x64-linux.tar.gz' % (version, version)
@@ -117,7 +117,7 @@ def install_megablast(env):
                     install_cmd("mv * %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("blastn")
 def install_blast(env):
     version = env.tool_version
     url = 'ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/%s/ncbi-blast-%s-x64-linux.tar.gz' % (version[:-1], version)
@@ -133,7 +133,7 @@ def install_blast(env):
                     install_cmd("mv * %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("sputnik")
 def install_sputnik(env):
     version = env.tool_version
     url = 'http://bitbucket.org/natefoo/sputnik-mononucleotide/downloads/sputnik_%s_linux2.6_x86_64' % version
@@ -147,7 +147,7 @@ def install_sputnik(env):
             install_cmd("mv sputnik %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("taxonomy2tree")
 def install_taxonomy(env):
     version = env.tool_version
     url = 'http://bitbucket.org/natefoo/taxonomy/downloads/taxonomy_%s_linux2.6_x86_64.tar.gz' % version
@@ -163,7 +163,7 @@ def install_taxonomy(env):
                 install_cmd("mv * %s" % install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("add_scores")
 def install_add_scores(env):
     version = env.tool_version
     url = 'http://bitbucket.org/natefoo/add_scores/downloads/add_scores_%s_linux2.6_x86_64' % version
@@ -177,36 +177,7 @@ def install_add_scores(env):
             install_cmd("mv add_scores %s" % install_dir)
 
 
-#@if_tool_not_found()
-#def install_emboss(env):
-#    version = env.tool_version
-#    url = 'ftp://emboss.open-bio.org/pub/EMBOSS/old/%s/EMBOSS-%s.tar.gz' % (version, version)
-#    pkg_name = 'emboss'
-#    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, version)
-#    install_cmd = sudo if env.use_sudo else run
-#    if not exists(install_dir):
-#        install_cmd("mkdir -p %s" % install_dir)
-#    with _make_tmp_dir() as work_dir:
-#        with cd(work_dir):
-#            run("wget %s" % url)
-#            run("tar -xvzf %s" % os.path.split(url)[-1])
-#            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
-#                run("./configure --prefix=%s" % install_dir)
-#                run("make")
-#                install_cmd("make install")
-#    phylip_version = '3.6b'
-#    url = 'ftp://emboss.open-bio.org/pub/EMBOSS/old/%s/PHYLIP-%s.tar.gz' % (version, phylip_version)
-#    with _make_tmp_dir() as work_dir:
-#        with cd(work_dir):
-#            run("wget %s" % url)
-#            run("tar -xvzf %s" % os.path.split(url)[-1])
-#            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
-#                run("./configure --prefix=%s" % install_dir)
-#                run("make")
-#                install_cmd("make install")
-
-
-@_if_not_installed(None)
+@_if_not_installed("HYPHY")
 def install_hyphy(env):
     version = env.tool_version
     url = 'http://www.datam0nk3y.org/svn/hyphy'
@@ -231,44 +202,6 @@ def install_hyphy(env):
             with cd("build"):
                 run("bash build.sh SP")
             install_cmd("mv build/* %s" % install_dir)
-    _update_default(env, install_dir)
-
-
-@_if_not_installed(None)
-def install_lastz(env):
-    version = env.tool_version
-    url = 'http://www.bx.psu.edu/~rsharris/lastz/older/lastz-%s.tar.gz' % version
-    install_dir = env.system_install
-    install_cmd = sudo if env.use_sudo else run
-    if not exists(install_dir):
-        install_cmd("mkdir -p %s" % install_dir)
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget %s" % url)
-            run("tar -xvzf %s" % os.path.split(url)[-1])
-            with cd('lastz-distrib-%s' % version):
-                run("sed -i -e 's/GCC_VERSION == 40302/GCC_VERSION >= 40302/' src/quantum.c")
-                run("sed -i -e 's/-Werror//' src/Makefile")
-                run("make")
-                install_cmd("make LASTZ_INSTALL=%s install" % install_dir)
-    sudo("echo 'PATH=%s:$PATH' > %s/env.sh" % (install_dir, install_dir))
-    _update_default(env, install_dir)
-
-
-@_if_not_installed(None)
-def install_perm(env):
-    url = 'http://perm.googlecode.com/files/PerM_Linux64%28noOpenMp%29.gz'
-    install_dir = env.system_install
-    install_cmd = sudo if env.use_sudo else run
-    if not exists(install_dir):
-        install_cmd("mkdir -p %s" % install_dir)
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget -O PerM.gz %s" % url)
-            run("gunzip PerM.gz")
-            install_cmd("mv PerM %s" % install_dir)
-    sudo("echo 'PATH=%s:$PATH' > %s/env.sh" % (install_dir, install_dir))
-    sudo("chmod +x %s/env.sh %s/PerM" % (install_dir, install_dir))
     _update_default(env, install_dir)
 
 
@@ -303,7 +236,7 @@ def install_gatk(env):
     install_cmd('chown --recursive %s:%s %s' % (env.galaxy_user, env.galaxy_user, jar_dir))
 
 
-@_if_not_installed(None)
+@_if_not_installed("srma.jar")
 def install_srma(env):
     version = env.tool_version
     mirror_info = "?use_mirror=voxel"
@@ -322,7 +255,7 @@ def install_srma(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("BEAM2")
 def install_beam(env):
     url = 'http://www.stat.psu.edu/~yuzhang/software/beam2.tar'
     install_dir = env.system_install
@@ -338,7 +271,7 @@ def install_beam(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("pass2")
 def install_pass(env):
     url = 'http://www.stat.psu.edu/~yuzhang/software/pass2.tar'
     install_dir = env.system_install
@@ -354,7 +287,7 @@ def install_pass(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("lps_tool")
 def install_lps_tool(env):
     version = env.tool_version
     url = 'http://www.bx.psu.edu/miller_lab/dist/lps_tool.%s.tar.gz' % version
@@ -373,7 +306,7 @@ def install_lps_tool(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("plink")
 def install_plink(env):
     version = env.tool_version
     url = 'http://pngu.mgh.harvard.edu/~purcell/plink/dist/plink-%s-x86_64.zip' % version
@@ -407,7 +340,7 @@ def install_fbat(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("Haploview_beta.jar")
 def install_haploview(env):
     url = 'http://www.broadinstitute.org/ftp/pub/mpg/haploview/Haploview_beta.jar'
     install_dir = env.system_install
@@ -422,7 +355,7 @@ def install_haploview(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
+@_if_not_installed("eigenstrat")
 def install_eigenstrat(env):
     version = env.tool_version
     url = 'http://www.hsph.harvard.edu/faculty/alkes-price/files/EIG%s.tar.gz' % version
@@ -439,47 +372,7 @@ def install_eigenstrat(env):
     _update_default(env, install_dir)
 
 
-@_if_not_installed(None)
-def install_mosaik(env):
-    version = env.tool_version
-    url = "http://mosaik-aligner.googlecode.com/files/Mosaik-%s-Linux-x64.tar.bz2" % version
-    install_dir = env.system_install
-    install_cmd = sudo if env.use_sudo else run
-    if not exists(install_dir):
-        install_cmd("mkdir -p %s" % install_dir)
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget %s -O %s" % (url, os.path.split(url)[-1]))
-            install_cmd("tar -xjvpf %s -C %s" % (os.path.split(url)[-1], install_dir))
-    with cd(install_dir):
-        with cd("mosaik-aligner"):
-            install_cmd("rm -rf data/ MosaikTools/ src/")
-        install_cmd("mv mosaik-aligner/* .")
-        install_cmd("rm -rf mosaik-aligner")
-    install_cmd("echo 'PATH=%s/bin:$PATH' > %s/env.sh" % (install_dir, install_dir))
-    _update_default(env, install_dir)
-
-
-#@if_tool_not_found()
-#def install_freebayes(env):
-#    version = env.tool_version
-#    url = "git://github.com/ekg/freebayes.git"
-#    pkg_name = 'freebayes'
-#    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, version)
-#    install_cmd = sudo if env.use_sudo else run
-#    if not exists(install_dir):
-#        install_cmd("mkdir -p %s" % install_dir)
-#    with _make_tmp_dir() as work_dir:
-#        with cd(work_dir):
-#            install_cmd("git clone --recursive %s" % url)
-#            with cd("freebayes"):
-#                install_cmd("make")
-#                install_cmd("mv bin/* %s" % install_dir)
-#    install_cmd("echo 'PATH=%s:$PATH' > %s/env.sh" % (install_dir, install_dir))
-#    _update_default(env, install_dir)
-
-
-@_if_not_installed(None)
+@_if_not_installed("SortSam.jar")
 def install_picard(env):
     version = env.tool_version
     mirror_info = "?use_mirror=voxel"
@@ -504,7 +397,7 @@ def install_picard(env):
     install_cmd('chown --recursive %s:%s %s' % (env.galaxy_user, env.galaxy_user, jar_dir))
 
 
-@_if_not_installed(None)
+@_if_not_installed("fastqc")
 def install_fastqc(env):
     """ This tool is installed in Galaxy's jars dir """
     version = env.tool_version
@@ -527,3 +420,32 @@ def _update_default(env, install_dir):
     sudo("touch %s/env.sh" % install_dir)
     sudo("chmod +x %s/env.sh" % install_dir)
     _set_default_config(env, install_dir)
+
+#@if_tool_not_found()
+#def install_emboss(env):
+#    version = env.tool_version
+#    url = 'ftp://emboss.open-bio.org/pub/EMBOSS/old/%s/EMBOSS-%s.tar.gz' % (version, version)
+#    pkg_name = 'emboss'
+#    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, version)
+#    install_cmd = sudo if env.use_sudo else run
+#    if not exists(install_dir):
+#        install_cmd("mkdir -p %s" % install_dir)
+#    with _make_tmp_dir() as work_dir:
+#        with cd(work_dir):
+#            run("wget %s" % url)
+#            run("tar -xvzf %s" % os.path.split(url)[-1])
+#            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
+#                run("./configure --prefix=%s" % install_dir)
+#                run("make")
+#                install_cmd("make install")
+#    phylip_version = '3.6b'
+#    url = 'ftp://emboss.open-bio.org/pub/EMBOSS/old/%s/PHYLIP-%s.tar.gz' % (version, phylip_version)
+#    with _make_tmp_dir() as work_dir:
+#        with cd(work_dir):
+#            run("wget %s" % url)
+#            run("tar -xvzf %s" % os.path.split(url)[-1])
+#            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
+#                run("./configure --prefix=%s" % install_dir)
+#                run("make")
+#                install_cmd("make install")
+

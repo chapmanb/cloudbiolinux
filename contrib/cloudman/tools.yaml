@@ -1,21 +1,25 @@
 ---
 applications:
-  ## Coming from bio_nextgen
+  ## Coming from bio_nextgen.py
   bwa: "0.5.9"
   ucsc_tools: "default"
-  bowtie: "0.12.7" # TODO: Update
+  bowtie: "0.12.7" 
   samtools: 
     - "0.1.16"
     - "0.1.18"
   abyss: "1.3.3"
   bfast: "0.7.0a"
   velvet: "1.2.07"
+  perm: "3.6"
+  lastz: "1.02.00"
+  mosaik: "default" # Version ignored now, CBL pulls from trunk
+  freebayes: "default"
+  macs: "1.4.2-1"
 
-  ## Coming from bio_general
+  ## Coming from bio_general.py
   emboss: "6.5.7"
 
-  ## Coming from applications
-  macs: "1.4.2-1"
+  ## Coming from applications.py
 
   ## Tried with bio_nextgen didn't work. [ubuntu@10.1.0.3] out: No package 'gtextutils' found
   fastx_toolkit: "0.0.13.2"
@@ -24,17 +28,18 @@ applications:
   cufflinks: "1.3.0"
   tophat: "1.3.3"
 
-  # Custom tool for it does not exist, CBL installs from 
-  maq: "0.7.1"
 
+  picard: "1.56"
+  fastqc: "0.10.0"  
+  gatk: "1.4-9-g1f1233b"  
+
+  maq: "0.7.1"
   megablast: "2.2.22"
   blast: "2.2.25+"
   sputnik: "r1"
   taxonomy: "r2"
   add_scores: "r1"
   hyphy: "r418"
-  lastz: "1.01.92"
-  perm: "3.0"
   srma: "0.1.15"
   beam: "2"
   pass: "2.0"
@@ -42,10 +47,6 @@ applications:
   plink: "1.07"
   haploview: "4.2b"
   eigenstrat: "3.0"
-  mosaik: "1.1.0021"
-  picard: "1.56"
-  fastqc: "0.10.0"  
-  gatk: "1.4-9-g1f1233b"  
 
 r_packages:
   - DBI

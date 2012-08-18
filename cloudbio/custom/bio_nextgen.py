@@ -87,7 +87,7 @@ def install_perm(env):
     """Efficient mapping of short sequences accomplished with periodic full sensitive spaced seeds.
     https://code.google.com/p/perm/
     """
-    version = "3.6"
+    version = env.get("tool_version", "3.6")
     url = "http://perm.googlecode.com/files/PerM_%s_Source.tar.gz" % version
     def gcc44_makefile_patch():
         gcc_cmd = "g++44"
@@ -161,7 +161,7 @@ def install_lastz(env):
     """LASTZ sequence alignment program.
     http://www.bx.psu.edu/miller_lab/dist/README.lastz-1.02.00/README.lastz-1.02.00a.html
     """
-    version = "1.02.00"
+    version = env.get("tool_version", "1.02.00")
     url = "http://www.bx.psu.edu/miller_lab/dist/" \
           "lastz-%s.tar.gz" % version
     def _remove_werror(env):
