@@ -568,8 +568,9 @@ def install_cortex_var(env):
     def _cortex_build(env):
         sed("Makefile", "\-L/full/path/\S*", "")
         sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include/gsl".format(env.system_install))
-        run("make MAXK=31 NUM_COLS=10 cortex_var")
-        run("make MAXK=63 NUM_COLS=10 cortex_var")
+        for cols in ["1", "2", "3", "4", "5"]:
+            for kmer in ["31", "63"]:
+                run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
         with cd("scripts/analyse_variants/needleman_wunsch-0.3.0"):
             sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
             run("make")
