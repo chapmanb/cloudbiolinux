@@ -107,8 +107,8 @@ def install_stampy(env):
     """Stampy: mapping of short reads from illumina sequencing machines onto a reference genome.
     http://www.well.ox.ac.uk/project-stampy
     """
-    base_version = "1.0.15"
-    revision = "1360"
+    base_version = "1.0.18"
+    revision = "1526"
     version = "{0}r{1}".format(base_version, revision)
     url = "http://www.well.ox.ac.uk/~gerton/software/Stampy/" \
           "stampy-{0}.tgz".format(version)
@@ -556,6 +556,23 @@ def install_trinity(env):
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
           "trinityrnaseq_%s.tar.gz" % version
     _get_install_local(url, env, _make_copy())
+
+def install_cortex_var(env):
+    """De novo genome assembly and variation analysis from sequence data.
+    http://cortexassembler.sourceforge.net/index_cortex_var.html
+    """
+    version = "1.0.5.10"
+    url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
+          "latest/CORTEX_release_v{}.tgz".format(version)
+    def _cortex_build(env):
+        sed("Makefile", "\-L/full/path/\S*", "")
+        sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include/gsl".format(env.system_install))
+        run("make MAXK=31 NUM_COLS=10 cortex_var")
+        run("make MAXK=63 NUM_COLS=10 cortex_var")
+        with cd("scripts/analyse_variants/needleman_wunsch-0.3.0"):
+            sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
+            run("make")
+    _get_install_local(url, env, _cortex_build)
 
 # --- ChIP-seq
 

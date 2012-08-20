@@ -38,6 +38,7 @@ bio_nextgen:
     - tophat
   assembly:
     - abyss
+    - cortex_var
     - transabyss
     - trinity
     - velvet
