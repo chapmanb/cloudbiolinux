@@ -39,7 +39,8 @@ def install_bowtie(env):
     """The bowtie short read aligner.
     http://bowtie-bio.sourceforge.net/index.shtml
     """
-    version = env.get("tool_version", "0.12.7")
+    default_version = "0.12.7"
+    version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
           "bowtie-%s-src.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie*'"))
@@ -59,7 +60,8 @@ def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    version = env.get("tool_version", "0.5.9")
+    default_version = "0.5.9"
+    version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
@@ -75,7 +77,8 @@ def install_bfast(env):
     """BFAST: Blat-like Fast Accurate Search Tool.
     http://sourceforge.net/apps/mediawiki/bfast/index.php?title=Main_Page
     """
-    version = env.get("tool_version", "0.7.0a")
+    default_version = "0.7.0a"
+    version = env.get("tool_version", default_version)
     major_version_regex = "\d+\.\d+\.\d+"
     major_version = re.search(major_version_regex, version).group(0)
     url = "http://downloads.sourceforge.net/project/bfast/bfast/%s/bfast-%s.tar.gz"\
@@ -87,7 +90,8 @@ def install_perm(env):
     """Efficient mapping of short sequences accomplished with periodic full sensitive spaced seeds.
     https://code.google.com/p/perm/
     """
-    version = env.get("tool_version", "3.6")
+    default_version = "3.6"
+    version = env.get("tool_version", default_version)
     url = "http://perm.googlecode.com/files/PerM_%s_Source.tar.gz" % version
     def gcc44_makefile_patch():
         gcc_cmd = "g++44"
@@ -161,7 +165,8 @@ def install_lastz(env):
     """LASTZ sequence alignment program.
     http://www.bx.psu.edu/miller_lab/dist/README.lastz-1.02.00/README.lastz-1.02.00a.html
     """
-    version = env.get("tool_version", "1.02.00")
+    default_version = "1.02.00"
+    version = env.get("tool_version", default_version)
     url = "http://www.bx.psu.edu/miller_lab/dist/" \
           "lastz-%s.tar.gz" % version
     def _remove_werror(env):
@@ -190,7 +195,8 @@ def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
     """
-    version = env.get("tool_version", "0.1.18")
+    default_version = "0.1.18"
+    version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -type f"))
@@ -200,7 +206,8 @@ def install_fastx_toolkit(env):
     """FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing.
     http://hannonlab.cshl.edu/fastx_toolkit/
     """
-    version = env.get("tool_version", "0.0.13")
+    default_version = "0.0.13"
+    version = env.get("tool_version", default_version)
     gtext_version = "0.6"
     url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
     fastx_url = "%sfastx_toolkit-%s.tar.bz2" % (url_base, version)
@@ -478,7 +485,8 @@ def install_tophat(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    version = env.get("tool_version", "2.0.0")
+    default_version = "2.0.0"
+    version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
@@ -489,7 +497,8 @@ def install_cufflinks(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    version = env.get("tool_version", "2.0.0")
+    default_version = "2.0.0"
+    version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
@@ -501,7 +510,8 @@ def install_abyss(env):
     http://www.bcgsc.ca/platform/bioinfo/software/abyss
     """
     # XXX check for no sparehash on non-ubuntu systems
-    version = env.get("tool_version", "1.3.3")
+    default_version = "1.3.3"
+    version = env.get("tool_version", default_version)
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
     def _remove_werror_get_boost(env):
         sed("configure", " -Werror", "")
@@ -526,7 +536,8 @@ def install_velvet(env):
     """Sequence assembler for very short reads.
     http://www.ebi.ac.uk/~zerbino/velvet/
     """
-    version = env.get("tool_version", "1.2.05")
+    default_version = "1.2.05"
+    version = env.get("tool_version", default_version)
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
         """Fix library order problem in recent gcc versions
@@ -553,7 +564,8 @@ def install_macs(env):
     """Model-based Analysis for ChIP-Seq.
     http://liulab.dfci.harvard.edu/MACS/
     """
-    version = env.get("tool_version", "1.4.2")
+    default_version = "1.4.2"
+    version = env.get("tool_version", default_version)
     url = "https://github.com/downloads/taoliu/MACS/" \
           "MACS-%s.tar.gz" % version
     _get_install(url, env, _python_make)
