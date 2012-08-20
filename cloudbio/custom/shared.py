@@ -17,15 +17,36 @@ def _if_not_installed(pname):
     """
     def argcatcher(func):
         functools.wraps(func)
+
         def decorator(*args, **kwargs):
-            with settings(
-                    hide('warnings', 'running', 'stdout', 'stderr'),
-                    warn_only=True):
-                result = run(pname)
-            if result.return_code == 127:
+            if _galaxy_tool_install(args):
+                run_function = not _galaxy_tool_present(args)
+            else:
+                run_function = _executable_not_on_path(pname)
+
+            if run_function:
                 return func(*args, **kwargs)
         return decorator
     return argcatcher
+
+
+def _executable_not_on_path(pname):
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
+        result = run(pname)
+    return result.return_code == 127
+
+
+def _galaxy_tool_install(args):
+    try:
+        return args[0]["galaxy_tool_install"]
+    except:
+        return False
+
+
+def _galaxy_tool_present(args):
+    return exists(os.path.join(args[0]["system_install"], "env.sh"))
+
 
 def _if_not_python_lib(library):
     """Decorator that checks if a python library is installed.
@@ -111,7 +132,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if do_make:
             run("make")
         if find_cmd:
-            install_dir = os.path.join(env.system_install, "bin")
+            install_dir = _get_bin_dir(env)
             for fname in run(find_cmd).split("\n"):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
@@ -174,7 +195,7 @@ def _java_install(pname, version, url, env, install_fn=None):
 
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)
-    env.safe_sudo("python%s setup.py install --skip-build" % env.python_version_ext)
+    env.safe_sudo("python%s setup.py install --skip-build --prefix '%s'" % (env.python_version_ext, env.system_install))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
@@ -207,3 +228,46 @@ def _write_to_file(contents, path, mode):
         os.close(fd)
     finally:
         os.unlink(local_path)
+
+
+def _get_bin_dir(env):
+    """ 
+    When env.system_install is /usr this exists, but in the Galaxy
+    it may not already exist.
+    """
+    return _get_install_subdir(env, "bin")
+
+
+def _get_include_dir(env):
+    return _get_install_subdir(env, "include")
+
+
+def _get_lib_dir(env):
+    return _get_install_subdir(env, "lib")
+
+
+def _get_install_subdir(env, subdir):
+    path = os.path.join(env.system_install, subdir)
+    if not exists(path):
+        env.safe_sudo("mkdir -p '%s'" % path)
+    return path
+
+
+def _set_default_config(env, install_dir):
+    """
+    Sets up default galaxy config directory symbolic link (if needed). Needed
+    when it doesn't exists or when installing a new version of software.
+    """
+    version = env["tool_version"]
+    if exists(install_dir):
+        install_dir_root = os.path.join(install_dir, "..")
+        replace_default = False
+        if not exists(os.path.join(install_dir_root, "default")):
+            replace_default = True
+        if not replace_default:
+            default_version = env.safe_sudo("basename `readlink -f %s/default`" % install_dir_root)
+            if version > default_version:  # Bug: Wouldn't work for 1.9 < 1.10
+                print "default version %s is older than version %s just installed, replacing..." % (default_version, version)
+                replace_default = True
+        if replace_default:
+            env.safe_sudo("rm -rf %s/default; ln -f -s %s %s/default" % (install_dir_root, install_dir, install_dir_root))
