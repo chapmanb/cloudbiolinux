@@ -379,7 +379,7 @@ def install_gatk(env):
     """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
     http://www.broadinstitute.org/gatk/
     """
-    version = "2.0-34-g6d0be9b"
+    version = "2.1-1-g426e8e7"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
@@ -389,7 +389,7 @@ def install_gatk_queue(env):
     """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
     http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
     """
-    version = "2.0-34-g6d0be9b"
+    version = "2.1-1-g426e8e7"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "QueueLite-%s%s" % (version, ext)
