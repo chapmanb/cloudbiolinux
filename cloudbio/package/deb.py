@@ -74,6 +74,7 @@ def _add_apt_gpg_keys():
     keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
+            ("subkeys.pgp.net", "D018A4CE"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
     standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
@@ -161,5 +162,6 @@ def _setup_apt_sources():
         if source.startswith("ppa:"):
             sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
-        elif not contains(env.sources_file, source): # FIXME: append never adds dups!
+        elif (not contains(env.sources_file, source) and
+              not contains(env.global_sources_file, source)):
             append(env.sources_file, source, use_sudo=True)
