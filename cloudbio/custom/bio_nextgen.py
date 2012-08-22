@@ -564,10 +564,11 @@ def install_cortex_var(env):
     """
     version = "1.0.5.10"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
-          "latest/CORTEX_release_v{}.tgz".format(version)
+          "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
-        sed("Makefile", "\-L/full/path/\S*", "")
-        sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include/gsl".format(env.system_install))
+        sed("Makefile", "\-L/full/path/\S*", "-L{0}/lib".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL_ALSO=.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
         for cols in ["1", "2", "3", "4", "5"]:
             for kmer in ["31", "63"]:
                 run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
