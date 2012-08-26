@@ -3,6 +3,7 @@
 import tempfile
 import os
 import functools
+from string import Template
 from contextlib import contextmanager
 
 from fabric.api import *
@@ -271,3 +272,61 @@ def _set_default_config(env, install_dir):
                 replace_default = True
         if replace_default:
             env.safe_sudo("rm -rf %s/default; ln -f -s %s %s/default" % (install_dir_root, install_dir, install_dir_root))
+
+
+def _setup_simple_service(service_name):
+    """
+    Very Ubuntu/Debian specific, will need to be modified if used on other
+    archs.
+    """
+    sudo("ln -f -s /etc/init.d/%s /etc/rc0.d/K01%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc1.d/K01%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc2.d/S99%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc3.d/S99%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc4.d/S99%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc5.d/S99%s" % (service_name, service_name))
+    sudo("ln -f -s /etc/init.d/%s /etc/rc6.d/K01%s" % (service_name, service_name))
+
+
+def _render_config_file_temlate(env, name, defaults={}, overrides={}, default_source=None):
+    param_prefix = name.replace(".", "_")
+    # Deployer can specify absolute path for config file, check this first
+    path_key_name = "%s_path" % param_prefix
+    template_key_name = "%s_template_path" % param_prefix
+    if env.get(path_key_name, None):
+        source_path = env[path_key_name]
+        source_template = False
+    elif env.get(template_key_name, None):
+        source_path = env[template_key_name]
+        source_template = True
+    elif default_source:
+        source_path = _get_installed_file(env, default_source)
+        source_template = source_path.endswith(".template")
+    else:
+        default_template_name = "%s.template" % name
+        source_path = _get_installed_file(env, default_template_name)
+        source_template = True
+
+    if source_template:
+        template = Template(open(source_path, "r").read())
+        template_params = _extend_env(env, defaults=defaults, overrides=overrides)
+        contents = template.substitute(template_params)
+    else:
+        contents = open(source_path, "r").read()
+    return contents
+
+
+def _extend_env(env, defaults={}, overrides={}):
+    new_env = {}
+    for key, value in defaults.iteritems():
+        new_env[key] = value
+    for key, value in env.iteritems():
+        new_env[key] = value
+    for key, value in overrides.iteritems():
+        new_env[key] = value
+    return new_env
+
+
+def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
+    conf_file_contents = _render_config_file_temlate(env, name, defaults, overrides, default_source)
+    _write_to_file(conf_file_contents, dest, mode=0755)
