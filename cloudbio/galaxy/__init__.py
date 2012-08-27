@@ -8,7 +8,7 @@ import os
 from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists, contains
 
-from cloudbio.custom.shared import _write_to_file
+from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service
 from cloudbio.galaxy.tools import _install_tools
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
 
@@ -57,6 +57,21 @@ def _install_galaxy(env):
     see volume_manipulations_fab.py script for that functionality.
     Also, this method is somewhat targeted for the EC2 deployment so some
     tweaking of the code may be desirable."""
+    _clone_galaxy_repo(env)
+    # MP: Ensure that everything under install dir is owned by env.galaxy_user
+    sudo("chown --recursive %s:%s %s"
+       % (env.galaxy_user, env.galaxy_user, os.path.split(env.galaxy_tools_dir)[0]))
+    sudo("chmod 755 %s" % os.path.split(env.galaxy_tools_dir)[0])
+    setup_service = _read_boolean(env, "galaxy_setup_service", False)
+    if setup_service:
+        _setup_service(env)
+    _install_tools(env)
+    setup_xvfb = _read_boolean(env, "galaxy_setup_xvfb", False)
+    if setup_xvfb:
+        _setup_xvfb(env)
+    return True
+
+def _clone_galaxy_repo(env):
     # MP: we need to have a tmp directory available if files already exist
     # in the galaxy install directory
     install_cmd = sudo if env.get("use_sudo", True) else run
@@ -90,16 +105,9 @@ def _install_galaxy(env):
     if exists(tmp_dir):
         install_cmd("cp -R %s/* %s" % (tmp_dir, env.galaxy_home))
         install_cmd("rm -rf %s" % tmp_dir)
-    # MP: Ensure that everything under install dir is owned by env.galaxy_user
-    sudo("chown --recursive %s:%s %s"
-       % (env.galaxy_user, env.galaxy_user, os.path.split(env.galaxy_tools_dir)[0]))
-    sudo("chmod 755 %s" % os.path.split(env.galaxy_tools_dir)[0])
-    env.get("galaxy_preconfigured_repository", False)
     preconfigured = _read_boolean(env, "galaxy_preconfigured_repository", False)
     if not preconfigured:
         _configure_galaxy_repository(env)
-    _install_tools(env)
-    return True
 
 
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
@@ -180,3 +188,16 @@ def _configure_galaxy_repository(env):
         sudo('ln -s %s/haploview.jar tool-data/shared/jars/.' % haploview_dir, user=env.galaxy_user)
         sudo('ln -s %s/*.jar tool-data/shared/jars/.' % picard_dir, user=env.galaxy_user)
     return True
+
+
+def _setup_service(env):
+    _setup_conf_file(env, "/etc/init.d/galaxy", "galaxy_init", default_source="galaxy_init")
+    _setup_conf_file(env, "/etc/default/galaxy", "galaxy_default")
+    _setup_simple_service("galaxy")
+
+
+def _setup_xvfb(env):
+    _setup_conf_file(env, "/etc/init.d/xvfb", "xvfb_init", default_source="xvfb_init")
+    _setup_conf_file(env, "/etc/default/xvfb", "xvfb_default", default_source="xvfb_default")
+    _setup_simple_service("xvfb")
+    env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")

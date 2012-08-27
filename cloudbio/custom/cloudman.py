@@ -4,13 +4,11 @@ From Enis Afgan: https://bitbucket.org/afgane/mi-deployment
 """
 import os, contextlib
 
-from string import Template
-
 from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists, settings, hide, contains, sed
 
 from cloudbio.galaxy.utils import _read_boolean
-from cloudbio.custom.shared import _make_tmp_dir, _write_to_file, _get_installed_file
+from cloudbio.custom.shared import _make_tmp_dir, _write_to_file, _setup_conf_file
 from cloudbio.cloudman import _configure_cloudman
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
@@ -57,9 +55,8 @@ def install_nginx(env):
                 sudo("make install")
                 sudo("cd %s; stow nginx" % env.install_dir)
 
-    conf_file_contents = _get_nginx_conf_contents(env)
-    nginx_conf_file = 'nginx.conf'
-    _write_to_file(conf_file_contents, os.path.join(remote_conf_dir, nginx_conf_file), mode=0755)
+    defaults = {"galaxy_home": "/mnt/galaxyTools/galaxy-central"}
+    _setup_conf_file(env, os.path.join(remote_conf_dir, "nginx.conf"), "nginx.conf", defaults=defaults)
 
     nginx_errdoc_file = 'nginx_errdoc.tar.gz'
     url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)
@@ -78,22 +75,6 @@ def install_nginx(env):
     if not exists(os.path.join(cloudman_default_dir, "nginx")):
         sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
     env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
-
-
-def _get_nginx_conf_contents(env):
-    # Give deployer chance to specify concrete nginx.conf file,
-    # barring that allow a nginx conf template path to be specified
-    # otherwise go with default cloudman template.
-    if env.get("nginx_conf_path", None):
-        conf_file_contents = open(env["nginx_conf_path"], "r").read()
-    else:
-        template_path = env.get("nginx_conf_template_path", _get_installed_file(env, "nginx.conf.template"))
-        template = Template(open(template_path, "r").read())
-        conf_parameters = {
-            "galaxy_home": env.get("galaxy_home", "/mnt/galaxyTools/galaxy-central")
-        }
-        conf_file_contents = template.substitute(conf_parameters)
-    return conf_file_contents
 
 
 def _get_nginx_modules(env):

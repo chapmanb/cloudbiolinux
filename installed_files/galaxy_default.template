@@ -1,0 +1,5 @@
+export GALAXY_USER=galaxy
+export GALAXY_HOME=$galaxy_home
+export PIDFILE=/var/lib/galaxy/galaxy.pid
+export GALAXY_INDICES=$galaxy_indices_mount
+export GALAXY_DATA=$galaxy_data_mount

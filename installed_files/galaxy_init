@@ -1,0 +1,65 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        galaxy
+# Required-Start:  
+# Required-Stop:   
+# Default-Start:   2 3 4 5
+# Default-Stop:    0 1 6
+# Short-Description: Start Galaxy daemon
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
+. /etc/default/galaxy
+
+NAME=galaxy
+
+case $1 in
+        start)
+                if [ ! -d $GALAXY_DATA ];
+                then
+                    log_daemon_msg "Creating directory for galaxy data"
+                    mkdir -p $GALAXY_DATA
+                    chown $GALAXY_USER:$GALAXY_USER $GALAXY_DATA
+                fi
+                if [ ! -d $GALAXY_INDICES -a -f /opt/compressed_genomes.tar.gz ];
+                then
+                    # Galaxy VM launcher has option to stash compressed genomes right
+                    # in image in compressed state. Look for such a file in /opt/compressed_genomes.tar.gz
+                    # and decompress in appropriate directory if needed.
+                    log_daemon_msg "Decompressing genomes for galaxy"
+                    cp /opt/compressed_genomes.tar.gz $GALAXY_INDICES/..
+                    tar xzvf $GALAXY_INDICES/../compressed_genomes.tar.gz -C $GALAXY_INDICES/..
+                fi
+
+                log_daemon_msg "Starting Galaxy" "Galaxy"
+                su - $GALAXY_USER /bin/sh -c "$GALAXY_HOME/run.sh --pid-file=$PIDFILE --log-file /var/log/galaxy/galaxy.log  --daemon"
+                status=$?
+                log_end_msg $status
+                ;;
+        stop)
+                log_daemon_msg "Stopping Galaxy" "Galaxy"
+                su - $GALAXY_USER /bin/sh -c "$GALAXY_HOME/run.sh --pid-file=$PIDFILE --stop-daemon"
+                log_end_msg $?
+                rm -f $PIDFILE
+                ;;
+        restart|force-reload)
+                $0 stop && sleep 2 && $0 start
+                ;;
+        try-restart)
+                if $0 status >/dev/null; then
+                        $0 restart
+                else
+                        exit 0
+                fi
+                ;;
+        reload)
+                exit 3
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|restart|try-restart|force-reload}"
+                exit 2
+                ;;
+esac
