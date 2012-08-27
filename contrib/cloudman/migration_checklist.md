@@ -2,6 +2,42 @@ This document is meant to layout work that is to be done and/or that
 has been done in merging mi-deployment and galaxy-vm-launcher into
 cloudbiolinux.
 
+## Concrete TODO List:
+
+### mi-deployment migration:
+
+* *TODETERMINE*: Is SGE configuration in cloudbiolinux up-to-date with mi-deployment?
+* *TODETERMINE*: Is setuptools install in mi-deployment needed with cloudbiolinux? (Seems no. -John)
+* *TODO*: Port mi-deployment s3fs install functionality to cloudbiolinux.
+* *TODETERMINE*: Is _configure_postgresql functionality needed? Seems to work without it.
+* *TODO*: Port mi-deployment _configure_galaxy_env functionality to cloudbiolinux.
+* *TODO*: Port mi-deployment _save_image_conf_support functionality to cloudbiolinx
+* *TODO*: Move required files for _configure_logrotate to cloudbiolinux installed_files and update setup procedure accordingly.
+* *TODO*: Move required files for proftpd to cloudbiolinux installed_files and update setup procedure accordingly.
+* *TODO*: Move nginx_errdoc.tar.gz to cloudbiolinux installed_files and update setup procedure accordingly.
+* *TODO*: Move required files for vimrc to cloudbiolinux installed_files and update setup procedure accordingly.
+* *TODO*: Port mi-deployment volume_manipulations_fab.py functionality to cloudbiolinux (if makes sense ).
+* *TODO*: Port mi-deployment instance-to-ebs-ami.sh functionality to cloudbiolinux (if makes sense ).
+* *TODO*: Port mi-deployment copy_snap/local_to_ebs_fab.py functionality to cloudbiolinux (if makes sense ).
+* *TODO*: Port mi-deployment wrf, graphlab, and tools/* functionality to cloudbiolinux (if makes sense ).
+
+### galaxy-vm-launcher migration:
+
+* *TODO*: Move these procedures into cloudbiolinux - _init_postgresql_data, _configure_nginx_service, start_nginx (all disabled by default to ensure cloudman compat.).
+* *TODO*: Refactor deploy.py to use cloudbio/galaxy/tools instead of gvl/lib/tools.py
+* *TODO*: Refactor galaxy.py to install galaxy via cloudbiolinux methods.
+* *TODO*: Move this functionality into cloudbiolinx - galaxy database migrations (disabled by default to ensure cloudman compat.)
+* *TODETERMINE*: Could we move setup_taxonomy_data from gvl/lib/deploy.py into cloudbio/biodata somewhere? How is cloudman being configuring this data?
+
+### Completed TODOs from original checklist
+
+* *TODETERMINE*: Is install_nginx in cloudbiolinux up-to-date with mi-deployment?
+* *TODO*: Refactor install_nginx in cloudbio.custom.cloudman so it can be used by 
+galaxy-vm-launcher
+* *TODO*: Determine and implement good way to make cloudman specific parts of nginx.conf optional.
+* *TODO*: Port mi-deployment _configure_xvfb functionality to cloudbiolinx
+* *TODO*: Move this functionality into cloudbiolinx - setting up galaxy init service, log (disabled by default to ensure cloudman compat.)
+
 ## mi-deployment
 
 * data_fabfile.py - Seems all the work was already been done.
@@ -159,34 +195,3 @@ cloudbiolinux.
   setup_taxonomy_data - Could be moved into cloudbio/biodata. Does cloudman use 
   the metagenomics tools? How is this currently being configured?
 
-## Concrete TODO List:
-
-### mi-deployment migration:
-
-* *TODETERMINE*: Is install_nginx in cloudbiolinux up-to-date with mi-deployment?
-* *TODETERMINE*: Is SGE configuration in cloudbiolinux up-to-date with mi-deployment?
-* *TODETERMINE*: Is setuptools install in mi-deployment needed with cloudbiolinux? (Seems no. -John)
-* *TODO*: Port mi-deployment s3fs install functionality to cloudbiolinux.
-* *TODETERMINE*: Is _configure_postgresql functionality needed? Seems to work without it.
-* *TODO*: Port mi-deployment _configure_galaxy_env functionality to cloudbiolinux.
-* *TODO*: Port mi-deployment _save_image_conf_support functionality to cloudbiolinx
-* *TODO*: Port mi-deployment _configure_xvfb functionality to cloudbiolinx
-* *TODO*: Move required files for _configure_logrotate to cloudbiolinux installed_files and update setup procedure accordingly.
-* *TODO*: Move required files for proftpd to cloudbiolinux installed_files and update setup procedure accordingly.
-* *TODO*: Move nginx_errdoc.tar.gz to cloudbiolinux installed_files and update setup procedure accordingly.
-* *TODO*: Move required files for vimrc to cloudbiolinux installed_files and update setup procedure accordingly.
-* *TODO*: Port mi-deployment volume_manipulations_fab.py functionality to cloudbiolinux (if makes sense ).
-* *TODO*: Port mi-deployment instance-to-ebs-ami.sh functionality to cloudbiolinux (if makes sense ).
-* *TODO*: Port mi-deployment copy_snap/local_to_ebs_fab.py functionality to cloudbiolinux (if makes sense ).
-* *TODO*: Port mi-deployment wrf, graphlab, and tools/* functionality to cloudbiolinux (if makes sense ).
-
-### galaxy-vm-launcher migration:
-
-* *TODO*: Refactor install_nginx in cloudbio.custom.cloudman so it can be used by 
-galaxy-vm-launcher
-* *TODO*: Determine and implement good way to make cloudman specific parts of nginx.conf optional.
-* *TODO*: Move these procedures into cloudbiolinux - _init_postgresql_data, _configure_nginx_service, start_nginx (all disabled by default to ensure cloudman compat.).
-* *TODO*: Refactor deploy.py to use cloudbio/galaxy/tools instead of gvl/lib/tools.py
-* *TODO*: Refactor galaxy.py to install galaxy via cloudbiolinux methods.
-* *TODO*: Move this functionality into cloudbiolinx - setting up galaxy init service, log, and database migrations (all disabled by default to ensure cloudman compat.)
-* *TODETERMINE*: Could we move setup_taxonomy_data from gvl/lib/deploy.py into cloudbio/biodata somewhere? How is cloudman being configuring this data?
