@@ -155,7 +155,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
     env.logger.debug("Meta-package list is '%s'" % packagelist)
     env.logger.debug("File path for explicit packages is '%s'" % pkg_config_file_path)
     env.logger.debug("Target is '%s'" % target)
-    pkg_install, lib_install = _read_main_config(packagelist) # read main yaml
+    pkg_install, lib_install, custom_ignore = _read_main_config(packagelist) # read main yaml
     if target is None or target == "packages":
         if env.distribution in ["debian", "ubuntu"]:
             _setup_apt_sources()
@@ -173,7 +173,7 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
             _nix_packages(pkg_install)
         _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
-        _custom_installs(pkg_install)
+        _custom_installs(pkg_install, custom_ignore)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -215,11 +215,12 @@ def _check_fabric_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or higher")
 
-def _custom_installs(to_install):
+def _custom_installs(to_install, ignore=None):
     if not exists(env.local_install):
         run("mkdir -p %s" % env.local_install)
     pkg_config = os.path.join(env.config_dir, "custom.yaml")
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
@@ -287,9 +288,10 @@ def _read_main_config(yaml_file=None):
     packages = packages if packages else []
     libraries = full_data['libraries']
     libraries = libraries if libraries else []
+    custom_ignore = full_data.get('custom_ignore', [])
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
-    return packages, sorted(libraries)
+    return packages, sorted(libraries), custom_ignore
 
 # ### Library specific installation code
 

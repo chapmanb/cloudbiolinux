@@ -21,7 +21,7 @@ def install_matplotlib(env):
     """matplotlib is a python 2D plotting library which produces publication quality figures
     http://matplotlib.sourceforge.net/
     """
-    version = "1.0.1"
+    version = "1.1.1"
     url = "http://downloads.sourceforge.net/project/matplotlib/matplotlib/" \
           "matplotlib-%s/matplotlib-%s.tar.gz" % (version, version)
     _get_install(url, env, _python_make)
@@ -37,4 +37,9 @@ def install_rpy(env):
           "%s/rpy-%s%s.zip" % (version, version, ext)
     def _fix_libraries(env):
         run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
+        result = run("R --version")
+        if result.failed:
+            return
     _get_install(url, env, _python_make, post_unpack_fn=_fix_libraries)

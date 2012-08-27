@@ -122,6 +122,7 @@ def _setup_centos():
 
 def _setup_scientificlinux():
     env.logger.info("ScientificLinux setup")
+    env.python_version_ext = ""
     env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"

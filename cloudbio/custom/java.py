@@ -25,7 +25,7 @@ def install_leinengin(env):
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run("wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein")
+            run("wget --no-check-certificate https://raw.github.com/technomancy/leiningen/preview/bin/lein")
             run("chmod a+rwx lein")
             env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
             run("lein self-install")

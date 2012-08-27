@@ -2,8 +2,17 @@
 # Flavor containing more minimal instructions to install tools for
 # running next-generation sequencing pipelines.
 packages:
+  - minimal
+  - libraries
   - python
   - java
   - bio_nextgen
 libraries:
   - python-libs
+custom_ignore:
+  - fastx_toolkit
+  - varianttools
+  - tophat
+  - cufflinks
+  - mosaik
+  - perm

@@ -10,7 +10,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_bin_dir, _get_lib_dir, _get_include_dir)
+                    _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
 
 @_if_not_installed("faToTwoBit")
 def install_ucsc_tools(env):
@@ -486,7 +486,7 @@ def install_tophat(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.0"
+    default_version = "2.0.4"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
@@ -498,7 +498,7 @@ def install_cufflinks(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.0"
+    default_version = "2.0.2"
     version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
