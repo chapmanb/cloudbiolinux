@@ -562,7 +562,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.10"
+    version = "1.0.5.11"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
@@ -570,7 +570,7 @@ def install_cortex_var(env):
         sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include".format(env.system_install))
         sed("Makefile", "^IDIR_GSL_ALSO=.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
         for cols in ["1", "2", "3", "4", "5"]:
-            for kmer in ["31", "63"]:
+            for kmer in ["31", "63", "95"]:
                 run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
         with cd("scripts/analyse_variants/needleman_wunsch-0.3.0"):
             sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
@@ -620,7 +620,7 @@ def install_crisp(env):
 @_if_not_installed("start_tassel.pl")
 def install_tassel(env):
     """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
-    http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&Itemid=119
+    http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&/Itemid=119
     """
     version = "3.0"
     url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
