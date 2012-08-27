@@ -66,6 +66,9 @@ def _install_galaxy(env):
     if setup_service:
         _setup_service(env)
     _install_tools(env)
+    setup_xvfb = _read_boolean(env, "galaxy_setup_xvfb", False)
+    if setup_xvfb:
+        _setup_xvfb(env)
     return True
 
 def _clone_galaxy_repo(env):
@@ -188,6 +191,13 @@ def _configure_galaxy_repository(env):
 
 
 def _setup_service(env):
-    _setup_conf_file(env, os.path.join("/etc/init.d/galaxy"), "galaxy_init", default_source="galaxy_init")
-    _setup_conf_file(env, os.path.join("/etc/default/galaxy"), "galaxy_default")
+    _setup_conf_file(env, "/etc/init.d/galaxy", "galaxy_init", default_source="galaxy_init")
+    _setup_conf_file(env, "/etc/default/galaxy", "galaxy_default")
     _setup_simple_service("galaxy")
+
+
+def _setup_xvfb(env):
+    _setup_conf_file(env, "/etc/init.d/xvfb", "xvfb_init", default_source="xvfb_init")
+    _setup_conf_file(env, "/etc/default/xvfb", "xvfb_default", default_source="xvfb_default")
+    _setup_simple_service("xvfb")
+    env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")
