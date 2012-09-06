@@ -12,17 +12,19 @@ def install_tracer(env):
     """A program for analysing results from Bayesian MCMC programs such as BEAST & MrBayes.
     http://beast.bio.ed.ac.uk/main_page
     """
+    version = "1.5"
     install_dir = os.path.join(env.system_install, "bioinf")
     final_exe = os.path.join(env.system_install, "bin", "tracer")
     if not exists(final_exe):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget http://bio4.dnsalias.net/download/biolinux/packages/Tracer_v1.5.tgz")
-                run("tar xvzf Tracer_v1.5.tgz")
-                run("chmod a+x Tracer_v1.5/bin/tracer")
+                run("wget -O Tracer_v{0}.tgz 'http://tree.bio.ed.ac.uk/download.php?id=80&num=3'".format(
+                        version))
+                run("tar xvzf Tracer_v{0}.tgz".format(version))
+                run("chmod a+x Tracer_v{0}/bin/tracer".format(version))
                 env.safe_sudo("mkdir -p %s" % install_dir)
                 env.safe_sudo("rm -rvf %s/tracer" % install_dir)
-                env.safe_sudo("mv -f Tracer_v1.5 %s/tracer" % install_dir)
+                env.safe_sudo("mv -f Tracer_v%s %s/tracer" % (version, install_dir))
                 env.safe_sudo("ln -sf %s/tracer/bin/tracer %s" % (install_dir, final_exe))
 
 @_if_not_installed("beast")

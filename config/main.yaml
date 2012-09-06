@@ -33,7 +33,7 @@ packages:
   - galaxy
   - cloudman
 libraries:
-  - haskell-libs
+  #- haskell-libs
   - perl-libs
   - python-libs
   - r-libs

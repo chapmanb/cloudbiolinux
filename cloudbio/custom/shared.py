@@ -3,6 +3,8 @@
 import tempfile
 import os
 import functools
+import urllib
+from tempfile import NamedTemporaryFile
 from string import Template
 from contextlib import contextmanager
 

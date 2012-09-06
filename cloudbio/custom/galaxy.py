@@ -1,6 +1,5 @@
 """
 """
-
 from cloudbio.galaxy import _setup_users
 from cloudbio.galaxy import _setup_galaxy_env_defaults
 from cloudbio.galaxy import _install_galaxy
