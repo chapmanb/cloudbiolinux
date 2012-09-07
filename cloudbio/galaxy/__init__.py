@@ -147,6 +147,7 @@ def _configure_galaxy_repository(env):
     in the changesets from https://bitbucket.org/jmchilton/cloud-galaxy-dist
     which prebakes these modifications in.
     """
+    sudo("chown -R %s %s" % (env.galaxy_user, env.galaxy_home))
     with cd(env.galaxy_home):  # and settings(warn_only=True):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
