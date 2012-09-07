@@ -198,7 +198,13 @@ def _java_install(pname, version, url, env, install_fn=None):
 
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)
-    env.safe_sudo("python%s setup.py install --skip-build --prefix '%s'" % (env.python_version_ext, env.python_install))
+    # handle standard Ubuntu case: only specify a prefix if we're not
+    # in the standard system directory
+    if env.system_install in ["/usr"]:
+        prefix = ""
+    else:
+        prefix = "--prefix '%s'" % env.system_install
+    env.safe_sudo("python%s setup.py install --skip-build %s" % (env.python_version_ext, prefix))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
