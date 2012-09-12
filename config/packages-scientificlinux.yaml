@@ -22,7 +22,6 @@ libraries:
   - freetype-devel
   - gsl-devel
   - libpng-devel
-  - libz-devel
 programming:
   - protobuf-c
   - protobuf-compiler
@@ -40,6 +39,11 @@ python:
   - python-devel
   - boost-python-devel
   - numpy
+r:
+  - R
+  - R-core
+  - libRmath
+  - libRmath-devel
 distributed:
   - hadoop-0.20
   - hadoop-0.20-native
