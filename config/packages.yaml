@@ -398,6 +398,13 @@ bio_microarray:
 bio_visualization:
   - rasmol
   # - bio-linux-clcsequenceviewer # Awaiting fix
+bio_proteomics:
+  # Needed for TPP
+  - xsltproc
+  - libxml-sax-expat-perl
+  - libgd2-xpm-dev
+bio_proteomics_wine:
+  - wine
 bio_utils:
   - bio-linux-genquery
   - bio-linux-keyring
@@ -405,11 +412,6 @@ bio_utils:
   - bio-linux-sampledata
   - bio-linux-taxinspector
   - bio-linux-xcut
-bio_proteomics:
-  # Needed for TPP
-  - xsltproc
-  - libxml-sax-expat-perl
-  - libgd2-xpm-dev
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
