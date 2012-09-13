@@ -71,6 +71,10 @@ bio_proteomics:
   - idpqonvert
   - pepitome
   - percolator
+bio_proteomics_wine:
+  - proteomics_wine_env
+  - multiplierz
+  - proteowizard
 cloudman:
   - nginx
   - proftpd
