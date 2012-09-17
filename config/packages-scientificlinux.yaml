@@ -18,6 +18,10 @@ minimal:
     - curl
     - wget
 libraries:
+  - atlas
+  - atlas-devel
+  - blas
+  - blas-devel
   - bzip2-devel
   - freetype-devel
   - gsl-devel
