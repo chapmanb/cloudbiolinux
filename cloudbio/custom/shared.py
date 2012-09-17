@@ -113,9 +113,11 @@ def _safe_dir_name(dir_name, need_dir=True):
 
 def _fetch_and_unpack(url, need_dir=True):
     if url.startswith(("git", "svn", "hg", "cvs")):
+        base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
+        if exists(base):
+            env.safe_sudo("rm -rf {0}".format(base))
         run(url)
-        base = os.path.basename(url.split()[-1])
-        return os.path.splitext(base)[0]
+        return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url)
         if not exists(tar_file):
