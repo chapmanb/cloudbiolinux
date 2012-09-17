@@ -424,6 +424,21 @@ def install_snpeff(env):
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
 
+def install_vep(env):
+    """Variant Effects Predictor (VEP) from Ensembl.
+    http://ensembl.org/info/docs/variation/vep/index.html
+    """
+    version = "branch-ensembl-68"
+    url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
+          "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
+          "&pathrev={0}".format(version)
+    cache_dbs = "24"
+    def _vep_install(env):
+        sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
+        sed("INSTALL.pl", ", <>\)",  ', "{0}")'.format(cache_dbs))
+        run("perl INSTALL.pl")
+    _get_install_local(url, env, _vep_install)
+
 @_if_not_installed("freebayes")
 def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.

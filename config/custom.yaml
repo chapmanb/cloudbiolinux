@@ -36,6 +36,7 @@ bio_nextgen:
     - shrec
     - snpeff
     - tophat
+    - vep
   assembly:
     - abyss
     - cortex_var

@@ -81,7 +81,7 @@ def _make_tmp_dir():
 # -- Standard build utility simplifiers
 
 def _get_expected_file(url):
-    tar_file = os.path.split(url)[-1]
+    tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'"
     exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
             (".tar.bz2",): "tar %s -xjpf" % safe_tar,
