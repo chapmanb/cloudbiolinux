@@ -56,10 +56,24 @@ def _install_applications(env, tools_conf):
     for (name, versions) in applications.iteritems():
         if type(versions) is str:
             versions = [versions]
-        for version in versions:
-            tool_env = _build_tool_env(env, name, version)
-            eval("install_%s" % name)(tool_env)
-            _install_galaxy_config(tool_env)
+        for version_info in versions:
+            if type(version_info) is str:
+                _install_tool(env, name, version_info)
+            else:
+                version = version_info["version"]
+                tool_env = _install_tool(env, name, version)
+                symlink_versions = version_info.get("symlink_versions", [])
+                print symlink_versions
+                if type(symlink_versions) is str:
+                    symlink_versions = [symlink_versions]
+                for symlink_version in symlink_versions:
+                    _set_default_config(tool_env, tool_env["system_install"], symlink_version)
+
+def _install_tool(env, name, version):
+    tool_env = _build_tool_env(env, name, version)
+    eval("install_%s" % name)(tool_env)
+    _install_galaxy_config(tool_env)
+    return tool_env
 
 
 def _build_tool_env(env, name, version):
