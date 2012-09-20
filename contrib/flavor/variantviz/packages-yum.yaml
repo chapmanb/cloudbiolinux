@@ -21,6 +21,7 @@ python:
 perl: 
   - perl
   - perl-DBI
+  - perl-DBD-MySQL
 ruby:
   - ruby
   - ruby-devel
