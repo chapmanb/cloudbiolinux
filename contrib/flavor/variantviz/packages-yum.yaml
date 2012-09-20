@@ -1,0 +1,34 @@
+---
+# List of packages to be installed via the yum package manager.
+programming:
+  build:
+    - gcc
+    - gcc-c++
+    - gcc-gfortran
+  libraries:
+    - atlas-devel
+    - blas
+    - blas-devel
+    - lapack
+    - lapack-devel
+python:
+  - python
+  - python-devel
+  - python-distribute
+  - python-pip
+  - scipy
+  - numpy
+perl: 
+  - perl
+  - perl-DBI
+ruby:
+  - ruby
+  - ruby-devel
+  - rubygems
+java:
+  - java-1.7.0-openjdk
+  - java-1.7.0-openjdk-devel
+  - ant
+web:
+  - nginx
+bio_nextgen:

@@ -231,7 +231,7 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
-@_if_not_installed("geminino")
+@_if_not_installed("gemini")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
@@ -240,11 +240,12 @@ def install_gemini(env):
     repository = "git clone git://github.com/arq5x/gemini.git"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
     def _gemini_install(env):
-        env.safe_sudo("pip{0} install -U cython".format(env.python_version_ext) )
+        env.safe_sudo("pip{0} install -U cython".format("-python" if env.python_version_ext else ""))
         _python_make(env)
         env.safe_sudo("mkdir -p {0}".format(data_dir))
         env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
         run("python{0} gemini/install-data.py {1}".format(env.python_version_ext, data_dir))
+        env.safe_sudo("rm -rf gemini.egg-info")
     _get_install(repository, env, _gemini_install)
 
 @_if_not_installed("vcftools")
