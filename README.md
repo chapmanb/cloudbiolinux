@@ -15,7 +15,7 @@ This works equally well for other virtual machines and private cloud
 environments, including [XEN][XEN], Linux [KVM][KVM], [Eucalyptus][eucalyptus]
 and [Openstack][openstack]. 
 
-# Using an instance
+# Using pre-built images
 
 ## Amazon
 
@@ -65,7 +65,7 @@ your environments:
 - `-u username` -- The username on the remote machine, overriding the default of
   your current username.
   
-## Using flavors
+## Customization with flavors
 
 CloudBioLinux normally creates a full system for bioinformatics, but can be
 easily configured to install only a subset of tools through flavors:
@@ -80,9 +80,10 @@ of any of the configuration files like `main.yaml` with customized copies.
 If you desire even more control, flavors allow custom python hooks. See
 `doc/hacking.md` for more details.
 
-## Customized targets
+## Specific install targets
 
-You can substitute `install_biolinux` with more specific targets:
+You can substitute `install_biolinux` with more specific targets to only build
+portions of CloudBioLinux:
 
 * `install_biolinux:packages` -- Install all of the defined system
   packages.
@@ -94,7 +95,7 @@ You can substitute `install_biolinux` with more specific targets:
 * `install_custom:a_package_name` -- Install a specific custom
    program.
 
-## Custom package installs
+## Specific package installation
 
 The custom directory contains installation instructions for programs that are
 not available from standard package repositories. These instructions are written
