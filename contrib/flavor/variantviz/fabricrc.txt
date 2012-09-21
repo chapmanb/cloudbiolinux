@@ -25,7 +25,6 @@ is_ec2_image = false
 
 # Global installation directory for packages and standard programs
 system_install = /usr
-config_dir=contrib/flavor/variantviz
 
 # Local install directory for versioned software that will not
 # be included in the path by default

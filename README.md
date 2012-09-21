@@ -1,46 +1,21 @@
-CloudBioLinux is a build and deployment system which installs a large
-selection of Bioinformatics and machine learning libraries on a bare
-virtual machine (VM) image, freshly installed PC, or in the Cloud.
-All that is required is a login with ssh (secure shell) into a fresh
-base install of Linux. The CloudBiolinux scripts will login and
-install software remotely - followed by system configuration.
+CloudBioLinux is a build and deployment system which installs a large selection
+of Bioinformatics and machine learning libraries on a bare virtual machine (VM)
+image, freshly installed PC, or in the Cloud. By default CloudBioLinux includes
+a large suite of tools installed through the default distribution installer,
+native installers, and libraries for Perl, R, Python, Java and Ruby.
 
-By default CloudBioLinux includes a large suite of tools and
-libraries, largely pulled from the package management system provided
-by the image. In addition to the default configuration, other software
-configurations are supported through, so called, 'editions' and
-'flavors'. An edition is a named base install, e.g. CloudBioLinux for
-Ubuntu. Such an Edition reflects shared installation properties
-between different projects. Flavors support overriding base packages
-for specific installations. With a Flavor a derivative of a base
-Edition can be designed. For example a single web server cound be
-implemented as a Flavor on top of the 'Minimal' Debian edition.
-CloudBioLinux installs packages through multiple mechanisms, including
-the default distribution installer, native installers, and libraries
-for Perl, R, Python, JAVA and Ruby, as well as installers for special
-data resources.
+CloudBioLinux included software packages are fully customizable. In addition to
+the default configuration, we support custom configuration builds through
+flavors. Flavors support overriding default package installations, making it
+simple to create derived installs for specific purposes.
 
-CloudBioLinux is designed as a single install route for both VMs on
-the desktop, such as [VirtualBox][v2], and cloud providers, such as
-[Amazon EC2][0], [Openstack][openstack], where you start with a bare
-bones system and bootstrap a running instance. You can even create a
-minimalistic private cloud on top of [XEN][XEN] or Linux [KVM][KVM],
-just plain, or with [Eucalyptus][eucalyptus]. CloudBioLinux included
-software packages are fully customizable, and different flavours of
-CloudBioLinux can be configured.
-
-CloudBioLinux provides a [Fabric build file][3], written in Python.
-There is little need to understand Python, though, as most configuration
-is done through configuration files. Other scripting languages can be
-added too. Package selection is through YAML files in the ./config
-directory.
+CloudBioLinux is a single install route both for desktop VMs such as
+[VirtualBox][v2], cloud providers such as [Amazon EC2][0] or desktop machines.
+This works equally well for other virtual machines and private cloud
+environments, including [XEN][XEN], Linux [KVM][KVM], [Eucalyptus][eucalyptus]
+and [Openstack][openstack]. 
 
 # Using an instance
-
-CloudBioLinux has ready-made images for Amazon EC2 and VirtualBox.
-Also a repository of biological data is available.
-
-It should be noted, at least 13GB free space is required on the disk.
 
 ## Amazon
 
@@ -51,27 +26,87 @@ version for users familiar with Amazon is:
 * Login to the [Amazon EC2 console][2].
 * Click Launch Instance, and choose the latest CloudBioLinux AMI from
   the [website][1] in the community AMI section (search for
-  'biolinux').
+  'CloudBioLinux').
 * After launching the instance, find the host details of
   your running instance from the Instances section.
 * Connect to your machine via ssh or VNC (using the Amazon PEM keys)
 
-To use bioligical data provided on Amazon, you need to use
-CloudBioLinux tools and fabric:
+# Installing CloudBioLinux on a local machine
 
-# Using CloudBioLinux tools and fabric
+The install process for CloudBioLinux is fully automated through a
+[Fabric build file][3] written in Python. The Fabric build files are useful for
+automating installation of scientific software on local systems as well as
+Amazon cloud servers. Everything is fully configurable through 
+plain text YAML configuration files, and custom build targets allow installation
+of a subset of the total available packages. 
 
 ## Installation
 
-1. On your (local) machine, install [Fabric][3]:
-
-        sudo apt-get install python-setuptools python-dev
-        sudo easy_install fabric pyyaml
-
-2. Retrieve the cloudbiolinux code base:
+Retrieve the CloudBioLinux code base and install libraries and dependencies:
 
         git clone git://github.com/chapmanb/cloudbiolinux.git
         cd cloudbiolinux
+        python setup.py build
+        sudo python setup.py install
+
+## Usage
+
+The basic usage specifies the hostname of a machine accessible via ssh:
+
+      fab -f fabfile.py -H localhost install_biolinux
+     
+Fabric contains some other useful commandline arguments for customizing this to
+your environments:
+
+- `-c your_fabricrc.txt` -- Specify the path to a fabricrc configuration files.
+  This allows customization of install directories and other server specific details.
+  See the default `config/fabricrc.txt` for a full list of options.
+  
+- `-u username` -- The username on the remote machine, overriding the default of
+  your current username.
+  
+## Using flavors
+
+CloudBioLinux normally creates a full system for bioinformatics, but can be
+easily configured to install only a subset of tools through flavors:
+
+      fab -f fabfile.py -H localhost install_biolinux:flavor=my_flavor
+      
+`my_flavor` can be the name of an existing flavor in `contrib/flavor` or the
+path to a directory with customization information. The files in your flavor
+directory replace those in the standard `config` directory, allowing replacement
+of any of the configuration files like `main.yaml` with customized copies.
+
+If you desire even more control, flavors allow custom python hooks. See
+`doc/hacking.md` for more details.
+
+## Customized targets
+
+You can substitute `install_biolinux` with more specific targets:
+
+* `install_biolinux:packages` -- Install all of the defined system
+  packages.
+* `install_biolinux:libraries` -- Install all libraries for various
+  programming languages.
+* `install_libraries:language` -- Install libraries for a specific
+  language.
+* `install_biolinux:custom` -- Install all custom programs.
+* `install_custom:a_package_name` -- Install a specific custom
+   program.
+
+## Custom package installs
+
+The custom directory contains installation instructions for programs that are
+not available from standard package repositories. These instructions are written
+in Python using the [Fabric][3] remote deployment tool and can also be used for
+installing individual packages locally on your machine. To do this, run:
+
+      fab -f fabfile.py -H localhost install_custom:your_package_name
+
+To build and install `your_package_name` on the local machine. We welcome
+additional custom bioinformatics package definitions for inclusion in
+CloudBioLinux. `custom/shared.py` contains a number of higher level functions
+which make it easier to write installation instructions.
 
 ## Biological data
 
@@ -105,7 +140,9 @@ to a local or [cloud-based][bd3] Galaxy server.
 [bd2]: https://github.com/chapmanb/cloudbiolinux/blob/master/config/biodata.yaml
 [bd3]: https://bitbucket.org/galaxy/galaxy-central/wiki/cloud
 
-## VirtualBox with vagrant
+# Supported virtual environments
+
+## Vagrant VirtualBox
 
 Vagrant allows easy deploying and connecting to VirtualBox images. The 
 setup is ideal for runnig CloudBioLinux on a desktop computer.
@@ -138,11 +175,6 @@ settings, and getting the all important guest additions) by firing up
 virtualbox itself. For more information, see the BioLinux 
 [Vagrant documentation][doc], as well as the 
 documentation on the [Vagrant website][v1].
-
-# Building an image from scratch using CloudBioLinux
-
-CloudBioLinux can be built for any virtualized platform, as long as
-the target VM is Linux, with an ssh command line.
 
 ## Amazon
 
@@ -178,12 +210,7 @@ local virtual machine from scratch with CloudBioLinux.
 
 [vb1]: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md
 
-## OpenStack
-
-[OpenStack][openstack] is a promising platform for Cloud computing.
-CloudBioLinux support for OpenStack is planned.
-
-## XEN/KVM/Eucalyptus private Cloud
+## OpenStack/XEN/KVM/Eucalyptus private Cloud
 
 As long as there is an 'ssh' entry to an running VM, CloudBioLinux can
 install itself.
@@ -203,81 +230,12 @@ For more on private Cloud and CloudBioLinux see ./doc/private\_cloud.md.
 [eucalyptus]: http://open.eucalyptus.com/
 [openstack]: http://www.openstack.org/
 
-# Technical details for using build scripts
-
-## Targets for local builds
-
-The Fabric build files are useful for automating installation of
-scientific software on local systems as well as Amazon cloud
-servers. There are a number of build targets that can be used to
-install a subset of the total available packages.
-
-The main build command is used as described above, but the host
-can point to a local machine or any server on your network:
-
-      fab -f fabfile.py -H localhost -c config/fabricrc.txt install_biolinux
-
-The `config/fabricrc.txt` configuration file specifies install
-directories and other server specific details.
-
-With this basic command, you can substitute `install_biolinux` with
-serveral more specific targets:
-
-* `install_biolinux:packages` -- Install all of the defined system
-  packages.
-* `install_biolinux:libraries` -- Install all libraries for various
-  programming languages.
-* `install_libraries:language` -- Install libraries for a specific
-  language.
-* `install_biolinux:custom` -- Install all custom programs.
-* `install_custom:your_package_name` -- Install a specific custom
-   program.
-
-### Custom package installs
-
-The custom directory contains installation instructions for programs that are
-not available from standard package repositories. These instructions are written
-in Python using the [Fabric][3] remote deployment tool and can also be used for
-installing individual packages locally on your machine. To do this, run:
-
-      fab -f fabfile.py -H localhost install_custom:your_package_name
-
-To build and install `your_package_name` on the local machine. We welcome
-additional custom bioinformatics package definitions for inclusion in
-CloudBioLinux. `custom/shared.py` contains a number of higher level functions
-which make it easier to write installation instructions.
-
-### Using flavors
-
-A Flavor is a specialization of an installation edition. A flavor can filter on
-packages and add packages and other software. To use a flavor, pass it
-in on the command line, e.g.
-
-      fab -f fabfile.py -H localhost install_biolinux:flavor=my_flavor
-
-And, like with the other options, a flavor can also be defined in the
-config file. A command line parameter, however, is preferred.
-
-### Rolling your own
-
-BioLinux normally creates a full system for Bioinformatics. The tools
-provided here to create such an environment are rather generic. So, if you want to
-install packages on any system, be it desktop, server or VM, the
-BioLinux tool set can be used to role your own. The first step it to us
-install_biolinux with a named package list, e.g.
-
-      fab -f fabfile.py -H localhost install_biolinux:packagelist=./contrib/minimal/main.yaml
-
-where install_biolinux is the fab entry point to a non-specific install,
-starting from the package list in the passed in packagelist. For more
-information see the section 'Rolling your own' in the BioLinux vagrant documentation in [./doc/vagrant.md][doc].
-
-## EC2 quickstart
+# EC2 quickstart
 
 This provides a quick cheat sheet of commands for getting up and running on EC2 using
 Amazon's command line tools.
 
-### Initial set up
+## Initial set up
 
 The first time using EC2, you'll need to install the toolkit and credentials
 for connecting on your local machine, following the [getting started guide][qs1].
@@ -318,7 +276,7 @@ Allow ssh and web access to your instances:
 [qs2]: http://aws.amazon.com/account/
 [qs3]: http://developer.amazonwebservices.com/connect/entry.jspa?externalID=351&categoryID=88
 
-### Starting an instance
+## Starting an instance
 
 Each time you'd like to use EC2, you need to create a remote instance to work
 with; the [AWS console][4] is useful for managing this process.

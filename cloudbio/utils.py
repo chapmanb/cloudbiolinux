@@ -2,7 +2,6 @@
 """
 import logging
 
-from fabric.api import sudo
 from fabric.colors import yellow, red, green, magenta
 
 class ColorFormatter(logging.Formatter):
@@ -69,4 +68,4 @@ def _update_biolinux_log(env, target, flavor):
     logfn = "/var/log/biolinux.log"
     info = "Target="+target+"; Edition="+env.edition.name+"; Flavor="+flavor
     env.logger.info(info)
-    sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
+    env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)

@@ -42,23 +42,18 @@ from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
 from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
                                   _setup_yum_sources)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
+from cloudbio.flavor import Flavor
+from cloudbio.flavor.config import get_config_file
 
 # ## Utility functions for establishing our build environment
 
 def _parse_fabricrc():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
-    # ## General setup
-    if not env.has_key("config_dir"):
-        env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-
+    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
     if not env.has_key("distribution") and not env.has_key("system_install"):
         env.logger.info("Reading default fabricrc.txt")
-        config_file = os.path.join(env.config_dir, "fabricrc.txt")
-        if os.path.exists(config_file):
-            env.update(load_settings(config_file))
-    else:
-        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
+        env.update(load_settings(get_config_file(env, "fabricrc.txt").base))
 
 def _create_local_paths():
     """Expand any paths defined in terms of shell shortcuts (like ~).
@@ -84,85 +79,68 @@ def _create_local_paths():
                 result = run("pwd")
                 env.local_install = result
 
-def _setup_flavor(flavor, environment=None):
-    """Setup flavor
+def _setup_flavor(flavor):
+    """Setup a flavor, providing customization hooks to modify CloudBioLinux installs.
+
+    Specify flavor as a name, in which case we look it up in the standard flavor
+    directory (contrib/flavor/your_flavor), or as a path to a flavor directory outside
+    of cloudbiolinux.
     """
-    if not flavor:
-        flavor = env.get("flavor", None)
-    if not environment:
-        environment = env.get("environment", None)
-    if environment:
-        env.environment = environment
-        env.logger.info("Environment %s" % env.environment)
+    env.flavor = Flavor(env)
+    env.flavor_dir = None
     if flavor:
-        # import a flavor defined through parameters flavor and flavor_path
-        flavor_path = env.get("flavor_path", None)
-        if flavor_path == None:
-          raise ImportError("You need to define the flavor_path for %s!" % flavor)
-        # Add path for flavors
-        sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
-        env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
-        try:
-            mod = __import__(flavor_path, fromlist=[flavor])
-        except ImportError:
-            raise ImportError("Failed to import %s" % flavor)
-    else:
-        # import default Flavor
-        from cloudbio.flavor import Flavor
+        # setup the directory for flavor customizations
+        if os.path.isabs(flavor):
+            flavor_dir = flavor
+        else:
+            flavor_dir =  os.path.join(os.path.dirname(__file__), "contrib", "flavor", flavor)
+        assert os.path.exists(flavor_dir), \
+            "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
+        env.flavor_dir = flavor_dir
+        # Load python customizations to base configuration if present
+        py_flavor = "{0}flavor".format(os.path.split(os.path.realpath(flavor_dir)))
+        flavor_custom_py = os.path.join(flavor_dir, "{0}.py".format(py_flavor))
+        if os.path.exists(flavor_custom_py):
+            sys.path.append(flavor_dir)
+            mod = __import__(flavor_dir, fromlist=[py_flavor])
     env.logger.info("This is a %s" % env.flavor.name)
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None, packagelist=None, flavor=None, environment=None,
-        pkg_config_file_path=None):
-    """
-    Main entry point for installing BioLinux on a remote server.
+def install_biolinux(target=None, flavor=None):
+    """Main entry point for installing BioLinux on a remote server.
 
-    ``packagelist`` should point to a top level file (eg, ``main.yaml``) listing
-    all the package categories that should be installed. This allows a different
-    package list and/or use of Flavor. So you can say::
+    `flavor` allows customization of CloudBioLinux behavior. It can either
+    be a flavor name that maps to a corresponding directory in contrib/flavor
+    or the path to a custom directory. This can contain:
+    
+      - alternative package lists (main.yaml, packages.yaml, custom.yaml)
+      - custom python code (nameflavor.py) that hooks into the build machinery
 
-      install_biolinux:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
-
-    ``pkg_config_file_path`` can be used to specify a path where a custom
-    ``packages.yaml`` and ``packages-[dist].yaml`` are located, allowing fine-
-    grained (i.e., individual package) customization. Otherwise, default
-    to ``./contrib`` where the CBL files are defined.
-
-    Both ``packagelist`` and ``flavor``, as well as the Edition, can also be
-    passed in through the ``fabricrc`` file.
-
-    target can also be supplied on the fab CLI. Special targets are:
+    `target` allows running only particular parts of the build process. Valid choices are:
 
       - packages     Install distro packages
       - custom       Install custom packages
       - libraries    Install programming language libraries
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
-
-    ``environment`` allows adding additional information on the command line -
-    usually for defining environments, for example ``environment=testing``, or
-    ``environment=production``, will set the deployment environment and tune
-    post-installation settings.
     """
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
+    _setup_flavor(flavor)
     _parse_fabricrc()
     _setup_edition(env)
-    _setup_flavor(flavor, environment)
     _setup_distribution_environment() # get parameters for distro, packages etc.
     _create_local_paths()
-    env.logger.debug("Meta-package list is '%s'" % packagelist)
-    env.logger.debug("File path for explicit packages is '%s'" % pkg_config_file_path)
     env.logger.debug("Target is '%s'" % target)
-    pkg_install, lib_install, custom_ignore = _read_main_config(packagelist) # read main yaml
+    pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
         if env.distribution in ["debian", "ubuntu"]:
             _setup_apt_sources()
             _setup_apt_automation()
             _add_apt_gpg_keys()
-            _apt_packages(pkg_install, pkg_config_file_path=pkg_config_file_path)
+            _apt_packages(pkg_install)
         elif env.distribution in ["centos", "scientificlinux"]:
             _setup_yum_sources()
             _yum_packages(pkg_install)
@@ -219,7 +197,7 @@ def _check_fabric_version():
 def _custom_installs(to_install, ignore=None):
     if not exists(env.local_install):
         run("mkdir -p %s" % env.local_install)
-    pkg_config = os.path.join(env.config_dir, "custom.yaml")
+    pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
     packages = [p for p in packages if ignore is None or p not in ignore]
     for p in env.flavor.rewrite_config_items("custom", packages):
@@ -247,11 +225,12 @@ def install_custom(p, automated=False, pkg_to_group=None):
     p = p.lower() # All packages are listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
+        _setup_flavor(None)
         _parse_fabricrc()
         _setup_edition(env)
         _setup_distribution_environment()
         _create_local_paths()
-        pkg_config = os.path.join(env.config_dir, "custom.yaml")
+        pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
 
     try:
@@ -276,13 +255,12 @@ def install_custom(p, automated=False, pkg_to_group=None):
     fn(env)
     _print_time_stats("Custom install for '%s'" % p, "end", time_start)
 
-def _read_main_config(yaml_file=None):
+def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
 
     Reads 'main.yaml' and returns packages and libraries
     """
-    if yaml_file is None:
-        yaml_file = os.path.join(env.config_dir, "main.yaml")
+    yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data['packages']
@@ -417,16 +395,16 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
+    _setup_flavor(None)
     _parse_fabricrc()
     _setup_edition(env)
-    _setup_flavor(None)
     _setup_distribution_environment()
     _create_local_paths()
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
     for iname in to_install:
-        yaml_file = os.path.join(env.config_dir, "%s.yaml" % iname)
+        yaml_file = get_config_file(env, "%s.yaml" % iname).base
         with open(yaml_file) as in_handle:
             config = yaml.load(in_handle)
         lib_installers[iname](config)
