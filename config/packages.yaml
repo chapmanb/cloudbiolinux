@@ -47,7 +47,6 @@ minimal:
     - openssh-server
     - screen
     - unzip
-    - tar
     - less
   network:
     - curl
@@ -112,7 +111,6 @@ programming:
     - libncurses5-dev
     - zlib1g-dev
     - libssl-dev
-    - libpcre3
     - libpcre3-dev
     - libreadline-dev
     - mime-support
@@ -191,7 +189,6 @@ distributed:
     - hadoop-0.20-pipes
     - hadoop-0.20-source
     - libopenmpi-dev
-    - libopenmpi1.3
     - openmpi-bin
     - libzmq-dev
     - libfuse-dev
@@ -228,7 +225,6 @@ r:
   - r-base-dev
   - r-base-html
 perl:
-  - perl-base
   - perl
   - libperl-dev
   - perl-modules
@@ -317,93 +313,96 @@ boinc:
   - boinc-manager
 bio_general:
   - primer3
-  - readseq
-  - bio-linux-xcut
+  - bio-linux-catchall
+  - bio-linux-emboss
+  - bio-linux-readseq
   - emboss
   - emboss-data
   - emboss-lib
   - jemboss
   - ugene
-  # - bio-linux-taverna # Broken graphviz dependency
 bio_search:
   - blast2
-  - hmmer
   - ncbi-tools-bin
-  - bio-linux-blast+
+  - bio-linux-blast
   - bio-linux-blixem
   - bio-linux-fasta
+  - bio-linux-hmmer
   - bio-linux-mspcrunch
   - bio-linux-mview
   - bio-linux-nrdb
+  - cdbfasta
 bio_alignment:
-  - clustalw
+  - bio-linux-clustal
+  - bio-linux-dotter
+  - bio-linux-jalview
+  - bio-linux-mcl
+  - bio-linux-mummer
+  - bio-linux-pfaat
+  - bio-linux-seaview
+  - bio-linux-squint
+  - bio-linux-t-coffee
   - exonerate
   - mafft
   - muscle
-  - mummer
+  - prank
   - probcons
-  - t-coffee
-  - bio-linux-seaview
-  - bio-linux-clustal # Version problem
-  - bio-linux-dotter
-  - bio-linux-jalview # Version problem
-  - bio-linux-pfaat
-  - bio-linux-prank
-  - bio-linux-squint
-  - bio-linux-wise2
+  - wise
 bio_nextgen:
+  - bio-linux-fastqc
   - fastx-toolkit
   - maq
   - plink
   - last-align
   - tabix
-  # - samtools # very old version
+  - samtools # now up-to-date again
 bio_sequencing:
   - bio-linux-assembly-conversion-tools
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
+  - bio-linux-mira
+  - bio-linux-mira-3rd-party
   - bio-linux-staden
   - bio-linux-stars
-  # Install problems with emboss: - bio-linux-msatfinder
-  #- bio-linux-mira # need mira-assembler but gone from repo
-  #- bio-linux-mira-3rd-party
+  - bio-linux-tablet
 bio_annotation:
   - mcl
+  - predictprotein
   - tigr-glimmer
   - bio-linux-artemis
   - bio-linux-big-blast
   - bio-linux-cd-hit
   - bio-linux-estscan
   - bio-linux-glimmer3
-  - bio-linux-partigene
-  - bio-linux-prot4est
+  - bio-linux-jprofilegrid
+  - bio-linux-msatfinder
+#   - bio-linux-prot4est - broken, fix in progress
   - bio-linux-rbs-finder
   - bio-linux-transterm-hp
   - bio-linux-trnascan
   - bio-linux-tetra
-  # Conflict: - bio-linux-act
   # 500Mb of disk: - bio-linux-priam
-  # Package broken: - bio-linux-yamap
+bio_markergenes:
+  - bio-linux-ampliconnoise
+  - bio-linux-jmotu
+  - bio-linux-mothur
+  - bio-linux-rdp-classifier
+  - bio-linux-qiime
 bio_microarray:
   - bio-linux-ocount
   - bio-linux-oligoarray
   - bio-linux-oligoarrayaux
 bio_visualization:
   - rasmol
-  - bio-linux-clcsequenceviewer
-  - bio-linux-maxd
+  # - bio-linux-clcsequenceviewer # Awaiting fix
 bio_utils:
-  - bio-linux-das-prep
-  - bio-linux-exchanger
   - bio-linux-genquery
   - bio-linux-keyring
-  - bio-linux-base-directories
   - bio-linux-bldp-files
   - bio-linux-sampledata
-  - bio-linux-sequin # Version problem
   - bio-linux-taxinspector
-  - bio-linux-themes-v5
+  - bio-linux-xcut
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
@@ -422,25 +421,18 @@ phylogeny:
     - njplot
     - tree-puzzle
     - bio-linux-arb
-    # biolinux-ape package is source (i386). It needs R - not in deps - and
-    # /usr/local/bioinf/ape# R CMD INSTALL ape (FIXME)
-    # - bio-linux-ape
-    - bio-linux-coalesce
+    - bio-linux-archaeopteryx
+    - bio-linux-cytoscape
     - bio-linux-dendroscope
-    - bio-linux-fastDNAml # Version problem
-    - bio-linux-fluctuate
-    - bio-linux-forester
+    - bio-linux-fastdnaml
     - bio-linux-happy
     - bio-linux-mesquite
-    - bio-linux-migrate
-    - bio-linux-mrbayes-multi
-    #- bio-linux-mothur
+    - bio-linux-mrbayes
     - bio-linux-paml
     - bio-linux-omegamap
     - bio-linux-qtlcart
-    - bio-linux-recombine
     - bio-linux-splitstree
-    - bio-linux-treeview # Version problem
+    - bio-linux-treeview
   needs_64bit:
     - bio-linux-fasttree
 ## Package lists imported from mi-deployment.

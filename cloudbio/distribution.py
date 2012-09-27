@@ -81,6 +81,7 @@ def _setup_ubuntu():
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu %s main", # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu %s main", # Free-NX
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
@@ -108,7 +109,7 @@ def _setup_deb_general():
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
-        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
     ]
     return shared_sources
