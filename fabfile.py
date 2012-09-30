@@ -19,7 +19,6 @@ import os
 import sys
 from datetime import datetime
 
-from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
@@ -30,9 +29,7 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
 sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
-from cloudbio.edition import _setup_edition
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging, _update_biolinux_log
+from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.custom.shared import _make_tmp_dir
@@ -42,68 +39,8 @@ from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
 from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
                                   _setup_yum_sources)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
-from cloudbio.flavor import Flavor
 from cloudbio.flavor.config import get_config_file
 
-# ## Utility functions for establishing our build environment
-
-def _parse_fabricrc():
-    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
-    """
-    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-    if not env.has_key("distribution") and not env.has_key("system_install"):
-        env.logger.info("Reading default fabricrc.txt")
-        env.update(load_settings(get_config_file(env, "fabricrc.txt").base))
-
-def _create_local_paths():
-    """Expand any paths defined in terms of shell shortcuts (like ~).
-    """
-    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
-                  warn_only=True):
-        # This is the first point we call into a remote host - make sure
-        # it does not fail silently by calling a dummy run
-        env.logger.info("Now, testing connection to host...")
-        test = run("pwd")
-        # If there is a connection failure, the rest of the code is (sometimes) not
-        # reached - for example with Vagrant the program just stops after above run
-        # command.
-        if test != None:
-          env.logger.info("Connection to host appears to work!")
-        else:
-          raise NotImplementedError("Connection to host failed")
-        env.logger.debug("Expand paths")
-        if env.has_key("local_install"):
-            if not exists(env.local_install):
-                run("mkdir -p %s" % env.local_install)
-            with cd(env.local_install):
-                result = run("pwd")
-                env.local_install = result
-
-def _setup_flavor(flavor):
-    """Setup a flavor, providing customization hooks to modify CloudBioLinux installs.
-
-    Specify flavor as a name, in which case we look it up in the standard flavor
-    directory (contrib/flavor/your_flavor), or as a path to a flavor directory outside
-    of cloudbiolinux.
-    """
-    env.flavor = Flavor(env)
-    env.flavor_dir = None
-    if flavor:
-        # setup the directory for flavor customizations
-        if os.path.isabs(flavor):
-            flavor_dir = flavor
-        else:
-            flavor_dir =  os.path.join(os.path.dirname(__file__), "contrib", "flavor", flavor)
-        assert os.path.exists(flavor_dir), \
-            "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
-        env.flavor_dir = flavor_dir
-        # Load python customizations to base configuration if present
-        py_flavor = "{0}flavor".format(os.path.split(os.path.realpath(flavor_dir)))
-        flavor_custom_py = os.path.join(flavor_dir, "{0}.py".format(py_flavor))
-        if os.path.exists(flavor_custom_py):
-            sys.path.append(flavor_dir)
-            mod = __import__(flavor_dir, fromlist=[py_flavor])
-    env.logger.info("This is a %s" % env.flavor.name)
 
 # ### Shared installation targets for all platforms
 
@@ -128,11 +65,7 @@ def install_biolinux(target=None, flavor=None):
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
-    _setup_flavor(flavor)
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_distribution_environment() # get parameters for distro, packages etc.
-    _create_local_paths()
+    _configure_fabric_environment(env, flavor)
     env.logger.debug("Target is '%s'" % target)
     pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
@@ -225,11 +158,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
     p = p.lower() # All packages are listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _setup_flavor(None)
-        _parse_fabricrc()
-        _setup_edition(env)
-        _setup_distribution_environment()
-        _create_local_paths()
+        _configure_fabric_environment(env)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
 
@@ -395,11 +324,7 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
-    _setup_flavor(None)
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_distribution_environment()
-    _create_local_paths()
+    _configure_fabric_environment(env)
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
