@@ -34,10 +34,7 @@ from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
-                                  _setup_apt_automation, _setup_apt_sources)
-from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
-                                  _setup_yum_sources)
+from cloudbio.package import _configure_and_install_native_packages
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
 
@@ -69,17 +66,8 @@ def install_biolinux(target=None, flavor=None):
     env.logger.debug("Target is '%s'" % target)
     pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
-        if env.distribution in ["debian", "ubuntu"]:
-            _setup_apt_sources()
-            _setup_apt_automation()
-            _add_apt_gpg_keys()
-            _apt_packages(pkg_install)
-        elif env.distribution in ["centos", "scientificlinux"]:
-            _setup_yum_sources()
-            _yum_packages(pkg_install)
-            _setup_yum_bashrc()
-        else:
-            raise NotImplementedError("Unknown target distribution")
+        _configure_and_install_native_packages(env, pkg_install)
+
         if env.nixpkgs: # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
