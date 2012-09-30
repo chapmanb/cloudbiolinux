@@ -4,16 +4,19 @@ https://bitbucket.org/afgane/mi-deployment
 """
 
 import os
+import contextlib
 
-from fabric.api import sudo, run, cd
-from fabric.contrib.files import exists, contains
+from fabric.api import sudo, run, cd, settings, hide
+from fabric.contrib.files import exists, contains, sed
 
-from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service
+from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service,  _make_tmp_dir
 from cloudbio.galaxy.tools import _install_tools
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
 
+
 # -- Adjust this link if using content from another location
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
+REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 
 def _setup_users(env):
@@ -202,3 +205,109 @@ def _setup_xvfb(env):
     _setup_conf_file(env, "/etc/default/xvfb", "xvfb_default", default_source="xvfb_default")
     _setup_simple_service("xvfb")
     env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")
+
+
+def _setup_nginx_service(env):
+    # Setup system service for nginx, not needed for CloudMan but it is
+    # useful if CloudMan is not being used (such as galaxy-vm-launcher work).
+    _setup_conf_file(env, "/etc/init.d/nginx", "nginx_init", default_source="nginx_init")
+    _setup_simple_service("nginx")
+
+
+def _install_nginx(env):
+    """Nginx open source web server.
+    http://www.nginx.org/
+    """
+    version = "1.2.0"
+    url = "http://nginx.org/download/nginx-%s.tar.gz" % version
+
+    install_dir = os.path.join(env.install_dir, "nginx")
+    remote_conf_dir = os.path.join(install_dir, "conf")
+
+    # Skip install if already present
+    if exists(remote_conf_dir) and contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
+        env.logger.debug("Nginx already installed; not installing it again.")
+        return
+
+    with _make_tmp_dir() as work_dir:
+        with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
+            modules = _get_nginx_modules(env)
+            module_flags = " ".join(["--add-module=../%s" % x for x in modules])
+            run("wget %s" % url)
+            run("tar xvzf %s" % os.path.split(url)[1])
+            with cd("nginx-%s" % version):
+                run("./configure --prefix=%s --with-ipv6 %s "
+                    "--user=galaxy --group=galaxy --with-debug "
+                    "--with-http_ssl_module --with-http_gzip_static_module" %
+                    (install_dir, module_flags))
+                sed("objs/Makefile", "-Werror", "")
+                run("make")
+                sudo("make install")
+                sudo("cd %s; stow nginx" % env.install_dir)
+
+    defaults = {"galaxy_home": "/mnt/galaxyTools/galaxy-central"}
+    _setup_conf_file(env, os.path.join(remote_conf_dir, "nginx.conf"), "nginx.conf", defaults=defaults)
+
+    nginx_errdoc_file = 'nginx_errdoc.tar.gz'
+    url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)
+    remote_errdoc_dir = os.path.join(install_dir, "html")
+    with cd(remote_errdoc_dir):
+        sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
+        sudo('tar xvzf %s' % nginx_errdoc_file)
+
+    sudo("mkdir -p %s" % env.install_dir)
+    if not exists("%s/nginx" % env.install_dir):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
+    # If the guessed symlinking did not work, force it now
+    cloudman_default_dir = "/opt/galaxy/sbin"
+    if not exists(cloudman_default_dir):
+        sudo("mkdir -p %s" % cloudman_default_dir)
+    if not exists(os.path.join(cloudman_default_dir, "nginx")):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
+
+
+def _get_nginx_modules(env):
+    """Retrieve add-on modules compiled along with nginx.
+    """
+    modules = {
+        "upload": True,
+        "chunk": True,
+        "ldap": False
+    }
+
+    module_dirs = []
+
+    for module, enabled_by_default in modules.iteritems():
+        enabled = _read_boolean(env, "nginx_enable_module_%s" % module, enabled_by_default)
+        if enabled:
+            module_dirs.append(eval("_get_nginx_module_%s" % module)(env))
+
+    return module_dirs
+
+
+def _get_nginx_module_upload(env):
+    upload_module_version = "2.2.0"
+    upload_url = "http://www.grid.net.ru/nginx/download/" \
+                 "nginx_upload_module-%s.tar.gz" % upload_module_version
+    run("wget %s" % upload_url)
+    upload_fname = os.path.split(upload_url)[1]
+    run("tar -xvzpf %s" % upload_fname)
+    return upload_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_chunk(env):
+    chunk_module_version = "0.22"
+    chunk_git_version = "b46dd27"
+
+    chunk_url = "https://github.com/agentzh/chunkin-nginx-module/tarball/v%s" % chunk_module_version
+    chunk_fname = "agentzh-chunkin-nginx-module-%s.tar.gz" % (chunk_git_version)
+    run("wget -O %s %s" % (chunk_fname, chunk_url))
+    run("tar -xvzpf %s" % chunk_fname)
+    return chunk_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_ldap(env):
+    run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
+    run("git clone https://code.google.com/p/nginx-auth-ldap/")
+    return "nginx-auth-ldap"
