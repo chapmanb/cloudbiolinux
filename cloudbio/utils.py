@@ -82,8 +82,6 @@ def _update_biolinux_log(env, target, flavor):
     env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
 
 
-# TODO: This block of code (more or less) appears a few places in
-# fabfile, replace occurrences with this.
 def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None):
     if not fabricrc_loader:
         fabricrc_loader = _parse_fabricrc
