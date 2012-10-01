@@ -1,0 +1,7 @@
+---
+packages:
+  - minimal
+  - cloudman
+  - galaxy
+  - galaxyp
+libraries:

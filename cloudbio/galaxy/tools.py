@@ -3,6 +3,7 @@ import yaml
 
 from cloudbio.custom.bio_general import *
 from cloudbio.custom.bio_nextgen import *
+from cloudbio.custom.bio_proteomics import *
 from cloudbio.custom.shared import _set_default_config, _add_to_profiles
 from cloudbio.galaxy.applications import *
 from cloudbio.galaxy.r import _install_r_packages
@@ -124,4 +125,5 @@ def _install_galaxy_config(tool_env, bin_dirs):
         # Standard bin install, just add it to path
         sudo("echo 'PATH=%s:$PATH' > %s/env.sh" % (path_addtion, install_dir))
         sudo("chmod +x %s/env.sh" % install_dir)
+
     _set_default_config(tool_env, install_dir)

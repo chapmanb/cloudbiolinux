@@ -61,6 +61,16 @@ bio_nextgen:
     - bfast
     - novoalign
     - plink_seq
+bio_proteomics:
+  - transproteomic_pipeline
+  - omssa
+  - mzmine
+  - myrimatch
+  - directag
+  - tagrecon
+  - idpqonvert
+  - pepitome
+  - percolator
 cloudman:
   - nginx
   - proftpd
@@ -68,6 +78,10 @@ cloudman:
 galaxy:
   - galaxy_webapp
   - galaxy_tools
+galaxyp:
+  - protk
+  - protvis
+  - proteomics_tools
 distributed:
   - pydoop
   - seal

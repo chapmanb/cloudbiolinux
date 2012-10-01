@@ -1,0 +1,44 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        protvis
+# Required-Start:  
+# Required-Stop:   
+# Default-Start:   2 3 4 5
+# Default-Stop:    0 1 6
+# Short-Description: Start protvis daemon
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME="protvis"
+. /lib/lsb/init-functions
+. /etc/default/$NAME
+
+case $1 in
+    start)
+	DAEMON_ARGS="--daemon --pid-file=$PROTVIS_HOME/daemon.pid $PROTVIS_HOME/production.ini http_port=$PORT http_address=$ADDRESS"
+	if [ ! -f "$PROTVIS_HOME/production.ini" ]; then
+	    log_daemon_msg "Copying over default settings for protvis."
+	    su - $PROTVIS_USER /bin/bash -c "cd $PROTVIS_HOME; cp production.ini.sample production.ini"
+	fi
+	log_daemon_msg "Starting $NAME" "$NAME"
+	su - $PROTVIS_USER /bin/bash -c "export TMPDIR=$TMPDIR; cd $PROTVIS_HOME; env/bin/pserve $DAEMON_ARGS"
+        log_end_msg $?
+	;;
+    stop)
+	log_daemon_msg "Stopping $NAME" "$NAME"
+	DAEMON_ARGS="--stop-daemon --pid-file=$PROTVIS_HOME/daemon.pid"
+	su - $PROTVIS_USER /bin/bash -c "cd $PROTVIS_HOME; env/bin/pserve $DAEMON_ARGS"
+	log_end_msg $?
+	;;
+    restart)
+	$0 stop && sleep 2 && $0 start
+	;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 2
+        ;;
+
+esac
+

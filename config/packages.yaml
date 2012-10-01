@@ -405,6 +405,11 @@ bio_utils:
   - bio-linux-sampledata
   - bio-linux-taxinspector
   - bio-linux-xcut
+bio_proteomics:
+  # Needed for TPP
+  - xsltproc
+  - libxml-sax-expat-perl
+  - libgd2-xpm-dev
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
@@ -512,6 +517,39 @@ galaxy:
     - pdfjam
     - python-scipy
     - libsparsehash-dev
+galaxyp:
+  all:
+     # Required for protk
+     - libxml2-dev
+     - libreadline-dev
+     # Required for protvis
+     - python-virtualenv
+     - python-setuptools
+     - libpng12-dev
+     - python-dev
+     - libexpat1-dev
+     - libboost-dev
+
+     # Needed for TPP
+     - xsltproc
+     - libxml-sax-expat-perl
+     - libgd2-xpm-dev
+
+     # Needed for percolator
+     - libxerces-c3.1 
+     - libxerces-c-dev
+     - xsdcxx 
+     - libboost-dev 
+     - libboost-filesystem-dev 
+     - libboost-system-dev
+     - libsqlite3-0  
+     - libboost-serialization-dev
+     - zlib1g-dev
+     - libboost-dev
+
+     # Needed for nbic galaxy stuff
+     - liblog-log4perl-perl
+     - libswiss-perl
 
 # To do -- in Deb Med but not propogated
 # squizz
@@ -535,3 +573,4 @@ galaxy:
 #   blast2go
 #   sputnik: microsattelites
 #   GenomeView
+
