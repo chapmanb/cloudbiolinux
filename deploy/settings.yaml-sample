@@ -1,0 +1,338 @@
+---
+
+## Must specify a key_file and corresponding vm_host, key_file should
+## be configured to allow password-less ssh access to ubuntu user (or
+## vagrant user in the case of vm_host: vagrant)
+
+key_file: MUST_SPECIFY
+vm_host: MUST_SPECIFY
+
+#key_file: <replace with path to your home directory>/.vagrant.d/insecure_private_key
+#vm_host: vagrant
+#vm_host: aws
+#vm_host: openstack
+#vm_host: eucalyptus
+
+hostname: galaxy
+
+## Uncomment to destroy VM after the script is complete (for testing).
+#destroy_on_complete: True
+
+## Pull in galaxy update and restart galaxy service at runtime.
+refresh_galaxy: False
+## Seed galaxy with API users, API keys, workflows etc... at 'configure' time or 'runtime'
+seed_galaxy: configure
+
+genome_source: default # can also set to 'S3' to download pre-existing genomes
+tool_data_table_conf_file: config/tool_data_table_conf.xml
+
+## Uncomment to compress and download genomes locally during the
+## configure or setup_genomes step.
+# stash_genomes: download
+
+## Uncomment to compress genomes and store in /opt of the VM during
+## the configure or setup_genomes_step, when galaxy boots in a fresh
+## VM this file will be decompressed into /mnt if needed.
+# stash_genomes: opt
+
+## Uncomment to upload compressed genomes previously downloaded during
+## a configure step.
+# upload_genomes: True
+
+## Add sudoers_addition lines to add options to the /etc/sudoers
+## file. Use with caution!
+sudoers_additions:
+  # This line is needed to implement max_lifetime option below.
+  - "galaxy       ALL=NOPASSWD:   /sbin/shutdown -h now,/sbin/reboot,/sbin/halt"
+
+## Configure max lifetime for VM in minutes.
+# max_lifetime: 10200
+
+## Configure ssmtp (right now only gmail is really supported).
+# smtp_server: smtp.gmail.com:587
+# smtp_user: <gmail username>@gmail.com
+# smtp_password: <gmail password>
+
+## Configure genome for initially uploaded files.
+# db_key: hg19
+
+## Configure history name for initially uploaded files. This history
+## name and corresponding user api key must match data found in
+## galaxy section below.
+# transfer_history_name:
+# transfer_history_api_key: 
+
+## Uncomment to setup taxonomy data required by Galaxy metagenomics
+## tools during the setup_genomes action.
+# setup_taxonomy_data: True
+
+## Path to ssh key to install for galaxy user (optional). (We
+## use this to automate transfers of results back to home base 
+## from the Cloud. -John)
+#galaxy_ssh_key: /path/to/ssh_private_key
+
+## Specify flavor of CloudBioLinux to install with. This has
+## not been tested an should probably not be set.
+# cloudbiolinux_flavor: cloudman/cloudman_and_galaxy
+
+## Default CloudBioLinux properties to load, by default CloudBioLinux
+## will just its own defaults (either ../config/fabrircr.txt or whatever
+## is specified by the CloudBioLinux flavor).
+# fabricrc_file: ../config/fabricrc.txt
+
+## CloudMan Options (does not work with Vagrant driver)
+cloudman:
+  ## Id of image containing cloudman to launch
+  image_id: XXXXXXXXXX
+
+  ## Size or flavor id of machine to launch. Defaults to 
+  ## cloud-specific option below.
+  # size_id:
+
+  ## access_key & secret_key to for use by CloudMan. Defaults 
+  ## to access_id & secret_key specified in cloud-spefic options below.
+  # access_key:
+  # secret_key: 
+
+  ## Name of cloudman cluster to create.
+  # cluster_name: cloudman
+
+  ## Password for CloudMan admin interface.
+  # password: adminpass
+
+
+## Set fabric env properties once virtual machine has been created, 
+## these are mostly used to modify CloudBioLinux behavior and will
+## override the properties loaded by fabricrc_file defind above.
+fabricrc_overrides:
+  ## Mercurial repository (should be fork of or contain changesets in https://bitbucket.org/jmchilton/cloud-galaxy-dist)
+  galaxy_repository: https://bitbucket.org/jmchilton/cloud-galaxy-dist
+
+  # Location to install galaxy
+  galaxy_home: /opt/galaxy/web
+  # Location to setup galaxy tool dependencies
+  galaxy_tools_dir: /opt/galaxy/tools
+  galaxy_jars_dir: /opt/galaxy/jars
+
+  # Configure biodata location
+  data_files: "/mnt/galaxyIndices"
+  galaxy_base: "/mnt/galaxyIndices/galaxy"
+
+  # Set to true because above changeset preconfigure Galaxy properly.
+  galaxy_preconfigured_repository: True
+
+  # Setup an init service for Galaxy and virtual frame buffer
+  galaxy_setup_service: True
+  galaxy_setup_xvfb: True
+
+  install_dir: /opt/galaxyTools/tools
+  postgres_version: 9.1
+
+  # Transferring large files is tough, give it multiple
+  # tries.
+  keepalive: 30
+  timeout: 60
+  connection_attempts: 5
+
+  tool_data_table_conf_file: config/tool_data_table_conf.xml
+
+
+## Define Amazon connection information, can also specify eucalytus or
+## openstack sections for other cloud environments.
+aws:
+  access_id: XXXXXXXXXXXXX
+  secret_key: XXXXXXXXXXXX
+  keypair_name: galaxy_key
+  size_id: m1.medium
+  ## Fresh Ubuntu Instance
+  image_id: ami-5c9b4935
+  availability_zone: us-east-1
+
+  ## Set this to a specific instance UUID to have deploy.sh commands use an
+  ## existing VM instead launching a new one
+  # use_existing_instance: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+  ## Packaging related options, all optional unless --action=package is
+  ## specified.
+
+
+  ## If package_type is default, manual packaging scripts are setup on the VM 
+  ## that are appropriate for instance or EBS backed instances. If package_type
+  ## is create_image, Amazon's CreateImage instance command is used, this  is
+  ## only appropriate for EBS backed instances (requires boto).
+  # package_type: default
+
+
+  ## AWS -> Your Account -> Security Credentials -> X.509 Certificates 
+  # x509_cert: /path/to/cert-XXXXXXXXXXXXXXXX.pem
+  # x509_key: /path/to/pk-XXXXXXXXXXXXXX.pem
+  ## AWS -> Your Account -> Security Credentials -> Account Identifiers -> AWS Account ID
+  # user_id: 123456789
+  ## S3 bucket to store your image into
+  # package_bucket: test1
+  ## Name of packaged instance
+  # package_image_name: Test1
+
+  ## Make the resulting image available to the public (currently only available 
+  ## for package_type: create_image).
+  # make_public: False
+
+galaxy:
+  ## In order to create data libraries. First user should be admin@localhost
+  ## and an API key must be specified, be sure to change API keys and passwords
+  users:
+    - username: admin@localhost
+      password: adminpass
+      api_key: 1234556789
+    - username: user1@example.com
+      password: pass1
+      api_key: 987654321
+      ## Histories to create for this user
+      histories:
+      - ExampleHistory
+      ## Workflows to automatically import for this user.
+      workflows:
+      # - /path/to/workflow_file
+
+## We have had all sorts of trouble getting fabric to reliably SFTP
+## really large files, so we have made all sorts of options available
+## to tweak this process.
+transfer:
+  ## Override what local temp directory is used on this machine if
+  ## chunking files or compression is used in transfer
+  # local_temp_dir: /tmp/
+  ## Compress transferred files (default is False)
+  # compress_transfers: True
+  ## If the following parameter is set, files will be split into
+  ## chunks of this size (in Mb) and recombined on remote host.
+  # transfer_chunk_size: 1
+  
+genomes:
+  # Details about the genomes you want to include.
+  #  Required genome fields (corresponding to Galaxy's tool_data_table_conf.xml columns):
+  #    dbkey   - globally unique identifier for the genome (e.g., hg19)
+  #    name    - descriptive name for the given genome (to be displayed in Galaxy, e.g., Hsapiens)
+  #  Optional genome fields (corresponding to Galaxy's tool_data_table_conf.xml columns):
+  #    formats, species, dbkey1, dbkey2, value, path, index
+  #  Additional genome fields specific to data deployment:
+  #    genome_indexes - list of tool indexes specific to the associated genome (overrides global 'genome_indexes')
+  genomes:
+    - dbkey: phix
+      name: phiX174
+
+    # - dbkey: hg19
+    #   name: Human (hg19)
+    #   dbsnp: false
+    #   rnaseq: false
+
+  # Global set of indexes to include for each genome.
+  # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbiolinux/biodata/genomes.py
+  genome_indexes:
+    - bwa
+
+  # Additional data targets
+  install_liftover: false
+  install_uniref: false
+
+tools:
+  applications:
+    bwa: "0.5.9"
+    ucsc_tools: "default"
+    bowtie: "0.12.7" 
+    samtools: 
+      - "0.1.16"
+      - "0.1.18"
+    abyss: "1.3.3"
+    bfast: "0.7.0a"
+    velvet: "1.2.07"
+    perm: "3.6"
+    lastz: "1.02.00"
+    mosaik: "default"
+    freebayes: "default"
+    macs: "1.4.2-1"
+    emboss:
+      - version: "6.5.7"
+        symlink_versions: "5.0.0"  # Setup a symbolic link, so when Galaxy looks for 5.0.0 it finds newest version
+    fastx_toolkit: "0.0.13.2"
+    cufflinks: "1.3.0"
+    tophat: "1.3.3"
+    picard: "1.56"
+    fastqc: "0.10.0"  
+    gatk: "1.4-9-g1f1233b"  
+    maq: "0.7.1"
+    megablast: "2.2.22"
+    blast: "2.2.25+"
+    sputnik: "r1"
+    taxonomy: "r2"
+    add_scores: "r1"
+    hyphy: "r418"
+    srma: "0.1.15"
+    beam: "2"
+    pass: "2.0"
+    lps_tool: "2010.09.30"
+    plink: "1.07"
+    haploview: "4.2b"
+    eigenstrat: "3.0"
+
+  r_packages:
+    - DBI
+    - RColorBrewer
+    - RCurl
+    - RSQLite
+    - XML
+    - biglm
+    - bitops
+    - digest
+    - ggplot2
+    - graph
+    - hexbin
+    - hwriter
+    - kernlab
+    - latticeExtra
+    - leaps
+    - pamr
+    - plyr
+    - proto
+    - qvalue
+    - reshape
+    - statmod
+    - xtable
+    - yacca
+
+  bioconductor_packages:
+    - AnnotationDbi 
+    - ArrayExpress 
+    - ArrayTools 
+    - Biobase
+    - Biostrings 
+    - DynDoc 
+    - GEOquery 
+    - GGBase 
+    - GGtools 
+    - GSEABase
+    - IRanges 
+    - affy 
+    - affyPLM 
+    - affyQCReport 
+    - affydata 
+    - affyio
+    - annaffy 
+    - annotate 
+    - arrayQualityMetrics 
+    - beadarray 
+    - biomaRt 
+    - gcrma 
+    - genefilter 
+    - geneplotter 
+    - globaltest 
+    - hgu95av2.db 
+    - limma   
+    - lumi 
+    - makecdfenv 
+    - marray 
+    - preprocessCore 
+    - ShortRead 
+    - siggenes
+    - simpleaffy 
+    - snpMatrix 
+    - vsn 

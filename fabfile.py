@@ -64,10 +64,22 @@ def install_biolinux(target=None, flavor=None):
     _check_fabric_version()
     _configure_fabric_environment(env, flavor)
     env.logger.debug("Target is '%s'" % target)
+    _perform_install(target, flavor)
+    _print_time_stats("Config", "end", time_start)
+
+
+def _perform_install(target=None, flavor=None):
+    """
+    Once CBL/fabric environment is setup, this method actually
+    runs the required installation procedures.
+
+    See `install_biolinux` for full details on arguments
+    `target` and `flavor`.
+    """
     pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
         _configure_and_install_native_packages(env, pkg_install)
-        if env.nixpkgs: # ./doc/nixpkgs.md
+        if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
         _update_biolinux_log(env, target, flavor)
@@ -90,7 +102,7 @@ def install_biolinux(target=None, flavor=None):
                 sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
                 sudo("rm -f cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
-    _print_time_stats("Config", "end", time_start)
+
 
 def _print_time_stats(action, event, prev_time=None):
     """ A convenience method for displaying time event during configuration.
