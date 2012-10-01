@@ -1,0 +1,5 @@
+export TMPDIR=$protvis_converted_files_dir
+export PORT=$protvis_port
+export ADDRESS="0.0.0.0"
+export PROTVIS_HOME=$protvis_home
+export PROTVIS_USER=$protvis_user
