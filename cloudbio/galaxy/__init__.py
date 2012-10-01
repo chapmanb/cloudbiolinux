@@ -310,7 +310,7 @@ def _get_nginx_module_chunk(env):
 
 def _get_nginx_module_ldap(env):
     run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
-    run("git clone https://code.google.com/p/nginx-auth-ldap/")
+    run("git clone https://github.com/kvspb/nginx-auth-ldap")
     return "nginx-auth-ldap"
 
 
