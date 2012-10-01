@@ -23,14 +23,15 @@ cloudbiolinux.
 
 ### galaxy-vm-launcher migration:
 
-* *TODO*: Move these procedures into cloudbiolinux - _init_postgresql_data, start_nginx (all disabled by default to ensure cloudman compat.).
+* *TODO*: Move these procedures into cloudbiolinux - start_nginx (all disabled by default to ensure cloudman compat.).
 * *TODO*: Refactor deploy.py to use cloudbio/galaxy/tools instead of gvl/lib/tools.py
 * *TODO*: Refactor galaxy.py to install galaxy via cloudbiolinux methods.
 * *TODO*: Move this functionality into cloudbiolinx - galaxy database migrations (disabled by default to ensure cloudman compat.)
-* *TODETERMINE*: Could we move setup_taxonomy_data from gvl/lib/deploy.py into cloudbio/biodata somewhere? How is cloudman being configuring this data?
+* *TODETERMINE*: Could we move setup_taxonomy_data from gvl/lib/deploy.py into cloudbio/biodata somewhere? How has cloudman been configuring this data?
 
 ### Completed TODOs from original checklist
 
+* *TODO*: Migrate _init_postgresql_data
 * *TODO*: Migrate _configure_nginx_service
 * *TODETERMINE*: Is install_nginx in cloudbiolinux up-to-date with mi-deployment?
 * *TODO*: Refactor install_nginx in cloudbio.custom.cloudman so it can be used by 

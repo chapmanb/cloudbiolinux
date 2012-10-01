@@ -7,7 +7,8 @@ import os
 import contextlib
 
 from fabric.api import sudo, run, cd, settings, hide
-from fabric.contrib.files import exists, contains, sed
+from fabric.contrib.files import exists, contains, sed, append
+from fabric.colors import red
 
 from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service,  _make_tmp_dir
 from cloudbio.galaxy.tools import _install_tools
@@ -311,3 +312,45 @@ def _get_nginx_module_ldap(env):
     run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
     run("git clone https://code.google.com/p/nginx-auth-ldap/")
     return "nginx-auth-ldap"
+
+
+def _setup_postgresql(env):
+    # Handled by CloudMan, but if configuring standalone galaxy, this
+    # will need to be executed to create a postgres user for Galaxy.
+    _configure_postgresql(env)
+    _init_postgresql_data()
+
+
+def _configure_postgresql(env, delete_main_dbcluster=False):
+    """ This method is intended for cleaning up the installation when
+    PostgreSQL is installed from a package. Basically, when PostgreSQL
+    is installed from a package, it creates a default database cluster
+    and splits the config file away from the data.
+    This method can delete the default database cluster that was automatically
+    created when the package is installed. Deleting the main database cluster
+    also has the effect of stopping the auto-start of the postmaster server at
+    machine boot. The method adds all of the PostgreSQL commands to the PATH.
+    """
+    pg_ver = sudo("dpkg -s postgresql | grep Version | cut -f2 -d':'")
+    pg_ver = pg_ver.strip()[:3]  # Get first 3 chars of the version since that's all that's used for dir name
+    got_ver = False
+    while(not got_ver):
+        try:
+            pg_ver = float(pg_ver)
+            got_ver = True
+        except Exception:
+            print(red("Problems trying to figure out PostgreSQL version."))
+            pg_ver = raw_input(red("Enter the correct one (eg, 9.1; not 9.1.3): "))
+    if delete_main_dbcluster:
+        sudo('pg_dropcluster --stop %s main' % pg_ver, user='postgres')
+    # Not sure why I ever added this to gvl, doesn't seem needed. -John
+    #_put_installed_file_as_user("postgresql-%s.conf" % env.postgres_version, "/etc/postgresql/%s/main/postgresql.conf" % env.postgres_version, user='root')
+    exp = "export PATH=/usr/lib/postgresql/%s/bin:$PATH" % pg_ver
+    if not contains('/etc/bash.bashrc', exp):
+        append('/etc/bash.bashrc', exp, use_sudo=True)
+
+
+def _init_postgresql_data():
+    if "galaxy" not in sudo("psql -P pager --list | grep galaxy || true", user="postgres"):
+        sudo("createdb galaxy", user="postgres")
+        sudo("psql -c 'create user galaxy; grant all privileges on database galaxy to galaxy;'", user="postgres")
