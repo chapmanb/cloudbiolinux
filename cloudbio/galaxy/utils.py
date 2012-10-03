@@ -8,4 +8,5 @@ def _read_boolean(env, name, default):
 
 def _chown_galaxy(env, path):
     chown_command = "chown --recursive %s:%s %s"
-    sudo(chown_command % (env.galaxy_user, env.galaxy_user, path))
+    galaxy_user = env.get("galaxy_user", "galaxy")
+    sudo(chown_command % (galaxy_user, galaxy_user, path))
