@@ -75,6 +75,7 @@ def _install_galaxy(env):
         _setup_xvfb(env)
     return True
 
+
 def _clone_galaxy_repo(env):
     # MP: we need to have a tmp directory available if files already exist
     # in the galaxy install directory
@@ -318,7 +319,7 @@ def _setup_postgresql(env):
     # Handled by CloudMan, but if configuring standalone galaxy, this
     # will need to be executed to create a postgres user for Galaxy.
     _configure_postgresql(env)
-    _init_postgresql_data()
+    _init_postgresql_data(env)
 
 
 def _configure_postgresql(env, delete_main_dbcluster=False):
@@ -342,7 +343,7 @@ def _configure_postgresql(env, delete_main_dbcluster=False):
             print(red("Problems trying to figure out PostgreSQL version."))
             pg_ver = raw_input(red("Enter the correct one (eg, 9.1; not 9.1.3): "))
     if delete_main_dbcluster:
-        sudo('pg_dropcluster --stop %s main' % pg_ver, user='postgres')
+        env.safe_sudo('pg_dropcluster --stop %s main' % pg_ver, user='postgres')
     # Not sure why I ever added this to gvl, doesn't seem needed. -John
     #_put_installed_file_as_user("postgresql-%s.conf" % env.postgres_version, "/etc/postgresql/%s/main/postgresql.conf" % env.postgres_version, user='root')
     exp = "export PATH=/usr/lib/postgresql/%s/bin:$PATH" % pg_ver
@@ -350,7 +351,7 @@ def _configure_postgresql(env, delete_main_dbcluster=False):
         append('/etc/bash.bashrc', exp, use_sudo=True)
 
 
-def _init_postgresql_data():
-    if "galaxy" not in sudo("psql -P pager --list | grep galaxy || true", user="postgres"):
-        sudo("createdb galaxy", user="postgres")
-        sudo("psql -c 'create user galaxy; grant all privileges on database galaxy to galaxy;'", user="postgres")
+def _init_postgresql_data(env):
+    if "galaxy" not in env.safe_sudo("psql -P pager --list | grep galaxy || true", user="postgres"):
+        env.safe_sudo("createdb galaxy", user="postgres")
+        env.safe_sudo("psql -c 'create user galaxy; grant all privileges on database galaxy to galaxy;'", user="postgres")
