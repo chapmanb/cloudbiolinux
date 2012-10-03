@@ -61,18 +61,19 @@ def _install_applications(env, tools_conf):
                 _install_tool(env, name, version_info)
             else:
                 version = version_info["version"]
-                tool_env = _install_tool(env, name, version)
+                bin_dirs = version_info.get("bin_dirs", ["bin"])
+                tool_env = _install_tool(env, name, version, bin_dirs)
                 symlink_versions = version_info.get("symlink_versions", [])
-                print symlink_versions
                 if type(symlink_versions) is str:
                     symlink_versions = [symlink_versions]
                 for symlink_version in symlink_versions:
                     _set_default_config(tool_env, tool_env["system_install"], symlink_version)
 
-def _install_tool(env, name, version):
+
+def _install_tool(env, name, version, bin_dirs=["bin"]):
     tool_env = _build_tool_env(env, name, version)
     eval("install_%s" % name)(tool_env)
-    _install_galaxy_config(tool_env)
+    _install_galaxy_config(tool_env, bin_dirs)
     return tool_env
 
 
@@ -99,16 +100,18 @@ class AttributeDict(dict):
     __setattr__ = dict.__setitem__
 
 
-def _install_galaxy_config(tool_env):
+def _install_galaxy_config(tool_env, bin_dirs):
     """
     Setup galaxy tool config files (env.sh-es) and default version
     symbolic links.
     """
     install_dir = tool_env["system_install"]
-    bin_dir = os.path.join(install_dir, "bin")
     env_path = os.path.join(install_dir, "env.sh")
-    if exists(bin_dir) and not exists(env_path):
+    bin_paths = [os.path.join(install_dir, bin_dir) for bin_dir in bin_dirs]
+    path_pieces = [bin_path for bin_path in bin_paths if exists(bin_path)]
+    if len(path_pieces) > 0 and not exists(env_path):
+        path_addtion = ":".join(path_pieces)
         # Standard bin install, just add it to path
-        sudo("echo 'PATH=%s/bin:$PATH' > %s/env.sh" % (install_dir, install_dir))
+        sudo("echo 'PATH=%s:$PATH' > %s/env.sh" % (path_addtion, install_dir))
         sudo("chmod +x %s/env.sh" % install_dir)
     _set_default_config(tool_env, install_dir)
