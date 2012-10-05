@@ -345,7 +345,7 @@ bio_alignment:
   - exonerate
   - mafft
   - muscle
-  - prank
+  - bio-linux-prank
   - probcons
   - wise
 bio_nextgen:
