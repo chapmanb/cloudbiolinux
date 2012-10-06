@@ -146,7 +146,8 @@ def _cleanup_ec2(env):
     env.logger.info("Cleaning up for EC2 AMI creation")
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
               "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir,
-              "%s/ec2autorun.err"  % env.install_dir, "%s/ec2autorun.log" % env.install_dir]
+              "%s/ec2autorun.err"  % env.install_dir, "%s/ec2autorun.log" % env.install_dir,
+              "%s/bin/ec2autorun.log" % env.install_dir]
     for fname in fnames:
         sudo("rm -f %s" % fname)
     rmdirs = ["/mnt/galaxyData", "/mnt/cm", "/tmp/cm"]
@@ -159,8 +160,7 @@ def _cleanup_ec2(env):
     # When starting up, RabbitMQ will recreate that directory.
     with settings(warn_only=True):
         sudo('/etc/init.d/rabbitmq-server stop')
-        sudo('stop rabbitmq-server')
-        sudo('/etc/init.d/rabbitmq-server stop')
+        sudo('service rabbitmq-server stop')
     sudo('initctl reload-configuration')
     for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
         if exists(db_location):
