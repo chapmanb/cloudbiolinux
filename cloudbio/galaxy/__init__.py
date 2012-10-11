@@ -53,6 +53,11 @@ def _setup_galaxy_env_defaults(env):
         env.galaxy_update_default = True
     if "python_version" not in env:
         env.python_version = "2.7"  # Override in fabricrc if this is not the case.
+    if "galaxy_indices_mount" not in env:
+        indicies_dir = env.get("data_files", "/mnt/galaxyIndcies")
+        env.galaxy_indices_mount = indicies_dir
+    if "galaxy_data_mount" not in env:
+        env.galaxy_data_mount = "/mnt/galaxyData"
 
 
 def _install_galaxy(env):
@@ -214,6 +219,11 @@ def _setup_nginx_service(env):
     # useful if CloudMan is not being used (such as galaxy-vm-launcher work).
     _setup_conf_file(env, "/etc/init.d/nginx", "nginx_init", default_source="nginx_init")
     _setup_simple_service("nginx")
+
+
+def _install_nginx_standalone(env):
+    _install_nginx(env)
+    _setup_nginx_service(env)
 
 
 def _install_nginx(env):

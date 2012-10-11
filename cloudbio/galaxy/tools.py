@@ -33,7 +33,7 @@ def _install_tools(env, tools_conf=None):
 def _load_tools_conf(env):
     tools_conf_path = env.get("galaxy_tools_conf",
                               os.path.join(env.config_dir, os.pardir,
-                                           "contrib", "cloudman", "tools.yaml"))
+                                           "contrib", "flavor", "cloudman", "tools.yaml"))
     with open(tools_conf_path) as in_handle:
         full_data = yaml.load(in_handle)
     return full_data
