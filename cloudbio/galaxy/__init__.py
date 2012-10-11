@@ -123,15 +123,10 @@ def _clone_galaxy_repo(env):
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
     """
     Read through fabric's environment and make sure any property of
-    the form galaxy_universe_XXX=YYY, lands up in Galaxy's universe_wsgi.ini
-    options as XXX=YYY using John Chilton's configuration directory work:
-
-    https://bitbucket.org/galaxy/galaxy-central/pull-request/44/allow-usage-of-directory-of-configuration
-
-    Until, the above pull request is accepted, its changeset should be pulled
-    into the configured Galaxy repository.
+    the form galaxy_universe_XXX=YYY lands up in Galaxy's universe_wsgi.ini
+    options as XXX=YYY using Galaxy configuration directory:
     """
-    galaxy_conf_directory = env.get("galaxy_conf_directory", False)
+    galaxy_conf_directory = env.get("galaxy_conf_directory", None)
     if not galaxy_conf_directory:
         return False
     # By default just read the options from env (i.e. from fabricrc), but
