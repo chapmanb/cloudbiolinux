@@ -109,10 +109,10 @@ to a local or [cloud-based][bd3] Galaxy server.
 
 Vagrant allows easy deploying and connecting to VirtualBox images. The 
 setup is ideal for runnig CloudBioLinux on a desktop computer.
-Install [VirtualBox 4.0][v2] and [vagrant][v1]. Then add the pre-built
+Install [VirtualBox 4.0][v2] and [vagrant][v1]. Then add a pre-built
 CloudLinux VirtualBox images and start it up:
 
-        vagrant box add biolinux_version https://s3.amazonaws.com/chapmanb/biolinux_version.box
+        vagrant box add biolinux_$VERSION https://s3.amazonaws.com/cloudbiolinux/biolinux_$VERSION.box
         mkdir tmp/biolinux
         cd tmp/biolinux
         vagrant init biolinux_version
