@@ -17,7 +17,9 @@ applications:
   macs: "1.4.2-1"
 
   ## Coming from bio_general.py
-  emboss: "6.5.7"
+  emboss:
+    - version: "6.5.7"
+      symlink_versions: "5.0.0"  # Setup a symbolic link, so when Galaxy looks for 5.0.0 it finds newest version
 
   ## Coming from applications.py
 

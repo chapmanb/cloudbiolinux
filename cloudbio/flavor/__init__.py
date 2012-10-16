@@ -8,8 +8,6 @@ to commit it to the main project (in ./contrib/flavor).
 Other (main) flavors can be found in this directory and in ./contrib/flavors
 """
 
-from fabric.api import *
-
 class Flavor:
     """Base class. Every flavor derives from this
     """
@@ -27,5 +25,4 @@ class Flavor:
 
     def post_install(self):
         """Post installation hook"""
-
-env.flavor = Flavor(env)
+        pass

@@ -1,0 +1,9 @@
+---
+# List of custom programs to install that are not packaged. These each require 
+# a install_name function in the appropriate place in the 'custom' directory to
+# define the steps for downloading, building, and installing the package.
+bio_nextgen:
+  - vep
+  - gemini
+java:
+  - leinengin

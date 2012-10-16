@@ -118,7 +118,7 @@ class BioNode(Edition):
                          "deb {repo} testing main contrib non-free".format(
                              repo=main_repository)
                         ]
-        new_sources = new_sources + [ "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux" ]
+        new_sources = new_sources + [ "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux" ]
 
         return new_sources
 

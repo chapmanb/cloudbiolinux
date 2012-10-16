@@ -1,9 +1,19 @@
 """Utilities for logging and progress tracking.
 """
 import logging
+import os
+import sys
 
-from fabric.api import sudo
+from fabric.main import load_settings
 from fabric.colors import yellow, red, green, magenta
+from fabric.api import settings, hide, cd, run
+from fabric.contrib.files import exists
+
+from cloudbio.edition import _setup_edition
+from cloudbio.distribution import _setup_distribution_environment
+from cloudbio.flavor import Flavor
+from cloudbio.flavor.config import get_config_file
+
 
 class ColorFormatter(logging.Formatter):
     """ Format log message based on the message level
@@ -69,4 +79,76 @@ def _update_biolinux_log(env, target, flavor):
     logfn = "/var/log/biolinux.log"
     info = "Target="+target+"; Edition="+env.edition.name+"; Flavor="+flavor
     env.logger.info(info)
-    sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
+    env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
+
+
+def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None):
+    if not fabricrc_loader:
+        fabricrc_loader = _parse_fabricrc
+
+    _setup_flavor(env, flavor)
+    fabricrc_loader(env)
+    _setup_edition(env)
+    _setup_distribution_environment()  # get parameters for distro, packages etc.
+    _create_local_paths(env)
+
+
+def _setup_flavor(env, flavor):
+    """Setup a flavor, providing customization hooks to modify CloudBioLinux installs.
+
+    Specify flavor as a name, in which case we look it up in the standard flavor
+    directory (contrib/flavor/your_flavor), or as a path to a flavor directory outside
+    of cloudbiolinux.
+    """
+    env.flavor = Flavor(env)
+    env.flavor_dir = None
+    if flavor:
+        # setup the directory for flavor customizations
+        if os.path.isabs(flavor):
+            flavor_dir = flavor
+        else:
+            flavor_dir = os.path.join(os.path.dirname(__file__), "..", "contrib", "flavor", flavor)
+        assert os.path.exists(flavor_dir), \
+            "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
+        env.flavor_dir = flavor_dir
+        # Load python customizations to base configuration if present
+        py_flavor = "{0}flavor".format(os.path.split(os.path.realpath(flavor_dir)))
+        flavor_custom_py = os.path.join(flavor_dir, "{0}.py".format(py_flavor))
+        if os.path.exists(flavor_custom_py):
+            sys.path.append(flavor_dir)
+            mod = __import__(flavor_dir, fromlist=[py_flavor])
+    env.logger.info("This is a %s" % env.flavor.name)
+
+
+def _parse_fabricrc(env):
+    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
+    """
+    env.config_dir = os.path.join(os.path.dirname(__file__), "..", "config")
+    if not env.has_key("distribution") and not env.has_key("system_install"):
+        env.logger.info("Reading default fabricrc.txt")
+        env.update(load_settings(get_config_file(env, "fabricrc.txt").base))
+
+
+def _create_local_paths(env):
+    """Expand any paths defined in terms of shell shortcuts (like ~).
+    """
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
+        # This is the first point we call into a remote host - make sure
+        # it does not fail silently by calling a dummy run
+        env.logger.info("Now, testing connection to host...")
+        test = run("pwd")
+        # If there is a connection failure, the rest of the code is (sometimes) not
+        # reached - for example with Vagrant the program just stops after above run
+        # command.
+        if test != None:
+            env.logger.info("Connection to host appears to work!")
+        else:
+            raise NotImplementedError("Connection to host failed")
+        env.logger.debug("Expand paths")
+        if env.has_key("local_install"):
+            if not exists(env.local_install):
+                run("mkdir -p %s" % env.local_install)
+            with cd(env.local_install):
+                result = run("pwd")
+                env.local_install = result

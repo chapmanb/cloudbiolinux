@@ -81,19 +81,22 @@ def _setup_ubuntu():
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
       "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu %s main", # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu %s main", # Free-NX
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
 def _setup_debian():
     env.logger.info("Debian setup")
+    unstable_remap = {"sid": "squeeze"}
     shared_sources = _setup_deb_general()
     sources = [
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-        "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
+        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s/", # lastest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
     # fill in %s
-    env.std_sources = _add_source_versions(env.dist_name, sources)
+    dist_name = unstable_remap.get(env.dist_name, env.dist_name)
+    env.std_sources = _add_source_versions(dist_name, sources)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
@@ -108,8 +111,8 @@ def _setup_deb_general():
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
-        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-        "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
+        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
     ]
     return shared_sources
 

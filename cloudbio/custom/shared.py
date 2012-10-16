@@ -113,9 +113,11 @@ def _safe_dir_name(dir_name, need_dir=True):
 
 def _fetch_and_unpack(url, need_dir=True):
     if url.startswith(("git", "svn", "hg", "cvs")):
+        base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
+        if exists(base):
+            env.safe_sudo("rm -rf {0}".format(base))
         run(url)
-        base = os.path.basename(url.split()[-1])
-        return os.path.splitext(base)[0]
+        return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url)
         if not exists(tar_file):
@@ -262,24 +264,25 @@ def _get_install_subdir(env, subdir):
     return path
 
 
-def _set_default_config(env, install_dir):
+def _set_default_config(env, install_dir, sym_dir_name="default"):
     """
     Sets up default galaxy config directory symbolic link (if needed). Needed
     when it doesn't exists or when installing a new version of software.
     """
     version = env["tool_version"]
     if exists(install_dir):
-        install_dir_root = os.path.join(install_dir, "..")
+        install_dir_root = "%s/.." % install_dir
+        sym_dir = "%s/%s" % (install_dir_root, sym_dir_name)
         replace_default = False
-        if not exists(os.path.join(install_dir_root, "default")):
+        if not exists(sym_dir):
             replace_default = True
         if not replace_default:
-            default_version = env.safe_sudo("basename `readlink -f %s/default`" % install_dir_root)
+            default_version = env.safe_sudo("basename `readlink -f %s`" % sym_dir)
             if version > default_version:  # Bug: Wouldn't work for 1.9 < 1.10
                 print "default version %s is older than version %s just installed, replacing..." % (default_version, version)
                 replace_default = True
         if replace_default:
-            env.safe_sudo("rm -rf %s/default; ln -f -s %s %s/default" % (install_dir_root, install_dir, install_dir_root))
+            env.safe_sudo("rm -rf %s; ln -f -s %s %s" % (sym_dir, install_dir, sym_dir))
 
 
 def _setup_simple_service(service_name):

@@ -4,6 +4,7 @@ from fabric.api import *
 from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.flavor.config import get_config_file
 
 def _yum_packages(to_install):
     """Install rpm packages available via yum.
@@ -12,7 +13,7 @@ def _yum_packages(to_install):
         package_file = "packages-scientificlinux.yaml"
     else:
         package_file = "packages-yum.yaml"
-    pkg_config = os.path.join(env.config_dir, package_file)
+    pkg_config = get_config_file(env, package_file).base
     with settings(warn_only=True):
         sudo("yum check-update")
     sudo("yum -y upgrade")

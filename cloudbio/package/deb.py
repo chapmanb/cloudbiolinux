@@ -4,8 +4,9 @@ from fabric.api import *
 from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.flavor.config import get_config_file
 
-def _apt_packages(to_install=None, pkg_list=None, pkg_config_file_path=None):
+def _apt_packages(to_install=None, pkg_list=None):
     """ 
     Install packages available via apt-get.
     Note that ``to_install`` and ``pkg_list`` arguments cannot be used simultaneously.
@@ -18,34 +19,15 @@ def _apt_packages(to_install=None, pkg_list=None, pkg_config_file_path=None):
     :type pkg_list:  list
     :param pkg_list: An explicit list of packages to install. No other files,
                      flavors, or editions are considered.
-
-    :type pkg_config_file_path:  string
-    :param pkg_config_file_path: Allows a custom path to be specified where
-                                 ``packages.yaml`` and ``packages-[dist].yaml``
-                                 are stored. Note that the file names cannot
-                                 be customized, only the path.
     """
     env.logger.info("Update the system")
     sudo("apt-get update") # Always update
     if to_install is not None:
-        env.logger.info("Will install all packages (as listed in packages*.yaml "
-                "files in {0})".format(pkg_config_file_path))
-        if pkg_config_file_path is None:
-            pkg_config_file_path = env.config_dir
-        pkg_config_file = os.path.join(pkg_config_file_path, "packages.yaml")
-        subs_pkg_config_file = os.path.join(pkg_config_file_path, "packages-%s.yaml" %
-                                       env.distribution)
-        if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
+        config_file = get_config_file(env, "packages.yaml")
         env.edition.apt_upgrade_system()
-        # Retrieve final package names
-        (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
-                                          subs_pkg_config_file)
-        # At this point allow the Edition to rewrite the package list - 
-        # this is shared within and between editions.
-        # Ref:  https://github.com/chapmanb/cloudbiolinux/pull/10#issuecomment-1616423
+        (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
+        # Allow editions and flavors to modify the package list
         packages = env.edition.rewrite_config_items("packages", packages)
-
-        # At this point allow the Flavor to rewrite the package list
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
         env.logger.info("Will install specific packages: {0}".format(pkg_list))

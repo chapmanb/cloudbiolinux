@@ -47,6 +47,7 @@ bio_nextgen:
     - hydra
   variant:
     - crisp
+    - gemini
     - tassel
     - stacks
   chip:

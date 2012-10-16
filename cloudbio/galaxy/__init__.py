@@ -4,16 +4,20 @@ https://bitbucket.org/afgane/mi-deployment
 """
 
 import os
+import contextlib
 
-from fabric.api import sudo, run, cd
-from fabric.contrib.files import exists, contains
+from fabric.api import sudo, run, cd, settings, hide
+from fabric.contrib.files import exists, contains, sed, append
+from fabric.colors import red
 
-from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service
+from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service,  _make_tmp_dir
 from cloudbio.galaxy.tools import _install_tools
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
 
+
 # -- Adjust this link if using content from another location
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
+REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 
 def _setup_users(env):
@@ -49,6 +53,11 @@ def _setup_galaxy_env_defaults(env):
         env.galaxy_update_default = True
     if "python_version" not in env:
         env.python_version = "2.7"  # Override in fabricrc if this is not the case.
+    if "galaxy_indices_mount" not in env:
+        indicies_dir = env.get("data_files", "/mnt/galaxyIndcies")
+        env.galaxy_indices_mount = indicies_dir
+    if "galaxy_data_mount" not in env:
+        env.galaxy_data_mount = "/mnt/galaxyData"
 
 
 def _install_galaxy(env):
@@ -70,6 +79,7 @@ def _install_galaxy(env):
     if setup_xvfb:
         _setup_xvfb(env)
     return True
+
 
 def _clone_galaxy_repo(env):
     # MP: we need to have a tmp directory available if files already exist
@@ -113,15 +123,10 @@ def _clone_galaxy_repo(env):
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
     """
     Read through fabric's environment and make sure any property of
-    the form galaxy_universe_XXX=YYY, lands up in Galaxy's universe_wsgi.ini
-    options as XXX=YYY using John Chilton's configuration directory work:
-
-    https://bitbucket.org/galaxy/galaxy-central/pull-request/44/allow-usage-of-directory-of-configuration
-
-    Until, the above pull request is accepted, its changeset should be pulled
-    into the configured Galaxy repository.
+    the form galaxy_universe_XXX=YYY lands up in Galaxy's universe_wsgi.ini
+    options as XXX=YYY using Galaxy configuration directory:
     """
-    galaxy_conf_directory = env.get("galaxy_conf_directory", False)
+    galaxy_conf_directory = env.get("galaxy_conf_directory", None)
     if not galaxy_conf_directory:
         return False
     # By default just read the options from env (i.e. from fabricrc), but
@@ -202,3 +207,156 @@ def _setup_xvfb(env):
     _setup_conf_file(env, "/etc/default/xvfb", "xvfb_default", default_source="xvfb_default")
     _setup_simple_service("xvfb")
     env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")
+
+
+def _setup_nginx_service(env):
+    # Setup system service for nginx, not needed for CloudMan but it is
+    # useful if CloudMan is not being used (such as galaxy-vm-launcher work).
+    _setup_conf_file(env, "/etc/init.d/nginx", "nginx_init", default_source="nginx_init")
+    _setup_simple_service("nginx")
+
+
+def _install_nginx_standalone(env):
+    _install_nginx(env)
+    _setup_nginx_service(env)
+
+
+def _install_nginx(env):
+    """Nginx open source web server.
+    http://www.nginx.org/
+    """
+    version = "1.2.0"
+    url = "http://nginx.org/download/nginx-%s.tar.gz" % version
+
+    install_dir = os.path.join(env.install_dir, "nginx")
+    remote_conf_dir = os.path.join(install_dir, "conf")
+
+    # Skip install if already present
+    if exists(remote_conf_dir) and contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
+        env.logger.debug("Nginx already installed; not installing it again.")
+        return
+
+    with _make_tmp_dir() as work_dir:
+        with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
+            modules = _get_nginx_modules(env)
+            module_flags = " ".join(["--add-module=../%s" % x for x in modules])
+            run("wget %s" % url)
+            run("tar xvzf %s" % os.path.split(url)[1])
+            with cd("nginx-%s" % version):
+                run("./configure --prefix=%s --with-ipv6 %s "
+                    "--user=galaxy --group=galaxy --with-debug "
+                    "--with-http_ssl_module --with-http_gzip_static_module" %
+                    (install_dir, module_flags))
+                sed("objs/Makefile", "-Werror", "")
+                run("make")
+                sudo("make install")
+                sudo("cd %s; stow nginx" % env.install_dir)
+
+    defaults = {"galaxy_home": "/mnt/galaxyTools/galaxy-central"}
+    _setup_conf_file(env, os.path.join(remote_conf_dir, "nginx.conf"), "nginx.conf", defaults=defaults)
+
+    nginx_errdoc_file = 'nginx_errdoc.tar.gz'
+    url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)
+    remote_errdoc_dir = os.path.join(install_dir, "html")
+    with cd(remote_errdoc_dir):
+        sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
+        sudo('tar xvzf %s' % nginx_errdoc_file)
+
+    sudo("mkdir -p %s" % env.install_dir)
+    if not exists("%s/nginx" % env.install_dir):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
+    # If the guessed symlinking did not work, force it now
+    cloudman_default_dir = "/opt/galaxy/sbin"
+    if not exists(cloudman_default_dir):
+        sudo("mkdir -p %s" % cloudman_default_dir)
+    if not exists(os.path.join(cloudman_default_dir, "nginx")):
+        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
+
+
+def _get_nginx_modules(env):
+    """Retrieve add-on modules compiled along with nginx.
+    """
+    modules = {
+        "upload": True,
+        "chunk": True,
+        "ldap": False
+    }
+
+    module_dirs = []
+
+    for module, enabled_by_default in modules.iteritems():
+        enabled = _read_boolean(env, "nginx_enable_module_%s" % module, enabled_by_default)
+        if enabled:
+            module_dirs.append(eval("_get_nginx_module_%s" % module)(env))
+
+    return module_dirs
+
+
+def _get_nginx_module_upload(env):
+    upload_module_version = "2.2.0"
+    upload_url = "http://www.grid.net.ru/nginx/download/" \
+                 "nginx_upload_module-%s.tar.gz" % upload_module_version
+    run("wget %s" % upload_url)
+    upload_fname = os.path.split(upload_url)[1]
+    run("tar -xvzpf %s" % upload_fname)
+    return upload_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_chunk(env):
+    chunk_module_version = "0.22"
+    chunk_git_version = "b46dd27"
+
+    chunk_url = "https://github.com/agentzh/chunkin-nginx-module/tarball/v%s" % chunk_module_version
+    chunk_fname = "agentzh-chunkin-nginx-module-%s.tar.gz" % (chunk_git_version)
+    run("wget -O %s %s" % (chunk_fname, chunk_url))
+    run("tar -xvzpf %s" % chunk_fname)
+    return chunk_fname.rsplit(".", 2)[0]
+
+
+def _get_nginx_module_ldap(env):
+    run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
+    run("git clone https://github.com/kvspb/nginx-auth-ldap")
+    return "nginx-auth-ldap"
+
+
+def _setup_postgresql(env):
+    # Handled by CloudMan, but if configuring standalone galaxy, this
+    # will need to be executed to create a postgres user for Galaxy.
+    _configure_postgresql(env)
+    _init_postgresql_data(env)
+
+
+def _configure_postgresql(env, delete_main_dbcluster=False):
+    """ This method is intended for cleaning up the installation when
+    PostgreSQL is installed from a package. Basically, when PostgreSQL
+    is installed from a package, it creates a default database cluster
+    and splits the config file away from the data.
+    This method can delete the default database cluster that was automatically
+    created when the package is installed. Deleting the main database cluster
+    also has the effect of stopping the auto-start of the postmaster server at
+    machine boot. The method adds all of the PostgreSQL commands to the PATH.
+    """
+    pg_ver = sudo("dpkg -s postgresql | grep Version | cut -f2 -d':'")
+    pg_ver = pg_ver.strip()[:3]  # Get first 3 chars of the version since that's all that's used for dir name
+    got_ver = False
+    while(not got_ver):
+        try:
+            pg_ver = float(pg_ver)
+            got_ver = True
+        except Exception:
+            print(red("Problems trying to figure out PostgreSQL version."))
+            pg_ver = raw_input(red("Enter the correct one (eg, 9.1; not 9.1.3): "))
+    if delete_main_dbcluster:
+        env.safe_sudo('pg_dropcluster --stop %s main' % pg_ver, user='postgres')
+    # Not sure why I ever added this to gvl, doesn't seem needed. -John
+    #_put_installed_file_as_user("postgresql-%s.conf" % env.postgres_version, "/etc/postgresql/%s/main/postgresql.conf" % env.postgres_version, user='root')
+    exp = "export PATH=/usr/lib/postgresql/%s/bin:$PATH" % pg_ver
+    if not contains('/etc/bash.bashrc', exp):
+        append('/etc/bash.bashrc', exp, use_sudo=True)
+
+
+def _init_postgresql_data(env):
+    if "galaxy" not in env.safe_sudo("psql -P pager --list | grep galaxy || true", user="postgres"):
+        env.safe_sudo("createdb galaxy", user="postgres")
+        env.safe_sudo("psql -c 'create user galaxy; grant all privileges on database galaxy to galaxy;'", user="postgres")

@@ -5,11 +5,11 @@ and [Galaxy][2]. A minimal CloudMan machine can be configured with the following
 
 A slightly more flushed out instance can be installed via the command:
 
-        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:packagelist=./contrib/cloudman/cloudman.yaml
+        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:flavor=cloudman/cloudman
 
 Finally, CloudMan and Galaxy can be installed together via the command:
 
-        fab -f fabfile.py -i <key> -H ubuntu@<IP>  install_biolinux:packagelist=./contrib/cloudman/cloudman_and_galaxy.yaml
+        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:falvor=cloudman/cloudman_and_galaxy
 
 You can additionally configure your CloudMan and Galaxy instance by specifing
 a configuration file: "-c <your_fabricrc.txt>" in the above command.
