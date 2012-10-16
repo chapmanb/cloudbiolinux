@@ -91,7 +91,7 @@ def _setup_debian():
     shared_sources = _setup_deb_general()
     sources = [
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s/", # lastest R versions
+        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s-cran/", # lastest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
     # fill in %s
