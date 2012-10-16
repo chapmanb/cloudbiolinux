@@ -6,7 +6,10 @@ ec2-api-tools: ""
 python-vm-builder-ec2: ""
 firefox: iceweasel
 freenx: ""
+# Problem Bio-Linux builds on debian 
 bio-linux-arb: ""
+bio-linux-assembly-conversion-tools: ""
+bio-linux-emboss: ""
 # emboss-data is broken in Squeeze
 emboss: ""
 emboss-data: ""
