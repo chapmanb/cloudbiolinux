@@ -518,7 +518,7 @@ def install_tophat(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.4"
+    default_version = "2.0.5"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
