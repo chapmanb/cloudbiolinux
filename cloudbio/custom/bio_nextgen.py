@@ -493,13 +493,14 @@ def _install_boost(env):
         run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
         run("./b2")
         env.safe_sudo("./b2 install")
-    if not exists(boost_version_file) or not contains(boost_version_file, check_version):
+    thread_lib = "libboost_thread.so.%s" % version
+    final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
+    if (not exists(boost_version_file) or not contains(boost_version_file, check_version)
+        or not exists(final_thread_lib)):
         _get_install(url, env, _boost_build)
-        thread_lib = "libboost_thread.so.%s" % version
-        final_lib = os.path.join(env.system_install, "lib", thread_lib)
         orig_lib = os.path.join(boost_dir, "lib", thread_lib)
-        if not exists(final_lib):
-            env.safe_sudo("ln -s %s %s" % (orig_lib, final_lib))
+        if not exists(final_thread_lib):
+            env.safe_sudo("ln -s %s %s" % (orig_lib, final_thread_lib))
 
 def _cufflinks_configure_make(env):
     orig_eigen = "%s/include/eigen3" % env.system_install
