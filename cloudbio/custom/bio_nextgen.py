@@ -582,6 +582,19 @@ def install_velvet(env):
     _get_install(url, env, _make_copy("find -perm -100 -name 'velvet*'"),
                  post_unpack_fn=_fix_library_order)
 
+@_if_not_installed("Ray")
+def install_ray(env):
+    """Ray -- Parallel genome assemblies for parallel DNA sequencing 
+    http://denovoassembler.sourceforge.net/
+    """
+    default_version = "2.1.0"
+    version = env.get("tool_version", default_version)
+    url = "http://downloads.sourceforge.net/project/denovoassembler/Ray-v%s.tar.bz2" % version
+    def _ray_do_nothing(env):
+        return
+    _get_install(url, env, _make_copy("find -name Ray"),
+                 post_unpack_fn=_ray_do_nothing)
+
 def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
     http://trinityrnaseq.sourceforge.net/
