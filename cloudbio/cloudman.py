@@ -129,6 +129,9 @@ def _configure_nfs(env):
                 '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
                 '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
                 '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
+    extra_nfs_exports = env.get("extra_nfs_exports", "")
+    for extra_nfs_export in extra_nfs_exports.split(","):
+        exports.append('%s   *(rw,sync,no_root_squash,no_subtree_check)' % extra_nfs_export)
     append('/etc/exports', exports, use_sudo=True)
     # Create a symlink for backward compatibility where all of CloudMan's
     # stuff is expected to be in /opt/galaxy
