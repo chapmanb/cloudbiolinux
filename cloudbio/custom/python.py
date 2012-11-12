@@ -21,7 +21,7 @@ def install_matplotlib(env):
     """matplotlib is a python 2D plotting library which produces publication quality figures
     http://matplotlib.sourceforge.net/
     """
-    version = "1.1.1"
+    version = "1.2.0"
     url = "http://downloads.sourceforge.net/project/matplotlib/matplotlib/" \
           "matplotlib-%s/matplotlib-%s.tar.gz" % (version, version)
     _get_install(url, env, _python_make)

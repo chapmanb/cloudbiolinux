@@ -50,7 +50,7 @@ def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
     http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
-    version = "2.0.0-beta6"
+    version = "2.0.2"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
@@ -60,7 +60,7 @@ def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.5.9"
+    default_version = "0.6.2"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
@@ -90,9 +90,9 @@ def install_perm(env):
     """Efficient mapping of short sequences accomplished with periodic full sensitive spaced seeds.
     https://code.google.com/p/perm/
     """
-    default_version = "3.6"
+    default_version = "4"
     version = env.get("tool_version", default_version)
-    url = "http://perm.googlecode.com/files/PerM_%s_Source.tar.gz" % version
+    url = "http://perm.googlecode.com/files/PerM%sSource.tar.gz" % version
     def gcc44_makefile_patch():
         gcc_cmd = "g++44"
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
@@ -119,7 +119,7 @@ def install_gmap(env):
     """GMAP and GSNAP: A Genomic Mapping and Alignment Program for mRNA EST and short reads.
     http://research-pub.gene.com/gmap/
     """
-    version = "2011-11-12"
+    version = "2012-11-09"
     url = "http://research-pub.gene.com/gmap/src/gmap-gsnap-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
@@ -135,8 +135,8 @@ def install_novoalign(env):
     """Novoalign short read aligner using Needleman-Wunsch algorithm with affine gap penalties.
     http://www.novocraft.com/main/index.php
     """
-    base_version = "V2.08.01"
-    cs_version = "V1.02.01"
+    base_version = "V2.08.02"
+    cs_version = "V1.02.02"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
