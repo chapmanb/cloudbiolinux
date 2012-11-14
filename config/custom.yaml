@@ -14,7 +14,8 @@ bio_nextgen:
     - gmap
     - lastz
     - mosaik
-    #- perm # difficult build process with directory names
+    # - perm # difficult build process with directory names
+    - snap
     - stampy
   utilitites:
     - bedtools
@@ -26,7 +27,7 @@ bio_nextgen:
     - vcftools
   analysis:
     - cufflinks
-    #- echo # build problems on ubuntu 12.10
+    # - echo # build problems on ubuntu 12.10
     - freebayes
     - gatk
     - gatk_queue
@@ -36,7 +37,7 @@ bio_nextgen:
     - shrec
     - snpeff
     - tophat
-    #- vep
+    - vep
   assembly:
     - abyss
     - cortex_var

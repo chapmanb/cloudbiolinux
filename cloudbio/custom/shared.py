@@ -84,7 +84,7 @@ def _get_expected_file(url):
     tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'"
     exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
-            (".tar",) : "tar %s -xpf" % safe_tar:,
+            (".tar",) : "tar %s -xpf" % safe_tar,
             (".tar.bz2",): "tar %s -xjpf" % safe_tar,
             (".zip",) : "unzip"}
     for ext_choices, tar_cmd in exts.iteritems():
@@ -102,7 +102,8 @@ def _safe_dir_name(dir_name, need_dir=True):
     # still couldn't find it, it's a nasty one
     for check_part in (dir_name.split("-")[0].split("_")[0],
                        dir_name.split("-")[-1].split("_")[-1],
-                       dir_name.split(".")[0]):
+                       dir_name.split(".")[0],
+                       dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
             dirs = run("ls -d1 *%s*/" % check_part).split("\n")

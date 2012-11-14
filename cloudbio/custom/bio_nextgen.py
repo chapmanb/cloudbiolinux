@@ -103,16 +103,30 @@ def install_perm(env):
             sed("makefile", "g\+\+", gcc_cmd)
     _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
 
+@_if_not_installed("snap")
+def install_snap(env):
+    """Scalable Nucleotide Alignment Program
+    http://snap.cs.berkeley.edu/
+    """
+    version = "0.15"
+    url = "http://github.com/downloads/amplab/snap/" \
+          "snap-%s-linux.tar.gz" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
+
 def install_stampy(env):
     """Stampy: mapping of short reads from illumina sequencing machines onto a reference genome.
     http://www.well.ox.ac.uk/project-stampy
     """
-    base_version = "1.0.18"
-    revision = "1526"
+    base_version = "1.0.21"
+    revision = "1654"
     version = "{0}r{1}".format(base_version, revision)
-    url = "http://www.well.ox.ac.uk/~gerton/software/Stampy/" \
-          "stampy-{0}.tgz".format(version)
-    _get_install_local(url, env, _make_copy(), dir_name="stampy-{0}".format(base_version))
+    url = "http://www.well.ox.ac.uk/bioinformatics/Software/" \
+          "stampy-%s.tgz" % (version)
+    def _clean_makefile(env):
+        sed("makefile", " -Wl", "")
+    _get_install_local(url, env, _make_copy(),
+                       dir_name="stampy-{0}".format(base_version),
+                       post_unpack_fn=_clean_makefile)
 
 @_if_not_installed("gmap")
 def install_gmap(env):
@@ -328,9 +342,10 @@ def install_bedtools(env):
     """A flexible suite of utilities for comparing genomic features.
     https://code.google.com/p/bedtools/
     """
-    version = "github"
-    repository = "git clone git://github.com/arq5x/bedtools.git"
-    _get_install(repository, env, _make_copy("ls -1 bin/*"))
+    version = "2.17.0"
+    url = "https://bedtools.googlecode.com/files/" \
+          "BEDTools.v%s.tar.gz" % version
+    _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 _shrec_run = """
 #!/usr/bin/perl
