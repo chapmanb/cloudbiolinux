@@ -179,14 +179,10 @@ def install_mosaik(env):
     """MOSAIK: reference-guided aligner for next-generation sequencing technologies
     http://code.google.com/p/mosaik-aligner/
     """
-    version = "github"
-    repository = "git clone git://github.com/wanpinglee/MOSAIK.git"
-    def _chdir_src(work_cmd):
-        def do_work(env):
-            with cd("src"):
-                work_cmd(env)
-        return do_work
-    _get_install(repository, env, _chdir_src(_make_copy("ls -1 ../bin/*")))
+    version = "2.1.73"
+    url = "http://mosaik-aligner.googlecode.com/files/" \
+          "MOSAIK-%s-binary.tar" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
 
 # --- Utilities
 
@@ -269,8 +265,8 @@ def install_varianttools(env):
     """Annotation, selection, and analysis of variants in the context of next-gen sequencing analysis.
     http://varianttools.sourceforge.net/
     """
-    version = "1.0.1"
-    version_ext = "a"
+    version = "1.0.3"
+    version_ext = "b"
     url = "http://downloads.sourceforge.net/project/varianttools/" \
           "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
     _get_install(url, env, _python_make)
@@ -293,7 +289,7 @@ def install_dwgsim(env):
     """DWGSIM: simulating NGS data and evaluating mappings and variant calling.
     http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Main_Page
     """
-    version = "0.1.8"
+    version = "0.1.10"
     samtools_version = "0.1.18"
     url = "http://downloads.sourceforge.net/project/dnaa/dwgsim/" \
           "dwgsim-{0}.tar.gz".format(version)
@@ -376,7 +372,7 @@ def install_echo(env):
     """ECHO: A reference-free short-read error correction algorithm
     http://uc-echo.sourceforge.net/
     """
-    version = "1_11"
+    version = "1_12"
     url = "http://downloads.sourceforge.net/project/uc-echo/source%20release/" \
           "echo_v{0}.tgz".format(version)
     _get_install_local(url, env, _make_copy())
@@ -387,7 +383,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.74"
+    version = "1.79"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
@@ -445,7 +441,7 @@ def install_vep(env):
     """Variant Effects Predictor (VEP) from Ensembl.
     http://ensembl.org/info/docs/variation/vep/index.html
     """
-    version = "branch-ensembl-68"
+    version = "branch-ensembl-69"
     url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
           "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
           "&pathrev={0}".format(version)
@@ -508,24 +504,26 @@ def _cufflinks_configure_make(env):
     if not exists(need_eigen):
         env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
     run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
-        " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
+        % (env.system_install, orig_eigen))
+    #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
+    #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
     run("make")
     env.safe_sudo("make install")
 
 @_if_not_installed("tophat")
-def install_tophat(env):
+def SRC_install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.5"
+    default_version = "2.0.6"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
 @_if_not_installed("cufflinks")
-def install_cufflinks(env):
+def SRC_install_cufflinks(env):
     """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
@@ -536,6 +534,30 @@ def install_cufflinks(env):
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
+@_if_not_installed("tophat")
+def install_tophat(env):
+    """TopHat is a fast splice junction mapper for RNA-Seq reads
+    http://tophat.cbcb.umd.edu/
+    """
+    default_version = "2.0.6"
+    version = env.get("tool_version", default_version)
+    url = "http://tophat.cbcb.umd.edu/downloads/" \
+          "tophat-%s.Linux_x86_64.tar.gz" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f",
+                                      do_make=False))
+
+@_if_not_installed("cufflinks")
+def install_cufflinks(env):
+    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    http://cufflinks.cbcb.umd.edu/
+    """
+    default_version = "2.0.2"
+    version = env.get("tool_version", default_version)
+    url = "http://cufflinks.cbcb.umd.edu/downloads/" \
+          "cufflinks-%s.Linux_x86_64.tar.gz" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f",
+                                      do_make=False))
+
 # --- Assembly
 
 @_if_not_installed("ABYSS")
@@ -544,7 +566,7 @@ def install_abyss(env):
     http://www.bcgsc.ca/platform/bioinfo/software/abyss
     """
     # XXX check for no sparehash on non-ubuntu systems
-    default_version = "1.3.3"
+    default_version = "1.3.4"
     version = env.get("tool_version", default_version)
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
     def _remove_werror_get_boost(env):
@@ -559,10 +581,9 @@ def install_transabyss(env):
     """Analyze ABySS multi-k-assembled shotgun transcriptome data.
     http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss
     """
-    version = "1.3.2"
-    ext = "_20120516"
+    version = "1.4.4"
     url = "http://www.bcgsc.ca/platform/bioinfo/software/trans-abyss/" \
-          "releases/%s/trans-ABySS-v%s%s.tar.gz" % (version, version, ext)
+          "releases/%s/trans-ABySS-v%s.tar.gz" % (version, version)
     _get_install_local(url, env, _make_copy(do_make=False))
 
 @_if_not_installed("velvetg")
@@ -570,7 +591,7 @@ def install_velvet(env):
     """Sequence assembler for very short reads.
     http://www.ebi.ac.uk/~zerbino/velvet/
     """
-    default_version = "1.2.05"
+    default_version = "1.2.08"
     version = env.get("tool_version", default_version)
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
@@ -599,16 +620,19 @@ def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
     http://trinityrnaseq.sourceforge.net/
     """
-    version = "r2012-05-18"
+    version = "r2012-10-05"
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
-          "trinityrnaseq_%s.tar.gz" % version
-    _get_install_local(url, env, _make_copy())
+          "trinityrnaseq_%s.tgz" % version
+    def _remove_werror(env):
+        sed("trinity-plugins/jellyfish/Makefile.in", " -Werror", "")
+    _get_install_local(url, env, _make_copy(),
+                       post_unpack_fn=_remove_werror)
 
 def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.11"
+    version = "1.0.5.13"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
@@ -618,8 +642,13 @@ def install_cortex_var(env):
         for cols in ["1", "2", "3", "4", "5"]:
             for kmer in ["31", "63", "95"]:
                 run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
-        with cd("scripts/analyse_variants/needleman_wunsch-0.3.0"):
+        with cd("scripts/analyse_variants/needleman_wunsch"):
             sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
+            # Fix incompatibilities with gzfile struct in zlib 1.2.6+
+            for fix_gz in ["libs/string_buffer/string_buffer.c", "libs/bioinf/bioinf.c",
+                           "libs/string_buffer/string_buffer.h", "libs/bioinf/bioinf.h"]:
+                sed(fix_gz, "gzFile \*", "gzFile ")
+                sed(fix_gz, "gzFile\*", "gzFile")
             run("make")
     _get_install_local(url, env, _cortex_build)
 
@@ -646,6 +675,17 @@ def install_hydra(env):
     url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         run("make clean")
+    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
+                 post_unpack_fn=clean_libs)
+
+@_if_not_installed("lumpy")
+def install_lumpy(env):
+    """a general probabilistic framework for structural variant discovery
+    https://github.com/arq5x/lumpy-sv
+    """
+    version = "github"
+    repository = "git clone git://github.com/arq5x/lumpy-sv.git" 
+    _get_install(repository, env, _make_copy("ls -1 bin/*"))
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
 
@@ -692,7 +732,7 @@ def install_stacks(env):
     """Stacks: build loci out of a set of short-read sequenced samples.
     http://creskolab.uoregon.edu/stacks/
     """
-    version = "0.998"
+    version = "0.9999"
     url = "http://creskolab.uoregon.edu/stacks/source/" \
           "stacks-{0}.tar.gz".format(version)
     _get_install(url, env, _configure_make)
@@ -702,8 +742,8 @@ def install_sambamba(env):
     """Library for working with SAM/BAM formats written in D programming language
     https://github.com/lomereiter/sambamba/wiki
     """
-    version = "0.1.0"
-    url = "http://cloud.github.com/downloads/lomereiter/sambamba/"\
+    version = "0.2.9"
+    url = "https://github.com/downloads/lomereiter/sambamba/" \
           "sambamba-{0}_amd64.deb".format(version)
     if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
         with _make_tmp_dir() as work_dir:
@@ -711,5 +751,3 @@ def install_sambamba(env):
                 run("wget {0}".format(url))
                 env.safe_sudo("sudo dpkg -i {0}".format(
                         os.path.basename(url)))
-        
-    

@@ -16,16 +16,6 @@ def install_bx_python(env):
     url = "hg clone http://bitbucket.org/james_taylor/bx-python"
     _get_install(url, env, _python_make)
 
-@_if_not_python_lib("matplotlib")
-def install_matplotlib(env):
-    """matplotlib is a python 2D plotting library which produces publication quality figures
-    http://matplotlib.sourceforge.net/
-    """
-    version = "1.2.0"
-    url = "http://downloads.sourceforge.net/project/matplotlib/matplotlib/" \
-          "matplotlib-%s/matplotlib-%s.tar.gz" % (version, version)
-    _get_install(url, env, _python_make)
-
 @_if_not_python_lib("rpy")
 def install_rpy(env):
     """RPy is a very simple, yet robust, Python interface to the R Programming Language.

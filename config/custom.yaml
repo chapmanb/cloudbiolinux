@@ -3,7 +3,7 @@
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
 bio_general:
- - bio4j
+ #- bio4j # no easy download for 0.8
  - emboss
  - pgdspider
 bio_nextgen:
@@ -14,7 +14,7 @@ bio_nextgen:
     - gmap
     - lastz
     - mosaik
-    - perm
+    #- perm # difficult build process with directory names
     - stampy
   utilitites:
     - bedtools
@@ -26,7 +26,7 @@ bio_nextgen:
     - vcftools
   analysis:
     - cufflinks
-    - echo
+    #- echo # build problems on ubuntu 12.10
     - freebayes
     - gatk
     - gatk_queue
@@ -36,7 +36,7 @@ bio_nextgen:
     - shrec
     - snpeff
     - tophat
-    - vep
+    #- vep
   assembly:
     - abyss
     - cortex_var
@@ -72,7 +72,6 @@ system:
   - s3fs
 python:
   - bx-python
-  - matplotlib
   - rpy
 java:
   - leinengin

@@ -271,8 +271,8 @@ databases:
   postgres:
     - postgresql
     - postgresql-client
-    - postgresql-plpython-8.4
-    - postgresql-plperl-8.4
+    - postgresql-plpython-9.1
+    - postgresql-plperl-9.1
     - libpq-dev
   sqlite:
     - libsqlite0
@@ -285,14 +285,14 @@ databases:
     - mongodb-10gen
     - couchdb
     - tokyocabinet-bin
-    - libtokyocabinet8
+    - libtokyocabinet9
     - libtokyocabinet-dev
   hdf:
-    - libhdf5-serial-1.8.4
-    - libhdf5-serial-dev
+    - libhdf5-7
+    - libhdf5-dev
 math:
   - prover9
-  - octave3.2
+  - octave
 viz:
   - imagemagick
   - x11-apps
@@ -314,7 +314,7 @@ boinc:
 bio_general:
   - primer3
   - bio-linux-catchall
-  - bio-linux-emboss
+  # - bio-linux-emboss
   - bio-linux-readseq
   - emboss
   - emboss-data
@@ -330,7 +330,7 @@ bio_search:
   - bio-linux-hmmer
   - bio-linux-mspcrunch
   - bio-linux-mview
-  - bio-linux-nrdb
+  # - bio-linux-nrdb # broken Depends: ia32-libs
   - cdbfasta
 bio_alignment:
   - bio-linux-clustal
@@ -357,14 +357,14 @@ bio_nextgen:
   - tabix
   - samtools # now up-to-date again
 bio_sequencing:
-  - bio-linux-assembly-conversion-tools
+  #- bio-linux-assembly-conversion-tools # broken Depends: bio-linux-staden
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
   - bio-linux-mira
   - bio-linux-mira-3rd-party
-  - bio-linux-staden
-  - bio-linux-stars
+  # - bio-linux-staden # broken Depends: ia32-libs
+  # - bio-linux-stars # broken Depends: bio-linux-staden
   - bio-linux-tablet
 bio_annotation:
   - mcl
@@ -381,7 +381,7 @@ bio_annotation:
   - bio-linux-rbs-finder
   - bio-linux-transterm-hp
   - bio-linux-trnascan
-  - bio-linux-tetra
+  # - bio-linux-tetra # broken Depends: ia32-libs
   # 500Mb of disk: - bio-linux-priam
 bio_markergenes:
   - bio-linux-ampliconnoise
@@ -390,7 +390,7 @@ bio_markergenes:
   - bio-linux-rdp-classifier
   - bio-linux-qiime
 bio_microarray:
-  - bio-linux-ocount
+  #- bio-linux-ocount # broken Depends: ia32-libs
   - bio-linux-oligoarray
   - bio-linux-oligoarrayaux
 bio_visualization:
@@ -425,7 +425,7 @@ phylogeny:
     - bio-linux-cytoscape
     - bio-linux-dendroscope
     - bio-linux-fastdnaml
-    - bio-linux-happy
+    #- bio-linux-happy # broken Depends: ia32-libs
     - bio-linux-mesquite
     - bio-linux-mrbayes
     - bio-linux-paml

@@ -42,6 +42,7 @@ pypi:
   #- cogent
   - DendroPy
   - HTSeq
+  - matplotlib
   - networkx
   - pandas
   - pybedtools

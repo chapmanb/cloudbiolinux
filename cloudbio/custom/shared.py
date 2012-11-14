@@ -84,6 +84,7 @@ def _get_expected_file(url):
     tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'"
     exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
+            (".tar",) : "tar %s -xpf" % safe_tar:,
             (".tar.bz2",): "tar %s -xjpf" % safe_tar,
             (".zip",) : "unzip"}
     for ext_choices, tar_cmd in exts.iteritems():
@@ -153,7 +154,8 @@ def _get_install(url, env, make_command, post_unpack_fn=None):
                     post_unpack_fn(env)
                 make_command(env)
 
-def _get_install_local(url, env, make_command, dir_name=None):
+def _get_install_local(url, env, make_command, dir_name=None,
+                       post_unpack_fn=None):
     """Build and install in a local directory.
     """
     (_, test_name, _) = _get_expected_file(url)
@@ -170,6 +172,8 @@ def _get_install_local(url, env, make_command, dir_name=None):
                 dir_name = _fetch_and_unpack(url)
                 if not exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
+                        if post_unpack_fn:
+                            post_unpack_fn(env)
                         make_command(env)
                     run("mv %s %s" % (dir_name, env.local_install))
 

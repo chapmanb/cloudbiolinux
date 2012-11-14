@@ -39,7 +39,7 @@ def install_beast(env):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 run("wget http://beast-mcmc.googlecode.com/files/BEASTv%s.tgz" % version)
-                run("tar xvzf BEASTv1.7.4.tgz" % version)
+                run("tar xvzf BEASTv%s.tgz" % version)
                 env.safe_sudo("mkdir -p %s" % install_dir)
                 env.safe_sudo("rm -rvf %s/beast" % install_dir)
                 env.safe_sudo("mv -f BEASTv%s %s/beast" % (version, install_dir))

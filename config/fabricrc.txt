@@ -8,7 +8,7 @@
 # details about the operating system
 ## Ubuntu
 distribution = ubuntu
-dist_name = precise
+dist_name = quantal
 ## Centos
 #distribution = centos
 ## Debian
