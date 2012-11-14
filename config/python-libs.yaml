@@ -6,6 +6,7 @@ pypi:
   - amqplib
   - BeautifulSoup
   - boto
+  - distribute
   - fabric
   - ipython
   - Logbook
