@@ -27,6 +27,10 @@ http {
         server localhost:42284;
     }
 
+    upstream galaxy_reports_app {
+        server localhost:9001;
+    }
+
     server {
         listen       80;
         client_max_body_size 2048m;
@@ -53,6 +57,13 @@ http {
         location /cloud/static/scripts {
             alias /mnt/cm/static/scripts;
             expires 24h;
+        }
+
+        location /reports {
+            rewrite ^/reports/(.*) /$1 break;
+            proxy_pass http://galaxy_reports_app;
+            proxy_set_header   X-Forwarded-Host $host;
+            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
         }
 
         location / {
