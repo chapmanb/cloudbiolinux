@@ -647,7 +647,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.13"
+    version = "1.0.5.14"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
