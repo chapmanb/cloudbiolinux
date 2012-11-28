@@ -654,6 +654,13 @@ def install_cortex_var(env):
         sed("Makefile", "\-L/full/path/\S*", "-L{0}/lib".format(env.system_install))
         sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include".format(env.system_install))
         sed("Makefile", "^IDIR_GSL_ALSO=.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
+        with cd("libs/gsl-1.15"):
+            run("make clean")
+            with settings(warn_only=True):
+                run("make")
+        with cd("libs/samtools-0.1.18"):
+            run("make clean")
+            run("make")
         for cols in ["1", "2", "3", "4", "5"]:
             for kmer in ["31", "63", "95"]:
                 run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))

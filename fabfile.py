@@ -124,7 +124,7 @@ def _custom_installs(to_install, ignore=None):
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
-def install_custom(p, automated=False, pkg_to_group=None):
+def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     """Install a single custom package by name.
     This method fetches names from custom.yaml that delegate to a method
     in the custom/name.py program. Alternatively, if a program install method is
@@ -146,7 +146,7 @@ def install_custom(p, automated=False, pkg_to_group=None):
     p = p.lower() # All packages are listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _configure_fabric_environment(env)
+        _configure_fabric_environment(env, flavor)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
 
