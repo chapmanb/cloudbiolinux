@@ -52,8 +52,9 @@ pypi:
   - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
-  - scikits.learn
-  - scikits.statsmodels
+  - scikits-learn
+  - statsmodels
+  - ramp
   - scipy
   # databases
   - CouchDB
