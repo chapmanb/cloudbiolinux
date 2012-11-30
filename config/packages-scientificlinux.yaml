@@ -54,3 +54,5 @@ distributed:
   - hadoop-0.20-pipes
   - hadoop-0.20-source
   - hadoop-0.20-libhdfs
+  - mpich2
+  - mpich2-devel

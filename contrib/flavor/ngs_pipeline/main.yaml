@@ -8,6 +8,7 @@ packages:
   - java
   - r
   - bio_nextgen
+  - distributed
 libraries:
   - python-libs
 custom_ignore:
@@ -17,3 +18,4 @@ custom_ignore:
   - cufflinks
   - mosaik
   - perm
+  - pydoop
