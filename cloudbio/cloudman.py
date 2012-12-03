@@ -169,5 +169,6 @@ def _cleanup_ec2(env):
         if exists(db_location):
             sudo('rm -rf %s' % db_location)
     # remove existing ssh host key pairs
-    # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/index.html?AESDG-chapter-sharingamis.htm
+    # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/AESDG-chapter-sharingamis.html
     sudo("rm -f /etc/ssh/ssh_host_*")
+    sudo("rm -f ~/.ssh/authorized_keys*")
