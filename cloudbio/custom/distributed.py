@@ -5,14 +5,8 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_installed, _make_tmp_dir, _if_not_python_lib, _fetch_and_unpack
-
-
-def _pip_cmd(env):
-    if env.has_key("pip_cmd") and env.pip_cmd:
-        return env.pip_cmd
-    else:
-        return "pip"
+from shared import (_if_not_installed, _make_tmp_dir, _if_not_python_lib,
+                    _fetch_and_unpack, _pip_cmd)
 
 @_if_not_python_lib("pydoop")
 def install_pydoop(env):

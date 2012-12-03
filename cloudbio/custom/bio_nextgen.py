@@ -8,7 +8,7 @@ from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _java_install,
+                    _java_install, _pip_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
 
@@ -250,7 +250,7 @@ def install_gemini(env):
     repository = "git clone git://github.com/arq5x/gemini.git"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
     def _gemini_install(env):
-        env.safe_sudo("pip{0} install -U cython".format("-python" if env.python_version_ext else ""))
+        env.safe_sudo("{0} install -U cython".format(_pip_cmd(env)))
         _python_make(env)
         env.safe_sudo("mkdir -p {0}".format(data_dir))
         env.safe_sudo("chown {0} {1}".format(env.user, data_dir))

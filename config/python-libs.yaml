@@ -52,7 +52,7 @@ pypi:
   - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
-  - scikits-learn
+  - scikit-learn
   - statsmodels
   - ramp
   - scipy

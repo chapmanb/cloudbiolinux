@@ -203,6 +203,16 @@ def _java_install(pname, version, url, env, install_fn=None):
                     else:
                         env.safe_sudo("mv *.jar %s" % install_dir)
 
+def _pip_cmd(env):
+    """Retrieve pip command for installing python packages, allowing configuration.
+    """
+    if env.has_key("pip_cmd") and env.pip_cmd:
+        return env.pip_cmd
+    elif env.has_key("python_version_ext") and env.python_version_ext:
+        return "pip-{0}".format(env.python_version_ext)
+    else:
+        return "pip"
+
 def _python_make(env):
     run("python%s setup.py build" % env.python_version_ext)
     # handle standard Ubuntu case: only specify a prefix if we're not
@@ -247,7 +257,7 @@ def _write_to_file(contents, path, mode):
 
 
 def _get_bin_dir(env):
-    """ 
+    """
     When env.system_install is /usr this exists, but in the Galaxy
     it may not already exist.
     """

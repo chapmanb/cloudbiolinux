@@ -7,7 +7,7 @@ from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.flavor.config import get_config_file
 
 def _apt_packages(to_install=None, pkg_list=None):
-    """ 
+    """
     Install packages available via apt-get.
     Note that ``to_install`` and ``pkg_list`` arguments cannot be used simultaneously.
 

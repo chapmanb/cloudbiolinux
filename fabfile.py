@@ -32,7 +32,7 @@ import cloudbio
 from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package import _configure_and_install_native_packages
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
@@ -246,10 +246,7 @@ def _python_library_installer(config):
     version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
     env.safe_sudo("easy_install%s -U pip" % version_ext)
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        env.safe_sudo("easy_install%s -U %s" % (version_ext, pname))
-        # Use pip when it doesn't re-download even if latest package installed
-        # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
-        #sudo("pip%s install -U %s" % (version_ext,  pname))
+        env.safe_sudo("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
