@@ -35,7 +35,7 @@ def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
     conn = boto.connect_s3()
     bucket = conn.lookup(bucket_name)
     mb_size = os.path.getsize(transfer_file) / 1e6
-    if mb_size < 60:
+    if mb_size < 50:
         _standard_transfer(bucket, s3_key_name, transfer_file, use_rr)
     else:
         _multipart_upload(bucket, s3_key_name, transfer_file, mb_size, use_rr,
@@ -91,7 +91,8 @@ def _multipart_upload(bucket, s3_key_name, tarball, mb_size, use_rr=True,
     def split_file(in_file, mb_size, split_num=5):
         prefix = os.path.join(os.path.dirname(in_file),
                               "%sS3PART" % (os.path.basename(s3_key_name)))
-        split_size = int(min(mb_size / (split_num * 2.0), 250))
+        # require a split size between 5Mb (AWS minimum) and 250Mb
+        split_size = int(max(min(mb_size / (split_num * 2.0), 250), 5))
         if not os.path.exists("%saa" % prefix):
             cl = ["split", "-b%sm" % split_size, in_file, prefix]
             subprocess.check_call(cl)
