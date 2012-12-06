@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Requires: 
+Requires:
     PyYAML http://pyyaml.org/wiki/PyYAMLDocumentation (easy_install pyyaml)
     boto http://code.google.com/p/boto/ (easy_install boto)
 
@@ -78,7 +78,7 @@ def _get_user_data():
     return ud
 
 def _get_bucket_name(cluster_name, access_key):
-    """Compose bucket name based on the user-provided cluster name and user access key""" 
+    """Compose bucket name based on the user-provided cluster name and user access key"""
     m = hashlib.md5()
     m.update( cluster_name + access_key )
     return "cm-" + m.hexdigest()
@@ -117,7 +117,7 @@ def _get_s3_conn(ud):
         log.error("Exception getting S3 connection: %s" % e)
         return None
     return s3_conn
-    
+
 
 def _bucket_exists(s3_conn, bucket_name):
     bucket = None
@@ -126,10 +126,10 @@ def _bucket_exists(s3_conn, bucket_name):
             # log.debug("Looking for bucket '%s'" % bucket_name)
             bucket = s3_conn.lookup(bucket_name)
             break
-        except S3ResponseError: 
+        except S3ResponseError:
             log.error ("Bucket '%s' not found, attempt %s/5" % (bucket_name, i+1))
             time.sleep(2)
-            
+
     if bucket is not None:
         log.debug("Cluster bucket '%s' found." % bucket_name)
         return True
@@ -143,10 +143,10 @@ def _remote_file_exists(s3_conn, bucket_name, remote_filename):
         try:
             b = s3_conn.get_bucket(bucket_name)
             break
-        except S3ResponseError: 
+        except S3ResponseError:
             log.error ("Problem connecting to bucket '%s', attempt %s/5" % (bucket_name, i))
             time.sleep(2)
-            
+
     if b is not None:
         k = Key(b, remote_filename)
         if k.exists():
@@ -164,21 +164,21 @@ def _save_file_to_bucket(s3_conn, bucket_name, remote_filename, local_file, forc
         except S3ResponseError, e:
             log.error ("Problem connecting to bucket '%s', attempt %s/5" % (bucket_name, i))
             time.sleep(2)
-    
+
     if b is not None:
         # log.debug("Establishing handle with key object '%s'..." % remote_filename)
         k = Key(b, remote_filename)
         if k.exists() and not force:
             log.debug("Remote file '%s' already exists. Not overwriting it." % remote_filename)
             return True
-        log.debug( "Attempting to save local file '%s' to bucket '%s' as '%s'" 
+        log.debug( "Attempting to save local file '%s' to bucket '%s' as '%s'"
             % (local_file, bucket_name, remote_filename))
         try:
             k.set_contents_from_filename(local_file)
             log.info( "Successfully saved file '%s' to bucket '%s'." % (remote_filename, bucket_name))
             return True
         except S3ResponseError, e:
-             log.error("Failed to save file local file '%s' to bucket '%s' as file '%s': %s" 
+             log.error("Failed to save file local file '%s' to bucket '%s' as file '%s': %s"
                 % (local_file, bucket_name, remote_filename, e))
              return False
     else:
@@ -189,14 +189,14 @@ def _get_file_from_bucket(s3_conn, bucket_name, remote_filename, local_filename)
     try:
         # log.debug("Establishing handle with bucket '%s'" % bucket_name)
         b = s3_conn.get_bucket(bucket_name)
-        
+
         # log.debug("Establishing handle with file object '%s'" % remote_filename)
         k = Key(b, remote_filename)
-    
+
         log.debug("Attempting to retrieve file '%s' from bucket '%s'" % (remote_filename, bucket_name))
         if k.exists():
             k.get_contents_to_filename(local_filename)
-            log.info("Successfully retrieved file '%s' from bucket '%s' to '%s'." 
+            log.info("Successfully retrieved file '%s' from bucket '%s' to '%s'."
                 % (remote_filename, bucket_name, local_filename))
             return True
         else:
@@ -213,7 +213,7 @@ def _get_file_from_url(url):
         f = urllib2.urlopen(url)
         with open(local_filename, 'w') as local_file:
             local_file.write(f.read())
-        os.chmod(local_filename, 0744) 
+        os.chmod(local_filename, 0744)
         if f:
             log.debug("Got boot script from '%s'" % url)
             return True
@@ -241,10 +241,10 @@ def _get_boot_script(ud):
             log.debug("Using cluster bucket '%s'" % ud['bucket_cluster'])
             use_default_bucket = False
     else:
-        log.debug("bucket_clutser not specified or no credentials provided; defaulting to bucket '%s'" 
+        log.debug("bucket_clutser not specified or no credentials provided; defaulting to bucket '%s'"
             % default_bucket_name)
         use_default_bucket = True
-        
+
     # If using cluster bucket, use credentials because the boot script may not be accessible to everyone
     got_boot_script = False
     if use_default_bucket is False:
@@ -256,7 +256,7 @@ def _get_boot_script(ud):
             os.chmod(os.path.join(LOCAL_PATH, DEFAULT_BOOT_SCRIPT_NAME), 0744)
     # If did not get the boot script, fall back on the publicly available one
     if not got_boot_script or use_default_bucket:
-        boot_script_url = os.path.join(_get_default_bucket_url(ud), ud.get('boot_script_name', 
+        boot_script_url = os.path.join(_get_default_bucket_url(ud), ud.get('boot_script_name',
             DEFAULT_BOOT_SCRIPT_NAME))
         log.debug("Could not get boot script '%s' from cluster bucket '%s'; "
             "retrieving the public one from bucket url '%s'" \
@@ -271,7 +271,7 @@ def _get_boot_script(ud):
             if _bucket_exists(s3_conn, ud['bucket_cluster']) and \
                not _remote_file_exists(s3_conn, ud['bucket_cluster'], ud['boot_script_name']):
                 _save_file_to_bucket(s3_conn, ud['bucket_cluster'], ud['boot_script_name'], \
-                    DEFAULT_BOOT_SCRIPT_NAME)        
+                    DEFAULT_BOOT_SCRIPT_NAME)
         return True
     log.debug("**Could not get the boot script**")
     return False
@@ -285,12 +285,12 @@ def _run_boot_script(boot_script_name):
         log.debug("Successfully ran boot script '%s'" % script)
         return True
     else:
-        log.error("Error running boot script '%s'. Process returned code '%s' and following stderr: %s" 
+        log.error("Error running boot script '%s'. Process returned code '%s' and following stderr: %s"
             % (script, process.returncode, stderr))
         return False
 
 def _create_basic_user_data_file():
-    # Create a basic YAML file that is expected by CloudMan 
+    # Create a basic YAML file that is expected by CloudMan
     with open(USER_DATA_FILE, 'w') as ud_file:
         ud_formatted = {'access_key': None,
                         'boot_script_name': DEFAULT_BOOT_SCRIPT_NAME,
@@ -309,9 +309,12 @@ def _get_default_bucket_url(ud=None):
         default_bucket_name = ud['bucket_default']
     else:
         default_bucket_name = DEFAULT_BUCKET_NAME
-    # TODO: Check if th bucket 'default_bucket_name' is accessible to everyone 
+    # TODO: Check if th bucket 'default_bucket_name' is accessible to everyone
     # because it is being accessed as a URL
-    bucket_url = ud.get("default_bucket_url", None)
+    if ud:
+        bucket_url = ud.get("default_bucket_url", None)
+    else:
+        bucket_url = None
     if not bucket_url:
         bucket_url = os.path.join(SERVICE_ROOT, default_bucket_name)
     log.debug("Default bucket url: %s" % bucket_url)
@@ -390,7 +393,7 @@ def _handle_yaml(user_data):
         if len(ud) == 1:
             return _handle_empty()
     # Create a YAML file from user data and store it as USER_DATA_FILE
-    # This code simply ensures fields required by CloudMan are in the 
+    # This code simply ensures fields required by CloudMan are in the
     # created file. Any other fields that might be included as user data
     # are also included in the created USER_DATA_FILE
     if ud.get('no_start', None) is not None:
@@ -402,55 +405,55 @@ def _handle_yaml(user_data):
     elif ud['cluster_name'] == '':
         log.warning("The cluster_name field of user data should not be empty.")
         ud['cluster_name'] = 'aCloudManCluster_%s' % random.randrange(1, 9999999)
-    
+
     if not ud.has_key('access_key'):
         log.info("The provided user data does not contain access_key field; setting it to None..")
         ud['access_key'] = None
     elif ud['access_key'] == '' or ud['access_key'] is None:
         log.warning("The access_key field of user data should not be empty; setting it to None.")
         ud['access_key'] = None
-    
+
     if not ud.has_key('secret_key'):
         log.info("The provided user data does not contain secret_key field; setting it to None.")
         ud['secret_key'] = None
     elif ud['secret_key'] == '' or ud['secret_key'] is None:
         log.warning("The secret_key field of user data should not be empty; setting it to None.")
         ud['secret_key'] = None
-    
+
     if not ud.has_key('password'):
         log.warning("The provided user data should contain password field.")
     elif ud['password'] == '':
         log.warning("The password field of user data should not be empty.")
     else: # ensure the password is a string
         ud['password'] = str(ud['password'])
-    
+
     if not ud.has_key('bucket_default'):
-        log.debug("The provided user data does not contain bucket_default field; setting it to '%s'." 
+        log.debug("The provided user data does not contain bucket_default field; setting it to '%s'."
             % DEFAULT_BUCKET_NAME)
         ud['bucket_default'] = DEFAULT_BUCKET_NAME
     elif ud['bucket_default'] == '':
-        log.warning("The bucket_default field of user data was empty; setting it to '%s'." 
+        log.warning("The bucket_default field of user data was empty; setting it to '%s'."
             % DEFAULT_BUCKET_NAME)
         ud['bucket_default'] = DEFAULT_BUCKET_NAME
-    
+
     if not ud.has_key('bucket_cluster'):
         if ud['access_key'] is not None and ud['secret_key'] is not None:
             ud['bucket_cluster'] = _get_bucket_name(ud['cluster_name'], ud['access_key'])
-    
+
     if not ud.has_key('role'):
         ud['role'] = 'master'
-    
+
     if not ud.has_key('cloudman_home'):
         ud['cloudman_home'] = CLOUDMAN_HOME
-    
+
     if not ud.has_key('boot_script_name'):
         ud['boot_script_name'] = DEFAULT_BOOT_SCRIPT_NAME
     ud['boot_script_path'] = LOCAL_PATH # Marks where boot script was saved
-    
+
     log.debug("Composed user data: %s" % ud)
     with open(USER_DATA_FILE, 'w') as ud_yaml:
         yaml.dump(ud, ud_yaml, default_flow_style=False)
-    
+
     # Get & run boot script
     if _get_boot_script(ud):
         _run_boot_script(DEFAULT_BOOT_SCRIPT_NAME)
