@@ -28,6 +28,8 @@ def _cleanup_space(env):
     env.logger.info("Cleaning up space from package builds")
     env.safe_sudo("rm -rf .cpanm")
     env.safe_sudo("rm -f /var/crash/*")
+    run("rm -f ~/*.dot")
+    run("rm -f ~/*.log")
 
 def _configure_gnome(env):
     """Configure NX server to use classic GNOME.
