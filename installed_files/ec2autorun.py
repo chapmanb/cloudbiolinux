@@ -225,12 +225,12 @@ def _get_file_from_url(url):
 def _get_boot_script(ud):
     # Test if cluster bucket exists; if it does not, resort to the default
     # bucket for downloading the boot script
-    use_default_bucket = False
+    use_default_bucket = ud.get("use_default_bucket", False)
     if ud.has_key('bucket_default'):
         default_bucket_name = ud['bucket_default']
     else:
         default_bucket_name = DEFAULT_BUCKET_NAME
-    if ud.has_key('bucket_cluster') and ud['access_key'] is not None and ud['secret_key'] is not None:
+    if not use_default_bucket and ud.has_key('bucket_cluster') and ud['access_key'] is not None and ud['secret_key'] is not None:
         s3_conn = _get_s3_conn(ud)
         # Check if cluster bucket exists or use the default one
         if not _bucket_exists(s3_conn, ud['bucket_cluster']) or \
@@ -265,7 +265,8 @@ def _get_boot_script(ud):
     if got_boot_script:
         log.debug("Saved boot script to '%s'" % os.path.join(LOCAL_PATH, DEFAULT_BOOT_SCRIPT_NAME))
         # Save the downloaded boot script to cluster bucket for future invocations
-        if ud.has_key('bucket_cluster') and ud['bucket_cluster']:
+        use_object_store = ud.get("use_object_store", True)
+        if use_object_store and ud.has_key('bucket_cluster') and ud['bucket_cluster']:
             s3_conn = _get_s3_conn(ud)
             if _bucket_exists(s3_conn, ud['bucket_cluster']) and \
                not _remote_file_exists(s3_conn, ud['bucket_cluster'], ud['boot_script_name']):
@@ -310,7 +311,9 @@ def _get_default_bucket_url(ud=None):
         default_bucket_name = DEFAULT_BUCKET_NAME
     # TODO: Check if th bucket 'default_bucket_name' is accessible to everyone 
     # because it is being accessed as a URL
-    bucket_url = os.path.join(SERVICE_ROOT, default_bucket_name)
+    bucket_url = ud.get("default_bucket_url", None)
+    if not bucket_url:
+        bucket_url = os.path.join(SERVICE_ROOT, default_bucket_name)
     log.debug("Default bucket url: %s" % bucket_url)
     return bucket_url
 
