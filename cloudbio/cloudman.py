@@ -172,3 +172,4 @@ def _cleanup_ec2(env):
     # http://docs.amazonwebservices.com/AWSEC2/latest/UserGuide/AESDG-chapter-sharingamis.html
     sudo("rm -f /etc/ssh/ssh_host_*")
     sudo("rm -f ~/.ssh/authorized_keys*")
+    sudo("rm -f /root/.ssh/authorized_keys*")
