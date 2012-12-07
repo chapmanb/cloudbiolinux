@@ -1,11 +1,18 @@
 ---
 # Debian packages use the standard packages.yaml list with naming substitutions
 # specified in this file.
+clojure: ""
 ec2-ami-tools: ""
 ec2-api-tools: ""
-python-vm-builder-ec2: ""
 firefox: iceweasel
 freenx: ""
+freenx-server: ""
+gdm: gdm3
+mongodb-10gen: mongodb
+python-vm-builder-ec2: ""
+ubuntu-desktop: ""
+ugene: ""
+unity-2d: ""
 # Problem Bio-Linux builds on debian 
 bio-linux-arb: ""
 bio-linux-assembly-conversion-tools: ""
