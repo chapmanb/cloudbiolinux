@@ -464,7 +464,7 @@ def install_vep(env):
     def _vep_install(env):
         sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
         sed("INSTALL.pl", ", <>\)",  ', "{0}")'.format(cache_dbs))
-        run("perl INSTALL.pl")
+        run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
 
 @_if_not_installed("freebayes")
@@ -620,7 +620,7 @@ def install_velvet(env):
 
 @_if_not_installed("Ray")
 def install_ray(env):
-    """Ray -- Parallel genome assemblies for parallel DNA sequencing 
+    """Ray -- Parallel genome assemblies for parallel DNA sequencing
     http://denovoassembler.sourceforge.net/
     """
     default_version = "2.1.0"
@@ -706,7 +706,7 @@ def install_lumpy(env):
     https://github.com/arq5x/lumpy-sv
     """
     version = "github"
-    repository = "git clone git://github.com/arq5x/lumpy-sv.git" 
+    repository = "git clone git://github.com/arq5x/lumpy-sv.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"))
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
