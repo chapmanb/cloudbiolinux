@@ -6,3 +6,4 @@ dist/
 *.pem
 dpkg.lst
 *.log
+venv/

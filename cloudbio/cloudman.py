@@ -21,7 +21,7 @@ from fabric.contrib.files import exists, settings, append
 
 from cloudbio.custom.shared import _make_tmp_dir, _write_to_file
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package.deb import _apt_packages
+from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 from cloudbio.galaxy import _setup_users
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -46,6 +46,7 @@ def _setup_env(env):
         url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
         cf = urllib.urlretrieve(url)
         (packages, _) = _yaml_to_packages(cf[0], 'cloudman')
+        _setup_apt_automation()
         _apt_packages(pkg_list=packages)
     elif env.distibution in ["centos", "scientificlinux"]:
         env.logger.warn("No CloudMan system package dependencies for CentOS")

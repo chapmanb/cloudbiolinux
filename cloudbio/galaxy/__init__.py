@@ -100,7 +100,8 @@ def _clone_galaxy_repo(env):
             if not exists(tmp_dir):
                 install_cmd("mkdir %s" % tmp_dir)
                 install_cmd("chown %s %s" % (env.user, tmp_dir))
-            install_cmd("mv %s/* %s" % (env.galaxy_home, tmp_dir))
+            with settings(warn_only=True):
+                install_cmd("mv %s/* %s" % (env.galaxy_home, tmp_dir))
     ## This is slightly different than mi-deployment to handle the
     ## case when the bucket url doesn't match the desired path.
     if not exists(env.galaxy_home):

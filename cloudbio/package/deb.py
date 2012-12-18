@@ -96,7 +96,7 @@ def _setup_apt_automation():
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
-        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+        cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
     sudo(cmd)
 
 def _setup_apt_sources():
