@@ -398,7 +398,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.79"
+    version = "1.82"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
@@ -407,7 +407,7 @@ def install_gatk(env):
     """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
     http://www.broadinstitute.org/gatk/
     """
-    version = "2.2-3-g63dddfb"
+    version = "2.3-4-gb8f1308"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
@@ -417,7 +417,7 @@ def install_gatk_queue(env):
     """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
     http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
     """
-    version = "2.2-3-g63dddfb"
+    version = "2.3-4-gb8f1308"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "QueueLite-%s%s" % (version, ext)
@@ -427,8 +427,8 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "2_0_5"
-    genomes = ["GRCh37.64", "NCBIM37.64", "athalianaTair10"]
+    version = "3_1"
+    genomes = ["GRCh37.68", "hg19", "NCBIM37.66", "GRCm38.68", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\

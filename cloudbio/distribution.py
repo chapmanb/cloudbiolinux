@@ -31,6 +31,7 @@ def _setup_distribution_environment():
     _cloudman_compatibility(env)
     _setup_nixpkgs()
     _configure_sudo(env)
+    _setup_fullpaths(env)
     # allow us to check for packages only available on 64bit machines
     machine = run("uname -m")
     env.is_64bit = machine.find("_64") > 0
@@ -44,6 +45,15 @@ def _configure_sudo(env):
     else:
         env.safe_sudo = run
         env.use_sudo = False
+
+def _setup_fullpaths(env):
+    home_dir = run("echo $HOME")
+    for attr in ["data_files", "galaxy_base", "local_install"]:
+        if hasattr(env, attr):
+            x = getattr(env, attr)
+            if x.startswith("~"):
+                x = x.replace("~", home_dir)
+                setattr(env, attr, x)
 
 def _cloudman_compatibility(env):
     """Environmental variable naming for compatibility with CloudMan.
@@ -184,4 +194,3 @@ def _add_source_versions(version, sources):
             s = s % name
         final.append(s)
     return final
-

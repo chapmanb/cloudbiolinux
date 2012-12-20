@@ -20,9 +20,9 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
     """
     folder_name = "variation"
     to_download = [("dbsnp_{ver}".format(ver=dbsnp_version), ""),
-                   ("hapmap_3.3", ".sites"),
-                   ("1000G_omni2.5", ".sites"),
-                   ("Mills_and_1000G_gold_standard.indels", ".sites")]
+                   ("hapmap_3.3", ""),
+                   ("1000G_omni2.5", ""),
+                   ("Mills_and_1000G_gold_standard.indels", "")]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
