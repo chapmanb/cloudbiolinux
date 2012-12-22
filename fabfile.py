@@ -39,6 +39,7 @@ from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
+from cloudbio.config_management.chef import _chef_provision, chef, _configure_chef
 
 # ### Shared installation targets for all platforms
 
@@ -56,6 +57,7 @@ def install_biolinux(target=None, flavor=None):
 
       - packages     Install distro packages
       - custom       Install custom packages
+      - chef_recipes Provision chef recipes
       - libraries    Install programming language libraries
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
@@ -90,6 +92,8 @@ def _perform_install(target=None, flavor=None):
             _nix_packages(pkg_install)
     if target is None or target == "custom":
         _custom_installs(pkg_install, custom_ignore)
+    if target is None or target == "chef_recipes":
+        _provision_chef_recipes(pkg_install, custom_ignore)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -147,6 +151,47 @@ def _custom_installs(to_install, ignore=None):
     packages = [p for p in packages if ignore is None or p not in ignore]
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
+
+
+def _provision_chef_recipes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "chef_recipes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    recipes = [recipe for recipe in env.flavor.rewrite_config_items("chef_recipes", packages)]
+    if recipes:  # Don't bother running chef if nothing to configure
+        install_chef_recipe(recipes, True)
+
+
+def install_chef_recipe(recipe, automated=False, flavor=None):
+    """Install one or more chef recipes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_custom:recipe
+
+    :type recipe:  string or list
+    :param recipe: A name (of list of names) of a custom program to install. This has to be either a name
+              that is listed in custom.yaml as a subordinate to a group name or a
+              program name whose install method is defined in either cloudbio or
+              custom packages (eg, install_cloudman).
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded.
+    """
+    _setup_logging(env)
+    if not automated:
+        _configure_fabric_environment(env, flavor)
+
+    time_start = _print_time_stats("Chef provision for recipe(s) '{0}'".format(recipe), "start")
+    _configure_chef(env, chef)
+    recipes = recipe if isinstance(recipe, list) else [recipe]
+    for recipe_to_add in recipes:
+        chef.add_recipe(recipe_to_add)
+    _chef_provision(env, recipes)
+    _print_time_stats("Chef provision for recipe(s) '%s'" % recipe, "end", time_start)
+
 
 def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     """
