@@ -14,15 +14,15 @@ task
 exec python %s 2> %s.log
 """
 import os
-import urllib
 
 from fabric.api import sudo, run, put, cd
 from fabric.contrib.files import exists, settings, append
 
-from cloudbio.custom.shared import _make_tmp_dir, _write_to_file
-from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 from cloudbio.galaxy import _setup_users
+from cloudbio.flavor.config import get_config_file
+from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.custom.shared import _make_tmp_dir, _write_to_file
+from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
@@ -36,25 +36,28 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_nfs(env)
 
 def _setup_env(env):
-    """ Setup the system environment required to run CloudMan. This primarily
-        refers to installing required Python dependencies (ie, libraries) as
-        defined in CloudMan's requirements.txt file.
+    """
+    Setup the system environment required to run CloudMan. This means
+    installing required system-level packages (as defined in CBL's
+    ``packages.yaml``, or a flavor thereof) and Python dependencies
+    (i.e., libraries) as defined in CloudMan's ``requirements.txt`` file.
     """
     # Get and install required system packages
     if env.distribution in ["debian", "ubuntu"]:
-        conf_file = 'config.yaml'
-        url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
-        cf = urllib.urlretrieve(url)
-        (packages, _) = _yaml_to_packages(cf[0], 'cloudman')
+        config_file = get_config_file(env, "packages.yaml")
+        (packages, _) = _yaml_to_packages(config_file.base, 'cloudman')
+        # Allow editions and flavors to modify the package list
+        packages = env.edition.rewrite_config_items("packages", packages)
+        packages = env.flavor.rewrite_config_items("packages", packages)
         _setup_apt_automation()
         _apt_packages(pkg_list=packages)
-    elif env.distibution in ["centos", "scientificlinux"]:
+    elif env.distribution in ["centos", "scientificlinux"]:
         env.logger.warn("No CloudMan system package dependencies for CentOS")
         pass
+    # Get and install required Python libraries
     reqs_file = 'requirements.txt'
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            # Get and install requried Python libraries
             url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
             run("wget --output-document=%s %s" % (reqs_file, url))
             sudo("pip install --upgrade --requirement={0}".format(reqs_file))
@@ -89,7 +92,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
     remote_file = '/etc/init/%s' % cloudman_boot_file
-    _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode=777)
+    _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode=0644)
     env.logger.debug("Done configuring CloudMan ec2_autorun")
 
 
@@ -159,12 +162,16 @@ def _cleanup_ec2(env):
         sudo("rm -rf %s" % rmdir)
     # Stop Apache from starting automatically at boot (it conflicts with Galaxy's nginx)
     sudo('/usr/sbin/update-rc.d -f apache2 remove')
-    # RabbitMQ fails to start if its database is embedded into the image
-    # because it saves the current IP address or host name so delete it now.
-    # When starting up, RabbitMQ will recreate that directory.
     with settings(warn_only=True):
+        # RabbitMQ fails to start if its database is embedded into the image
+        # because it saves the current IP address or host name so delete it now.
+        # When starting up, RabbitMQ will recreate that directory.
         sudo('/etc/init.d/rabbitmq-server stop')
         sudo('service rabbitmq-server stop')
+        # Clean up packages that are causing issues or are unnecessary
+        pkgs_to_remove = ['tntnet', 'tntnet-runtime', 'libtntnet9']
+        for ptr in pkgs_to_remove:
+            sudo('apt-get -y --force-yes remove --purge {0}'.format(ptr))
     sudo('initctl reload-configuration')
     for db_location in ['/var/lib/rabbitmq/mnesia', '/mnesia']:
         if exists(db_location):
