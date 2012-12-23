@@ -186,8 +186,8 @@ class BroadGenome(_DownloadHelper):
             run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "1.5"
-DBSNP_VERSION = "135"
+BROAD_BUNDLE_VERSION = "2.3"
+DBSNP_VERSION = "137"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
@@ -396,7 +396,7 @@ class CustomMaskManager:
         assert custom.has_key("mask")
         self._custom = custom
         self.config = config
- 
+
     def download(self, seq_dir):
         base_seq = os.path.join(os.pardir, self._custom["base"],
                                 "seq", "{0}.fa".format(self._custom["base"]))
@@ -453,8 +453,8 @@ def _build_galaxy_loc_line(dbkey, file_path, config, prefix, new_style, tool_nam
         tool_conf = _get_tool_conf(tool_name)
         loc_cols = LocCols(config, dbkey, file_path)
         # Compose the .loc file line as str_parts list by looking for column values
-        # from the retrieved tool_conf (as defined in tool_data_table_conf.xml). 
-        # Any column values required but missing in the the tool_conf are 
+        # from the retrieved tool_conf (as defined in tool_data_table_conf.xml).
+        # Any column values required but missing in the the tool_conf are
         # supplemented by the defaults defined in LocCols class
         for col in tool_conf.get('columns', []):
             str_parts.append(config.get(col, getattr(loc_cols, col)))
@@ -470,7 +470,7 @@ def _build_galaxy_loc_line(dbkey, file_path, config, prefix, new_style, tool_nam
 def _get_tool_conf(tool_name):
     """
     Parse the tool_data_table_conf.xml from installed_files subfolder and extract
-    values for the 'columns' tag and 'path' parameter for the 'file' tag, returning 
+    values for the 'columns' tag and 'path' parameter for the 'file' tag, returning
     those as a dict.
     """
     tool_conf = {}
@@ -651,7 +651,7 @@ def _index_eland(ref_file):
     """Index for Solexa's Eland aligner.
 
     This is nasty since Eland will choke on large files like the mm9 and h18
-    genomes. It also has a restriction on only having 24 larger reference 
+    genomes. It also has a restriction on only having 24 larger reference
     files per directory. This indexes files with lots of shorter sequences (like
     xenopus) as one file, and splits up other files, removing random and other
     associated chromosomes to avoid going over the 24 file limit.
