@@ -83,7 +83,11 @@ def install_biolinux(target=None, flavor=None):
         _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             if env.distribution in ["ubuntu"]:
-                sudo("apt-get install cloud-init")
+                # For the time being (Dec 2012), must install development version
+                # of cloud-init because of a boto & cloud-init bug:
+                # https://bugs.launchpad.net/cloud-init/+bug/1068801
+                sudo('wget https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
+                sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
     _print_time_stats("Config", "end", time_start)
 
@@ -127,25 +131,29 @@ def _custom_installs(to_install, ignore=None):
         install_custom(p, True, pkg_to_group)
 
 def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
-    """Install a single custom package by name.
-    This method fetches names from custom.yaml that delegate to a method
-    in the custom/name.py program. Alternatively, if a program install method is
-    defined in approapriate package, it will be called directly (see param p).
+    """
+    Install a single custom program or package by name.
+
+    This method fetches program name from ``config/custom.yaml`` and delegates
+    to a method in ``custom/*name*.py`` to proceed with the installation.
+    Alternatively, if a program install method is defined in the appropriate
+    package, it will be called directly (see param ``p``).
 
     Usage: fab [-i key] [-u user] -H host install_custom:program_name
 
     :type p:  string
-    :param p: A name of a custom program to install. This has to be either a name
-              that is listed in custom.yaml as a subordinate to a group name or a
-              program name whose install method is defined in either cloudbio or
-              custom packages (eg, install_cloudman).
+    :param p: A name of the custom program to install. This has to be either a name
+              that is listed in ``custom.yaml`` as a subordinate to a group name or a
+              program name whose install method is defined in either ``cloudbio`` or
+              ``custom`` packages
+              (e.g., ``cloudbio/custom/cloudman.py -> install_cloudman``).
 
     :type automated:  bool
     :param automated: If set to True, the environment is not loaded and reading of
-                      the custom.yaml is skipped.
+                      the ``custom.yaml`` is skipped.
     """
     _setup_logging(env)
-    p = p.lower() # All packages are listed in custom.yaml are in lower case
+    p = p.lower() # All packages listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
         _configure_fabric_environment(env, flavor)
