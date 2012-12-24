@@ -114,6 +114,8 @@ programming:
     - libpcre3-dev
     - libreadline-dev
     - mime-support
+    - uuid
+    - uuid-dev
     - gcc
     - g++
     - gfortran
