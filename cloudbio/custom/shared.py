@@ -314,7 +314,22 @@ def _setup_simple_service(service_name):
     sudo("ln -f -s /etc/init.d/%s /etc/rc6.d/K01%s" % (service_name, service_name))
 
 
-def _render_config_file_temlate(env, name, defaults={}, overrides={}, default_source=None):
+def _render_config_file_template(env, name, defaults={}, overrides={}, default_source=None):
+    """
+    If ``name` is say ``nginx.conf``, check fabric environment for
+    ``nginx_conf_path`` and then ``nginx_conf_template_path``. If
+    ``nginx_conf_path`` is set, return the contents of that file. If
+    nginx_conf_template_path is set, return the contents of that file
+    but with variable interpolation performed. Variable interpolation
+    is performed using a dervative of the fabric environment defined
+    using the supplied ``defaults`` and ``overrides`` using the
+    ``_extend_env`` function below.
+
+    Finally, if neither ``nginx_conf_path`` or
+    ``nginx_conf_template_path`` are set, check the
+    ``installed_files`` directory for ``nginx.conf`` and finally
+    ``nginx.conf.template``.
+    """
     param_prefix = name.replace(".", "_")
     # Deployer can specify absolute path for config file, check this first
     path_key_name = "%s_path" % param_prefix
@@ -343,6 +358,11 @@ def _render_config_file_temlate(env, name, defaults={}, overrides={}, default_so
 
 
 def _extend_env(env, defaults={}, overrides={}):
+    """
+    Create a new ``dict`` from fabric's ``env``, first adding defaults
+    specified via ``defaults`` (if available). Finally, override
+    anything in env, with values specified by ``overrides``.
+    """
     new_env = {}
     for key, value in defaults.iteritems():
         new_env[key] = value
@@ -354,5 +374,5 @@ def _extend_env(env, defaults={}, overrides={}):
 
 
 def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
-    conf_file_contents = _render_config_file_temlate(env, name, defaults, overrides, default_source)
+    conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
     _write_to_file(conf_file_contents, dest, mode=0755)
