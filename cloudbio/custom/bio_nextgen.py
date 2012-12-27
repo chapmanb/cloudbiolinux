@@ -407,11 +407,20 @@ def install_gatk(env):
     """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
     http://www.broadinstitute.org/gatk/
     """
+    # Install main gatk executable
     version = "2.3-4-gb8f1308"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
+    # Install R gsalib for report and pdf generation
+    with quiet():
+        have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
+    if have_gsalib and "FALSE" in have_gsalib:
+        git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
+        def install_gsalib(env):
+            env.safe_sudo("ant gsalib")
+        _get_install(git_repo, env, install_gsalib)
 
 def install_gatk_queue(env):
     """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
