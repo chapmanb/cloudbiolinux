@@ -45,7 +45,7 @@ def _setup_galaxy_env_defaults(env):
         # Was called install_dir in tools_fabfile.py
         env.galaxy_tools_dir = "/mnt/galaxyTools/tools"
     if "galaxy_loc_files" not in env:
-        indicies_dir = env.get("data_files", "/mnt/galaxyIndcies")
+        indicies_dir = env.get("data_files", "/mnt/galaxyIndices")
         env.galaxy_loc_files = os.path.join(indicies_dir, "galaxy", "galaxy-data")
     if "galaxy_jars_dir" not in env:
         env.galaxy_jars_dir = os.path.join(env.galaxy_home, "tool-data", "shared", "jars")
@@ -54,7 +54,7 @@ def _setup_galaxy_env_defaults(env):
     if "python_version" not in env:
         env.python_version = "2.7"  # Override in fabricrc if this is not the case.
     if "galaxy_indices_mount" not in env:
-        indicies_dir = env.get("data_files", "/mnt/galaxyIndcies")
+        indicies_dir = env.get("data_files", "/mnt/galaxyIndices")
         env.galaxy_indices_mount = indicies_dir
     if "galaxy_data_mount" not in env:
         env.galaxy_data_mount = "/mnt/galaxyData"
