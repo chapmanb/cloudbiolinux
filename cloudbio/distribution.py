@@ -48,7 +48,7 @@ def _configure_sudo(env):
 
 def _setup_fullpaths(env):
     home_dir = run("echo $HOME")
-    for attr in ["data_files", "galaxy_base", "local_install"]:
+    for attr in ["data_files", "galaxy_home", "local_install"]:
         if hasattr(env, attr):
             x = getattr(env, attr)
             if x.startswith("~"):

@@ -5,7 +5,7 @@
 #
 #  fab -H vagrant -f $source/fabfile.py -c  $source/contrib/minimal/fabricrc.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
 #
-#  Updated by Pjotr Prins <pjotr.debian@thebird.nl> 
+#  Updated by Pjotr Prins <pjotr.debian@thebird.nl>
 #
 
 ## BioNode is Debian
@@ -24,5 +24,3 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
-

@@ -23,11 +23,11 @@ shell = /bin/bash -l -c
 # Global setting for using sudo; allows installation of custom packages
 # by non-privileged users.
 # system_install needs to point to a user writeable directory if set to False
-use_sudo = true 
+use_sudo = true
 
 # details for biological data files and Galaxy
 data_files = /mnt/biodata
-galaxy_base = /mnt/biodata/galaxy
+galaxy_home = /mnt/biodata/galaxy
 
 # Picard home
 picard_home = /usr/share/java/picard

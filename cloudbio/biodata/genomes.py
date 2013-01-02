@@ -503,12 +503,12 @@ def _move_seq_files(ref_file, base_zips, seq_dir):
 def _update_loc_file(ref_file, line_parts):
     """Add a reference to the given genome to the base index file.
     """
-    if env.galaxy_base is not None:
-        tools_dir = os.path.join(env.galaxy_base, "tool-data")
+    if env.galaxy_home is not None:
+        tools_dir = os.path.join(env.galaxy_home, "tool-data")
         if not exists(tools_dir):
             run("mkdir -p %s" % tools_dir)
             put(env.tool_data_table_conf_file,
-                os.path.join(env.galaxy_base, "tool_data_table_conf.xml"))
+                os.path.join(env.galaxy_home, "tool_data_table_conf.xml"))
         add_str = "\t".join(line_parts)
         with cd(tools_dir):
             if not exists(ref_file):
