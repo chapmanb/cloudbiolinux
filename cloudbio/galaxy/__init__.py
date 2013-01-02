@@ -61,13 +61,14 @@ def _setup_galaxy_env_defaults(env):
 
 
 def _install_galaxy(env):
-    """ Used to install Galaxy and setup its environment.
-    This method cannot be used to update an existing instance of Galaxy code;
-    see volume_manipulations_fab.py script for that functionality.
-    Also, this method is somewhat targeted for the EC2 deployment so some
-    tweaking of the code may be desirable."""
+    """
+    Used to install Galaxy and setup its environment, including tools.
+    This method is somewhat targeted for the cloud deployment so some
+    tweaking of the code may be desirable. This method cannot be used
+    to update an existing Galaxy.
+    """
     _clone_galaxy_repo(env)
-    # MP: Ensure that everything under install dir is owned by env.galaxy_user
+    # Ensure that everything under install dir is owned by env.galaxy_user
     sudo("chown --recursive %s:%s %s"
        % (env.galaxy_user, env.galaxy_user, os.path.split(env.galaxy_tools_dir)[0]))
     sudo("chmod 755 %s" % os.path.split(env.galaxy_tools_dir)[0])
@@ -80,46 +81,32 @@ def _install_galaxy(env):
         _setup_xvfb(env)
     return True
 
-
 def _clone_galaxy_repo(env):
-    # MP: we need to have a tmp directory available if files already exist
-    # in the galaxy install directory
-    install_cmd = sudo if env.get("use_sudo", True) else run
+    """
+    Clone Galaxy source code repository from ``env.galaxy_repository`` to
+    ``env.galaxy_home``, setting the directory ownership to ``env.galaxy_user``
 
-    base_tmp_dir = env.get("galaxy_tmp_dir", "/mnt")
-    tmp_dir = os.path.join(base_tmp_dir, "fab_tmp")
-    if exists(tmp_dir):
-        install_cmd("rm -rf %s" % tmp_dir)
+    This method cannot be used to update an existing Galaxy installation.
+    """
+    # Make sure ``env.galaxy_home`` dir exists but without Galaxy in it
     if exists(env.galaxy_home):
         if exists(os.path.join(env.galaxy_home, '.hg')):
-            env.logger.info("Galaxy install dir '%s' exists and seems to have a Mercurial repository already there. Galaxy already installed.")
+            env.logger.info("Galaxy install dir '%s' exists and seems to have " \
+                "a Mercurial repository already there. Galaxy already installed?")
             return False
-        else:
-            # MP: need to move any files already in galaxy home so that hg
-            # can checkout files.
-            if not exists(tmp_dir):
-                install_cmd("mkdir %s" % tmp_dir)
-                install_cmd("chown %s %s" % (env.user, tmp_dir))
-            with settings(warn_only=True):
-                install_cmd("mv %s/* %s" % (env.galaxy_home, tmp_dir))
-    ## This is slightly different than mi-deployment to handle the
-    ## case when the bucket url doesn't match the desired path.
-    if not exists(env.galaxy_home):
+    else:
         sudo("mkdir -p '%s'" % env.galaxy_home)
-        _chown_galaxy(env, env.galaxy_home)
     with cd(env.galaxy_home):
-        # MP needs to be done as non galaxy user, otherwise we have a
+        # Needs to be done as non galaxy user, otherwise we have a
         # permissions problem.
         galaxy_repository = env.get("galaxy_repository", 'https://bitbucket.org/galaxy/galaxy-central/')
-        sudo('hg clone %s .' % galaxy_repository)
-    # MP: now we need to move the files back into the galaxy directory.
-    if exists(tmp_dir):
-        install_cmd("cp -R %s/* %s" % (tmp_dir, env.galaxy_home))
-        install_cmd("rm -rf %s" % tmp_dir)
+        env.safe_sudo('hg clone %s .' % galaxy_repository)
+    # Make sure ``env.galaxy_home`` is owned by ``env.galaxy_user``
+    _chown_galaxy(env, env.galaxy_home)
+    # If needed, custom-configure this freshly cloned Galaxy
     preconfigured = _read_boolean(env, "galaxy_preconfigured_repository", False)
     if not preconfigured:
         _configure_galaxy_repository(env)
-
 
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
     """
@@ -146,14 +133,16 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
             _write_to_file(contents, conf_file, 0700)
             _chown_galaxy(env, conf_file)
 
-
 def _configure_galaxy_repository(env):
-    """ mi-deployment would always edit the repository in this way, but
+    """
+    Custom-configure Galaxy repository. This is primarily targeted at a cloud
+    deployment.
+
+    mi-deployment would always edit the repository in this way, but
     galaxy-vm-launcher requires the configured Galaxy repository to pull
     in the changesets from https://bitbucket.org/jmchilton/cloud-galaxy-dist
     which prebakes these modifications in.
     """
-    sudo("chown -R %s %s" % (env.galaxy_user, env.galaxy_home))
     with cd(env.galaxy_home):  # and settings(warn_only=True):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
