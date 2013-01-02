@@ -446,8 +446,8 @@ cloudman:
     - rabbitmq-server
     # Required to handle data volumes (including LVM support)
     - lvm2
-    - dmsetup 
-    - mdadm
+    - dmsetup
+    # - mdadm
     - reiserfsprogs
     - xfsprogs
     # Required to compile nginx
@@ -477,7 +477,7 @@ cloudman:
     - fuse-utils
     - libcurl4-openssl-dev
     - libxml2-dev
-    - mime-support    
+    - mime-support
 galaxy:
   all:
     - postgresql
