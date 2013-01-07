@@ -9,12 +9,13 @@ A slightly more flushed out instance can be installed via the command:
 
 Finally, CloudMan and Galaxy can be installed together via the command:
 
-        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:falvor=cloudman/cloudman_and_galaxy
+        fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:flavor=cloudman/cloudman_and_galaxy
 
-You can additionally configure your CloudMan and Galaxy instance by specifing
+You can additionally configure your CloudMan and Galaxy instance by specifying
 a configuration file: "-c <your_fabricrc.txt>" in the above command.
 
-A subset of the parameters you may override via this mechanism includes:
+A subset of the parameters you may override via this mechanism includes (see
+``config/fabricrc.txt`` for a full list):
 
 * `galaxy_user` (default `galaxy`): User of Galaxy webapp
 * `galaxy_home` (default `/mnt/galaxyTools/galaxy-central`): Galaxy installation directory
