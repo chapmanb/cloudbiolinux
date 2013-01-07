@@ -1,332 +1,377 @@
+#
+# vcr.py
+#  - Configures the environment for running the Viral Assembly (vir-assembly-pipeline.sh) and VIGOR (VIGOR3.pl) pipelines (creating directory structure and installs software). 
+#
+
 import os.path, re
 from fabric.api import cd, env, hide, local, run, settings, sudo, task
 from fabric.network import disconnect_all
 
-    
-def install_cloudvigor(env):
-    try:
-        _initialize_script()
-        _initialize_host()
-        _install_tools()
-        _install_vigor()
-    finally:
-        disconnect_all()
+# Common variables
 
-def install_testcloudvigor(env):
-    try:
-        _initialize_script()
+dependency_URL = "http://s3.amazonaws.com/VIGOR-GSC"
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Adenovirus.pm \
-                -x %(VIGOR_RUNTIME_DIR)s/conf/hadv_FJ349096.cfg \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Adenovirus/34615.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/34615 \
-                > %(VIGOR_SCRATCH_DIR)s/34615.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+# Viral Assembly
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Coronavirus.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Coronavirus/GCV_35931.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/GCV_35931 \
-                > %(VIGOR_SCRATCH_DIR)s/GCV_35931.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+viral_dirs = {}
+viral_urls = {}
+viral_tars = {}
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Coronavirus.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Coronavirus/GCV_32276.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/GCV_32276 \
-                > %(VIGOR_SCRATCH_DIR)s/GCV_32276.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+# Viral Assembly - install methods
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Coronavirus.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Coronavirus/GCV_32265.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/GCV_32265 \
-                > %(VIGOR_SCRATCH_DIR)s/GCV_32265.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+def install_viralassembly():
+	try:
+		_initialize_area_viral()
+		_add_tools_viral()
+		_add_refs()
+		sudo("chmod -R 755 %(VIRAL_ROOT_DIR)s" % env)
+	finally:
+		disconnect_all()
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Flu.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Flu/FluB.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/FluB \
-                > %(VIGOR_SCRATCH_DIR)s/FluB.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+def install_viralassembly_cleanall():
+	try:
+		_initialize_env("viral")
+		_remove_dir("%(VIRAL_ROOT_DIR)s" % env)
+		print("Viral Assembly Removed\n")
+	finally:
+		disconnect_all()
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Rhinovirus.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Rhinovirus/Rhinovirus_genomes.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/Rhinovirus_genomes \
-                > %(VIGOR_SCRATCH_DIR)s/Rhinovirus_genomes.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+# Viral Assembly - utility methods
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -l %(VIGOR_RUNTIME_DIR)s/Rotavirus.pm \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/Rotavirus/rotaV_10_22_genome.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/rotaV_10_22_genome \
-                > %(VIGOR_SCRATCH_DIR)s/rotaV_10_22_genome.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+def _initialize_area_viral():
+	print("user: %(user)s" % env)
+	print("host: %(host)s" % env)
+	
+	_initialize_env("viral")
+	
+	env.VIRAL_SCRIPT = "https://raw.github.com/rsanka/rsanka-repo/master/vir-assembly-pipeline.sh"
+	
+	viral_dirs["PROJECT_DIR"] = "%(VIRAL_ROOT_DIR)s/project" % env
+	viral_dirs["REF_DIR"] = "%(VIRAL_ROOT_DIR)s/references"  % env
+	viral_dirs["TOOLS_DIR"] = "%(VIRAL_ROOT_DIR)s/tools"     % env
+	viral_dirs["TOOLS_BINARIES_DIR"] = "%s/BINARIES"         % viral_dirs["TOOLS_DIR"]
+	viral_dirs["TOOLS_PERL_DIR"] = "%s/PERL"                 % viral_dirs["TOOLS_DIR"]
+	viral_dirs["TOOLS_SFF_DIR"] = "%s/SFF"                   % viral_dirs["TOOLS_DIR"]
+	viral_dirs["TOOLS_FASTX_DIR"] = "%s/FASTX"               % viral_dirs["TOOLS_DIR"]
+	
+	env.VIRAL_REF_FILES = "corona_virus,hadv,influenza_a_virus,jev,mpv,norv,rota_virus,rsv,veev,vzv,yfv"
+	
+	viral_urls["FASTX_URL"] = "http://hannonlab.cshl.edu/fastx_toolkit"
+	viral_urls["BIO_LINUX_URL"] = "http://nebc.nerc.ac.uk/bio-linux/"
+	
+	viral_tars["BINARIES_TARBALL"] = "BINARIES.tgz"
+	viral_tars["PERL_TARBALL"] = "PERL.tgz"
+	viral_tars["SFF_TARBALL"] = "seq454-64_v2.6.tgz"
+	viral_tars["FASTX_TARBALL"] = "fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2"
+	
+	print("user:                      %(user)s" % env)
+	print("host:                      %(host)s" % env)
+	print("ROOT DIR:                  %(VIRAL_ROOT_DIR)s" % env)
+	print("VIRAL ASSEMBLY SCRIPT:     %(VIRAL_SCRIPT)s" % env)
+	for name in sorted(viral_dirs.keys()):
+		if not _path_is_dir(viral_dirs[name]):
+			sudo("mkdir -p %s" % viral_dirs[name])
+		print("%s:                        %s" % (name,viral_dirs[name]))
+	print("VIRAL ASSEMBLY REFS FILES: %(VIRAL_REF_FILES)s" % env)
+	for name in sorted(viral_urls.keys()):
+		print("%s:                        %s" % (name,viral_urls[name]))
+	for name in sorted(viral_tars.keys()):
+		print("%s:\t\t%s" % (name,viral_tars[name]))
 
-        cmd = ("""%(VIGOR_RUNTIME_DIR)s/VIGOR.pl \
-                -v 1 \
-                -i %(VIGOR_SAMPLE_DATA_DIR)s/YellowFeverV/YFV_genome.fasta \
-                -O %(VIGOR_TEST_OUTPUT_DIR)s/YFV_genome \
-                > %(VIGOR_SCRATCH_DIR)s/YFV_genome.log 2>&1 \
-                """) % env
-        print("DEBUG: cmd[%s]" % cmd)
-        run(cmd)
+def _add_tools_viral():
+	sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> /home/ubuntu/.bashrc")
+	sudo("wget --no-check-certificate -O %s/vir-assembly-pipeline.sh %s" % (env.VIRAL_ROOT_DIR,env.VIRAL_SCRIPT))
+	_add_package(dependency_URL,viral_tars["BINARIES_TARBALL"],viral_dirs["TOOLS_BINARIES_DIR"],"tar")
+	_add_package(dependency_URL,viral_tars["PERL_TARBALL"],viral_dirs["TOOLS_PERL_DIR"],"tar")
+	_add_package(dependency_URL,viral_tars["SFF_TARBALL"],viral_dirs["TOOLS_SFF_DIR"],"tar")
+	_apt_get_install("csh")
+	_apt_get_install("gawk")
+	_add_fastx()
+	_initialize_bio_linux()
 
-    finally:
-        disconnect_all()
+def _add_refs():
+	files = (env.VIRAL_REF_FILES).split(",")
+	for file in files:
+		_add_package(dependency_URL,"%s.tgz" % file,viral_dirs["REF_DIR"],"tar")
 
-def install_validatevigor(env):
-    print("here0")
-    try:
-        _initialize_script()
-        _install_package(env.AMAZONS3_URL, "vigor-20111129code-test-output-lserver.tgz",
-                         env.VIGOR_VALIDATION_TEST_DATA_DIR, True)
-        with settings(hide("running","stdout")):
-            results = run("""diff -Bwr %(VIGOR_VALIDATION_TEST_DATA_DIR)s \
-                          %(VIGOR_TEST_OUTPUT_DIR)s \
-                          || echo 'VALIDATION FAILED'""" % env)
-        if results:
-            print("\n\nValidation Failed:\n\n%s\n" % results)
-    finally:
-        disconnect_all()
+def _add_fastx():
+	_add_package(viral_urls["FASTX_URL"],viral_tars["FASTX_TARBALL"],viral_dirs["TOOLS_FASTX_DIR"],"bz2")
+	sudo("cp %s/bin/* %s" % (viral_dirs["TOOLS_FASTX_DIR"],viral_dirs["TOOLS_FASTX_DIR"]))
+	sudo("rm -fr %s/bin"  % viral_dirs["TOOLS_FASTX_DIR"])
+
+def _initialize_bio_linux():
+	sudo("echo -e \"deb %s unstable bio-linux\" >> /etc/apt/sources.list" % viral_urls["BIO_LINUX_URL"])
+	sudo("sudo apt-get update")
+	_apt_get_install("bio-linux-keyring")
+	_apt_get_install("bwa")
+	_apt_get_install("samtools")
+	_apt_get_install("bio-linux-cap3")
+	_apt_get_install("emboss")
 
 
-def install_cleanall(env):
-    try:
-        _initialize_script()
-        _initialize_host()
-        _remove_vigor()
-        _remove_tools()
-        _remove_dir(env.SCRATCH_DIR)
-    finally:
-        disconnect_all()
+# VIGOR
 
+vigor_dirs = {}
+vigor_urls = {}
+vigor_tars = {}
+vigor_names = {}
 
-def _create_scratch_dir():
-    if not _path_is_dir(env.VIGOR_SCRATCH_DIR):
-        sudo("mkdir -p %(VIGOR_SCRATCH_DIR)s" % env)
-    sudo("chown -R %(user)s:%(user)s %(VIGOR_SCRATCH_DIR)s" % env)
-    sudo("find %(VIGOR_SCRATCH_DIR)s -type d -exec chmod 775 {} \;" % env)
+# VIGOR - install methods
 
-def _create_tools_dir():
-    if not _path_is_dir(env.TOOLS_DIR):
-        sudo("mkdir -p %(TOOLS_DIR)s" % env)
-    sudo("chown -R %(user)s:%(user)s %(TOOLS_DIR)s" % env)
+def install_viralvigor():
+	try:
+		_initialize_area_vigor()
+		_initialize_host()
+		_add_vigor()
+		_add_tools_vigor()
+	finally:
+		disconnect_all()
 
-def _create_vigor_scratch_dir():
-    if not _path_is_dir(env.VIGOR_SCRATCH_DIR):
-        sudo("mkdir -p %(VIGOR_SCRATCH_DIR)s" % env)
-    if not _path_is_dir(env.VIGOR_TEST_OUTPUT_DIR):
-        sudo("mkdir -p %(VIGOR_TEST_OUTPUT_DIR)s" % env)
-    sudo("find %(VIGOR_SCRATCH_DIR)s -type f -exec chmod 666 {} \;" % env)
-    sudo("find %(VIGOR_SCRATCH_DIR)s -type d -exec chmod 777 {} \;" % env)
+def install_viralvigor_test():
+	try:
+		_initialize_area_vigor()
+		cmd = ("""%s/VIGOR3.pl \
+				-D yfv \
+				-i %s/westnile.fasta \
+				-O %s/westnile \
+				> %s/westnile_test_run.log 2>&1 \
+				""") % (vigor_dirs["VIGOR_RUNTIME_DIR"],vigor_dirs["VIGOR_SAMPLE_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"],vigor_dirs["VIGOR_SCRATCH_DIR"])
+		print("DEBUG: cmd[%s]" % cmd)
+		run(cmd)
+	finally:
+		disconnect_all()
 
-def _create_vigor_tempspace_dir():
-    if not _path_is_dir(env.VIGOR_TEMPSPACE_DIR):
-        sudo("mkdir -p %(VIGOR_TEMPSPACE_DIR)s" % env)
-    sudo("chown -R %(user)s:%(user)s %(VIGOR_TEMPSPACE_DIR)s" % env)
-    sudo("find %(VIGOR_TEMPSPACE_DIR)s -type d -exec chmod 777 {} \;" % env)
+def install_viralvigor_validate():
+	try:
+		_initialize_area_vigor()
+		sudo("rm -f %s/westnile.rpt" % vigor_dirs["VIGOR_TEST_OUTPUT_DIR"])
+		with settings(hide("running","stdout")):
+			results = run("""diff -Bwr %s %s || echo 'VALIDATION FAILED'""" % (vigor_dirs["VIGOR_VALIDATION_TEST_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"]))
+		if results:
+			print("\n\nValidation Failed:\n\n%s\n" % results)
+	finally:
+		disconnect_all()
 
-def _fix_etc_hosts():
-    internal_ip = sudo("hostname")
-    print("internal_ip[%s]" % internal_ip)
-    filespec = "/etc/hosts"
-    sudo("echo '127.0.0.1 %s' >> %s" % (internal_ip, filespec))
+def install_viralvigor_cleanall():
+	try:
+		_initialize_env("vigor")
+		_remove_dir(env.VIGOR_ROOT_DIR)
+		_remove_dir(env.SCRATCH_DIR)
+		print("Vigor Removed\n")
+	finally:
+		disconnect_all()
+
+# VIGOR - utility methods
+
+def _initialize_area_vigor():
+	machine = run("uname -m")
+	
+	if machine.find('64')>0:
+		env.ARCH = 'x64-linux'
+	else:
+		env.ARCH = 'ia32-linux'
+	
+	_initialize_env("vigor")
+	
+	vigor_dirs["TOOLS_DIR"] = "%(VIGOR_ROOT_DIR)s/tools"                     % env
+	vigor_dirs["VIGOR_STORED_DIR"] = "%s/vigor"                              % vigor_dirs["TOOLS_DIR"]
+	vigor_dirs["VIGOR_RUNTIME_DIR"] = "%s/prod3"                             % vigor_dirs["VIGOR_STORED_DIR"]
+	vigor_dirs["VIGOR_SCRATCH_DIR"] = "%(SCRATCH_DIR)s/vigor"                % env
+	vigor_dirs["VIGOR_TEMPSPACE_DIR"] = "%s/tempspace"                       % vigor_dirs["VIGOR_SCRATCH_DIR"]
+	vigor_dirs["VIGOR_SAMPLE_DATA_DIR"] = "%s/samples"                       % vigor_dirs["VIGOR_STORED_DIR"]
+	vigor_dirs["VIGOR_TEST_OUTPUT_DIR"] = "%s/test"                          % vigor_dirs["VIGOR_STORED_DIR"]
+	vigor_dirs["VIGOR_VALIDATION_TEST_DATA_DIR"] = "%s/samples_valid_output" % vigor_dirs["VIGOR_STORED_DIR"]
+	vigor_dirs["BLAST_DIR"] = "%s/blast"                                     % vigor_dirs["TOOLS_DIR"]
+	vigor_dirs["CLUSTALW_DIR"] = "%s/clustalw"                               % vigor_dirs["TOOLS_DIR"]
+	vigor_dirs["EXE_DIR"] = vigor_dirs["VIGOR_RUNTIME_DIR"]
+	
+	vigor_names["BLAST_NAME"] = 'blast-2.2.15'
+	vigor_names["CLUSTALW_NAME"] = 'clustalw-1.83'
+	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud-release-20121204'
+	
+	vigor_tars["VIGOR_TAR_FILENAME"] = "%s.tgz"                              % vigor_names["VIGOR_NAME"]
+	vigor_tars["BLAST_TAR_FILENAME"] = "%s-%s.tar.gz"                  % (vigor_names["BLAST_NAME"],env.ARCH)
+	vigor_tars["CLUSTALW_TAR_FILENAME"] = "%s-%s.deb"                  % (vigor_names["CLUSTALW_NAME"],env.ARCH)
+	
+	print("user:                           %(user)s"                         % env)
+	print("host:                           %(host)s"                         % env)
+	print("ARCH:                           %(ARCH)s"                         % env)
+	print("ROOT DIR:                       %(VIGOR_ROOT_DIR)s"               % env)
+	print("SCRATCH DIR:                    %(SCRATCH_DIR)s"                  % env)
+	for name in sorted(vigor_dirs.keys()):
+		print("%s:                             %s"                           % (name,vigor_dirs[name]))
+	for name in sorted(vigor_urls.keys()):
+		print("%s:                             %s"                           % (name,vigor_urls[name]))
+	print("BLAST_NAME:                     %s"                               % vigor_names["BLAST_NAME"])
+	print("CLUSTALW_NAME:                  %s"                               % vigor_names["CLUSTALW_NAME"])
+	print("VIGOR_NAME:                     %s"                               % vigor_names["VIGOR_NAME"])
+	for name in sorted(vigor_tars.keys()):
+		print("%s:                             %s"                           % (name,vigor_tars[name]))
 
 def _initialize_host():
-    local("ssh-keygen -R %(host)s" % env)
-    _fix_etc_hosts()
-    _create_scratch_dir()
+	local("ssh-keygen -R %(host)s" % env)
+	_fix_etc_hosts()
+	_create_scratch_dir()
 
-def _initialize_script():
+def _add_vigor():
+	print("Installing VIGOR...")
+	_create_vigor_tempspace_dir()
+	_create_vigor_scratch_dir()
+	_add_package(dependency_URL, vigor_tars["VIGOR_TAR_FILENAME"], vigor_dirs["VIGOR_STORED_DIR"], "tar")
+	sudo("chmod 755 %s" % os.path.join(vigor_dirs["VIGOR_RUNTIME_DIR"], "*.pl"))
+	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "perl")):
+		sudo("ln -sf %s %s" % ("/usr/bin/perl", vigor_dirs["EXE_DIR"]))
+		sudo("ln -sf %s %s" % ("/usr/bin/perl", "/usr/local/bin"))
+	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "vigorscratch")):
+		sudo("ln -sf %s %s/vigorscratch" % (vigor_dirs["VIGOR_TEMPSPACE_DIR"], vigor_dirs["EXE_DIR"]))
 
-    machine = run("uname -m")
+def _add_tools_vigor():
+	print("Install tools...")
+	_create_tools_dir()
+	_add_blast()
+	_add_clustalw()
+	_apt_get_install("libapache-dbi-perl")
+	_apt_get_install("libclass-dbi-sqlite-perl")
 
-    if machine.find('64')>0:
-        env.ARCH = 'x64-linux'
-    else:
-        env.ARCH = 'ia32-linux'
+def _fix_etc_hosts():
+	internal_ip = sudo("hostname")
+	print("internal_ip[%s]" % internal_ip)
+	filespec = "/etc/hosts"
+	sudo("echo '127.0.0.1 %s' >> %s" % (internal_ip, filespec))
 
-    env.ROOT_DIR = '/usr/local'
-    env.SCRATCH_DIR = '/usr/local/scratch'
-    #env.AMAZONS3_URL = 'https://s3.amazonaws.com/VIGOR-GSC'
-    env.AMAZONS3_URL = 'https://github.com/downloads/JCVI-Cloud/cloudbiolinux'
-    env.BLAST_NAME = 'blast-2.2.15'
-    env.CLUSTALW_NAME = 'clustalw-1.83'
-    env.VIGOR_NAME = 'vigor-GSCcloud-release-20111129'
-    env.VIGOR_SAMPLE_DATA_TAR_FILENAME = 'vigor-sample-data.tgz'
+def _create_scratch_dir():
+	if not _path_is_dir(env.SCRATCH_DIR):
+		sudo("mkdir -p %(SCRATCH_DIR)s" % env)
+	sudo("chown -R %(user)s:%(user)s %(SCRATCH_DIR)s" % env)
+	sudo("find %(SCRATCH_DIR)s -type d -exec chmod 775 {} \;" % env)
 
+def _create_vigor_tempspace_dir():
+	if not _path_is_dir(vigor_dirs["VIGOR_TEMPSPACE_DIR"]):
+		sudo("mkdir -p %s" % vigor_dirs["VIGOR_TEMPSPACE_DIR"])
+		sudo("chown -R %s:%s %s" % (env.user, env.user, vigor_dirs["VIGOR_TEMPSPACE_DIR"]))
+		sudo("find %s -type d -exec chmod 777 {} \;" % vigor_dirs["VIGOR_TEMPSPACE_DIR"])
 
-    print("user[%(user)s]" % env)
-    print("host[%(host)s]" % env)
-    print("ROOT_DIR[%(ROOT_DIR)s]" % env)
-    print("SCRATCH_DIR[%(SCRATCH_DIR)s]" % env)
-    print("AMAZONS3_URL[%(AMAZONS3_URL)s]" % env)
-    print("BLAST_NAME[%(BLAST_NAME)s]" % env)
-    print("CLUSTALW_NAME[%(CLUSTALW_NAME)s]" % env)
-    print("VIGOR_NAME[%(VIGOR_NAME)s]" % env)
-    print("VIGOR_SAMPLE_DATA_TAR_FILENAME[%(VIGOR_SAMPLE_DATA_TAR_FILENAME)s]" % env)
-    print("ARCH[%(ARCH)s]" % env)
-          
-    env.HOME = os.path.join("/home", env.user)
+def _create_vigor_scratch_dir():
+	if not _path_is_dir(vigor_dirs["VIGOR_SCRATCH_DIR"]):
+		sudo("mkdir -p %(VIGOR_SCRATCH_DIR)s" % env)
+	sudo("find %s -type f -exec chmod 666 {} \;" % vigor_dirs["VIGOR_SCRATCH_DIR"])
+	sudo("find %s -type d -exec chmod 777 {} \;" % vigor_dirs["VIGOR_SCRATCH_DIR"])
 
-    env.TOOLS_DIR = os.path.join(env.ROOT_DIR, "tools")
-    env.VIGOR_RUNTIME_DIR = os.path.join(env.TOOLS_DIR, "vigor")
-    env.VIGOR_SCRATCH_DIR = os.path.join(env.SCRATCH_DIR, "vigor")
-    env.VIGOR_TEMPSPACE_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "tempspace")
-    env.VIGOR_SAMPLE_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "sample-data")
-    env.VIGOR_TAR_FILENAME = "%(VIGOR_NAME)s.tgz" % env
-    env.VIGOR_TEST_OUTPUT_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "test-output")
-    env.VIGOR_VALIDATION_TEST_DATA_DIR = os.path.join(env.VIGOR_SCRATCH_DIR, "validate-test-data")
-    env.BLAST_DIR = os.path.join(env.TOOLS_DIR, "blast")
-    env.CLUSTALW_DIR = os.path.join(env.TOOLS_DIR, "clustalw")
-    env.EXE_DIR = "/usr/local/bin"
-    env.BLAST_TAR_FILENAME = "%(BLAST_NAME)s-%(ARCH)s.tar.gz" % env
-    env.CLUSTALW_TAR_FILENAME = "%(CLUSTALW_NAME)s-%(ARCH)s.deb" % env
+def _create_tools_dir():
+	if not _path_is_dir(vigor_dirs["TOOLS_DIR"]):
+		sudo("mkdir -p %s" % vigor_dirs["TOOLS_DIR"])
+	sudo("chown -R %s:%s %s" % (env.user,env.user,vigor_dirs["TOOLS_DIR"]))
 
-def _install_blast():
-    print("    Installing blast...")
-    _create_tools_dir()
-    _install_package(env.AMAZONS3_URL, env.BLAST_TAR_FILENAME, env.BLAST_DIR, True)
-    if not _path_exists(os.path.join(env.EXE_DIR, "blastall")):
-        sudo("ln -s %s %s"
-            % (os.path.join(env.BLAST_DIR, env.BLAST_NAME, "bin", "*"),
-                env.EXE_DIR))
+def _add_blast():
+	print("    Installing blast...")
+	_create_tools_dir()
+	_add_package(dependency_URL, vigor_tars["BLAST_TAR_FILENAME"], vigor_dirs["BLAST_DIR"], "tar")
+	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "blastall")):
+		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["BLAST_DIR"], vigor_names["BLAST_NAME"], "bin", "bl2seq"), vigor_dirs["EXE_DIR"]))
+		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["BLAST_DIR"], vigor_names["BLAST_NAME"], "bin", "blastall"), vigor_dirs["EXE_DIR"]))
+		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["BLAST_DIR"], vigor_names["BLAST_NAME"], "bin", "fastacmd"), vigor_dirs["EXE_DIR"]))
+		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["BLAST_DIR"], vigor_names["BLAST_NAME"], "bin", "formatdb"), vigor_dirs["EXE_DIR"]))
 
-def _install_clustalw():
-    print("    Installing clustalw...")
-    _create_tools_dir()
-    _install_package(env.AMAZONS3_URL, env.CLUSTALW_TAR_FILENAME,
-                     env.CLUSTALW_DIR, False)
-    if not _path_exists(os.path.join(env.EXE_DIR, "clustalw")):
-            sudo("ln -s %s %s"
-                 % (os.path.join(env.CLUSTALW_DIR, env.CLUSTALW_NAME, "clustalw"),
-                    env.EXE_DIR))
-
-def _install_tools():
-    print("Install tools...")
-    _create_tools_dir()
-    _install_blast()
-    _install_clustalw()
-
-def _install_vigor():
-    print("Installing VIGOR...")
-    _create_vigor_tempspace_dir()
-    _create_vigor_scratch_dir()
-    _install_vigor_sample_data()
-    _install_package(env.AMAZONS3_URL, env.VIGOR_TAR_FILENAME,
-                     env.VIGOR_RUNTIME_DIR, True)
-    sudo("chmod 755 %s" % os.path.join(env.VIGOR_RUNTIME_DIR, "*.pl"))
-    if not _path_exists(os.path.join(env.EXE_DIR, "perl")):
-        sudo("ln -s %s %s" % ("/usr/bin/perl", env.EXE_DIR))
-
-def _install_vigor_sample_data():
-    print("    Installing VIGOR sample data...")
-    _install_package(env.AMAZONS3_URL, env.VIGOR_SAMPLE_DATA_TAR_FILENAME,
-                 env.VIGOR_SAMPLE_DATA_DIR, True)
-    sudo("find %(VIGOR_SAMPLE_DATA_DIR)s -type f -exec chmod ugo-w {} \;"
-         % env)
-    sudo("find %(VIGOR_SAMPLE_DATA_DIR)s -type d -exec chmod 555 {} \;"
-         % env)
-
-def _remove_blast():
-    print("    Removing blast...")
-    _remove_symlinks(os.path.join(env.BLAST_DIR, env.BLAST_NAME, "bin", "*"),
-                     env.EXE_DIR)
-    _remove_dir(env.BLAST_DIR)
-
-def _remove_clustalw():
-    print("    Removing clustalw...")
-    _remove_symlinks(os.path.join(env.CLUSTALW_DIR, env.CLUSTALW_NAME, "*"),
-                     env.EXE_DIR)
-    _remove_dir(env.CLUSTALW_DIR)
-
-def _remove_tools():
-    print("Removing tools...")
-    _remove_blast()
-    #_remove_clustalw()
-    _remove_dir(env.TOOLS_DIR)
+def _add_clustalw():
+	print("    Installing clustalw...")
+	_create_tools_dir()
+	_add_package(dependency_URL, vigor_tars["CLUSTALW_TAR_FILENAME"], vigor_dirs["CLUSTALW_DIR"], "deb")
+	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "clustalw")):
+		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["CLUSTALW_DIR"], vigor_names["CLUSTALW_NAME"], "clustalw"), vigor_dirs["EXE_DIR"]))
 
 def _remove_vigor():
-    print("Removing VIGOR...")
-    _remove_dir(env.VIGOR_RUNTIME_DIR)
-    _remove_dir(env.VIGOR_SAMPLE_DATA_DIR)
-    _remove_dir(env.VIGOR_TEMPSPACE_DIR)
-    _remove_dir(env.VIGOR_TEST_OUTPUT_DIR)
-    _remove_dir(env.VIGOR_VALIDATION_TEST_DATA_DIR)
-    _remove_dir(env.VIGOR_SCRATCH_DIR)
+	print("Removing VIGOR...")
+	_remove_dir(env.VIGOR_RUNTIME_DIR)
+	_remove_dir(env.VIGOR_SAMPLE_DATA_DIR)
+	_remove_dir(env.VIGOR_TEMPSPACE_DIR)
+	_remove_dir(env.VIGOR_TEST_OUTPUT_DIR)
+	_remove_dir(env.VIGOR_VALIDATION_TEST_DATA_DIR)
+	_remove_dir(env.VIGOR_SCRATCH_DIR)
 
-# Utility methods.
+def _remove_tools():
+	print("Removing tools...")
+	_remove_blast()
+	_remove_clustalw()
+	_remove_dir(env.TOOLS_DIR)
 
-def _install_package(download_url, filename, install_dir, tar):
-    if not _path_is_dir(install_dir):
-        sudo("mkdir -p %s" % install_dir)
-    with cd(install_dir):
-        if not _path_exists(os.path.join(install_dir, filename)):
-            sudo("""wget --no-host-directories --cut-dirs=1 \
-                 --directory-prefix=%s %s/%s"""
-                % (install_dir, download_url, filename))
-            if tar:
-                sudo("tar xvfz %s" % filename)
-            else: 
-                sudo("dpkg -x %s %s" % (filename,install_dir))
-                sudo("mkdir %s/%s" % (install_dir, env.CLUSTALW_NAME))
-                sudo("cp %s/usr/bin/* %s/%s" % (install_dir,install_dir,env.CLUSTALW_NAME))
-    sudo("chown -R %s:%s %s" % (env.user, env.user, install_dir))
-    sudo("find %s -type d -exec chmod 755 {} \;" % install_dir)
+def _remove_blast():
+	print("    Removing blast...")
+	_remove_symlinks(os.path.join(env.BLAST_DIR, vigor_names["BLAST_NAME"], "bin", "*"), env.EXE_DIR)
+	_remove_dir(env.BLAST_DIR)
 
-def _path_exists(path):
-    found = False
-    with settings(hide("running","stdout")):
-        result = sudo("test -e '%s' || echo 'FALSE'" % path)
-    if result != "FALSE": found = True
-    return found
-
-def _path_is_dir(path):
-    found = False
-    with settings(hide("running","stdout")):
-        result = sudo("test -d '%s' || echo 'FALSE'" % path)
-    if result != "FALSE": found = True
-    return found
-
-def _remove_dir(dirspec):
-    if _path_is_dir(dirspec):
-        _unlock_dir(dirspec)
-        sudo("rm -rf %s" % dirspec)
-    #else:
-    #    print("DEBUG: _remove_dir[%s] -- NOT FOUND" % dirspec)
-
+def _remove_clustalw():
+	print("    Removing clustalw...")
+	_remove_symlinks(os.path.join(env.CLUSTALW_DIR, vigor_names["CLUSTALW_NAME"], "*"), env.EXE_DIR)
+	_remove_dir(env.CLUSTALW_DIR)
 
 def _remove_symlinks(link_from_filespec, link_to_dir):
-    if _path_is_dir(link_to_dir):
-        sudo("find %s -lname '%s' -delete" % (link_to_dir, link_from_filespec))
+	if _path_is_dir(link_to_dir):
+		sudo("find %s -lname '%s' -delete" % (link_to_dir, link_from_filespec))
+
+
+# Common methods
+
+def _initialize_env(pipeline):
+	if pipeline == "viral":
+		env.VIRAL_ROOT_DIR = "/usr/local/VHTNGS"
+		if not _path_exists(env.VIRAL_ROOT_DIR):
+			sudo("mkdir -p %s" % env.VIRAL_ROOT_DIR)
+	else:
+		env.VIGOR_ROOT_DIR = "/usr/local/VIGOR"
+		if not _path_exists(env.VIGOR_ROOT_DIR):
+			sudo("mkdir -p %s" % env.VIGOR_ROOT_DIR)
+		env.SCRATCH_DIR = "/usr/local/scratch"
+		if not _path_exists(env.SCRATCH_DIR):
+			sudo("mkdir -p %s" % env.SCRATCH_DIR)
+
+def _add_package(download_url, filename, install_dir, type):
+	if not _path_is_dir(install_dir):
+		sudo("mkdir -p %s" % install_dir)
+	with cd(install_dir):
+		if not _path_exists(os.path.join(install_dir, filename)):
+			sudo("""wget --no-host-directories --cut-dirs=1 --directory-prefix=%s %s/%s""" % (install_dir, download_url, filename))
+			if type == "tar":
+				sudo("tar xvfz %s" % filename)
+			elif type == "bz2":
+				sudo("tar xfj %s" % filename) 
+			else: 
+				sudo("dpkg -x %s %s" % (filename,install_dir))
+				sudo("mkdir %s/%s" % (install_dir, vigor_names["CLUSTALW_NAME"]))
+				sudo("cp %s/usr/bin/* %s/%s" % (install_dir,install_dir,vigor_names["CLUSTALW_NAME"]))
+	sudo("chown -R %s:%s %s" % (env.user, env.user, install_dir))
+	sudo("find %s -type d -exec chmod 755 {} \;" % install_dir)
+
+def _add_tarball(download_url,tarball,install_dir,options):
+	sudo("wget --no-check-certificate -O %s %s" % (tarball,download_url))
+	sudo("mv %s %s" % (tarball,install_dir))
+	sudo("tar %s %s/%s -C %s" % (options,install_dir,tarball,install_dir))
+
+def _remove_dir(dirspec):
+	if _path_is_dir(dirspec):
+		_unlock_dir(dirspec)
+		sudo("rm -rf %s" % dirspec)
+	else:
+		print("DEBUG: _remove_dir[%s] -- NOT FOUND" % dirspec)
 
 def _unlock_dir(dirspec):
-    with settings(hide("running","stdout")):
-        sudo("find %s -type d -exec chmod 755 {} \;" % dirspec)
-        sudo("find %s -type d -exec chmod g+s {} \;" % dirspec)
-        sudo("find %s -type f -exec chmod 644 {} \;" % dirspec)
+	with settings(hide("running","stdout")):
+		sudo("find %s -type d -exec chmod 755 {} \;" % dirspec)
+		sudo("find %s -type d -exec chmod g+s {} \;" % dirspec)
+		sudo("find %s -type f -exec chmod 644 {} \;" % dirspec)
+
+def _apt_get_install(tool):
+	sudo("apt-get -q -y --force-yes install %s" % tool)
+
+def _path_exists(path):
+	found = False
+	with settings(hide("running","stdout")):
+		result = sudo("test -e '%s' || echo 'FALSE'" % path)
+	if result != "FALSE": found = True
+	return found
+
+def _path_is_dir(path):
+	found = False
+	with settings(hide("running","stdout")):
+		result = sudo("test -d '%s' || echo 'FALSE'" % path)
+	if result != "FALSE": found = True
+	return found
