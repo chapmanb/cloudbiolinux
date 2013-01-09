@@ -44,7 +44,7 @@ def _initialize_area_viral():
 	
 	_initialize_env("viral")
 	
-	env.VIRAL_SCRIPT = "https://raw.github.com/rsanka/rsanka-repo/master/vir-assembly-pipeline.sh"
+	env.VIRAL_SCRIPT = "%s/vir-assembly-pipeline.sh" % dependency_URL
 	
 	viral_dirs["PROJECT_DIR"] = "%(VIRAL_ROOT_DIR)s/project" % env
 	viral_dirs["REF_DIR"] = "%(VIRAL_ROOT_DIR)s/references"  % env
