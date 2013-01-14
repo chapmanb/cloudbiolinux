@@ -408,7 +408,7 @@ def install_gatk(env):
     http://www.broadinstitute.org/gatk/
     """
     # Install main gatk executable
-    version = "2.3-4-gb8f1308"
+    version = "2.3-9-gdcdccbb"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
@@ -426,11 +426,24 @@ def install_gatk_queue(env):
     """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
     http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
     """
-    version = "2.3-4-gb8f1308"
+    version = "2.3-9-gdcdccbb"
     ext = ".tar.bz2"
     url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
           "QueueLite-%s%s" % (version, ext)
     _java_install("gatk_queue", version, url, env)
+
+def install_varscan(env):
+    """
+    http://varscan.sourceforge.net/
+    """
+    version = "2.3.3"
+    url = "http://downloads.sourceforge.net/project/varscan/VarScan.v%s.jar" % version
+    install_dir = _symlinked_java_version_dir("varscan", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % url)
+                env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.

@@ -52,6 +52,7 @@ bio_nextgen:
     - gemini
     - tassel
     - stacks
+    - varscan
   chip:
     - macs
   needs_64bit:
