@@ -160,6 +160,7 @@ def _configure_nfs(env):
     galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
     galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
     exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
+                '/opt/condor           *(rw,sync,no_root_squash,no_subtree_check)',
                 '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
                 '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
                 '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
