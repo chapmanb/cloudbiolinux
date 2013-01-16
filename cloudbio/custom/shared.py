@@ -321,7 +321,7 @@ def _render_config_file_template(env, name, defaults={}, overrides={}, default_s
     ``nginx_conf_path`` is set, return the contents of that file. If
     nginx_conf_template_path is set, return the contents of that file
     but with variable interpolation performed. Variable interpolation
-    is performed using a dervative of the fabric environment defined
+    is performed using a derivative of the fabric environment defined
     using the supplied ``defaults`` and ``overrides`` using the
     ``_extend_env`` function below.
 

@@ -59,10 +59,26 @@ data_files = /mnt/biodata
 # URL for the Galaxy application source code repository
 #galaxy_repository = https://bitbucket.org/galaxy/galaxy-central/
 
+# A path to the binaries for interacting with PostgreSQL
+#postgres_bin_dir = /usr/lib/postgresql/9.1/bin
+#postrges_user = postgres
+#postgres_port = 5840
+
+# If ``True``, setup and initialize Postgres database for use by Galaxy
+# according to the following options
+#galaxy_setup_database = False
+#galaxy_db_name = galaxy
+#galaxy_database_path = /mnt/galaxy/db
+#galaxy_ftp_user_password = fu5yOj2sn
+#galaxy_universe_wsgi_url = https://bitbucket.org/galaxy/cloudman/raw/tip/universe_wsgi.ini.cloud
+
 # If ``True``, Galaxy repository will not be custom-configured after being cloned
 # The customization details are primarily targeted at a cloud deployment; for
 # details, see ``cbl.galaxy.__init__ -> _configure_galaxy_repository``
 #galaxy_preconfigured_repository = False
+
+# If ``True``, setup and initialize Postgres database for use by Galaxy
+#galaxy_setup_database = False
 
 # If ``True``, setup Galaxy as a system-level service controlled via init.d
 #galaxy_setup_service = False
@@ -99,6 +115,10 @@ data_files = /mnt/biodata
 
 
 # -- Tool-specific configurations
+
+# A location of a custom nginx.conf or a comparable template, respectively.
+#nginx_conf_template_path = installed_files/nginx.conf.template
+#nginx_conf_path = path/to/custom/nginx.conf
 
 # Picard home
 picard_home = /usr/share/java/picard
