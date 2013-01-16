@@ -127,7 +127,7 @@ def _get_galaxy_db_configs(env):
     Extract configuration options for Galaxy database and return those as a dictionary
     """
     config = {}
-    config['psql_data_dir'] = env.get('galaxy_database_path', '/mnt/galaxy/db'))
+    config['psql_data_dir'] = env.get('galaxy_database_path', '/mnt/galaxy/db')
     config['psql_conf_file'] = os.path.join(config['psql_data_dir'], 'postgresql.conf')
     config['psql_bin_dir'] = env.get('postgres_bin_dir', '/usr/lib/postgresql/9.1/bin')
     config['psql_user'] = env.get('postrges_user', 'postgres')
@@ -223,7 +223,7 @@ def _init_galaxy_db(env):
     """
     with cd(env.galaxy_home):
         universe_wsgi_url = env.get('galaxy_universe_wsgi_url',
-            os.path.join(CM_REPO_ROOT_URL, 'universe_wsgi.ini.cloud')
+            os.path.join(CM_REPO_ROOT_URL, 'universe_wsgi.ini.cloud'))
         sudo("wget --output-document=universe_wsgi.ini {0}".format(universe_wsgi_url))
         started = False
         if not _postgres_running(env):

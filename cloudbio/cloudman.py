@@ -33,6 +33,7 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_logrotate(env)
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
+    _configure_hadoop(env)
     _configure_nfs(env)
 
 def _setup_env(env):
@@ -110,6 +111,21 @@ def _configure_sge(env):
     if not exists(os.path.join(sge_package_dir, sge_dir)):
         sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
     env.logger.debug("Done configuring CloudMan SGE")
+
+def _configure_hadoop(env):
+    """
+    Grab files required by CloudMan to setup a Hadoop cluster atop SGE.
+    """
+    hadoop_root = '/opt/hadoop'
+    if not exists(hadoop_root):
+        sudo("mkdir -p %s" % hadoop_root)
+    with cd(hadoop_root):
+        if not exists('hadoop.tar.gz'):
+            sudo("wget --output-document=hadoop.tar.gz https://s3.amazonaws.com/cloudman/hadoop.tar.gz")
+        if not exists('sge_integration.tar.gz'):
+            sudo("wget --output-document=sge_integration.tar.gz https://s3.amazonaws.com/cloudman/sge_integration.tar.gz")
+    sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root)
+    env.logger.debug("Done configuring Hadoop for CloudMan")
 
 def _configure_nfs(env):
     nfs_dir = "/export/data"
