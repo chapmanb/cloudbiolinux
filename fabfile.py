@@ -86,8 +86,10 @@ def install_biolinux(target=None, flavor=None):
                 # For the time being (Dec 2012), must install development version
                 # of cloud-init because of a boto & cloud-init bug:
                 # https://bugs.launchpad.net/cloud-init/+bug/1068801
-                sudo('wget https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
+                sudo('wget --output-document=cloud-init_0.7.1-0ubuntu4_all.deb ' +
+                    'https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
                 sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
+                sudo("rm -f cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
     _print_time_stats("Config", "end", time_start)
 
