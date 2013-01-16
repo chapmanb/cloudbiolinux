@@ -33,6 +33,7 @@ def _setup_users(env):
     _add_user('galaxy', '1001')
     _add_user('sgeadmin')
     _add_user('postgres')
+    _add_user('condor')
     env.logger.debug("Done setting up CloudMan users")
 
 

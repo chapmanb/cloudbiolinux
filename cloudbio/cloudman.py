@@ -34,6 +34,7 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
     _configure_hadoop(env)
+    _configure_condor(env)
     _configure_nfs(env)
 
 def _setup_env(env):
@@ -124,8 +125,23 @@ def _configure_hadoop(env):
             sudo("wget --output-document=hadoop.tar.gz https://s3.amazonaws.com/cloudman/hadoop.tar.gz")
         if not exists('sge_integration.tar.gz'):
             sudo("wget --output-document=sge_integration.tar.gz https://s3.amazonaws.com/cloudman/sge_integration.tar.gz")
-    sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root)
+    sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root))
     env.logger.debug("Done configuring Hadoop for CloudMan")
+
+def _configure_condor(env):
+    """
+    Grab files required by CloudMan to setup HTCondor
+    """
+    condor_root = '/opt/condor'
+    filename = 'condor-7.9.1-x86_64_ubuntu_10.04.4-stripped.tar.gz'
+    if not exists(condor_root):
+        sudo("mkdir -p %s" % condor_root)
+    with cd(condor_root):
+        if not exists(filename):
+            sudo('wget --output-document={0} https://s3.amazonaws.com/cloudman/{0}'\
+                .format(filename))
+    sudo("chown -R condor:condor {0}".format(condor_root))
+    env.logger.debug("Done configuring HTCondor for CloudMan")
 
 def _configure_nfs(env):
     nfs_dir = "/export/data"
