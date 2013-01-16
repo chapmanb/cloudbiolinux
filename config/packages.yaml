@@ -473,8 +473,9 @@ cloudman:
     - libreadline6-dev
     # Required for s3fs
     - libfuse-dev
-    - pkg-config
+    - libfuse2
     - fuse-utils
+    - pkg-config
     - libcurl4-openssl-dev
     - libxml2-dev
     - mime-support
