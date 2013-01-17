@@ -19,7 +19,7 @@ viral_tars = {}
 
 # Viral Assembly - install methods
 
-def install_viralassembly():
+def install_viralassembly(env):
 	try:
 		_initialize_area_viral()
 		_add_tools_viral()
@@ -28,7 +28,7 @@ def install_viralassembly():
 	finally:
 		disconnect_all()
 
-def install_viralassembly_cleanall():
+def install_viralassembly_cleanall(env):
 	try:
 		_initialize_env("viral")
 		_remove_dir("%(VIRAL_ROOT_DIR)s" % env)
@@ -118,7 +118,7 @@ vigor_names = {}
 
 # VIGOR - install methods
 
-def install_viralvigor():
+def install_viralvigor(env):
 	try:
 		_initialize_area_vigor()
 		_initialize_host()
@@ -127,7 +127,7 @@ def install_viralvigor():
 	finally:
 		disconnect_all()
 
-def install_viralvigor_test():
+def install_viralvigor_test(env):
 	try:
 		_initialize_area_vigor()
 		cmd = ("""%s/VIGOR3.pl \
@@ -141,7 +141,7 @@ def install_viralvigor_test():
 	finally:
 		disconnect_all()
 
-def install_viralvigor_validate():
+def install_viralvigor_validate(env):
 	try:
 		_initialize_area_vigor()
 		sudo("rm -f %s/westnile.rpt" % vigor_dirs["VIGOR_TEST_OUTPUT_DIR"])
@@ -152,7 +152,7 @@ def install_viralvigor_validate():
 	finally:
 		disconnect_all()
 
-def install_viralvigor_cleanall():
+def install_viralvigor_cleanall(env):
 	try:
 		_initialize_env("vigor")
 		_remove_dir(env.VIGOR_ROOT_DIR)
