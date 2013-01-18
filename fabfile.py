@@ -67,7 +67,6 @@ def install_biolinux(target=None, flavor=None):
     pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
         _configure_and_install_native_packages(env, pkg_install)
-
         if env.nixpkgs: # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)

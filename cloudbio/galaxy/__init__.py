@@ -94,21 +94,26 @@ def _clone_galaxy_repo(env):
     This method cannot be used to update an existing Galaxy installation.
     """
     # Make sure ``env.galaxy_home`` dir exists but without Galaxy in it
+    galaxy_exists = False
     if exists(env.galaxy_home):
         if exists(os.path.join(env.galaxy_home, '.hg')):
             env.logger.warning("Galaxy install dir {0} exists and seems to have " \
                 "a Mercurial repository already there. Galaxy already installed?"\
                 .format(env.galaxy_home))
-            return False
+            galaxy_exists = True
     else:
         sudo("mkdir -p '%s'" % env.galaxy_home)
-    with cd(env.galaxy_home):
-        # Needs to be done as non galaxy user, otherwise we have a
-        # permissions problem.
-        galaxy_repository = env.get("galaxy_repository", 'https://bitbucket.org/galaxy/galaxy-central/')
-        env.safe_sudo('hg clone %s .' % galaxy_repository)
+    if not galaxy_exists:
+        with cd(env.galaxy_home):
+            # Needs to be done as non galaxy user, otherwise we have a
+            # permissions problem.
+            galaxy_repository = env.get("galaxy_repository", 'https://bitbucket.org/galaxy/galaxy-central/')
+            env.safe_sudo('hg clone %s .' % galaxy_repository)
     # Make sure ``env.galaxy_home`` is owned by ``env.galaxy_user``
     _chown_galaxy(env, env.galaxy_home)
+    # Make sure env.galaxy_home root dir is also owned by env.galaxy_user so Galaxy
+    # process can create necessary dirs (e.g., shed_tools, tmp)
+    sudo("chown {0}:{0} {1}".format(env.galaxy_user, os.path.split(env.galaxy_home)[0]))
     # If needed, custom-configure this freshly cloned Galaxy
     preconfigured = _read_boolean(env, "galaxy_preconfigured_repository", False)
     if not preconfigured:
@@ -292,28 +297,16 @@ def _configure_galaxy_repository(env):
         # Set up the symlink for SAMTOOLS (remove this code once SAMTOOLS is converted to data tables)
         if exists("%s/tool-data/sam_fa_indices.loc" % env.galaxy_home):
             sudo("rm %s/tool-data/sam_fa_indices.loc" % env.galaxy_home, user=env.galaxy_user)
-        tmp_loc = False
-        if not exists(env.galaxy_loc_files):
-            sudo("mkdir -p '%s'" % env.galaxy_loc_files)
-            _chown_galaxy(env, env.galaxy_loc_files)
-        if not exists("%s/sam_fa_indices.loc" % env.galaxy_loc_files):
-            sudo("touch %s/sam_fa_indices.loc" % env.galaxy_loc_files, user=env.galaxy_user)
-            tmp_loc = True
-        sudo("ln -s %s/sam_fa_indices.loc %s/tool-data/sam_fa_indices.loc" % (env.galaxy_loc_files, env.galaxy_home), user=env.galaxy_user)
-        if tmp_loc:
-            sudo("rm %s/sam_fa_indices.loc" % env.galaxy_loc_files)
-        # set up the special HYPHY link in tool-data/
-        hyphy_dir = os.path.join(env.galaxy_tools_dir, 'hyphy', 'default')
-        sudo('ln -s %s tool-data/HYPHY' % hyphy_dir, user=env.galaxy_user)
+        # TODO: Is this really necessary here? Shouldn't the tools do this themselves?
         # set up the jars directory for Java tools
-        if not exists('tool-data/shared/jars'):
-            sudo("mkdir -p tool-data/shared/jars", user=env.galaxy_user)
+        if not exists(env.galaxy_jars_dir):
+            sudo("mkdir -p %s" % env.galaxy_jars_dir, user=env.galaxy_user)
         srma_dir = os.path.join(env.galaxy_tools_dir, 'srma', 'default')
         haploview_dir = os.path.join(env.galaxy_tools_dir, 'haploview', 'default')
         picard_dir = os.path.join(env.galaxy_tools_dir, 'picard', 'default')
-        sudo('ln -s %s/srma.jar tool-data/shared/jars/.' % srma_dir, user=env.galaxy_user)
-        sudo('ln -s %s/haploview.jar tool-data/shared/jars/.' % haploview_dir, user=env.galaxy_user)
-        sudo('ln -s %s/*.jar tool-data/shared/jars/.' % picard_dir, user=env.galaxy_user)
+        sudo('ln -s %s/srma.jar %s' % (srma_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        sudo('ln -s %s/haploview.jar %s' % (haploview_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        sudo('ln -s %s/*.jar %s' % (picard_dir, env.galaxy_jars_dir), user=env.galaxy_user)
     return True
 
 

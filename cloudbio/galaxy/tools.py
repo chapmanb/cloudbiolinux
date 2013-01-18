@@ -25,6 +25,8 @@ def _install_tools(env, tools_conf=None):
        # Need to ensure the install dir exists and is owned by env.galaxy_user
         _setup_install_dir(env)
         _install_applications(env, tools_conf)
+        _chown_galaxy(env, env.galaxy_tools_dir)
+        _chown_galaxy(env, env.galaxy_jars_dir)
 
     if _read_boolean(env, "galaxy_install_r_packages", False):
         _install_r_packages(tools_conf)

@@ -1,5 +1,5 @@
 from fabric.api import sudo
-
+from fabric.contrib.files import exists
 
 def _read_boolean(env, name, default):
     property_str = env.get(name, str(default))
@@ -7,9 +7,13 @@ def _read_boolean(env, name, default):
 
 
 def _chown_galaxy(env, path):
+    """
+    Recursively change ownership of ``path``, first checking if ``path`` exists.
+    """
     chown_command = "chown --recursive %s:%s %s"
     galaxy_user = env.get("galaxy_user", "galaxy")
-    sudo(chown_command % (galaxy_user, galaxy_user, path))
+    if exists(path):
+        sudo(chown_command % (galaxy_user, galaxy_user, path))
 
 def _dir_is_empty(path):
     """
