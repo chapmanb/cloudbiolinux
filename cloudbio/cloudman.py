@@ -21,7 +21,8 @@ from fabric.contrib.files import exists, settings, append
 from cloudbio.galaxy import _setup_users
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.custom.shared import _make_tmp_dir, _write_to_file
+from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
+                                    _configure_make,_if_not_installed)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -36,6 +37,7 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_hadoop(env)
     _configure_condor(env)
     _configure_nfs(env)
+    install_s3fs(env)
 
 def _setup_env(env):
     """
@@ -179,6 +181,16 @@ def _configure_nfs(env):
     if not exists(old_dir) and exists(new_dir):
         sudo('ln -s {0} {1}'.format(new_dir, old_dir))
     env.logger.debug("Done configuring CloudMan NFS")
+
+@_if_not_installed("s3fs")
+def install_s3fs(env):
+    """
+    Install s3fs, allowing S3 buckets to be mounted as ~POSIX file systems
+    """
+    default_version = "1.61"
+    version = env.get("tool_version", default_version)
+    url = "http://s3fs.googlecode.com/files/s3fs-%s.tar.gz" % version
+    _get_install(url, env, _configure_make)
 
 def _cleanup_ec2(env):
     """Clean up any extra files after building.

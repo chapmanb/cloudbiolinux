@@ -8,7 +8,7 @@ import contextlib
 from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists, settings, hide, sed
 
-from cloudbio.custom.shared import _make_tmp_dir, _get_install, _configure_make
+from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.cloudman import _configure_cloudman
 from cloudbio.galaxy import _install_nginx
 
@@ -25,7 +25,6 @@ def install_cloudman(env):
     install_nginx(env)
     install_proftpd(env)
     install_sge(env)
-    install_s3fs(env)
 
 def install_nginx(env):
     _install_nginx(env)
@@ -91,12 +90,3 @@ def install_sge(env):
             sudo("chown %s %s" % (env.user, install_dir))
             run("tar -C %s -xvzf %s" % (install_dir, os.path.split(url)[1]))
     env.logger.debug("SGE setup")
-
-def install_s3fs(env):
-    """
-    Install s3fs, allowing S3 buckets to be mounted as ~POSIX file systems
-    """
-    default_version = "1.61"
-    version = env.get("tool_version", default_version)
-    url = "http://s3fs.googlecode.com/files/s3fs-%s.tar.gz" % version
-    _get_install(url, env, _configure_make)
