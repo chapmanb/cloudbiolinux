@@ -22,7 +22,7 @@ from cloudbio.galaxy import _setup_users
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
-                                    _configure_make,_if_not_installed)
+                                    _configure_make, _if_not_installed, _setup_conf_file)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -97,6 +97,11 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     cloudman_boot_file = 'cloudman.conf'
     remote_file = '/etc/init/%s' % cloudman_boot_file
     _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode=0644)
+    # Setup default image user data (if configured by image_user_data_path or
+    # image_user_data_template_path). This specifies defaults for CloudMan when
+    # used with resulting image, normal userdata supplied by user will override
+    # these defaults.
+    _setup_conf_file(env, os.path.join(env.install_dir, "bin", "IMAGE_USER_DATA"), "image_user_data", default_source="image_user_data")
     env.logger.debug("Done configuring CloudMan ec2_autorun")
 
 

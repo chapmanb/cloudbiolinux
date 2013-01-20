@@ -227,7 +227,9 @@ def _python_make(env):
 
 
 def _get_installed_file(env, local_file):
-    path = os.path.join('installed_files', local_file)
+    installed_files_dir = \
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "installed_files")
+    path = os.path.join(installed_files_dir, local_file)
     if not os.path.exists(path):
         # If using cloudbiolinux as a library, this won't be available,
         # download the file from github instead
