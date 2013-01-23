@@ -376,10 +376,45 @@ def _handle_url(url):
     boot_script_name = os.path.split(url)[1]
     _run_boot_script(boot_script_name)
 
+
+#http://stackoverflow.com/questions/823196/yaml-merge-in-python
+def _merge(specific, default):
+    """
+    Recursively merges two yaml produced data structures,
+    a more specific input (`specific`) and defaults
+    (`default`).
+    """
+    if isinstance(specific, dict) and isinstance(default, dict):
+        for k, v in default.iteritems():
+            if k not in specific:
+                specific[k] = v
+            else:
+                specific[k] = _merge(specific[k], v)
+    return specific
+
+def _load_user_data(user_data):
+    """ Loads user data into dict (using pyyaml). If machine image
+    contains default data this is loaded and populated in resulting
+    data structure as well. These separate options are merged using
+    the `_merge` function above and priority is always given to
+    user supplied options.
+    """
+    ud = yaml.load(user_data)
+    if ud == user_data:
+        # Bad user data, cannot merge default
+        return ud
+    default_user_data_path = \
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'IMAGE_USER_DATA')
+    if os.path.exists(default_user_data_path):
+        image_ud = yaml.load(open(default_user_data_path, 'r').read())
+        if image_ud:
+            ud = _merge(ud, image_ud)
+    return ud
+
 def _handle_yaml(user_data):
     """ Process user data in YAML format"""
     log.info("Handling user data in YAML format.")
-    ud = yaml.load(user_data)
+    ud = _load_user_data(user_data)
     # Handle bad user data as a string
     if ud == user_data:
         return _handle_empty()
