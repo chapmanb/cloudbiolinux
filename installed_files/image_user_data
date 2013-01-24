@@ -1,0 +1,3 @@
+# YAML properties placed in this file will act as defaults
+# for CloudMan user data. User supplied data at launch time 
+# will override these properties.
