@@ -21,6 +21,7 @@ viral_tars = {}
 
 def install_viralassembly(env):
 	try:
+		_enable_galaxy_on_sudo()
 		_initialize_area_viral()
 		_add_tools_viral()
 		_add_refs()
@@ -120,6 +121,7 @@ vigor_names = {}
 
 def install_viralvigor(env):
 	try:
+		_enable_galaxy_on_sudo()
 		_initialize_area_vigor()
 		_initialize_host()
 		_add_vigor()
@@ -310,6 +312,9 @@ def _remove_symlinks(link_from_filespec, link_to_dir):
 
 
 # Common methods
+
+def _enable_galaxy_on_sudo():
+	sudo("if grep -q \"galaxy\" /etc/sudoers; then echo \"User galaxy already listed on sudo.\"; else echo \"galaxy ALL=(ALL) NOPASSWD: ALL\" | sudo tee -a /etc/sudoers; fi")
 
 def _initialize_env(pipeline):
 	if pipeline == "viral":
