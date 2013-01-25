@@ -10,7 +10,9 @@ from fabric.api import sudo, run, cd, settings, hide
 from fabric.contrib.files import exists, contains, sed, append
 from fabric.colors import red
 
-from cloudbio.custom.shared import _write_to_file, _setup_conf_file, _setup_simple_service,  _make_tmp_dir
+from cloudbio.custom.shared import (_write_to_file, _setup_conf_file,
+                                    _setup_simple_service,  _make_tmp_dir,
+                                    _add_to_profiles)
 from cloudbio.galaxy.tools import _install_tools
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean, _dir_is_empty
 
@@ -19,6 +21,7 @@ from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean, _dir_is_empty
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip/"
+
 
 def _setup_users(env):
     def _add_user(username, uid=None):
@@ -62,6 +65,7 @@ def _setup_galaxy_env_defaults(env):
     if "galaxy_init_database" not in env:
         env.galaxy_init_database = False
 
+
 def _install_galaxy(env):
     """
     Used to install Galaxy and setup its environment, including tools.
@@ -70,7 +74,7 @@ def _install_galaxy(env):
     to update an existing Galaxy.
     """
     _clone_galaxy_repo(env)
-    _chown_galaxy(env, env.galaxy_home) # Make sure env.galaxy_user owns env.galaxy_home
+    _chown_galaxy(env, env.galaxy_home)  # Make sure env.galaxy_user owns env.galaxy_home
     sudo("chmod 755 %s" % os.path.split(env.galaxy_home)[0])
     setup_db = _read_boolean(env, "galaxy_setup_database", False)
     if setup_db:
@@ -82,9 +86,10 @@ def _install_galaxy(env):
     setup_xvfb = _read_boolean(env, "galaxy_setup_xvfb", False)
     if setup_xvfb:
         _setup_xvfb(env)
-    _chown_galaxy(env, env.galaxy_home) # Make sure env.galaxy_user owns env.galaxy_home
-    _chown_galaxy(env, env.galaxy_loc_files) # Make sure env.galaxy_user owns env.galaxy_loc_files
+    _chown_galaxy(env, env.galaxy_home)  # Make sure env.galaxy_user owns env.galaxy_home
+    _chown_galaxy(env, env.galaxy_loc_files)  # Make sure env.galaxy_user owns env.galaxy_loc_files
     return True
+
 
 def _clone_galaxy_repo(env):
     """
@@ -119,6 +124,7 @@ def _clone_galaxy_repo(env):
     if not preconfigured:
         _configure_galaxy_repository(env)
 
+
 def _setup_galaxy_db(env):
     """
     Create (if one already does not exist) and initialize a database for use
@@ -127,6 +133,7 @@ def _setup_galaxy_db(env):
     if not _galaxy_db_exists(env):
         _create_galaxy_db(env)
     _init_galaxy_db(env)
+
 
 def _get_galaxy_db_configs(env):
     """
@@ -149,6 +156,7 @@ def _get_galaxy_db_configs(env):
     config['psql_cmd'] = "{0} -p {1}".format(os.path.join(config['psql_bin_dir'], 'psql'),
         config['psql_port'])
     return config
+
 
 def _galaxy_db_exists(env):
     """
@@ -181,6 +189,7 @@ def _galaxy_db_exists(env):
             with settings(warn_only=True):
                 sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
     return db_exists
+
 
 def _create_galaxy_db(env):
     """
@@ -219,8 +228,8 @@ def _create_galaxy_db(env):
         with settings(warn_only=True):
             sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
     exp = "export PATH={0}:$PATH".format(c['psql_bin_dir'])
-    if not contains('/etc/bash.bashrc', exp):
-        append('/etc/bash.bashrc', exp, use_sudo=True)
+    _add_to_profiles(exp)
+
 
 def _init_galaxy_db(env):
     """
@@ -242,6 +251,7 @@ def _init_galaxy_db(env):
         if started:
             with settings(warn_only=True):
                 sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
+
 
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
     """
@@ -268,6 +278,7 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
             _write_to_file(contents, conf_file, 0700)
             _chown_galaxy(env, conf_file)
 
+
 def _configure_galaxy_repository(env):
     """
     Custom-configure Galaxy repository. This is primarily targeted at a cloud
@@ -278,7 +289,7 @@ def _configure_galaxy_repository(env):
     in the changesets from https://bitbucket.org/jmchilton/cloud-galaxy-dist
     which prebakes these modifications in.
     """
-    _chown_galaxy(env, env.galaxy_home) # Make sure env.galaxy_user owns env.galaxy_home
+    _chown_galaxy(env, env.galaxy_home)  # Make sure env.galaxy_user owns env.galaxy_home
     with cd(env.galaxy_home):  # and settings(warn_only=True):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
@@ -474,6 +485,7 @@ def _init_postgresql_data(env):
     if "galaxy" not in env.safe_sudo("psql -P pager --list | grep galaxy || true", user="postgres"):
         env.safe_sudo("createdb galaxy", user="postgres")
         env.safe_sudo("psql -c 'create user galaxy; grant all privileges on database galaxy to galaxy;'", user="postgres")
+
 
 def _postgres_running(env):
     """

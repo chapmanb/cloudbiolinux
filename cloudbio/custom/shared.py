@@ -378,3 +378,16 @@ def _extend_env(env, defaults={}, overrides={}):
 def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
     conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
     _write_to_file(conf_file_contents, dest, mode=0755)
+
+
+def _add_to_profiles(line, profiles=[]):
+    """
+    If it's not already there, append ``line`` to shell profiles files.
+    By default, these are ``/etc/profile`` and ``/etc/bash.bashrc`` but can be
+    overridden by providing a list of file paths to the ``profiles`` argument.
+    """
+    if not profiles:
+        profiles = ['/etc/bash.bashrc', '/etc/profile']
+    for profile in profiles:
+        if not contains(profile, line):
+            append(profile, line, use_sudo=True)

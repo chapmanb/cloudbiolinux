@@ -22,11 +22,13 @@ from cloudbio.galaxy import _setup_users
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
-                                    _configure_make, _if_not_installed, _setup_conf_file)
+                                    _configure_make, _if_not_installed,
+                                    _setup_conf_file, _add_to_profiles)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
+
 
 def _configure_cloudman(env, use_repo_autorun=False):
     _setup_users(env)
@@ -38,6 +40,7 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_condor(env)
     _configure_nfs(env)
     install_s3fs(env)
+
 
 def _setup_env(env):
     """
@@ -70,7 +73,12 @@ def _setup_env(env):
     remote_file = '/etc/vim/vimrc'
     sudo("wget --output-document=%s %s" % (remote_file, vimrc_url))
     env.logger.debug("Added a custom vimrc to {0}".format(remote_file))
+    # Setup profile
+    aliases = ['alias lt="ls -ltr"', 'alias ll="ls -l"']
+    for alias in aliases:
+        _add_to_profiles(alias, ['/etc/bash.bashrc'])
     env.logger.debug("Done setting up CloudMan's environment")
+
 
 def _configure_logrotate(env):
     """
@@ -81,6 +89,7 @@ def _configure_logrotate(env):
     url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
     sudo("wget --output-document=%s %s" % (remote, url))
     env.logger.debug("----- Added logrotate file to {0} -----".format(remote))
+
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
     script = "ec2autorun.py"
@@ -120,6 +129,7 @@ def _configure_sge(env):
         sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
     env.logger.debug("Done configuring CloudMan SGE")
 
+
 def _configure_hadoop(env):
     """
     Grab files required by CloudMan to setup a Hadoop cluster atop SGE.
@@ -135,6 +145,7 @@ def _configure_hadoop(env):
     sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root))
     env.logger.debug("Done configuring Hadoop for CloudMan")
 
+
 def _configure_condor(env):
     """
     Grab files required by CloudMan to setup HTCondor
@@ -149,6 +160,7 @@ def _configure_condor(env):
                 .format(filename))
     sudo("chown -R condor:condor {0}".format(condor_root))
     env.logger.debug("Done configuring HTCondor for CloudMan")
+
 
 def _configure_nfs(env):
     nfs_dir = "/export/data"
@@ -166,13 +178,14 @@ def _configure_nfs(env):
     galaxy_data_mount = env.get("galaxy_data_mount", "/mnt/galaxyData")
     galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
     galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
-    exports = [ '/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
-                '/opt/condor           *(rw,sync,no_root_squash,no_subtree_check)',
-                '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
-                '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
-                '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
-                '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
-                '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
+    exports = ['/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
+               '/opt/condor           *(rw,sync,no_root_squash,no_subtree_check)',
+               '/opt/hadoop           *(rw,sync,no_root_squash,no_subtree_check)',
+               '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
+               '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
+               '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
+               '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
+               '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
     extra_nfs_exports = env.get("extra_nfs_exports", "")
     for extra_nfs_export in extra_nfs_exports.split(","):
         exports.append('%s   *(rw,sync,no_root_squash,no_subtree_check)' % extra_nfs_export)
@@ -187,6 +200,7 @@ def _configure_nfs(env):
         sudo('ln -s {0} {1}'.format(new_dir, old_dir))
     env.logger.debug("Done configuring CloudMan NFS")
 
+
 @_if_not_installed("s3fs")
 def install_s3fs(env):
     """
@@ -197,13 +211,14 @@ def install_s3fs(env):
     url = "http://s3fs.googlecode.com/files/s3fs-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
+
 def _cleanup_ec2(env):
     """Clean up any extra files after building.
     """
     env.logger.info("Cleaning up for EC2 AMI creation")
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
               "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir,
-              "%s/ec2autorun.err"  % env.install_dir, "%s/ec2autorun.log" % env.install_dir,
+              "%s/ec2autorun.err" % env.install_dir, "%s/ec2autorun.log" % env.install_dir,
               "%s/bin/ec2autorun.log" % env.install_dir]
     for fname in fnames:
         sudo("rm -f %s" % fname)
