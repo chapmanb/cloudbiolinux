@@ -1,5 +1,5 @@
 ---
-# List of custom programs to install that are not packaged. These each require 
+# List of custom programs to install that are not packaged. These each require
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
 bio_general:
@@ -82,10 +82,12 @@ phylogeny:
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
 vcr:
-  - cloudvigor
-  - testcloudvigor
-  - validatevigor 
-  - cleanall
+  - viralassembly
+  - viralassembly_cleanall
+  - viralvigor
+  - viralvigor_test
+  - viralvigor_validate
+  - viralvigor_cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma
