@@ -50,7 +50,7 @@ def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
     http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
-    version = "2.0.4"
+    version = "2.0.5"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
@@ -554,7 +554,7 @@ def SRC_install_tophat(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.6"
+    default_version = "2.0.7"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
@@ -576,7 +576,7 @@ def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
-    default_version = "2.0.6"
+    default_version = "2.0.7"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
