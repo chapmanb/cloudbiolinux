@@ -48,6 +48,7 @@ bio_nextgen:
   sv:
     - hydra
   variant:
+    - bcbio_variation
     - crisp
     - gemini
     - tassel

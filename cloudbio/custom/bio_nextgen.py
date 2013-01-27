@@ -433,7 +433,7 @@ def install_gatk_queue(env):
     _java_install("gatk_queue", version, url, env)
 
 def install_varscan(env):
-    """
+    """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/
     """
     version = "2.3.3"
@@ -695,6 +695,20 @@ def install_cortex_var(env):
                 sed(fix_gz, "gzFile\*", "gzFile")
             run("make")
     _get_install_local(url, env, _cortex_build)
+
+def install_bcbio_variation(env):
+    """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
+    https://github.com/chapmanb/bcbio.variation
+    """
+    version = "0.0.6"
+    url = "https://s3.amazonaws.com/bcbio.variation/" \
+          "bcbio.variation-%s-standalone.jar" % version
+    install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % url)
+                env.safe_sudo("mv *.jar %s" % install_dir)
 
 # --- ChIP-seq
 

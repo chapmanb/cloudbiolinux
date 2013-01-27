@@ -14,8 +14,6 @@ libraries:
 custom_ignore:
   - fastx_toolkit
   - varianttools
-  - tophat
-  - cufflinks
   - mosaik
   - perm
   - pydoop
