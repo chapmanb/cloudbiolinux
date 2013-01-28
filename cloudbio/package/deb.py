@@ -20,8 +20,9 @@ def _apt_packages(to_install=None, pkg_list=None):
     :param pkg_list: An explicit list of packages to install. No other files,
                      flavors, or editions are considered.
     """
-    env.logger.info("Update the system")
-    sudo("apt-get update") # Always update
+    if env.edition.name not in ["minimal"]:
+        env.logger.info("Update the system")
+        sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
         env.edition.apt_upgrade_system()
