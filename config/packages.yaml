@@ -184,12 +184,6 @@ distributed:
     - rabbitmq-server
     - nfs-kernel-server
     - nfs-common
-    - hadoop-0.20
-    - hadoop-pig
-    - hadoop-hive
-    - libhdfs0-dev
-    - hadoop-0.20-pipes
-    - hadoop-0.20-source
     - libopenmpi-dev
     - openmpi-bin
     - libzmq-dev
@@ -199,6 +193,13 @@ distributed:
     - libmpich2-3
     - libmpich2-dev
     - mpich2
+hadoop:
+  - hadoop-0.20
+  - hadoop-pig
+  - hadoop-hive
+  - libhdfs0-dev
+  - hadoop-0.20-pipes
+  - hadoop-0.20-source
 amazon:
   - s3cmd
   - euca2ools
@@ -244,7 +245,7 @@ java:
   - ant
   - libbiojava-java
   - libbiojava-java-demos
-  - eclipse
+  #- eclipse
   - maven2
   - libjline-java
   - libjhdf5-java

@@ -117,15 +117,19 @@ def install_stampy(env):
     """Stampy: mapping of short reads from illumina sequencing machines onto a reference genome.
     http://www.well.ox.ac.uk/project-stampy
     """
-    base_version = "1.0.21"
-    revision = "1654"
-    version = "{0}r{1}".format(base_version, revision)
+    version = "1.0.21"
+    #version = base_version
+    #revision = "1654"
+    #version = "{0}r{1}".format(base_version, revision)
+    #url = "http://www.well.ox.ac.uk/bioinformatics/Software/" \
+    #      "stampy-%s.tgz" % (version)
+    # Ugh -- Stampy now uses a 'Stampy-latest' download target
     url = "http://www.well.ox.ac.uk/bioinformatics/Software/" \
-          "stampy-%s.tgz" % (version)
+          "Stampy-latest.tgz"
     def _clean_makefile(env):
         sed("makefile", " -Wl", "")
     _get_install_local(url, env, _make_copy(),
-                       dir_name="stampy-{0}".format(base_version),
+                       dir_name="stampy-{0}".format(version),
                        post_unpack_fn=_clean_makefile)
 
 @_if_not_installed("gmap")

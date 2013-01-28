@@ -16,7 +16,7 @@ def _yum_packages(to_install):
     pkg_config = get_config_file(env, package_file).base
     with settings(warn_only=True):
         sudo("yum check-update")
-    if env.edition.name not in ["minimal"]:
+    if env.edition.short_name not in ["minimal"]:
         sudo("yum -y upgrade")
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)

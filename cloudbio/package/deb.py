@@ -20,7 +20,7 @@ def _apt_packages(to_install=None, pkg_list=None):
     :param pkg_list: An explicit list of packages to install. No other files,
                      flavors, or editions are considered.
     """
-    if env.edition.name not in ["minimal"]:
+    if env.edition.short_name not in ["minimal"]:
         env.logger.info("Update the system")
         sudo("apt-get update")
     if to_install is not None:

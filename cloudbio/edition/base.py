@@ -53,7 +53,7 @@ class Edition:
         """
         sudo("apt-get -y --force-yes upgrade")
 
-    def post_install(self):
+    def post_install(self, pkg_install=None):
         """Post installation hook"""
         pass
 
@@ -73,11 +73,11 @@ class CloudBioLinux(Edition):
         self.name = "CloudBioLinux Edition"
         self.short_name = "cloudbiolinux"
         
-    def post_install(self, pkg_install=[]):
+    def post_install(self, pkg_install=None):
         """Add scripts for starting FreeNX and CloudMan.
         """
         _freenx_scripts(self.env)
-        if 'cloudman' in pkg_install:
+        if pkg_install is not None and 'cloudman' in pkg_install:
             _configure_cloudman(self.env)
 
 class BioNode(Edition):

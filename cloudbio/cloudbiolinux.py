@@ -25,11 +25,12 @@ def _freenx_scripts(env):
 def _cleanup_space(env):
     """Cleanup to recover space from builds and packages.
     """
-    env.logger.info("Cleaning up space from package builds")
-    env.safe_sudo("rm -rf .cpanm")
-    env.safe_sudo("rm -f /var/crash/*")
-    run("rm -f ~/*.dot")
-    run("rm -f ~/*.log")
+    if env.edition.short_name not in ["minimal"]:
+        env.logger.info("Cleaning up space from package builds")
+        env.safe_sudo("rm -rf .cpanm")
+        env.safe_sudo("rm -f /var/crash/*")
+        run("rm -f ~/*.dot")
+        run("rm -f ~/*.log")
 
 def _configure_gnome(env):
     """Configure NX server to use classic GNOME.

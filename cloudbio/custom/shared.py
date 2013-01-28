@@ -80,7 +80,7 @@ def _make_tmp_dir():
 
 # -- Standard build utility simplifiers
 
-def _get_expected_file(url):
+def _get_expected_file(url, dir_name=None):
     tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'"
     exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
@@ -90,7 +90,9 @@ def _get_expected_file(url):
     for ext_choices, tar_cmd in exts.iteritems():
         for ext in ext_choices:
             if tar_file.endswith(ext):
-                return tar_file, tar_file[:-len(ext)], tar_cmd
+                if dir_name is None:
+                    dir_name = tar_file[:-len(ext)]
+                return tar_file, dir_name, tar_cmd
     raise ValueError("Did not find extract command for %s" % url)
 
 def _safe_dir_name(dir_name, need_dir=True):
@@ -113,7 +115,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _fetch_and_unpack(url, need_dir=True):
+def _fetch_and_unpack(url, need_dir=True, dir_name=None):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
         if exists(base):
@@ -121,7 +123,7 @@ def _fetch_and_unpack(url, need_dir=True):
         run(url)
         return base
     else:
-        tar_file, dir_name, tar_cmd = _get_expected_file(url)
+        tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name)
         if not exists(tar_file):
             run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
         run("%s %s" % (tar_cmd, tar_file))
@@ -170,7 +172,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
     if not exists(test1) and not exists(test2):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                dir_name = _fetch_and_unpack(url)
+                dir_name = _fetch_and_unpack(url, dir_name=dir_name)
                 if not exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
