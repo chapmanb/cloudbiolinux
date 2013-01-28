@@ -31,6 +31,11 @@ CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip"
 
 
 def _configure_cloudman(env, use_repo_autorun=False):
+    """
+    Configure the machine to be capable of running CloudMan.
+
+    ..Also see: ``custom/cloudman.py``
+    """
     _setup_users(env)
     _setup_env(env)
     _configure_logrotate(env)
@@ -77,7 +82,7 @@ def _setup_env(env):
     aliases = ['alias lt="ls -ltr"', 'alias ll="ls -l"']
     for alias in aliases:
         _add_to_profiles(alias, ['/etc/bash.bashrc'])
-    env.logger.debug("Done setting up CloudMan's environment")
+    env.logger.info("Done setting up CloudMan's environment")
 
 
 def _configure_logrotate(env):
@@ -88,10 +93,18 @@ def _configure_logrotate(env):
     remote = '/etc/logrotate.d/cloudman'
     url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
     sudo("wget --output-document=%s %s" % (remote, url))
-    env.logger.debug("----- Added logrotate file to {0} -----".format(remote))
+    env.logger.info("----- Added logrotate file to {0} -----".format(remote))
 
 
 def _configure_ec2_autorun(env, use_repo_autorun=False):
+    """
+    ec2autorun.py is a script that launches CloudMan on instance boot
+    and is thus required on an instance. See the script itself for the
+    details of what it does.
+
+    This script also adds a cloudman service to ``/etc/init``, which
+    actually runs ec2autorun.py as a system-level service at system boot.
+    """
     script = "ec2autorun.py"
     remote = os.path.join(env.install_dir, "bin", script)
     if not exists(os.path.dirname(remote)):
@@ -111,11 +124,17 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # used with resulting image, normal userdata supplied by user will override
     # these defaults.
     _setup_conf_file(env, os.path.join(env.install_dir, "bin", "IMAGE_USER_DATA"), "image_user_data", default_source="image_user_data")
-    env.logger.debug("Done configuring CloudMan ec2_autorun")
+    env.logger.info("Done configuring CloudMan's ec2_autorun")
 
 
 def _configure_sge(env):
-    """This method only sets up the environment for SGE w/o actually setting up SGE"""
+    """
+    This method sets up the environment for SGE w/o
+    actually setting up SGE; it basically makes sure system paths expected
+    by CloudMan exist on the system.
+
+    TODO: Merge this with ``install_sge`` method in ``custom/cloudman.py``.
+    """
     sge_root = '/opt/sge'
     if not exists(sge_root):
         sudo("mkdir -p %s" % sge_root)
@@ -127,7 +146,7 @@ def _configure_sge(env):
         sudo("mkdir -p %s" % sge_package_dir)
     if not exists(os.path.join(sge_package_dir, sge_dir)):
         sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
-    env.logger.debug("Done configuring CloudMan SGE")
+    env.logger.info("Done configuring SGE for CloudMan")
 
 
 def _configure_hadoop(env):
@@ -135,15 +154,17 @@ def _configure_hadoop(env):
     Grab files required by CloudMan to setup a Hadoop cluster atop SGE.
     """
     hadoop_root = '/opt/hadoop'
-    if not exists(hadoop_root):
-        sudo("mkdir -p %s" % hadoop_root)
+    url_root = 'https://s3.amazonaws.com/cloudman'
+    hcm_file = 'hadoop.1.0.4__1.0.tar.gz'
+    si_file = 'sge_integration.1.0.tar.gz'
+    # Make sure we're working with a clean hadoop_home dir to avoid any version conflicts
+    sudo("rm -rf {0}".format(hadoop_root))
+    sudo("mkdir -p %s" % hadoop_root)
     with cd(hadoop_root):
-        if not exists('hadoop.tar.gz'):
-            sudo("wget --output-document=hadoop.tar.gz https://s3.amazonaws.com/cloudman/hadoop.tar.gz")
-        if not exists('sge_integration.tar.gz'):
-            sudo("wget --output-document=sge_integration.tar.gz https://s3.amazonaws.com/cloudman/sge_integration.tar.gz")
+        sudo("wget --output-document={0} {1}/{0}".format(hcm_file, url_root))
+        sudo("wget --output-document={0} {1}/{0}".format(si_file, url_root))
     sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root))
-    env.logger.debug("Done configuring Hadoop for CloudMan")
+    env.logger.info("Done configuring Hadoop for CloudMan")
 
 
 def _configure_condor(env):
@@ -159,10 +180,17 @@ def _configure_condor(env):
             sudo('wget --output-document={0} https://s3.amazonaws.com/cloudman/{0}'\
                 .format(filename))
     sudo("chown -R condor:condor {0}".format(condor_root))
-    env.logger.debug("Done configuring HTCondor for CloudMan")
+    env.logger.info("Done configuring HTCondor for CloudMan")
 
 
 def _configure_nfs(env):
+    """
+    Edit ``/etc/exports`` to append paths that are shared over NFS by CloudMan.
+
+    In addition to the hard coded paths listed here, additional paths
+    can be included by setting ``extra_nfs_exports`` in ``fabricrc.txt`` as
+    a comma-separated list of directories.
+    """
     nfs_dir = "/export/data"
     cloudman_dir = "/mnt/galaxyData/export"
     if not exists(nfs_dir):
@@ -198,7 +226,7 @@ def _configure_nfs(env):
     new_dir = os.path.dirname(env.install_dir)
     if not exists(old_dir) and exists(new_dir):
         sudo('ln -s {0} {1}'.format(new_dir, old_dir))
-    env.logger.debug("Done configuring CloudMan NFS")
+    env.logger.info("Done configuring NFS for CloudMan")
 
 
 @_if_not_installed("s3fs")
@@ -213,7 +241,11 @@ def install_s3fs(env):
 
 
 def _cleanup_ec2(env):
-    """Clean up any extra files after building.
+    """
+    Clean up any extra files after building. This method must be called
+    on an instance after being built and before creating a new machine
+    image. *Note* that after this method has run, key-based ssh access
+    to the machine is no longer possible.
     """
     env.logger.info("Cleaning up for EC2 AMI creation")
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
