@@ -105,8 +105,21 @@ cloudman:
 ## these are mostly used to modify CloudBioLinux behavior and will
 ## override the properties loaded by fabricrc_file defind above.
 fabricrc_overrides:
-  ## Mercurial repository (should be fork of or contain changesets in https://bitbucket.org/jmchilton/cloud-galaxy-dist)
+
+  ## Mercurial repository for galaxy.  If use_galaxy is True above,
+  ## this should be fork of or contain changesets in
+  ## https://bitbucket.org/jmchilton/cloud-galaxy-dist. For a more
+  ## traditional CloudMan workflow this can be any galaxy repository.
   galaxy_repository: https://bitbucket.org/jmchilton/cloud-galaxy-dist
+
+  ## Set to true because above galaxy repo preconfigures Galaxy
+  ## properly. Comment this out for a more traditional CloudMan 
+  ## workflow.
+  galaxy_preconfigured_repository: True
+
+  ## These defaults reflect installing galaxy and tools on instance
+  ## disk. These defaults should be changed for more traditional
+  ## CloudMan workflow to reflect defaults in config/fabricrc.txt.
 
   # Location to install galaxy
   galaxy_home: /opt/galaxy/web
@@ -118,9 +131,6 @@ fabricrc_overrides:
   data_files: "/mnt/galaxyIndices"
   galaxy_base: "/mnt/galaxyIndices/galaxy"
 
-  # Set to true because above changeset preconfigure Galaxy properly.
-  galaxy_preconfigured_repository: True
-
   # Setup an init service for Galaxy and virtual frame buffer
   galaxy_setup_service: True
   galaxy_setup_xvfb: True
@@ -128,8 +138,8 @@ fabricrc_overrides:
   install_dir: /opt/galaxyTools/tools
   postgres_version: 9.1
 
-  # Transferring large files is tough, give it multiple
-  # tries.
+  ## Transferring large files is tough, have fabric try multiple
+  ## times if needed and lengthen timeouts.
   keepalive: 30
   timeout: 60
   connection_attempts: 5
@@ -152,15 +162,15 @@ aws:
   ## existing VM instead launching a new one
   # use_existing_instance: XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-  ## Packaging related options, all optional unless --action=package is
-  ## specified.
-
 
   ## If package_type is default, manual packaging scripts are setup on the VM 
   ## that are appropriate for instance or EBS backed instances. If package_type
   ## is create_image, Amazon's CreateImage instance command is used, this  is
   ## only appropriate for EBS backed instances (requires boto).
   # package_type: default
+
+  ## Packaging related options, all optional unless --action=package is
+  ## specified.
 
 
   ## AWS -> Your Account -> Security Credentials -> X.509 Certificates 
@@ -234,6 +244,9 @@ genomes:
   install_liftover: false
   install_uniref: false
 
+## This tool selection was up-to-date for the galaxy-vm-launcher, but
+## this probably should be updated based on the latest contents of
+## contrib/flavor/cloudman/tools.yaml.
 tools:
   applications:
     bwa: "0.5.9"
