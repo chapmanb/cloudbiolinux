@@ -21,10 +21,9 @@ def _configure_and_install_native_packages(env, pkg_install):
             nonhome = env.shell_config.split("~/", 1)[-1]
             env.shell_config = os.path.join(home_dir, nonhome)
     if env.distribution in ["debian", "ubuntu"]:
-        if env.edition.short_name not in ["minimal"]:
-            _setup_apt_sources()
-            _setup_apt_automation()
-            _add_apt_gpg_keys()
+        _setup_apt_sources()
+        _setup_apt_automation()
+        _add_apt_gpg_keys()
         _apt_packages(pkg_install)
     elif env.distribution in ["centos", "scientificlinux"]:
         if env.edition.short_name not in ["minimal"]:
