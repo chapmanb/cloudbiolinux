@@ -19,13 +19,13 @@ def install_cljr(env):
     run("rm cljr-installer.jar")
 
 @_if_not_installed("lein")
-def install_leinengin(env):
+def install_leiningen(env):
     """Clojure tool for project configuration and automation.
     http://github.com/technomancy/leiningen
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run("wget --no-check-certificate https://raw.github.com/technomancy/leiningen/preview/bin/lein")
+            run("wget --no-check-certificate https://raw.github.com/technomancy/leiningen/stable/bin/lein")
             run("chmod a+rwx lein")
             env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
-            run("lein self-install")
+            run("lein")

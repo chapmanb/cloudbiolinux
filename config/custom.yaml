@@ -95,7 +95,7 @@ python:
   - bx-python
   - rpy
 java:
-  - leinengin
+  - leiningen
 phylogeny:
   - tracer
   - beast
