@@ -404,6 +404,17 @@ bio_proteomics:
   - xsltproc
   - libxml-sax-expat-perl
   - libgd2-xpm-dev
+  # Needed for percolator
+  - libxerces-c3.1 
+  - libxerces-c-dev
+  - xsdcxx 
+  - libboost-dev 
+  - libboost-filesystem-dev 
+  - libboost-system-dev
+  - libsqlite3-0  
+  - libboost-serialization-dev
+  - zlib1g-dev
+  - libboost-dev
 bio_proteomics_wine:
   - wine
 bio_utils:
