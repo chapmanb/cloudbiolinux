@@ -20,7 +20,7 @@ fi
 # pip-requires
 if [ ! `lsvirtualenv | grep $VIRTUALENV_NAME` ];
 then
-    mkvirtualenv -r pip-requires $VIRTUALENV_NAME
+    mkvirtualenv -r requirements.txt $VIRTUALENV_NAME
 fi
 
 # Use cbl_deploy virtualenv
