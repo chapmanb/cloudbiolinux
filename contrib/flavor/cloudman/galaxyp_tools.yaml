@@ -23,3 +23,5 @@ applications:
   mayu: "1.06"
   pepnovo: "20120423"
   ipig: "r5"
+  searchgui: "1.11.0"
+  peptide_shaker: "0.19.0"

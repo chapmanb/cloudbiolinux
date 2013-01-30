@@ -138,6 +138,51 @@ def install_mzmine(env):
     _java_install("mzmine2", version, url, env, install_fn)
 
 
+@_if_not_installed("SearchGUI")
+def install_searchgui(env):
+    default_version = "1.11.0"
+    version = env.get("tool_version", default_version)
+    url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
+
+    def install_fn(env, install_dir):
+        dir_name = "SearchGUI-%s_mac_and_linux" % version
+        env.safe_sudo("tar -xf %s.tar" % dir_name)
+        with cd(dir_name):
+            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/77aa11751a9e747c3b75afa13c591413bce182ec/SearchGUI")
+            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/b97fb4d9fe9927de1cfc5433dd1702252e9c0348/SearchCLI")
+            env.safe_sudo("mv * '%s'" % install_dir)
+            bin_dir = os.path.join(env.get("system_install"), "bin")
+            env.safe_sudo("mkdir -p '%s'" % bin_dir)
+            env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "SearchGUI"), os.path.join(bin_dir, "SearchGUI")))
+            env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "SearchCLI"), os.path.join(bin_dir, "SearchCLI")))
+
+    _unzip_install("SearchGUI", version, url, env, install_fn)
+
+
+@_if_not_installed("PeptideShaker")
+def install_peptide_shaker(env):
+    default_version = "0.19.0"
+    version = env.get("tool_version", default_version)
+    url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
+
+    def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/ed9b48a0f01cb975f8a9e6e126965c955bbee848/PeptideShaker")
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/8a17d5fb589984365284e55a98a455c2b47da54f/PeptideShakerCLI")
+        env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "PeptideShaker"), os.path.join(bin_dir, "PeptideShaker")))
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "PeptideShakerCLI"), os.path.join(bin_dir, "PeptideShakerCLI")))
+
+    _java_install("PeptideShaker", version, url, env, install_fn)
+
+
+def _get_gist_script(env, url):
+    name = url.split("/")[-1]
+    env.safe_sudo("wget '%s'" % url)
+    env.safe_sudo("chmod +x '%s'" % name)
+
+
 @_if_not_installed("Mayu")
 def install_mayu(env):
     default_version = "1.06"
