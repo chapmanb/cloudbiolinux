@@ -28,6 +28,10 @@ from vmlauncher.transfer import FileTransferManager
 from vmlauncher import build_vm_launcher
 
 
+DEFAULT_CLOUDBIOLINUX_TARGET = None
+DEFAULT_CLOUDBIOLINUX_FLAVOR = None
+
+
 def deploy(options):
     actions = _expand_actions(options.get("actions"))
     vm_launcher = build_vm_launcher(options)
@@ -144,7 +148,7 @@ def _setup_cloudbiolinux(options):
     def fabricrc_loader(env):
         _setup_cloudbiolinux_fabric_properties(env, options)
 
-    flavor = get_main_options_string(options, "flavor", None)
+    flavor = get_main_options_string(options, "flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
     _setup_logging(env)
     _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
 
@@ -275,8 +279,8 @@ def configure_instance(options, actions):
 
 
 def install_biolinux(options):
-    flavor = options.get("flavor", None)
-    target = options.get("target", None)
+    flavor = options.get("flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
+    target = options.get("target", DEFAULT_CLOUDBIOLINUX_TARGET)
     _perform_install(target=target, flavor=flavor)
 
 

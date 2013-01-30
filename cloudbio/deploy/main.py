@@ -1,19 +1,36 @@
 from argparse import ArgumentParser
 import yaml
 
-from cloudbio.deploy import deploy
+from cloudbio.deploy import deploy, DEFAULT_CLOUDBIOLINUX_FLAVOR, DEFAULT_CLOUDBIOLINUX_TARGET
 
 DESC = "Creates an on-demand cloud instance, sets up applications, and transfer files to it."
+
+## Properties that may be specified as args or in settings file,
+## argument takes precedence.
+ARG_PROPERTIES = [
+  "files",
+  "compressed_files",
+  "actions",
+  "runtime_properties",
+  "target",
+  "flavor",
+]
 
 
 def main():
     args = parse_args()
     options = parse_settings(args.settings)
-    options["files"] = args.files
-    options["compressed_files"] = args.compressed_files
-    options["actions"] = args.actions
-    options["runtime_properties"] = args.runtime_properties
+
+    for property in ARG_PROPERTIES:
+        _copy_arg_to_options(options, args, property)
+
     deploy(options)
+
+
+def _copy_arg_to_options(options, args, property):
+    arg_property = getattr(args, property)
+    if arg_property or not property in options:
+        options[property] = arg_property
 
 
 def parse_args():
@@ -23,6 +40,8 @@ def parse_args():
     parser.add_argument('--runtime_property', dest="runtime_properties", action="append", default=[])
     parser.add_argument('--compressed_file', dest="compressed_files", action="append", default=[], help="file to transfer to new instance and decompress")
     parser.add_argument('--file', dest="files", action="append", default=[], help="file to transfer to new instance")
+    parser.add_argument("--target", dest="target", default=DEFAULT_CLOUDBIOLINUX_TARGET)
+    parser.add_argument("--flavor", dest="flavor", default=DEFAULT_CLOUDBIOLINUX_FLAVOR)
     args = parser.parse_args()
     if len(args.actions) == 0:
         args.actions = ["transfer"]
