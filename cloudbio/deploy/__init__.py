@@ -315,7 +315,7 @@ def _interactive_ssh(vm_launcher):
     host = vm_launcher.get_ip()
     user = vm_launcher.get_user()
     key_file = vm_launcher.get_key_file()
-    cmd = "ssh -i '%s' -l '%s' '%s'" % (key_file, user, host)
+    cmd = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i '%s' -l '%s' '%s'" % (key_file, user, host)
     call(cmd, shell=True)
 
 
