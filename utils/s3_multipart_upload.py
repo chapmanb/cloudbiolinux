@@ -34,6 +34,8 @@ def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
         s3_key_name = os.path.basename(transfer_file)
     conn = boto.connect_s3()
     bucket = conn.lookup(bucket_name)
+    if bucket is None:
+        bucket = conn.create_bucket(bucket_name)
     mb_size = os.path.getsize(transfer_file) / 1e6
     if mb_size < 50:
         _standard_transfer(bucket, s3_key_name, transfer_file, use_rr)
