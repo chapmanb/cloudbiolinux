@@ -131,11 +131,12 @@ fabricrc_overrides:
   data_files: "/mnt/galaxyIndices"
   galaxy_base: "/mnt/galaxyIndices/galaxy"
 
-  # Setup an init service for Galaxy and virtual frame buffer
+
+  ## Setup Galaxy init service. For more traditional cloudman workflow,
+  ## this should be set to False.
   galaxy_setup_service: True
   galaxy_setup_xvfb: True
 
-  install_dir: /opt/galaxyTools/tools
   postgres_version: 9.1
 
   ## Transferring large files is tough, have fabric try multiple
