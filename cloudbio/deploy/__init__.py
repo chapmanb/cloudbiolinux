@@ -3,6 +3,7 @@
 import os
 
 from tempfile import tempdir
+from subprocess import call
 
 from cloudbio.utils import _setup_logging, _configure_fabric_environment, _parse_fabricrc
 from cloudbio.biodata.genomes import install_data, install_data_s3
@@ -84,6 +85,8 @@ def _setup_vm(options, vm_launcher, actions):
                 create_data_library_for_uploads(options)
             if 'package' in actions:
                 vm_launcher.package()
+            if 'ssh' in actions:
+                _interactive_ssh(vm_launcher)
             if not destroy_on_complete:
                 print 'Your Galaxy instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
     finally:
@@ -108,6 +111,7 @@ def _expand_actions(actions):
                           "launch",  # Dummy action justs launches image
                           "install_biolinux",
                           "cloudman_launch",
+                          "ssh",
                           ]:
         if simple_action in actions:
             unique_actions.add(simple_action)
@@ -297,6 +301,16 @@ def _cd_indices_parent():
 def _indices_parent():
     parent_dir = os.path.abspath(os.path.join(env.data_files, ".."))
     return parent_dir
+
+
+def _interactive_ssh(vm_launcher):
+    """ Launch an interactive SSH session to host described by vm_launcher object.
+    """
+    host = vm_launcher.get_ip()
+    user = vm_launcher.get_user()
+    key_file = vm_launcher.get_key_file()
+    cmd = "ssh -i '%s' -l '%s' '%s'" % (key_file, user, host)
+    call(cmd, shell=True)
 
 
 def stash_genomes(where):
