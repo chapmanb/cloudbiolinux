@@ -71,9 +71,11 @@ sudoers_additions:
 ## from the Cloud. -John)
 #galaxy_ssh_key: /path/to/ssh_private_key
 
-## Specify flavor of CloudBioLinux to install with. This has
-## not been tested an should probably not be set.
-# cloudbiolinux_flavor: cloudman/cloudman_and_galaxy
+## Specify flavor and target for CloudBioLinux to install with 
+## when configuring environmet and install (if install_biolinux
+## action is used).
+# flavor: cloudman/cloudman_and_galaxy
+# target: 
 
 ## Default CloudBioLinux properties to load, by default CloudBioLinux
 ## will just its own defaults (either ../config/fabrircr.txt or whatever

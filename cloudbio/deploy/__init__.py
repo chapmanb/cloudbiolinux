@@ -144,7 +144,7 @@ def _setup_cloudbiolinux(options):
     def fabricrc_loader(env):
         _setup_cloudbiolinux_fabric_properties(env, options)
 
-    flavor = get_main_options_string(options, "cloudbiolinux_flavor", None)
+    flavor = get_main_options_string(options, "flavor", None)
     _setup_logging(env)
     _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
 
@@ -275,7 +275,9 @@ def configure_instance(options, actions):
 
 
 def install_biolinux(options):
-    _perform_install()
+    flavor = options.get("flavor", None)
+    target = options.get("target", None)
+    _perform_install(target=target, flavor=flavor)
 
 
 def _indices_dir_name():
