@@ -16,8 +16,8 @@ fi
 # Configure virtualenv and virtualenvwrapper with virtualenv-burrito
 . $HOME/.venvburrito/startup.sh
 
-# If no cbl_deploy virtualenv exists, create it and populate via
-# pip-requires
+# If no cbl_deploy virtualenv exists, create it and populate
+# requirements.
 if [ ! `lsvirtualenv | grep $VIRTUALENV_NAME` ];
 then
     mkvirtualenv -r requirements.txt $VIRTUALENV_NAME
