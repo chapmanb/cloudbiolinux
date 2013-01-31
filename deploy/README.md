@@ -18,12 +18,13 @@ All deploy actions first require the existence of a setting file.
 
     cp settings.yaml-sample settings.yaml
 
-This file has numerous settings to customize how the deployer acts. At
-very least, `key_file` and `vm_host` must be set as well as cloud
-specific settings (if `vm_host = aws`, these settings will be in the
-aws section of the YAML file). The argument
-`--settings=/path/to/custom_settings.yaml` may be passed to
-`deploy.sh` to specify a custom path for this settings file.
+This file has numerous settings to customize how the deployer acts. Be
+default, the deployer will target Amazon Web Services and `key_file`,
+`access_id`, and `private_key` in the aws section of of this file must
+be specified.
+
+The argument `--settings=/path/to/custom_settings.yaml` may be passed
+to `deploy.sh` to specify a custom path for this settings file.
 
 ## Configuring Galaxy
 

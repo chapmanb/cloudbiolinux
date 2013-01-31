@@ -14,7 +14,7 @@ ARG_PROPERTIES = [
   "runtime_properties",
   "target",
   "flavor",
-  "vm_host",
+  "vm_provider",
 ]
 
 
@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument('--file', dest="files", action="append", default=[], help="file to transfer to new instance")
     parser.add_argument("--target", dest="target", default=DEFAULT_CLOUDBIOLINUX_TARGET)
     parser.add_argument("--flavor", dest="flavor", default=DEFAULT_CLOUDBIOLINUX_FLAVOR)
-    parser.add_argument("--vm_host", dest="vm_host", default=None, help="libcloud driver to use (or vagrant) (e.g. aws, openstack)")
+    parser.add_argument("--vm_provider", dest="vm_provider", default=None, help="libcloud driver to use (or vagrant) (e.g. aws, openstack)")
     args = parser.parse_args()
     if len(args.actions) == 0:
         args.actions = ["transfer"]

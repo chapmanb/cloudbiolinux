@@ -1,17 +1,9 @@
 ---
 
-## Must specify a key_file and corresponding vm_host, key_file should
-## be configured to allow password-less ssh access to ubuntu user (or
-## vagrant user in the case of vm_host: vagrant)
-
-key_file: MUST_SPECIFY
-vm_host: MUST_SPECIFY
-
-#key_file: <replace with path to your home directory>/.vagrant.d/insecure_private_key
-#vm_host: vagrant
-#vm_host: aws
-#vm_host: openstack
-#vm_host: eucalyptus
+## Set VM provider, default is aws. Other options include
+## vagrant, openstack, and eucalyptus. Specify connection 
+## details in corresponding sections below.
+# vm_provider: aws
 
 hostname: galaxy
 
@@ -149,10 +141,13 @@ fabricrc_overrides:
 
   tool_data_table_conf_file: config/tool_data_table_conf.xml
 
-
-## Define Amazon connection information, can also specify eucalytus or
-## openstack sections for other cloud environments.
+## Define Amazon connection information. This is used if `vm_provider: aws`
+## (the default) is set can also specify `eucalytus` or `openstack` sections
+## for other cloud environments.
 aws:
+  # Path to private key used to connect to machine image
+  key_file: XXXXXXXXXXXXX
+
   access_id: XXXXXXXXXXXXX
   secret_key: XXXXXXXXXXXX
   keypair_name: galaxy_key
@@ -189,6 +184,10 @@ aws:
   ## Make the resulting image available to the public (currently only available 
   ## for package_type: create_image).
   # make_public: False
+
+# Vagrant VM provider options, these are used if vm_provider: vagrant is set. 
+vagrant:
+  key_file: ~/.vagrant.d/insecure_private_key
 
 galaxy:
   ## In order to create data libraries. First user should be admin@localhost
