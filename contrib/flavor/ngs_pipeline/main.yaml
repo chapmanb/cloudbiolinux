@@ -27,3 +27,5 @@ custom_ignore:
   - velvet
   - pydoop
   - seal
+  - bx-python
+  - rpy

@@ -13,8 +13,7 @@ def install_bx_python(env):
     https://bitbucket.org/james_taylor/bx-python/wiki/Home
     """
     version = "bitbucket"
-    url = "hg clone http://bitbucket.org/james_taylor/bx-python"
-    _get_install(url, env, _python_make)
+    env.safe_sudo("pip install --upgrade https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2")
 
 @_if_not_python_lib("rpy")
 def install_rpy(env):
