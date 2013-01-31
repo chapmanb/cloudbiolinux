@@ -39,6 +39,7 @@ from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
+from cloudbio.config_management.puppet import _puppet_provision
 from cloudbio.config_management.chef import _chef_provision, chef, _configure_chef
 
 # ### Shared installation targets for all platforms
@@ -94,6 +95,8 @@ def _perform_install(target=None, flavor=None):
         _custom_installs(pkg_install, custom_ignore)
     if target is None or target == "chef_recipes":
         _provision_chef_recipes(pkg_install, custom_ignore)
+    if target is None or target == "puppet_classes":
+        _provision_puppet_classes(pkg_install, custom_ignore)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -166,16 +169,26 @@ def _provision_chef_recipes(to_install, ignore=None):
         install_chef_recipe(recipes, True)
 
 
+def _provision_puppet_classes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "puppet_classes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    classes = [recipe for recipe in env.flavor.rewrite_config_items("puppet_classes", packages)]
+    if classes:  # Don't bother running chef if nothing to configure
+        install_puppet_class(classes, True)
+
+
 def install_chef_recipe(recipe, automated=False, flavor=None):
     """Install one or more chef recipes by name.
 
-    Usage: fab [-i key] [-u user] -H host install_custom:recipe
+    Usage: fab [-i key] [-u user] -H host install_chef_recipe:recipe
 
     :type recipe:  string or list
-    :param recipe: A name (of list of names) of a custom program to install. This has to be either a name
-              that is listed in custom.yaml as a subordinate to a group name or a
-              program name whose install method is defined in either cloudbio or
-              custom packages (eg, install_cloudman).
+    :param recipe: TODO
 
     :type automated:  bool
     :param automated: If set to True, the environment is not loaded.
@@ -191,6 +204,27 @@ def install_chef_recipe(recipe, automated=False, flavor=None):
         chef.add_recipe(recipe_to_add)
     _chef_provision(env, recipes)
     _print_time_stats("Chef provision for recipe(s) '%s'" % recipe, "end", time_start)
+
+
+def install_puppet_class(classes, automated=False, flavor=None):
+    """Install one or more puppet classes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_puppet_class:class
+
+    :type classes:  string or list
+    :param classes: TODO
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded.
+    """
+    _setup_logging(env)
+    if not automated:
+        _configure_fabric_environment(env, flavor)
+
+    time_start = _print_time_stats("Puppet provision for class(es) '{0}'".format(classes), "start")
+    classes = classes if isinstance(classes, list) else [classes]
+    _puppet_provision(env, classes)
+    _print_time_stats("Puppet provision for classes(s) '%s'" % classes, "end", time_start)
 
 
 def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
