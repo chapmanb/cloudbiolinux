@@ -26,11 +26,11 @@ libraries:
   - freetype-devel
   - gsl-devel
   - libpng-devel
+  - openssl-devel
 programming:
   - protobuf-c
   - protobuf-compiler
   - protobuf-python
-  - openssl-devel
 java:
   - ant
   - ant-junit

@@ -216,17 +216,9 @@ def _pip_cmd(env):
         return "pip"
 
 def _python_make(env):
-    run("python%s setup.py build" % env.python_version_ext)
-    # handle standard Ubuntu case: only specify a prefix if we're not
-    # in the standard system directory
-    if env.system_install in ["/usr"]:
-        prefix = ""
-    else:
-        prefix = "--prefix '%s'" % env.system_install
-    env.safe_sudo("python%s setup.py install --skip-build %s" % (env.python_version_ext, prefix))
+    env.safe_sudo("%s install --upgrade `pwd`" % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
-
 
 def _get_installed_file(env, local_file):
     installed_files_dir = \

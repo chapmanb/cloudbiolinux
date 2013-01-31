@@ -51,6 +51,35 @@ minimal:
   network:
     - curl
     - wget
+libraries:
+  - libatlas-base-dev
+  #- libatlas-dev
+  - libblas-dev
+  - liblapack-dev
+  - libeigen3-dev
+  - libc6-dev
+  - libzip-dev
+  - libbz2-dev
+  - zlib1g-dev
+  - libcurl4-openssl-dev
+  - libgsl0-dev
+  - libgsl0ldbl
+  - gsl-bin
+  - mime-support
+  - libncurses5-dev
+  - libpcre3-dev
+  - libpng12-dev
+  - libreadline-dev
+  - libssl-dev
+  - uuid
+  - uuid-dev
+  - libxml2
+  - libxml2-dev
+  - libxslt1-dev
+  - libxslt1.1
+  - xz-utils
+  - liblzma-dev
+  - zlib1g-dev
 desktop:
   #Packages to support a remote desktop
   all:
@@ -90,35 +119,12 @@ programming:
     - texlive-latex-recommended
     - texlive-latex-extra
   build:
-    - swig
-    - cmake
-    - libcurl4-openssl-dev
-    - libxml2
-    - libxml2-dev
-    - libxslt1-dev
-    - libxslt1.1
-    - libgsl0-dev
-    - libgsl0ldbl
-    - gsl-bin
     - xfsprogs
-    - libc6-dev
-    - libzip-dev
-    - libbz2-dev
-    - zlib1g-dev
-    - xz-utils
-    - liblzma-dev
+    - stow
+    - rsync
+    - python-software-properties
+    - protobuf-compiler
     - libgtk2.0-dev
-    - libncurses5-dev
-    - zlib1g-dev
-    - libssl-dev
-    - libpcre3-dev
-    - libreadline-dev
-    - mime-support
-    - uuid
-    - uuid-dev
-    - gcc
-    - g++
-    - gfortran
     - stow
     - rsync
     - python-software-properties
@@ -127,11 +133,6 @@ programming:
     - libfuse-dev
     - fuse-utils
   libraries:
-    - libatlas-base-dev
-    #- libatlas-dev
-    - libblas-dev
-    - liblapack-dev
-    - libeigen3-dev
     - tcl-dev
     - tk-dev
     - imagemagick
