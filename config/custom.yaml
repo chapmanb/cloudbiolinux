@@ -60,6 +60,7 @@ bio_nextgen:
     - ucsc_tools
     - bfast
     - novoalign
+    - novosort
     - plink_seq
 bio_proteomics:
   - transproteomic_pipeline

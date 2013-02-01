@@ -178,6 +178,24 @@ def install_novoalign(env):
                 for fname in ["novoalignCS"]:
                     env.safe_sudo("mv %s %s" % (fname, install_dir))
 
+@_if_not_installed("novosort")
+def install_novosort(env):
+    """Multithreaded sort and merge for BAM files.
+    http://www.novocraft.com/wiki/tiki-index.php?page=Novosort
+    """
+    base_version = "V2.08.02"
+    version = "V1.00.01"
+    url = "http://www.novocraft.com/downloads/%s/novosort%s.gcc.tar.gz" % (base_version, version)
+    ref_url = "http://www.novocraft.com/main/downloadpage.php"
+    install_dir = os.path.join(env.system_install, "bin")
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            _wget_with_cookies(ref_url, url)
+            run("tar -xzvpf novosort%s.gcc.tar.gz" % version)
+            with cd("novosort"):
+                for fname in ["novosort"]:
+                    env.safe_sudo("mv %s %s" % (fname, install_dir))
+
 @_if_not_installed("lastz")
 def install_lastz(env):
     """LASTZ sequence alignment program.
