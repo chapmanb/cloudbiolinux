@@ -39,7 +39,7 @@ def install_bowtie(env):
     """The bowtie short read aligner.
     http://bowtie-bio.sourceforge.net/index.shtml
     """
-    default_version = "0.12.7"
+    default_version = "0.12.9"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
           "bowtie-%s-src.zip" % (version, version)
@@ -492,7 +492,7 @@ def install_snpeff(env):
                     env.safe_sudo("mkdir %s" % data_dir)
                     for org in genomes:
                         if not exists(os.path.join(data_dir, org)):
-                            gurl = genome_url_base % (version, version, org)
+                            gurl = genome_url_bgase % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
 
