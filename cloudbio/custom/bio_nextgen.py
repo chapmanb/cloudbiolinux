@@ -272,7 +272,8 @@ def install_gemini(env):
     repository = "git clone git://github.com/arq5x/gemini.git"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
     def _gemini_install(env):
-        env.safe_sudo("{0} install -U cython".format(_pip_cmd(env)))
+        env.safe_sudo("{0} install --upgrade cython".format(_pip_cmd(env)))
+        env.safe_sudo("{0} install --upgrade distribute".format(_pip_cmd(env)))
         _python_make(env)
         env.safe_sudo("mkdir -p {0}".format(data_dir))
         env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
