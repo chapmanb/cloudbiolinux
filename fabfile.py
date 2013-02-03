@@ -34,10 +34,10 @@ from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package import _configure_and_install_native_packages
+from cloudbio.package import (_configure_and_install_native_packages,
+                              _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
-
 
 # ### Shared installation targets for all platforms
 
@@ -78,7 +78,11 @@ def _perform_install(target=None, flavor=None):
     """
     pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
-        _configure_and_install_native_packages(env, pkg_install)
+        # can only install native packages if we have sudo access.
+        if env.use_sudo:
+            _configure_and_install_native_packages(env, pkg_install)
+        else:
+            _connect_native_packages(env, pkg_install)
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)

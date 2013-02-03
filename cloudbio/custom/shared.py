@@ -210,6 +210,8 @@ def _pip_cmd(env):
     """
     if env.has_key("pip_cmd") and env.pip_cmd:
         return env.pip_cmd
+    elif not env.use_sudo:
+        return os.path.join(env.system_install, "bin", "pip")
     elif env.has_key("python_version_ext") and env.python_version_ext:
         return "pip-{0}".format(env.python_version_ext)
     else:

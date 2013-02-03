@@ -2,8 +2,9 @@
 """
 import os
 
-from fabric.api import run
+from fabric.api import run, cd
 
+from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
                                   _setup_apt_automation, _setup_apt_sources)
 from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
@@ -32,3 +33,23 @@ def _configure_and_install_native_packages(env, pkg_install):
         _setup_yum_bashrc()
     else:
         raise NotImplementedError("Unknown target distribution")
+
+def _connect_native_packages(env, pkg_install):
+    """Connect native installed packages to local versions.
+
+    This helps setup a non-sudo environment to handle software
+    that needs a local version in our non-root directory tree.
+    """
+    bin_dir = os.path.join(env.system_install, "bin")
+    if "python" in pkg_install:
+        _create_python_virtualenv(env.system_install)
+
+def _create_python_virtualenv(target_dir):
+    """Create virtualenv in target directory for non-sudo installs.
+    """
+    url = "https://raw.github.com/pypa/virtualenv/master/virtualenv.py"
+    if not os.path.exists(os.path.join(target_dir, "bin", "python")):
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % url)
+                run("python virtualenv.py %s" % target_dir)

@@ -45,7 +45,7 @@ class ColorFormatter(logging.Formatter):
         result = logging.Formatter.format(self, record)
         # Restore the original format configured by the user
         self._fmt = format_orig
-        return result 
+        return result
 
 def _setup_logging(env):
     env.logger = logging.getLogger("cloudbiolinux")
@@ -79,7 +79,8 @@ def _update_biolinux_log(env, target, flavor):
     logfn = "/var/log/biolinux.log"
     info = "Target="+target+"; Edition="+env.edition.name+"; Flavor="+flavor
     env.logger.info(info)
-    env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
+    if env.use_sudo:
+        env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
 
 
 def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None):
