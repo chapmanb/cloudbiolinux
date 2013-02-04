@@ -1,10 +1,12 @@
-"""Automated installation on debian package systems with apt.
+"""
+Automated installation on debian package systems with apt.
 """
 from fabric.api import *
 from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.flavor.config import get_config_file
+
 
 def _apt_packages(to_install=None, pkg_list=None):
     """
@@ -42,9 +44,10 @@ def _apt_packages(to_install=None, pkg_list=None):
     env.logger.info("Installing %i packages" % len(packages))
     while i < len(packages):
         env.logger.info("Package install progress: {0}/{1}".format(i, len(packages)))
-        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
+        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i + group_size]))
         i += group_size
     sudo("apt-get clean")
+
 
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
@@ -67,6 +70,7 @@ def _add_apt_gpg_keys():
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     sudo("apt-get update")
     sudo("sudo apt-get install bio-linux-keyring")
+
 
 def _setup_apt_automation():
     """Setup the environment to be fully automated for tricky installs.
@@ -95,12 +99,14 @@ def _setup_apt_automation():
             "grub-pc grub-pc/install_devices_empty boolean true",
             "acroread acroread/default-viewer boolean false",
             "rabbitmq-server rabbitmq-server/upgrade_previous note",
+            "condor condor/configure select No",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
         cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
     sudo(cmd)
+
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
@@ -120,7 +126,7 @@ def _setup_apt_sources():
 
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
-    comment = "# This file was modified for "+ env.edition.name
+    comment = "# This file was modified for " + env.edition.name
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
     preferences = env.edition.rewrite_apt_preferences([])
