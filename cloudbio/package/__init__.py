@@ -51,5 +51,5 @@ def _create_python_virtualenv(target_dir):
     if not os.path.exists(os.path.join(target_dir, "bin", "python")):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % url)
+                run("wget --no-check-certificate %s" % url)
                 run("python virtualenv.py %s" % target_dir)
