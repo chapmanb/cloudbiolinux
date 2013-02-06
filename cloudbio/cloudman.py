@@ -15,7 +15,7 @@ exec python %s 2> %s.log
 """
 import os
 
-from fabric.api import sudo, run, put, cd
+from fabric.api import sudo, put, cd
 from fabric.contrib.files import exists, settings, append
 
 from cloudbio.galaxy import _setup_users
@@ -23,7 +23,8 @@ from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
                                     _configure_make, _if_not_installed,
-                                    _setup_conf_file, _add_to_profiles)
+                                    _setup_conf_file, _add_to_profiles,
+                                    _create_python_virtualenv)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -67,12 +68,10 @@ def _setup_env(env):
         env.logger.warn("No CloudMan system package dependencies for CentOS")
         pass
     # Get and install required Python libraries
-    reqs_file = 'requirements.txt'
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            url = os.path.join(CM_REPO_ROOT_URL, reqs_file)
-            run("wget --output-document=%s %s" % (reqs_file, url))
-            sudo("pip install --upgrade --requirement={0}".format(reqs_file))
+            url = os.path.join(CM_REPO_ROOT_URL, 'requirements.txt')
+            _create_python_virtualenv(env, 'CM', reqs_url=url)
     # Add a custom vimrc
     vimrc_url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', 'vimrc')
     remote_file = '/etc/vim/vimrc'

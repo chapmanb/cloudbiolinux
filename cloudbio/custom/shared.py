@@ -387,3 +387,48 @@ def _add_to_profiles(line, profiles=[]):
     for profile in profiles:
         if not contains(profile, line):
             append(profile, line, use_sudo=True)
+
+
+def install_venvburrito():
+    """
+    If not already installed, install virtualenv-burrito
+    (https://github.com/brainsik/virtualenv-burrito) as a convenient
+    method for installing and managing Python virtualenvs.
+    """
+    url = "https://raw.github.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh"
+    if not exists("$HOME/.venvburrito/startup.sh"):
+        run("curl -s {0} | $SHELL".format(url))
+
+
+def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
+    """
+    Using virtual-burrito, create a new Python virtualenv named ``venv_name``.
+    Do so only if the virtualenv of the given name does not already exist.
+    virtual-burrito installs virtualenvs in ``$HOME/.virtualenvs``.
+
+    By default, an empty virtualenv is created. Python libraries can be
+    installed into the virutalenv at the time of creation by providing a path
+    to the requirements.txt file (``reqs_file``). Instead of providing the file,
+    a url to the file can be provided via ``reqs_url``, in which case the
+    requirements file will first be downloaded. Note that if the ``reqs_url``
+    is provided, the downloaded file will take precedence over ``reqs_file``.
+    """
+    # First make sure virtualenv-burrito is installed
+    install_venvburrito()
+    activate_vburrito = ". $HOME/.venvburrito/startup.sh"
+    if venv_name in run("{0}; lsvirtualenv | grep {1} || true"
+        .format(activate_vburrito, venv_name)):
+        env.logger.info("Virtualenv {0} already exists".format(venv_name))
+    else:
+        with _make_tmp_dir():
+            if reqs_file or reqs_url:
+                if not reqs_file:
+                    # This mean the url only is provided so 'standardize ' the file name
+                    reqs_file = 'requirements.txt'
+                cmd = "mkvirtualenv -r {0} {1}".format(reqs_file, venv_name)
+            else:
+                cmd = "mkvirtualenv {0}".format(venv_name)
+            if reqs_url:
+                run("wget --output-document=%s %s" % (reqs_file, reqs_url))
+            run("{0}; {1}".format(activate_vburrito, cmd))
+            env.logger.info("Finished installing virtualenv {0}".format(venv_name))

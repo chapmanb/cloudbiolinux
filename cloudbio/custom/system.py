@@ -1,11 +1,8 @@
-"""Install system programs not available from packages.
 """
-import os
-
-from fabric.api import *
-from fabric.contrib.files import *
-
+Install system programs not available from packages.
+"""
 from shared import _if_not_installed, _get_install, _configure_make
+
 
 @_if_not_installed("s3fs")
 def install_s3fs(env):
