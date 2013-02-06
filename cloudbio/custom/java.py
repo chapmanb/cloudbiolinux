@@ -23,9 +23,10 @@ def install_leiningen(env):
     """Clojure tool for project configuration and automation.
     http://github.com/technomancy/leiningen
     """
+    bin_dir = os.path.join(env.system_install, "bin")
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             run("wget --no-check-certificate https://raw.github.com/technomancy/leiningen/stable/bin/lein")
             run("chmod a+rwx lein")
-            env.safe_sudo("mv lein %s" % os.path.join(env.system_install, "bin"))
-            run("lein")
+            env.safe_sudo("mv lein %s" % bin_dir)
+            run("%s/lein" % bin_dir)

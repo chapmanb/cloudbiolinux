@@ -3,6 +3,7 @@
 import os
 
 from fabric.api import run, cd
+from fabric.contrib import files
 
 from cloudbio.custom.shared import _make_tmp_dir
 from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
@@ -41,6 +42,13 @@ def _connect_native_packages(env, pkg_install):
     that needs a local version in our non-root directory tree.
     """
     bin_dir = os.path.join(env.system_install, "bin")
+    path = run("echo $PATH")
+    if bin_dir not in path and files.exists(env.shell_config):
+        comment_line = "# CloudBioLinux PATH updates"
+        add_path = "export PATH=$PATH:%s" % bin_dir
+        if not files.contains(env.shell_config, add_path):
+            files.append(env.shell_config, comment_line)
+            files.append(env.shell_config, add_path)
     if "python" in pkg_install:
         _create_python_virtualenv(env.system_install)
 
