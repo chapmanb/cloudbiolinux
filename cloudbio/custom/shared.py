@@ -376,7 +376,7 @@ def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=
     _write_to_file(conf_file_contents, dest, mode=0755)
 
 
-def _add_to_profiles(line, profiles=[]):
+def _add_to_profiles(line, profiles=[], use_sudo=True):
     """
     If it's not already there, append ``line`` to shell profiles files.
     By default, these are ``/etc/profile`` and ``/etc/bash.bashrc`` but can be
@@ -386,7 +386,7 @@ def _add_to_profiles(line, profiles=[]):
         profiles = ['/etc/bash.bashrc', '/etc/profile']
     for profile in profiles:
         if not contains(profile, line):
-            append(profile, line, use_sudo=True)
+            append(profile, line, use_sudo=use_sudo)
 
 
 def install_venvburrito():
@@ -398,6 +398,8 @@ def install_venvburrito():
     url = "https://raw.github.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh"
     if not exists("$HOME/.venvburrito/startup.sh"):
         run("curl -s {0} | $SHELL".format(url))
+        # Add the startup script into the ubuntu user's bashrc
+        _add_to_profiles(". $HOME/.venvburrito/startup.sh", ['/home/ubuntu/.bashrc'], use_sudo=False)
 
 
 def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
