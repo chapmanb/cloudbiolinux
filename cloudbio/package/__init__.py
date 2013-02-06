@@ -50,9 +50,9 @@ def _connect_native_packages(env, pkg_install):
             files.append(env.shell_config, comment_line)
             files.append(env.shell_config, add_path)
     if "python" in pkg_install:
-        _create_python_virtualenv(env.system_install)
+        _create_local_virtualenv(env.system_install)
 
-def _create_python_virtualenv(target_dir):
+def _create_local_virtualenv(target_dir):
     """Create virtualenv in target directory for non-sudo installs.
     """
     url = "https://raw.github.com/pypa/virtualenv/master/virtualenv.py"
