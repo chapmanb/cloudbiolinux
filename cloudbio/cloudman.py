@@ -43,7 +43,6 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_ec2_autorun(env, use_repo_autorun)
     _configure_sge(env)
     _configure_hadoop(env)
-    _configure_condor(env)
     _configure_nfs(env)
     install_s3fs(env)
 
@@ -166,22 +165,6 @@ def _configure_hadoop(env):
     env.logger.info("Done configuring Hadoop for CloudMan")
 
 
-def _configure_condor(env):
-    """
-    Grab files required by CloudMan to setup HTCondor
-    """
-    condor_root = '/opt/condor'
-    filename = 'condor-7.9.1-x86_64_ubuntu_10.04.4-stripped.tar.gz'
-    if not exists(condor_root):
-        sudo("mkdir -p %s" % condor_root)
-    with cd(condor_root):
-        if not exists(filename):
-            sudo('wget --output-document={0} https://s3.amazonaws.com/cloudman/{0}'\
-                .format(filename))
-    sudo("chown -R condor:condor {0}".format(condor_root))
-    env.logger.info("Done configuring HTCondor for CloudMan")
-
-
 def _configure_nfs(env):
     """
     Edit ``/etc/exports`` to append paths that are shared over NFS by CloudMan.
@@ -191,7 +174,7 @@ def _configure_nfs(env):
     a comma-separated list of directories.
     """
     nfs_dir = "/export/data"
-    cloudman_dir = "/mnt/galaxyData/export"
+    cloudman_dir = "/mnt/galaxy/export"
     if not exists(nfs_dir):
         # For the case of rerunning this script, ensure the nfs_dir does
         # not exist (exists() method does not recognize it as a file because
@@ -206,7 +189,6 @@ def _configure_nfs(env):
     galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
     galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
     exports = ['/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
-               '/opt/condor           *(rw,sync,no_root_squash,no_subtree_check)',
                '/opt/hadoop           *(rw,sync,no_root_squash,no_subtree_check)',
                '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
                '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,

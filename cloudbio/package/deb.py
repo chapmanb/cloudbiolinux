@@ -99,7 +99,7 @@ def _setup_apt_automation():
             "grub-pc grub-pc/install_devices_empty boolean true",
             "acroread acroread/default-viewer boolean false",
             "rabbitmq-server rabbitmq-server/upgrade_previous note",
-            "condor condor/configure select No",
+            "condor condor/wantdebconf boolean false",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
