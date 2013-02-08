@@ -91,6 +91,8 @@ def _setup_vm(options, vm_launcher, actions):
                 vm_launcher.package()
             if 'ssh' in actions:
                 _interactive_ssh(vm_launcher)
+            if 'attach_ip' in actions:
+                vm_launcher.attach_public_ip()
             if not destroy_on_complete:
                 print 'Your Galaxy instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
     finally:
@@ -116,6 +118,7 @@ def _expand_actions(actions):
                           "install_biolinux",
                           "cloudman_launch",
                           "ssh",
+                          "attach_ip",
                           ]:
         if simple_action in actions:
             unique_actions.add(simple_action)
