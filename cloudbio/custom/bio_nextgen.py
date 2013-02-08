@@ -468,6 +468,20 @@ def install_varscan(env):
                 run("wget %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
+def install_cram(env):
+    """Highly efficient and tunable reference-based compression of sequence data.
+    http://www.ebi.ac.uk/ena/about/cram_toolkit/
+    """
+    version = "1.0"
+    url = "https://github.com/vadimzalunin/crammer/raw/master/" \
+          "cramtools-%s.jar" % version
+    install_dir = _symlinked_java_version_dir("cram", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                run("wget %s" % url)
+                env.safe_sudo("mv *.jar %s" % install_dir)
+
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/

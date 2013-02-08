@@ -19,6 +19,7 @@ bio_nextgen:
     - stampy
   utilitites:
     - bedtools
+    - cram
     - dwgsim
     - fastqc
     - fastx_toolkit
