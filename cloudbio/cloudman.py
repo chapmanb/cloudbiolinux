@@ -15,7 +15,7 @@ exec python %s 2> %s.log
 """
 import os
 
-from fabric.api import sudo, put, cd
+from fabric.api import sudo, put, cd, run
 from fabric.contrib.files import exists, settings, append
 
 from cloudbio.galaxy import _setup_users
@@ -24,7 +24,8 @@ from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
                                     _configure_make, _if_not_installed,
                                     _setup_conf_file, _add_to_profiles,
-                                    _create_python_virtualenv)
+                                    _create_python_virtualenv,
+                                    _setup_simple_service)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -44,7 +45,51 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_sge(env)
     _configure_hadoop(env)
     _configure_nfs(env)
+    _configure_novnc(env)
     install_s3fs(env)
+
+
+def _configure_novnc(env):
+    if not "novnc_install_dir" in env:
+        env.novnc_install_dir = "/opt/novnc"
+    if not "vnc_password" in env:
+        env.vnc_password = "cl0udbi0l1nux"
+    if not "vnc_user" in env:
+        env.vnc_user = env.user
+    if not "vnc_display" in env:
+        env.vnc_display = "1"
+    if not "vnc_depth" in env:
+        env.vnc_depth = "16"
+    if not "vnc_geometry" in env:
+        env.vnc_geometry = "1024x768"
+
+    _configure_vncpasswd(env)
+
+    novnc_dir = env.novnc_install_dir
+    env.safe_sudo("mkdir -p '%s'" % novnc_dir)
+    env.safe_sudo("chown %s '%s'" % (env.user, novnc_dir))
+    clone_cmd = "NOVNC_DIR='%s'; rm -rf $NOVNC_DIR; git clone https://github.com/kanaka/noVNC.git $NOVNC_DIR" % novnc_dir
+    run(clone_cmd)
+    ## Move vnc_auto.html which takes vnc_password as query argument
+    ## to index.html and rewrite it so that password is autoset, no
+    ## need to specify via query parameter.
+    run("sed s/password\\ =\\ /password\\ =\\ \\\'%s\\\'\\;\\\\\\\\/\\\\\\\\// '%s/vnc_auto.html' > '%s/index.html'" % (env.vnc_password, novnc_dir, novnc_dir))
+
+    _setup_conf_file(env, "/etc/init.d/novnc", "novnc_init", default_source="novnc_init")
+    _setup_conf_file(env, "/etc/default/novnc", "novnc_default", default_source="novnc_default.template")
+    _setup_conf_file(env, "/etc/init.d/vncserver", "vncserver_init", default_source="vncserver_init")
+    _setup_conf_file(env, "/etc/default/vncserver", "vncserver_default", default_source="vncserver_default.template")
+    _setup_simple_service("novnc")
+    _setup_simple_service("vncserver")
+
+
+def _configure_vncpasswd(env):
+    with cd("~"):
+        run("mkdir -p ~/.vnc")
+        run("git clone https://github.com/trinitronx/vncpasswd.py vncpasswd")
+        run("python vncpasswd/vncpasswd.py '%s' -f ~/.vnc/passwd" % env.vnc_password)
+        run("chmod 600 ~/.vnc/passwd")
+        run("rm -rf vncpasswd")
 
 
 def _setup_env(env):
