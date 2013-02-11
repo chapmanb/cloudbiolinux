@@ -69,7 +69,7 @@ def _add_apt_gpg_keys():
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     sudo("apt-get update")
-    sudo("sudo apt-get install bio-linux-keyring")
+    sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
 
 
 def _setup_apt_automation():
