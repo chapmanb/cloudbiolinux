@@ -465,7 +465,7 @@ def install_varscan(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % url)
+                run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_cram(env):
@@ -479,7 +479,7 @@ def install_cram(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % url)
+                run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_snpeff(env):
