@@ -40,8 +40,10 @@ genomes:
     name: S cerevisiae (sacCer2)
   - dbkey: WS210
     name: C elegans (WS210)
-  - dbkey: unknown
-    name: unknown 
+#custom:
+#  - dbkey: GRCh37-NA12878-xprize-fosmid
+#    base: GRCh37
+#    mask: https://s3.amazonaws.com/chapmanb/xprize/GRCh37-NA12878-xprize-fosmid.bed
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in data_fabfile.py

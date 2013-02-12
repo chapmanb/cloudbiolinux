@@ -5,7 +5,7 @@
 #
 #  fab -H vagrant -f $source/fabfile.py install_biolinux -c $source/contrib/bionode/fabricrc_bionode.txt
 #
-#  Updated by Pjotr Prins <pjotr.debian@thebird.nl> 
+#  Updated by Pjotr Prins <pjotr.debian@thebird.nl>
 #
 
 ## BioNode is Debian
@@ -23,5 +23,5 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 data_files = /mnt/biodata
-galaxy_base = /mnt/biodata/galaxy
+galaxy_home = /mnt/biodata/galaxy
 

@@ -31,7 +31,7 @@ def build_ucsc_map(ensembl_chrs, mt_chr):
     return out
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "63"
+ensembl_release = "66"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name",
@@ -137,7 +137,10 @@ def _query_for_ucsc_ensembl_map(org_name):
     cursor.execute("select * from ucscToEnsembl")
     ucsc_map = {}
     for ucsc, ensembl in cursor.fetchall():
-        ucsc_map[ensembl] = ucsc
+        # only include standard chromosomes -- not haplotype and random
+        # gtf_to_fasta in TopHat doesn't seem to like these
+        if len(ucsc) < 6:
+            ucsc_map[ensembl] = ucsc
     return ucsc_map
 
 def _download_ensembl_gff(build):

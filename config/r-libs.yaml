@@ -38,11 +38,13 @@ cran:
  - hwriter
  - kernlab
  - kernsmooth
+ - knitr
  - lattice
  - latticeExtra
  - leaps
  - lmtest
  - maptree
+ - markdown
  - mass
  - matrix
  - mclust
@@ -91,6 +93,7 @@ cran:
 
 biocrepo: http://bioconductor.org/biocLite.R
 bioc:
+ - affxparser
  - affy
  - affydata
  - affyio
@@ -99,6 +102,7 @@ bioc:
  - annaffy
  - annotate
  - AnnotationDbi
+ - aroma.light
  - ArrayExpress
  - arrayQualityMetrics
  - ArrayTools
@@ -129,6 +133,7 @@ bioc:
  - DESeq
  - DEXSeq
  - DiffBind
+ - DNAcopy
  - DynDoc
  - edgeR
  - EDASeq
@@ -137,12 +142,16 @@ bioc:
  - gcrma
  - genefilter
  - geneplotter
+ - GenomeGraphs
+ - genomeIntervals
  - GenomicFeatures
  - GenomicRanges
+ - Genominator 
  - GEOquery
- - girafe
  - GGBase
  - GGtools
+ - ggbio
+ - girafe
  - globaltest
  #- GO.db
  - GOFunction
@@ -153,6 +162,7 @@ bioc:
  - hgu95av2.db
  - HilbertVis
  - htSeqTools
+ - impute
  - IRanges
  - KEGG.db
  - limma
@@ -170,21 +180,35 @@ bioc:
  #- org.Mm.eg.db
  #- org.Sc.sgd.db
  #- org.Xl.eg.db
+ - PAnnBuilder
  - preprocessCore
  - PICS
+ - qpgraph
+ - qrqc
  - rGADEM
  - R453Plus1Toolbox
+ - RBGL
+ - Repitools
  - rGADEM
  - Rgraphviz
+ - Ringo
  - rnaSeqMap
  - Rolexa
  - Rsamtools
+ - Rsubread
  - rtracklayer
  - segmentSeq
+ - seqbias
+ - seqLogo
  - ShortRead
  - siggenes
  - simpleaffy
  - snpMatrix
+ - snpStats
  - splots
  - SRAdb
+ - tkWidgets
+ - VariantAnnotation
  - vsn
+ - widgetTools
+ - zlibbioc

@@ -1,0 +1,31 @@
+---
+# Flavor containing more minimal instructions to install tools for
+# running next-generation sequencing pipelines.
+packages:
+  - minimal
+  - libraries
+  - python
+  - java
+  - r
+  - bio_nextgen
+  - distributed
+libraries:
+custom_ignore:
+  - bfast
+  - gmap
+  - lastz
+  - mosaik
+  - perm
+  - snap
+  - fastx_toolkit
+  - varianttools
+  - vep
+  - abyss
+  - ray
+  - transabyss
+  - trinity
+  - velvet
+  - pydoop
+  - seal
+  - bx-python
+  - rpy

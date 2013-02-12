@@ -5,15 +5,17 @@
 #
 #   fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data_s3:your_biodata.yaml
 
-# details about the operating system
+# -- Details about the operating system
 ## Ubuntu
 distribution = ubuntu
-dist_name = oneiric
+dist_name = quantal
 ## Centos
 #distribution = centos
 ## Debian
 #distribution = debian
 #dist_name = squeeze
+
+# -- Installation details
 
 # Unset to avoid CloudBioLinux customizations like setup scripts;
 # or set to different edition to get specific customizations
@@ -29,16 +31,94 @@ system_install = /usr
 # Local install directory for versioned software that will not
 # be included in the path by default
 local_install = ~/install
+
+# Shell to be used by CBL scripts during runtime
 shell_config = ~/.bashrc
-shell = /bin/bash -l -c
+shell = /bin/bash --noprofile -i -l -c
+
 # Global setting for using sudo; allows installation of custom packages
 # by non-privileged users.
-# system_install needs to point to a user writeable directory if set to False
-use_sudo = true 
+# *Note*: ``system_install`` needs to point to a user-writeable directory if
+# ``use_sudo`` is set to ``False``
+use_sudo = True
 
-# details for biological data files and Galaxy
+# -- Details about reference data installation
+
+# Path where biological reference data files should be retrieved to
 data_files = /mnt/biodata
-galaxy_base = /mnt/biodata/galaxy
+
+# --  Details about installing Galaxy and its dependencies. Values behind the
+#     comments are the defaults.
+
+# Specify as which user should Galaxy be installed
+#galaxy_user = galaxy
+
+# Path where Galaxy application is installed
+#galaxy_home = /mnt/galaxyTools/galaxy-central
+
+# URL for the Galaxy application source code repository
+#galaxy_repository = https://bitbucket.org/galaxy/galaxy-central/
+
+# A path to the binaries for interacting with PostgreSQL
+#postgres_bin_dir = /usr/lib/postgresql/9.1/bin
+#postrges_user = postgres
+#postgres_port = 5840
+
+# If ``True``, setup and initialize Postgres database for use by Galaxy
+# according to the following options
+#galaxy_setup_database = False
+#galaxy_db_name = galaxy
+#galaxy_database_path = /mnt/galaxy/db
+#galaxy_ftp_user_password = fu5yOj2sn
+#galaxy_universe_wsgi_url = https://bitbucket.org/galaxy/cloudman/raw/tip/universe_wsgi.ini.cloud
+
+# If ``True``, Galaxy repository will not be custom-configured after being cloned
+# The customization details are primarily targeted at a cloud deployment; for
+# details, see ``cbl.galaxy.__init__ -> _configure_galaxy_repository``
+#galaxy_preconfigured_repository = False
+
+# If ``True``, setup and initialize Postgres database for use by Galaxy
+#galaxy_setup_database = False
+
+# If ``True``, setup Galaxy as a system-level service controlled via init.d
+#galaxy_setup_service = False
+
+# If ``True``, setup Xvfb as a system-level service via init.d
+#galaxy_setup_xvfb = False
+
+# Location of Galaxy's .loc files
+#galaxy_loc_files = /mnt/biodata/galaxy/galaxy-data
+
+# Galaxy requires Java tools to have their jar files places in a specific
+# directory, so specify it here.
+#galaxy_jars_dir = /mnt/galaxyTools/galaxy-central/tool-data/shared/jars
+
+# If ``True``, install a set of tools considered as Galaxy dependencies
+#galaxy_install_dependencies = False
+
+# Specify a custom location to a YAML file containing a list of tools to
+# install as Galaxy dependencies
+#galaxy_tools_conf = contrib/cloudman/tools.yaml
+
+# Location where (some?!) Galaxy dependency tools should be installed
+#galaxy_tools_dir = /mnt/galaxyTools/tools
+
+# If ``True``, install R packages listed in contrib/cloudman/tools.yaml
+#galaxy_install_r_packages = False
+
+# Paths for respective file systems that will be added to ``/etc/exports``
+# and thus exported via NFS when the operating system boots
+#galaxy_data_mount = /mnt/galaxyData
+#galaxy_tools_mount = /mnt/galaxyTools
+#galaxy_indices_mount = /mnt/biodata
+#extra_nfs_exports = comma,separate,desired,paths
+
+
+# -- Tool-specific configurations
+
+# A location of a custom nginx.conf or a comparable template, respectively.
+#nginx_conf_template_path = installed_files/nginx.conf.template
+#nginx_conf_path = path/to/custom/nginx.conf
 
 # Picard home
 picard_home = /usr/share/java/picard

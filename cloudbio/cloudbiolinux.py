@@ -25,15 +25,20 @@ def _freenx_scripts(env):
 def _cleanup_space(env):
     """Cleanup to recover space from builds and packages.
     """
-    env.logger.info("Cleaning up space from package builds")
-    env.safe_sudo("rm -rf .cpanm")
-    env.safe_sudo("rm -f /var/crash/*")
+    if env.edition.short_name not in ["minimal"]:
+        env.logger.info("Cleaning up space from package builds")
+        env.safe_sudo("rm -rf .cpanm")
+        env.safe_sudo("rm -f /var/crash/*")
+        run("rm -f ~/*.dot")
+        run("rm -f ~/*.log")
 
 def _configure_gnome(env):
     """Configure NX server to use classic GNOME.
 
     http://askubuntu.com/questions/50503/why-do-i-get-unity-instead-of-classic-when-using-nx
+    http://notepad2.blogspot.com/2012/04/install-freenx-server-on-ubuntu-1110.html
     """
-    add = 'COMMAND_START_GNOME="/usr/bin/nx-session-launcher-suid gnome-session --session=gnome-classic"'
+    add = 'COMMAND_START_GNOME="gnome-session --session gnome-fallback"'
     fname = "/etc/nxserver/node.conf"
-    append(fname, add, use_sudo=True)
+    if exists("/etc/nxserver/"):
+        append(fname, add, use_sudo=True)

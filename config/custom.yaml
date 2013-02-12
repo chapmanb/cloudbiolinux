@@ -1,9 +1,9 @@
 ---
-# List of custom programs to install that are not packaged. These each require 
+# List of custom programs to install that are not packaged. These each require
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
 bio_general:
- - bio4j
+ #- bio4j # no easy download for 0.8
  - emboss
  - pgdspider
 bio_nextgen:
@@ -14,10 +14,12 @@ bio_nextgen:
     - gmap
     - lastz
     - mosaik
-    - perm
+    # - perm # difficult build process with directory names
+    - snap
     - stampy
   utilitites:
     - bedtools
+    - cram
     - dwgsim
     - fastqc
     - fastx_toolkit
@@ -26,50 +28,87 @@ bio_nextgen:
     - vcftools
   analysis:
     - cufflinks
-    - echo
+    # - echo # build problems on ubuntu 12.10
     - freebayes
     - gatk
     - gatk_queue
     - picard
     - samtools
+    - sambamba
     - shrec
     - snpeff
     - tophat
+    - vep
   assembly:
     - abyss
+    - cortex_var
+    - ray
     - transabyss
     - trinity
     - velvet
   sv:
     - hydra
   variant:
+    - bcbio_variation
     - crisp
+    - gemini
     - tassel
     - stacks
+    - varscan
   chip:
     - macs
   needs_64bit:
     - ucsc_tools
     - bfast
     - novoalign
+    - novosort
     - plink_seq
+bio_proteomics:
+  - transproteomic_pipeline
+  - omssa
+  - mzmine
+  - myrimatch
+  - directag
+  - tagrecon
+  - idpqonvert
+  - pepitome
+  - percolator
+bio_proteomics_wine:
+  - proteomics_wine_env
+  #- multiplierz
+  - proteowizard
 cloudman:
   - nginx
   - proftpd
   - sge
+galaxy:
+  - galaxy_webapp
+  - galaxy_tools
+galaxyp:
+  - protk
+  - protvis
+  - proteomics_tools
 distributed:
-  - mahout
   - pydoop
+  - seal
+system:
+  - s3fs
 python:
   - bx-python
-  - matplotlib
   - rpy
 java:
-  - leinengin
+  - leiningen
 phylogeny:
   - tracer
   - beast
-  #- cljr
+#Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
+vcr:
+  - viralassembly
+  - viralassembly_cleanall
+  - viralvigor
+  - viralvigor_test
+  - viralvigor_validate
+  - viralvigor_cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

@@ -8,7 +8,7 @@ Retrieves dbSNP plus training data for variant recalibration:
   - dbsnp_132.hg19.vcf.gz
   - hapmap_3.3.hg19.sites.vcf
   - 1000G_omni2.5.hg19.sites.vcf
-  - indels_mills_devine.hg19.sites.vcf
+  - Mills_and_1000G_gold_standard.indels.hg19.sites.vcf
 """
 import os
 
@@ -20,9 +20,9 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
     """
     folder_name = "variation"
     to_download = [("dbsnp_{ver}".format(ver=dbsnp_version), ""),
-                   ("hapmap_3.3", ".sites"),
-                   ("1000G_omni2.5", ".sites"),
-                   ("Mills_Devine_2hit.indels", ".sites")]
+                   ("hapmap_3.3", ""),
+                   ("1000G_omni2.5", ""),
+                   ("Mills_and_1000G_gold_standard.indels", "")]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
@@ -32,6 +32,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
         with cd(vrn_dir):
             for dl_name, dl_ext in to_download:
                 _download_broad_bundle(manager.dl_name, bundle_version, dl_name, dl_ext)
+            _download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}{ext}.vcf".format(gid=gid, name=name, ext=ext)
@@ -44,3 +45,12 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
         run("gunzip %s" % os.path.basename(base_url))
         run("mv %s %s" % (broad_fname, fname))
     return fname
+
+def _download_background_vcf(gid):
+    """Download background file of variant to use in calling.
+    """
+    base_url = "https://s3.amazonaws.com/biodata/variants"
+    base_name = "background-diversity-1000g.vcf"
+    if gid in ["GRCh37"] and not exists("{0}.gz".format(base_name)):
+        for ext in ["gz", "gz.tbi"]:
+            run("wget {0}/{1}.{2}".format(base_url, base_name, ext))

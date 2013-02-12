@@ -14,5 +14,4 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
 

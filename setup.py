@@ -7,7 +7,7 @@ reusing code.
 from setuptools import setup, find_packages
 
 setup(name = "cloudbiolinux",
-      version = "0.2a",
+      version = "0.3a",
       author = "Brad Chapman",
       author_email = "chapmanb@50mail.com",
       description = "configure virtual (or real) machines with tools for biological analyses",

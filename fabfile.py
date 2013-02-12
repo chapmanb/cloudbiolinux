@@ -19,7 +19,6 @@ import os
 import sys
 from datetime import datetime
 
-from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
@@ -30,166 +29,99 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
 sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
-from cloudbio.edition import _setup_edition
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging, _update_biolinux_log
+from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
-                                  _setup_apt_automation, _setup_apt_sources)
-from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
-                                  _setup_yum_sources)
+from cloudbio.package import (_configure_and_install_native_packages,
+                              _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
-
-# ## Utility functions for establishing our build environment
-
-def _parse_fabricrc():
-    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
-    """
-    # ## General setup
-    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-
-    if not env.has_key("distribution") and not env.has_key("system_install"):
-        env.logger.info("Reading default fabricrc.txt")
-        config_file = os.path.join(env.config_dir, "fabricrc.txt")
-        if os.path.exists(config_file):
-            env.update(load_settings(config_file))
-    else:
-        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
-
-def _create_local_paths():
-    """Expand any paths defined in terms of shell shortcuts (like ~).
-    """
-    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
-                  warn_only=True):
-        # This is the first point we call into a remote host - make sure
-        # it does not fail silently by calling a dummy run
-        env.logger.info("Now, testing connection to host...")
-        test = run("pwd")
-        # If there is a connection failure, the rest of the code is (sometimes) not
-        # reached - for example with Vagrant the program just stops after above run
-        # command.
-        if test != None:
-          env.logger.info("Connection to host appears to work!")
-        else:
-          raise NotImplementedError("Connection to host failed")
-        env.logger.debug("Expand paths")
-        if env.has_key("local_install"):
-            if not exists(env.local_install):
-                run("mkdir -p %s" % env.local_install)
-            with cd(env.local_install):
-                result = run("pwd")
-                env.local_install = result
-
-def _setup_flavor(flavor, environment=None):
-    """Setup flavor
-    """
-    if not flavor:
-        flavor = env.get("flavor", None)
-    if not environment:
-        environment = env.get("environment", None)
-    if environment:
-        env.environment = environment
-        env.logger.info("Environment %s" % env.environment)
-    if flavor:
-        # import a flavor defined through parameters flavor and flavor_path
-        flavor_path = env.get("flavor_path", None)
-        if flavor_path == None:
-          raise ImportError("You need to define the flavor_path for %s!" % flavor)
-        # Add path for flavors
-        sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
-        env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
-        try:
-            mod = __import__(flavor_path, fromlist=[flavor])
-        except ImportError:
-            raise ImportError("Failed to import %s" % flavor)
-    else:
-        # import default Flavor
-        from cloudbio.flavor import Flavor
-    env.logger.info("This is a %s" % env.flavor.name)
+from cloudbio.flavor.config import get_config_file
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None, packagelist=None, flavor=None, environment=None):
-    """Main entry point for installing Biolinux on a remote server.
+def install_biolinux(target=None, flavor=None):
+    """Main entry point for installing BioLinux on a remote server.
 
-    This allows a different main package list (the main YAML file is passed in),
-    and/or use of Flavor. So you can say:
+    `flavor` allows customization of CloudBioLinux behavior. It can either
+    be a flavor name that maps to a corresponding directory in contrib/flavor
+    or the path to a custom directory. This can contain:
 
-      install_biolinux:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
+      - alternative package lists (main.yaml, packages.yaml, custom.yaml)
+      - custom python code (nameflavor.py) that hooks into the build machinery
 
-    Both packagelist and flavor, as well as the Edition, can also be passed in
-    through the fabricrc file.
-
-    target can also be supplied on the fab CLI. Special targets are:
+    `target` allows running only particular parts of the build process. Valid choices are:
 
       - packages     Install distro packages
       - custom       Install custom packages
       - libraries    Install programming language libraries
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
-
-    environment allows adding additional information on the command line -
-    usually for defining environments, for example environment=testing, or
-    environment=production, will set the deployment environment and tune
-    post-installation settings.
     """
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_flavor(flavor, environment)
-    _setup_distribution_environment() # get parameters for distro, packages etc.
-    _create_local_paths()
-    env.logger.info("packagelist=%s" % packagelist)
-    pkg_install, lib_install = _read_main_config(packagelist)  # read yaml
-    env.logger.info("Target=%s" % target)
+    _configure_fabric_environment(env, flavor)
+    env.logger.debug("Target is '%s'" % target)
+    _perform_install(target, flavor)
+    _print_time_stats("Config", "end", time_start)
+
+
+def _perform_install(target=None, flavor=None):
+    """
+    Once CBL/fabric environment is setup, this method actually
+    runs the required installation procedures.
+
+    See `install_biolinux` for full details on arguments
+    `target` and `flavor`.
+    """
+    pkg_install, lib_install, custom_ignore = _read_main_config()
     if target is None or target == "packages":
-        if env.distribution in ["debian", "ubuntu"]:
-            _setup_apt_sources()
-            _setup_apt_automation()
-            _add_apt_gpg_keys()
-            _apt_packages(pkg_install)
-        elif env.distibution in ["centos"]:
-            _setup_yum_sources()
-            _yum_packages(pkg_install)
-            _setup_yum_bashrc()
+        # can only install native packages if we have sudo access.
+        if env.use_sudo:
+            _configure_and_install_native_packages(env, pkg_install)
         else:
-            raise NotImplementedError("Unknown target distribution")
-        if env.nixpkgs: # ./doc/nixpkgs.md
+            _connect_native_packages(env, pkg_install)
+        if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
         _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
-        _custom_installs(pkg_install)
+        _custom_installs(pkg_install, custom_ignore)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
-        env.edition.post_install()
+        env.edition.post_install(pkg_install=pkg_install)
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
         if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            if env.distribution in ["ubuntu"]:
+                # For the time being (Dec 2012), must install development version
+                # of cloud-init because of a boto & cloud-init bug:
+                # https://bugs.launchpad.net/cloud-init/+bug/1068801
+                sudo('wget --output-document=cloud-init_0.7.1-0ubuntu4_all.deb ' +
+                    'https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
+                sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
+                sudo("rm -f cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
-    _print_time_stats("Config", "end", time_start)
+
 
 def _print_time_stats(action, event, prev_time=None):
     """ A convenience method for displaying time event during configuration.
-    
+
     :type action: string
     :param action: Indicates type of action (eg, Config, Lib install, Pkg install)
-    
+
     :type event: string
     :param event: The monitoring event (eg, start, stop)
-    
+
     :type prev_time: datetime
     :param prev_time: A timeststamp of a previous event. If provided, duration between
                       the time the method is called and the time stamp is included in
                       the printout
-                      
+
     :rtype: datetime
     :return: A datetime timestamp of when the method was called
     """
@@ -206,42 +138,45 @@ def _check_fabric_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or higher")
 
-def _custom_installs(to_install):
+def _custom_installs(to_install, ignore=None):
     if not exists(env.local_install):
         run("mkdir -p %s" % env.local_install)
-    pkg_config = os.path.join(env.config_dir, "custom.yaml")
+    pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
-def install_custom(p, automated=False, pkg_to_group=None):
-    """Install a single custom package by name.
-    This method fetches names from custom.yaml that delegate to a method
-    in the custom/name.py program. Alternatively, if a program install method is
-    defined in approapriate package, it will be called directly (see param p).
-    
+def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
+    """
+    Install a single custom program or package by name.
+
+    This method fetches program name from ``config/custom.yaml`` and delegates
+    to a method in ``custom/*name*.py`` to proceed with the installation.
+    Alternatively, if a program install method is defined in the appropriate
+    package, it will be called directly (see param ``p``).
+
     Usage: fab [-i key] [-u user] -H host install_custom:program_name
-    
+
     :type p:  string
-    :param p: A name of a custom program to install. This has to be either a name
-              that is listed in custom.yaml as a subordinate to a group name or a
-              program name whose install method is defined in either cloudbio or
-              custom packages (eg, install_cloudman).
-    
+    :param p: A name of the custom program to install. This has to be either a name
+              that is listed in ``custom.yaml`` as a subordinate to a group name or a
+              program name whose install method is defined in either ``cloudbio`` or
+              ``custom`` packages
+              (e.g., ``cloudbio/custom/cloudman.py -> install_cloudman``).
+
     :type automated:  bool
     :param automated: If set to True, the environment is not loaded and reading of
-                      the custom.yaml is skipped.
+                      the ``custom.yaml`` is skipped.
     """
     _setup_logging(env)
-    p = p.lower() # All packages are listed in custom.yaml are in lower case
+    p = p.lower() # All packages listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _parse_fabricrc()
-        _setup_edition(env)
-        _setup_distribution_environment()
-        _create_local_paths()
-        pkg_config = os.path.join(env.config_dir, "custom.yaml")
+        _configure_fabric_environment(env, flavor)
+        pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+
     try:
         env.logger.debug("Import %s" % p)
         # Allow direct calling of a program install method, even if the program
@@ -264,23 +199,22 @@ def install_custom(p, automated=False, pkg_to_group=None):
     fn(env)
     _print_time_stats("Custom install for '%s'" % p, "end", time_start)
 
-def _read_main_config(yaml_file=None):
+def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
 
     Reads 'main.yaml' and returns packages and libraries
     """
-    if yaml_file is None:
-        yaml_file = os.path.join(env.config_dir, "main.yaml")
+    yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data['packages']
     packages = packages if packages else []
     libraries = full_data['libraries']
     libraries = libraries if libraries else []
-    env.logger.info("Meta-package information")
-    env.logger.info(",".join(packages))
-    env.logger.info(",".join(libraries))
-    return packages, sorted(libraries)
+    custom_ignore = full_data.get('custom_ignore', [])
+    env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
+            "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
+    return packages, sorted(libraries), custom_ignore
 
 # ### Library specific installation code
 
@@ -337,10 +271,7 @@ def _python_library_installer(config):
     version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
     env.safe_sudo("easy_install%s -U pip" % version_ext)
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        env.safe_sudo("easy_install%s -U %s" % (version_ext, pname))
-        # Use pip when it doesn't re-download even if latest package installed
-        # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
-        #sudo("pip%s install -U %s" % (version_ext,  pname))
+        env.safe_sudo("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
@@ -405,16 +336,12 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_flavor(None)
-    _setup_distribution_environment()
-    _create_local_paths()
+    _configure_fabric_environment(env)
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
     for iname in to_install:
-        yaml_file = os.path.join(env.config_dir, "%s.yaml" % iname)
+        yaml_file = get_config_file(env, "%s.yaml" % iname).base
         with open(yaml_file) as in_handle:
             config = yaml.load(in_handle)
         lib_installers[iname](config)

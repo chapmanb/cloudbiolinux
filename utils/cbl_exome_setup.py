@@ -3,6 +3,7 @@
 
 - Updates configuration file with server details.
 - Provides links to custom Galaxy instance
+- Install latest processing pipeline
 - Start toplevel processing server to run exome analysis.
 - Adds RabbitMQ user and virtual host with correct permissions.
 
@@ -13,6 +14,7 @@ import time
 import shutil
 import socket
 import subprocess
+import contextlib
 import ConfigParser
 
 import yaml
@@ -27,6 +29,7 @@ def main():
     update_amqp_config(amqp_config, socket.getfqdn())
     amqp_user, amqp_pass = read_ampq_config(amqp_config)
     amqp_vhost = read_pp_config(pp_config)
+    install_latest_pipeline()
     setup_custom_galaxy()
     run_nextgen_analysis_server(pp_config, work_dir, work_user)
     setup_rabbitmq(amqp_vhost, amqp_user, amqp_pass)
@@ -44,6 +47,15 @@ def setup_custom_galaxy():
                                os.path.split(galaxy_path)[0]])
     subprocess.check_call(["chmod", "a+rwx", storage_dir])
 
+def install_latest_pipeline():
+    url = "git://github.com/chapmanb/bcbb.git"
+    tmpdir = "/tmp"
+    with chdir(tmpdir):
+        subprocess.check_call(["git", "clone", url])
+        with chdir(os.path.join(tmpdir, "bcbb", "nextgen")):
+            subprocess.check_call(["python", "setup.py", "install"])
+        shutil.rmtree("bcbb")
+
 UPSTART_SCRIPT = """
 description   "Nextgen sequencing analysis server"
 
@@ -56,6 +68,7 @@ end script
 
 exec su -l -c 'nextgen_analysis_server.py -q toplevel {config_file} --basedir={work_dir}' {user}
 """
+
 
 def run_nextgen_analysis_server(pp_config, work_dir, work_user):
     """Run a nextgen sequencing server using Ubuntu upstart.
@@ -110,6 +123,8 @@ def update_amqp_config(fname, hostname):
     # make updated file readable by initial user
     os.chown(fname, orig_stat.st_uid, orig_stat.st_gid)
 
+# ## Utilities
+
 def wait_until_mounted(fname):
     """Wait up to 3 minutes for mounted directory with file.
     """
@@ -124,6 +139,18 @@ def wait_until_mounted(fname):
                 f=fname, s=max_tries*wait_sec))
         time.sleep(wait_sec)
         num_tries += 1
+
+@contextlib.contextmanager
+def chdir(new_dir):
+    """Context manager to temporarily change to a new directory.
+    http://lucentbeing.com/blog/context-managers-and-the-with-statement-in-python/
+    """
+    cur_dir = os.getcwd()
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(cur_dir)
  
 if __name__ == "__main__":
     main()

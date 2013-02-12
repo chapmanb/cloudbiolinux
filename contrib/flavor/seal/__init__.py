@@ -1,0 +1,2 @@
+"""Seal flavor
+"""

@@ -53,7 +53,7 @@ class Edition:
         """
         sudo("apt-get -y --force-yes upgrade")
 
-    def post_install(self):
+    def post_install(self, pkg_install=None):
         """Post installation hook"""
         pass
 
@@ -72,12 +72,13 @@ class CloudBioLinux(Edition):
         Edition.__init__(self,env)
         self.name = "CloudBioLinux Edition"
         self.short_name = "cloudbiolinux"
-        
-    def post_install(self):
+
+    def post_install(self, pkg_install=None):
         """Add scripts for starting FreeNX and CloudMan.
         """
         _freenx_scripts(self.env)
-        _configure_cloudman(self.env)
+        if pkg_install is not None and 'cloudman' in pkg_install:
+            _configure_cloudman(self.env)
 
 class BioNode(Edition):
     """BioNode specialization of BioLinux
@@ -117,7 +118,7 @@ class BioNode(Edition):
                          "deb {repo} testing main contrib non-free".format(
                              repo=main_repository)
                         ]
-        new_sources = new_sources + [ "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux" ]
+        new_sources = new_sources + [ "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux" ]
 
         return new_sources
 
@@ -167,19 +168,10 @@ class Minimal(Edition):
 
     def rewrite_apt_sources_list(self, sources):
         """Allows editions to modify the sources list. Minimal, by
-           default, uses the barest 'stable' packages.
+           default, assumes system has stable packages configured
+           and adds only the biolinux repository.
         """
-        # See if the repository is defined in env
-        if not env.get('debian_repository'):
-            main_repository = 'http://ftp.us.debian.org/debian/'
-        else:
-            main_repository = env.debian_repository
-        # The two basic repositories
-        new_sources = ["deb {repo} {dist} main contrib non-free".format(repo=main_repository,
-                                                                        dist=env.dist_name),
-                       "deb {repo} {dist}-updates main contrib non-free".format(
-                           repo=main_repository, dist=env.dist_name)]
-        return new_sources
+        return ["deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux"]
 
     def rewrite_apt_automation(self, package_info):
         return []
@@ -198,4 +190,3 @@ class Minimal(Edition):
         python, ruby, perl
         """
         return items
-

@@ -21,6 +21,8 @@ def _setup_distribution_environment():
         _setup_ubuntu()
     elif env.distribution == "centos":
         _setup_centos()
+    elif env.distribution == "scientificlinux":
+        _setup_scientificlinux()
     elif env.distribution == "debian":
         _setup_debian()
     else:
@@ -29,6 +31,10 @@ def _setup_distribution_environment():
     _cloudman_compatibility(env)
     _setup_nixpkgs()
     _configure_sudo(env)
+    _setup_fullpaths(env)
+    # allow us to check for packages only available on 64bit machines
+    machine = run("uname -m")
+    env.is_64bit = machine.find("_64") > 0
 
 def _configure_sudo(env):
     """Setup env variable and safe_sudo supporting non-privileged users.
@@ -39,6 +45,15 @@ def _configure_sudo(env):
     else:
         env.safe_sudo = run
         env.use_sudo = False
+
+def _setup_fullpaths(env):
+    home_dir = run("echo $HOME")
+    for attr in ["data_files", "galaxy_home", "local_install"]:
+        if hasattr(env, attr):
+            x = getattr(env, attr)
+            if x.startswith("~"):
+                x = x.replace("~", home_dir)
+                setattr(env, attr, x)
 
 def _cloudman_compatibility(env):
     """Environmental variable naming for compatibility with CloudMan.
@@ -74,27 +89,31 @@ def _setup_ubuntu():
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
       "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/", # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
-      "deb http://archive.canonical.com/ubuntu maverick partner", # sun-java
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu lucid main", # Free-NX
+      "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main", # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main", # Free-NX
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
 def _setup_debian():
     env.logger.info("Debian setup")
+    unstable_remap = {"sid": "squeeze"}
     shared_sources = _setup_deb_general()
     sources = [
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-        "deb http://cran.stat.ucla.edu/bin/linux/debian %s-cran/", # latest R versions
+        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s-cran/", # lastest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
         ] + shared_sources
     # fill in %s
-    env.std_sources = _add_source_versions(env.dist_name, sources)
+    dist_name = unstable_remap.get(env.dist_name, env.dist_name)
+    env.std_sources = _add_source_versions(dist_name, sources)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
     """
     env.logger.debug("Debian-shared setup")
     env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
+    env.global_sources_file = "/etc/apt/sources.list"
     env.apt_preferences_file = "/etc/apt/preferences"
     env.python_version_ext = ""
     env.ruby_version_ext = "1.9.1"
@@ -102,8 +121,8 @@ def _setup_deb_general():
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-6-openjdk"
     shared_sources = [
-        "deb http://nebc.nox.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-        "deb http://download.virtualbox.org/virtualbox/debian %s contrib"
+        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
+        "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
     ]
     return shared_sources
 
@@ -111,6 +130,13 @@ def _setup_centos():
     env.logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     env.ruby_version_ext = ""
+    if not env.has_key("java_home"):
+        env.java_home = "/etc/alternatives/java_sdk"
+
+def _setup_scientificlinux():
+    env.logger.info("ScientificLinux setup")
+    env.python_version_ext = ""
+    env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
@@ -168,4 +194,3 @@ def _add_source_versions(version, sources):
             s = s % name
         final.append(s)
     return final
-

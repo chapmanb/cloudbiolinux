@@ -1,0 +1,8 @@
+#fabric
+paramiko==1.7.7.1
+git+git://github.com/jmchilton/fabric.git@1.4.2-gvl-2#egg=fabric
+git+git://github.com/jmchilton/vm-launcher.git#egg=vmlauncher
+argparse
+pyyaml
+apache-libcloud==0.11.3
+boto

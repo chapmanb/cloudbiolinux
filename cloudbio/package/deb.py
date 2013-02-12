@@ -1,44 +1,39 @@
-"""Automated installation on debian package systems with apt.
+"""
+Automated installation on debian package systems with apt.
 """
 from fabric.api import *
 from fabric.contrib.files import *
 
 from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.flavor.config import get_config_file
+
 
 def _apt_packages(to_install=None, pkg_list=None):
-    """ Install packages available via apt-get.
-        Note that the two arguments cannot be used together.
-    
+    """
+    Install packages available via apt-get.
+    Note that ``to_install`` and ``pkg_list`` arguments cannot be used simultaneously.
+
     :type to_install:  list
-    :param to_install: A list of strings (ie, groups) present in the main config
-                       file that will be used to filter out specific packages to
-                       be installed.
-    
+    :param to_install: A list of strings (ie, groups) present in the ``main.yaml``
+                       config file that will be used to filter out the specific
+                       packages to be installed.
+
     :type pkg_list:  list
-    :param pkg_list: An explicit list of packages to install. No other files, 
+    :param pkg_list: An explicit list of packages to install. No other files,
                      flavors, or editions are considered.
     """
-    env.logger.info("Update the system")
-    sudo("apt-get update") # Always update
+    if env.edition.short_name not in ["minimal"]:
+        env.logger.info("Update the system")
+        sudo("apt-get update")
     if to_install is not None:
-        env.logger.info("Install all packages")
-        pkg_config_file = os.path.join(env.config_dir, "packages.yaml")
-        subs_pkg_config_file = os.path.join(env.config_dir, "packages-%s.yaml" %
-                                       env.distribution)
-        if not os.path.exists(subs_pkg_config_file): subs_pkg_config_file = None
+        config_file = get_config_file(env, "packages.yaml")
         env.edition.apt_upgrade_system()
-        # Retrieve final package names
-        (packages, _) = _yaml_to_packages(pkg_config_file, to_install,
-                                          subs_pkg_config_file)
-        # At this point allow the Edition to rewrite the package list - 
-        # this is shared within and between editions.
-        # Ref:  https://github.com/chapmanb/cloudbiolinux/pull/10#issuecomment-1616423
+        (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
+        # Allow editions and flavors to modify the package list
         packages = env.edition.rewrite_config_items("packages", packages)
-
-        # At this point allow the Flavor to rewrite the package list
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
-        env.logger.info("Install specific packages")
+        env.logger.info("Will install specific packages: {0}".format(pkg_list))
         packages = pkg_list
     else:
         raise ValueError("Need a file with packages or a list of packages")
@@ -46,12 +41,13 @@ def _apt_packages(to_install=None, pkg_list=None):
     # for the command line size, so we do 30 at a time
     group_size = 30
     i = 0
-    env.logger.info("Updating %i packages" % len(packages))
+    env.logger.info("Installing %i packages" % len(packages))
     while i < len(packages):
         env.logger.info("Package install progress: {0}/{1}".format(i, len(packages)))
-        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i+group_size]))
+        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i + group_size]))
         i += group_size
     sudo("apt-get clean")
+
 
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
@@ -64,6 +60,7 @@ def _add_apt_gpg_keys():
     keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
+            ("subkeys.pgp.net", "D018A4CE"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
     standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
@@ -71,6 +68,9 @@ def _add_apt_gpg_keys():
         sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
+    sudo("apt-get update")
+    sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
+
 
 def _setup_apt_automation():
     """Setup the environment to be fully automated for tricky installs.
@@ -99,12 +99,14 @@ def _setup_apt_automation():
             "grub-pc grub-pc/install_devices_empty boolean true",
             "acroread acroread/default-viewer boolean false",
             "rabbitmq-server rabbitmq-server/upgrade_previous note",
+            "condor condor/wantdebconf boolean false",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
-        cmd += "echo %s | /usr/bin/debconf-set-selections ; " % l
+        cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
     sudo(cmd)
+
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
@@ -124,7 +126,7 @@ def _setup_apt_sources():
 
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
-    comment = "# This file was modified for "+ env.edition.name
+    comment = "# This file was modified for " + env.edition.name
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
     preferences = env.edition.rewrite_apt_preferences([])
@@ -151,5 +153,6 @@ def _setup_apt_sources():
         if source.startswith("ppa:"):
             sudo("apt-get install -y --force-yes python-software-properties")
             sudo("add-apt-repository '%s'" % source)
-        elif not contains(env.sources_file, source): # FIXME: append never adds dups!
+        elif (not contains(env.sources_file, source) and
+              not contains(env.global_sources_file, source)):
             append(env.sources_file, source, use_sudo=True)
