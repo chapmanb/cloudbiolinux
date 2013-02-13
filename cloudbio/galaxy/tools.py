@@ -53,7 +53,7 @@ def _setup_install_dir(env):
     if not exists(bin_dir):
         sudo("mkdir -p %s" % bin_dir)
         _chown_galaxy(env, bin_dir)
-        line = "export PATH={0}:$PATH" % bin_dir
+        line = "export PATH={0}:$PATH".format(bin_dir)
         _add_to_profiles(line)
     if not exists(env.galaxy_jars_dir):
         sudo("mkdir -p %s" % env.galaxy_jars_dir)
