@@ -192,6 +192,7 @@ DBSNP_VERSION = "137"
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
            ("Scerevisiae", "sacCer2", UCSCGenome("sacCer2")),
+           ("Mmusculus", "mm10", UCSCGenome("mm10")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
            ("Hsapiens", "hg18", BroadGenome("hg18", BROAD_BUNDLE_VERSION,
@@ -200,6 +201,7 @@ GENOMES_SUPPORTED = [
                                             "ucsc.hg19.fasta")),
            ("Hsapiens", "GRCh37", BroadGenome("GRCh37", BROAD_BUNDLE_VERSION,
                                               "human_g1k_v37.fasta", "b37")),
+           ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
@@ -213,6 +215,7 @@ GENOMES_SUPPORTED = [
            ("Paeruginosa_UCBPP-PA14", "386", NCBIRest("386", ["CP000438.1"])),
            ("Ecoli", "eschColi_K12", NCBIRest("eschColi_K12", ["U00096.2"])),
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
+           ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),
            ("Cfamiliaris_Dog", "canFam2", UCSCGenome("canFam2")),
            ("Drerio_Zebrafish", "danRer6", UCSCGenome("danRer6")),
            ("Ecaballus_Horse", "equCab2", UCSCGenome("equCab2")),
