@@ -17,9 +17,6 @@
 genomes:
   - dbkey: phix
     name: phiX174
-  - dbkey: hg18
-    name: Human (hg18)
-    dbsnp: true
   - dbkey: hg19
     name: Human (hg19)
     dbsnp: true
@@ -29,8 +26,8 @@ genomes:
     dbsnp: true
   - dbkey: dm3
     name: D melangogaster (dm3)
-  - dbkey: mm9
-    name: Mouse (mm9)
+  - dbkey: mm10
+    name: Mouse (mm10)
     rnaseq: true
   - dbkey: araTha_tair9
     name: Arabidopsis thaliana (TAIR9)

@@ -20,3 +20,4 @@ contribute time and expertise.
 - Mitch Skinner
 - Bela Tiwari
 - Roman Valls
+- Luca Pireddu
