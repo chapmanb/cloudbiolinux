@@ -8,7 +8,7 @@ import os
 
 def install_proteomics_wine_env(env):
     script_src = env.get("setup_proteomics_wine_env_script")
-    script_dest = "%s/bin" % env.get("system_install")
+    script_dest = "%s/bin/setup_proteomics_wine_env.sh" % env.get("system_install")
     if not exists(script_dest):
         put(script_src, script_dest, mode=0755, use_sudo=True)
 
