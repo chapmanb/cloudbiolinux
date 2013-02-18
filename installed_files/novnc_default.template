@@ -1,0 +1,4 @@
+NOVNC_USER=$vnc_user
+NOVNC_HOME=$novnc_install_dir
+PORT="0.0.0.0:6080"
+VNC_DEST="localhost:590$vnc_display"

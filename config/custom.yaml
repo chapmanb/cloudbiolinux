@@ -81,6 +81,7 @@ cloudman:
   - nginx
   - proftpd
   - sge
+  - novnc
 galaxy:
   - galaxy_webapp
   - galaxy_tools

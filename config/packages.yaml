@@ -502,6 +502,8 @@ cloudman:
     - mime-support
     # Required to get HTCondor
     - condor
+    # Required for novnc
+    - vnc4server
 galaxy:
   all:
     - postgresql
