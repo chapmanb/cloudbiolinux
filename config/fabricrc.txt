@@ -122,3 +122,17 @@ data_files = /mnt/biodata
 
 # Picard home
 picard_home = /usr/share/java/picard
+
+# -- novnc configuration options
+# Configure novnc along with CloudMan, disabled 
+# by default for now.
+#configure_novnc = False
+# Where to install novnc
+#novnc_install_dir = /opt/novnc
+# Password used by novnc to connect to vncserver.
+#vnc_password = cl0udbi0l1nux
+# Set vnc_user if different than env.user
+#vnc_user=ubuntu
+#vnc_display=1
+#vnc_depth=16
+#vnc_geometry=1024x768

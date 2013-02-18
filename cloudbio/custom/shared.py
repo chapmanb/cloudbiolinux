@@ -434,3 +434,8 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
                 run("wget --output-document=%s %s" % (reqs_file, reqs_url))
             run("{0}; {1}".format(activate_vburrito, cmd))
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
+
+
+def _read_boolean(env, name, default):
+    property_str = env.get(name, str(default))
+    return property_str.upper() in ["TRUE", "YES"]
