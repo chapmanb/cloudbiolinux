@@ -25,7 +25,8 @@ from cloudbio.custom.shared import (_make_tmp_dir, _write_to_file, _get_install,
                                     _configure_make, _if_not_installed,
                                     _setup_conf_file, _add_to_profiles,
                                     _create_python_virtualenv,
-                                    _setup_simple_service)
+                                    _setup_simple_service,
+                                    _read_boolean)
 from cloudbio.package.deb import (_apt_packages, _setup_apt_automation)
 
 MI_REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
@@ -50,6 +51,9 @@ def _configure_cloudman(env, use_repo_autorun=False):
 
 
 def _configure_novnc(env):
+    if not _read_boolean(env, "configure_novnc", False):
+        # Longer term would like this enabled by default. -John
+        return
     if not "novnc_install_dir" in env:
         env.novnc_install_dir = "/opt/novnc"
     if not "vnc_password" in env:
@@ -86,6 +90,7 @@ def _configure_novnc(env):
 def _configure_vncpasswd(env):
     with cd("~"):
         run("mkdir -p ~/.vnc")
+        run("rm -rf vncpasswd")
         run("git clone https://github.com/trinitronx/vncpasswd.py vncpasswd")
         run("python vncpasswd/vncpasswd.py '%s' -f ~/.vnc/passwd" % env.vnc_password)
         run("chmod 600 ~/.vnc/passwd")
