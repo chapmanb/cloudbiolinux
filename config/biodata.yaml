@@ -43,7 +43,7 @@ genomes:
 #    mask: https://s3.amazonaws.com/chapmanb/xprize/GRCh37-NA12878-xprize-fosmid.bed
 
 # Global set of indexes to include for each genome.
-# Available choices are in GENOMES_INDEXES_SUPPORTED in data_fabfile.py
+# Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
 genome_indexes:
   - bowtie
   - bwa
