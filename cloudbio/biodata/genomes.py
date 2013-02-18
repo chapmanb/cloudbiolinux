@@ -118,10 +118,11 @@ class NCBIRest(_DownloadHelper):
             for ref in self._refs:
                 run("wget %s" % (self._base_url % ref))
                 run("ls -l")
-                run("sed -rie .bak '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
-                    ref))
+                # sed fails in Linux
+                #run("sed -rie .bak '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
+                #    ref))
                 # sed in Fabric does not cd properly?
-                #sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
+                sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
             tmp_file = genome_file.replace(".fa", ".txt")
             run("cat *.fasta > %s" % tmp_file)
             run("rm -f *.fasta")
