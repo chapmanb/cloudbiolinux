@@ -723,9 +723,13 @@ def install_cortex_var(env):
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
-        sed("Makefile", "\-L/full/path/\S*", "-L{0}/lib".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL =.*$", "IDIR_GSL={0}/include".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL_ALSO =.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
+        sed("Makefile", "\-L/full/path/\S*",
+            "-L{0}/lib -L/usr/lib -L/usr/local/lib".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL =.*$",
+            "IDIR_GSL={0}/include -I/usr/include -I/usr/local/include".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL_ALSO =.*$",
+            "IDIR_GSL_ALSO={0}/include/gsl -I/usr/include/gsl -I/usr/local/include/gsl".format(
+                env.system_install))
         with cd("libs/gsl-1.15"):
             run("make clean")
         with cd("libs/htslib"):
