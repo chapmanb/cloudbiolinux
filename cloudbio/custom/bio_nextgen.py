@@ -706,18 +706,16 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.14"
+    version = "1.0.5.15"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
         sed("Makefile", "\-L/full/path/\S*", "-L{0}/lib".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL=.*$", "IDIR_GSL={0}/include".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL_ALSO=.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL =.*$", "IDIR_GSL={0}/include".format(env.system_install))
+        sed("Makefile", "^IDIR_GSL_ALSO =.*$", "IDIR_GSL_ALSO={0}/include/gsl".format(env.system_install))
         with cd("libs/gsl-1.15"):
             run("make clean")
-            with settings(warn_only=True):
-                run("make")
-        with cd("libs/samtools-0.1.18"):
+        with cd("libs/htslib"):
             run("make clean")
             run("make")
         for cols in ["1", "2", "3", "4", "5"]:

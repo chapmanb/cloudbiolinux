@@ -130,6 +130,7 @@ def _setup_centos():
     env.logger.info("CentOS setup")
     env.python_version_ext = "2.6"
     env.ruby_version_ext = ""
+    env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 

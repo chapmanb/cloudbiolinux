@@ -40,7 +40,7 @@ def _setup_yum_sources():
     """Add additional useful yum repositories.
     """
     repos = [
-      "http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-7.noarch.rpm",
+      "http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm",
       "http://archive.cloudera.com/redhat/6/x86_64/cdh/cdh3-repository-1.0-1.noarch.rpm"
     ]
     for repo in repos:

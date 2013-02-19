@@ -28,10 +28,10 @@ def _configure_and_install_native_packages(env, pkg_install):
         _add_apt_gpg_keys()
         _apt_packages(pkg_install)
     elif env.distribution in ["centos", "scientificlinux"]:
-        if env.edition.short_name not in ["minimal"]:
-            _setup_yum_sources()
+        _setup_yum_sources()
         _yum_packages(pkg_install)
-        _setup_yum_bashrc()
+        if env.edition.short_name not in ["minimal"]:
+            _setup_yum_bashrc()
     else:
         raise NotImplementedError("Unknown target distribution")
 

@@ -43,6 +43,7 @@ python:
   - python-devel
   - boost-python-devel
   - numpy
+  - python-pip
 r:
   - R
   - R-core
