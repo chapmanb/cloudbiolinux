@@ -5,12 +5,16 @@ import re
 
 from fabric.api import *
 from fabric.contrib.files import *
+import yaml
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _pip_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
+
+from cloudbio import libraries
+from cloudbio.flavor.config import get_config_file
 
 @_if_not_installed("faToTwoBit")
 def install_ucsc_tools(env):
@@ -440,6 +444,15 @@ def install_gatk(env):
     with quiet():
         have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
     if have_gsalib and "FALSE" in have_gsalib:
+        # install dependencies for gsalib
+        rlib_config = get_config_file(env, "r-libs.yaml").base
+        with open(rlib_config) as in_handle:
+            config = yaml.load(in_handle)
+        config["bioc"] = []
+        config["update_packages"] = False
+        config["cran"] = ["ggplot2", "gplots"]
+        libraries.r_library_installer(config)
+        # install gsalib
         git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
         def install_gsalib(env):
             env.safe_sudo("ant gsalib")
@@ -507,7 +520,7 @@ def install_snpeff(env):
                     env.safe_sudo("mkdir %s" % data_dir)
                     for org in genomes:
                         if not exists(os.path.join(data_dir, org)):
-                            gurl = genome_url_bgase % (version, version, org)
+                            gurl = genome_url_base % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
 

@@ -29,6 +29,7 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
 sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
+from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
@@ -218,53 +219,6 @@ def _read_main_config():
 
 # ### Library specific installation code
 
-def _r_library_installer(config):
-    """Install R libraries using CRAN and Bioconductor.
-    """
-    # Create an Rscript file with install details.
-    out_file = "install_packages.R"
-    if exists(out_file):
-        run("rm -f %s" % out_file)
-    run("touch %s" % out_file)
-    repo_info = """
-    cran.repos <- getOption("repos")
-    cran.repos["CRAN" ] <- "%s"
-    options(repos=cran.repos)
-    source("%s")
-    """ % (config["cranrepo"], config["biocrepo"])
-    append(out_file, repo_info)
-    install_fn = """
-    repo.installer <- function(repos, install.fn) {
-      update.or.install <- function(pname) {
-        if (pname %in% installed.packages())
-          update.packages(lib.loc=c(pname), repos=repos, ask=FALSE)
-        else
-          install.fn(pname)
-      }
-    }
-    """
-    append(out_file, install_fn)
-    std_install = """
-    std.pkgs <- c(%s)
-    std.installer = repo.installer(cran.repos, install.packages)
-    lapply(std.pkgs, std.installer)
-    """ % (", ".join('"%s"' % p for p in config['cran']))
-    append(out_file, std_install)
-    bioc_install = """
-    bioc.pkgs <- c(%s)
-    bioc.installer = repo.installer(biocinstallRepos(), biocLite)
-    lapply(bioc.pkgs, bioc.installer)
-    """ % (", ".join('"%s"' % p for p in config['bioc']))
-    append(out_file, bioc_install)
-    final_update = """
-    update.packages(repos=biocinstallRepos(), ask=FALSE)
-    update.packages(ask=FALSE)
-    """
-    append(out_file, final_update)
-    # run the script and then get rid of it
-    env.safe_sudo("Rscript %s" % out_file)
-    run("rm -f %s" % out_file)
-
 def _python_library_installer(config):
     """Install python specific libraries using easy_install.
     """
@@ -308,12 +262,6 @@ def _perl_library_installer(config):
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
         run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
 
-def _clojure_library_installer(config):
-    """Install clojure libraries using cljr.
-    """
-    for lib in config['cljr']:
-        run("cljr install %s" % lib)
-
 def _haskell_library_installer(config):
     """Install haskell libraries using cabal.
     """
@@ -323,11 +271,10 @@ def _haskell_library_installer(config):
         run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
-    "r-libs" : _r_library_installer,
+    "r-libs" : libraries.r_library_installer,
     "python-libs" : _python_library_installer,
     "ruby-libs" : _ruby_library_installer,
     "perl-libs" : _perl_library_installer,
-    "clojure-libs": _clojure_library_installer,
     "haskell-libs": _haskell_library_installer,
     }
 

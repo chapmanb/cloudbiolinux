@@ -32,6 +32,7 @@ libraries:
   - libgfortran
   - libpng-devel
   - openssl-devel
+  - ncurses-devel
   - libxml2-devel
   - zlib-devel
 desktop:
@@ -66,7 +67,6 @@ programming:
     - xz-devel
     - gtk2
     - gtk2-devel
-    - ncurses-devel
     - globus-openss
     - globus-openssl-devel
     - pcre

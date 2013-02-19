@@ -17,6 +17,7 @@ custom_ignore:
   - mosaik
   - perm
   - snap
+  - stacks
   - fastx_toolkit
   - varianttools
   - vep
