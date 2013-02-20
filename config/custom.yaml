@@ -89,7 +89,7 @@ galaxy:
   - galaxy_webapp
   - galaxy_tools
 galaxyp:
-  - protk
+  - protkgem
   - protvis
   - proteomics_tools
 distributed:

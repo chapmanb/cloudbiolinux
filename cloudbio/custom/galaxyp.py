@@ -9,7 +9,7 @@ from cloudbio.galaxy.tools import _install_tools
 from fabric.context_managers import prefix
 from fabric.contrib.files import *
 
-from shared import _get_install, _write_to_file
+from shared import _write_to_file
 
 import yaml
 
@@ -20,44 +20,60 @@ def install_proteomics_tools(env):
     _install_tools(env, galaxyp_tools_conf)
 
 
-def install_protk(env):
-    """Installs Ira Cooke's ProtK framework for the
-    galaxy user"""
+def install_protkgem(env):
+    """This method installs Ira Cooke's ProtK framework for the galaxy user.
+
+    By default this will install ProtK from rubygems server, but if
+    env.protk_version is set to <version>@<url> (e.g.
+    1.1.5@https://bitbucket.org/iracooke/protk-working) the
+    gem will be cloned with hg and installed from source.
+    """
     _prep_galaxy(env)
-    default_version = "0.95@e81050c1c658"
+    default_version = "1.1.5"
     version_and_revision = env.get("protk_version", default_version)
-    (version, revision) = version_and_revision.split("@")
-    url = _get_bitbucket_download_url(revision, "https://bitbucket.org/iracooke/protk")
+    install_from_source = version_and_revision.find("@") > 0
+    # e.g. protk_version = 1.1.5@https://bitbucket.org/iracooke/protk-working
+    if install_from_source:
+        (version, revision) = version_and_revision.split("@")
+        url = _get_bitbucket_download_url(revision, "https://bitbucket.org/iracooke/protk")
+    else:
+        version = version_and_revision
+
+    ruby_version = "1.9.3"
+    force_rvm_install = True
     with prefix("HOME=~%s" % env.galaxy_user):
-        if not exists("$HOME/.rvm"):
+        def rvm_exec(env, cmd="", rvm_cmd="use"):
+            prefix = ". $HOME/.rvm/scripts/rvm; rvm %s %s; " % (rvm_cmd, ruby_version)
+            env.safe_sudo("%s %s" % (prefix, cmd), user=env.galaxy_user)
+        if not exists("$HOME/.rvm") or force_rvm_install:
             env.safe_sudo("curl -L get.rvm.io | bash -s stable; source ~%s/.rvm/scripts/rvm" % (env.galaxy_user), user=env.galaxy_user)
-            env.safe_sudo(". $HOME/.rvm/scripts/rvm; rvm install 1.8.7 | cat", user=env.galaxy_user)
-            env.safe_sudo(". $HOME/.rvm/scripts/rvm; rvm 1.8.7 do gem install rake --no-rdoc --no-ri", user=env.galaxy_user)
+            rvm_exec(env, rvm_cmd="install")
+            if not install_from_source:
+                # Typical rubygem install
+                rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version)
+            else:
+                with cd("~%s" % env.galaxy_user):
+                    env.safe_sudo("hg clone '%s' protk_source" % url, user=env.galaxy_user)
+                    rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk")
+            rvm_exec(env, "protk_setup.rb galaxy")
 
-    install_dir = os.path.join(env.galaxy_tools_dir, "protk", version)
+        protk_properties = {}
+        protk_properties["tpp_root"] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default")
+        protk_properties['openms_root'] = "/usr"
+        #os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
+        protk_properties['omssa_root'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
+        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast", "default")
+        protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
+        # Other properties: log_file, blast_root
+        _write_to_file(yaml.dump(protk_properties), "/home/galaxy/.protk/config.yml", 0755)
 
-    def _make(env):
-        env.safe_sudo("PROTK_DIR=%s; rm -rf $PROTK_DIR; mkdir -p $PROTK_DIR; mv * $PROTK_DIR" % (install_dir))
-
-    _get_install(url, env, _make)
-    _chown_galaxy(env, install_dir)
-    with prefix("HOME=~%s" % env.galaxy_user):
-        import StringIO
-        output = StringIO.StringIO()
-        get("%s/config.yml.sample" % install_dir, output)
-        sample_config = yaml.load(output.getvalue())
-        sample_config['test']['tpp_bin'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
-        sample_config['test']['omssa_bin'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
-        sample_config['test']['ncbi_tools_bin'] = os.path.join(env.galaxy_tools_dir, "blast", "default", "bin")
-        sample_config['test']['openms_bin'] = os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
-        #sample_config['test']['galaxy_root']=env.galaxy_home
-        _write_to_file(yaml.dump(sample_config), "%s/config.yml" % install_dir, 0755)
+        install_dir = os.path.join(env.galaxy_tools_dir, "protkgem", version)
+        env.safe_sudo("mkdir -p '%s'" % install_dir)
+        _chown_galaxy(env, install_dir)
+        env.safe_sudo('ln -s -f "$HOME/.protk/galaxy/env.sh" "%s/env.sh"' % install_dir, user=env.galaxy_user)
         with cd(install_dir):
-            #env.safe_sudo("mv /tmp/config.yaml .")
-            env.safe_sudo(". $HOME/.rvm/scripts/rvm; echo No | ./setup.sh", user=env.galaxy_user)
-            env.safe_sudo("gcc -o make_random make_random.c -lm; ln -s ../make_random bin", user=env.galaxy_user)
-    with cd("%s/.." % install_dir):
-        env.safe_sudo("ln -s -f %s default" % version)
+            with cd(".."):
+                env.safe_sudo("ln -s -f '%s' default" % version)
 
 
 def install_protvis(env):
