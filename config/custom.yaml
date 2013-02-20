@@ -90,6 +90,7 @@ galaxyp:
   - protvis
   - proteomics_tools
 distributed:
+  - gnu_parallel
   - pydoop
   - seal
 system:

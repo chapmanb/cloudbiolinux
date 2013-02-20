@@ -6,7 +6,17 @@ from fabric.api import *
 from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir, _if_not_python_lib,
-                    _fetch_and_unpack, _pip_cmd)
+                    _fetch_and_unpack, _pip_cmd,
+                    _get_install, _configure_make)
+
+@_if_not_installed("parallel -h")
+def install_gnu_parallel(env):
+    """GNU parallel: build and execute command lines from standard input in parallel.
+    https://savannah.gnu.org/projects/parallel/
+    """
+    version = "20130122"
+    url = "ftp://ftp.gnu.org/gnu/parallel/parallel-%s.tar.bz2" % version
+    _get_install(url, env, _configure_make)
 
 @_if_not_python_lib("pydoop")
 def install_pydoop(env):
