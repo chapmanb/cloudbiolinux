@@ -386,8 +386,9 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
     indexes = {}
     with cd(work_dir):
         for idx in genome_indexes:
-            indexes[idx] = os.path.join(work_dir,
-                                        INDEX_FNS[idx](ref_file))
+            index_file = INDEX_FNS[idx](ref_file)
+            if index_file:
+                indexes[idx] = os.path.join(work_dir, index_file)
     galaxy.prep_locs(gid, indexes, config)
 
 class CustomMaskManager:
