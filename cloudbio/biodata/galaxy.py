@@ -114,11 +114,16 @@ def index_picard(ref_file):
     """Provide a Picard style dict index file for a reference genome.
     """
     index_file = "%s.dict" % os.path.splitext(ref_file)[0]
-    try:
-        picard_jar = os.path.join(env.picard_home, "CreateSequenceDictionary.jar")
-    except AttributeError:
-        picard_jar = None
-    if picard_jar and exists(picard_jar) and not exists(index_file):
+    dirs_to_try = ["%s/share/java/picard" % env.system_install,
+                   getattr(env, "picard_home", None)]
+    picard_jar = None
+    for dname in dirs_to_try:
+        if dname:
+            test_jar = os.path.join(dname, "CreateSequenceDictionary.jar")
+            if exists(test_jar):
+                picard_jar = test_jar
+                break
+    if picard_jar and not exists(index_file):
         run("java -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
             jar=picard_jar, ref=ref_file, out=index_file))
     return index_file
