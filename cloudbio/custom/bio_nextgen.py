@@ -16,7 +16,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
 
-@_if_not_installed("faToTwoBit")
+@_if_not_installed("twoBitToFa")
 def install_ucsc_tools(env):
     """Useful executables from UCSC.
 
@@ -27,7 +27,7 @@ def install_ucsc_tools(env):
              "bigBedInfo", "bigBedSummary", "bigBedToBed",
              "bigWigInfo", "bigWigSummary", "bigWigToBedGraph", "bigWigToWig",
              "fetchChromSizes", "wigToBigWig", "faSize", "twoBitInfo",
-             "faCount"]
+             "twoBitToFa", "faCount"]
     url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/"
     install_dir = _get_bin_dir(env)
     for tool in tools:

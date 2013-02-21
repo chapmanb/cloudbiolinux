@@ -217,9 +217,9 @@ def configure_ssh_key(options):
 def setup_genomes(options):
     install_proc = install_data
     sudo("mkdir -p %s" % env.data_files)
-    sudo("mkdir -p %s/tool-data" % env.galaxy_base)
+    sudo("mkdir -p %s/tool-data" % env.galaxy_home)
     sudo("chown -R %s:%s %s" % (env.user, env.user, env.data_files))
-    put("config/tool_data_table_conf.xml", "%s/tool_data_table_conf.xml" % env.galaxy_base)
+    put("config/tool_data_table_conf.xml", "%s/tool_data_table_conf.xml" % env.galaxy_home)
     indexing_packages = ["bowtie", "bwa", "samtools"]
     path_extensions = ":".join(map(lambda package: "/opt/galaxyTools/tools/%s/default" % package, indexing_packages))
     with prefix("PATH=$PATH:%s" % path_extensions):

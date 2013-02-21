@@ -66,6 +66,12 @@ def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     setup_environment()
     genomes.install_data_s3(config_source)
 
+def install_data_rsync(config_source=CONFIG_FILE):
+    """Install data using Galaxy rsync data servers.
+    """
+    setup_environment()
+    genomes.install_data_rsync(config_source)
+
 def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
