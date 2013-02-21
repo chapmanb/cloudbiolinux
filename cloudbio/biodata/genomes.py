@@ -105,11 +105,12 @@ class UCSCGenome(_DownloadHelper):
 class NCBIRest(_DownloadHelper):
     """Retrieve files using the TogoWS REST server pointed at NCBI.
     """
-    def __init__(self, name, refs):
+    def __init__(self, name, refs, dl_name=None):
         _DownloadHelper.__init__(self)
         self.data_source = "NCBI"
         self._name = name
         self._refs = refs
+        self.dl_name = dl_name if dl_name is not None else name
         self._base_url = "http://togows.dbcls.jp/entry/ncbi-nucleotide/%s.fasta"
 
     def download(self, seq_dir):
@@ -118,10 +119,6 @@ class NCBIRest(_DownloadHelper):
             for ref in self._refs:
                 run("wget %s" % (self._base_url % ref))
                 run("ls -l")
-                # sed fails in Linux
-                #run("sed -rie .bak '/1/ s/^>.*$/>%s/g' %s.fasta" % (ref,
-                #    ref))
-                # sed in Fabric does not cd properly?
                 sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
             tmp_file = genome_file.replace(".fa", ".txt")
             run("cat *.fasta > %s" % tmp_file)
