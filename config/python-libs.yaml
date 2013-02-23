@@ -70,6 +70,10 @@ pypi:
   - pydot
   - pygooglechart
   - reportlab
+  # cloudman
+  - oca
+  - hoover
+  - Mako
 
 ## compile problems
   #- tables
