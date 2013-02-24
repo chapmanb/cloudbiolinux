@@ -48,10 +48,11 @@ class _DownloadHelper:
         return exists(fname) or exists(os.path.join(seq_dir, fname))
 
 class UCSCGenome(_DownloadHelper):
-    def __init__(self, genome_name):
+    def __init__(self, genome_name, dl_name=None):
         _DownloadHelper.__init__(self)
         self.data_source = "UCSC"
         self._name = genome_name
+        self.dl_name = dl_name if dl_name is not None else name
         self._url = "ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips" % \
                 genome_name
 
