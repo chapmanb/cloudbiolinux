@@ -52,7 +52,7 @@ class UCSCGenome(_DownloadHelper):
         _DownloadHelper.__init__(self)
         self.data_source = "UCSC"
         self._name = genome_name
-        self.dl_name = dl_name if dl_name is not None else name
+        self.dl_name = dl_name if dl_name is not None else genome_name
         self._url = "ftp://hgdownload.cse.ucsc.edu/goldenPath/%s/bigZips" % \
                 genome_name
 
