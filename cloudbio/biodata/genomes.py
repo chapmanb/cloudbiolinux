@@ -137,7 +137,7 @@ class EnsemblGenome(_DownloadHelper):
     caenorhabditis_elegans/dna/Caenorhabditis_elegans.WS200.56.dna.toplevel.fa.gz
     """
     def __init__(self, ensembl_section, release_number, release2, organism,
-            name, convert_to_ucsc=False):
+            name, convert_to_ucsc=False, dl_name = None):
         _DownloadHelper.__init__(self)
         self.data_source = "Ensembl"
         if ensembl_section == "standard":
@@ -150,6 +150,7 @@ class EnsemblGenome(_DownloadHelper):
         self._get_file = "%s.%s%s.dna.toplevel.fa.gz" % (organism, name,
                 release2)
         self._name = name
+        self.dl_name = dl_name if dl_name is not None else name
         self._convert_to_ucsc = convert_to_ucsc
 
     def download(self, seq_dir):
