@@ -105,6 +105,7 @@ phylogeny:
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
 vcr:
+  - GSC_patches
   - viralassembly
   - viralassembly_cleanall
   - viralvigor

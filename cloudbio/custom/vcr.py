@@ -8,20 +8,29 @@ from fabric.api import cd, env, hide, local, run, settings, sudo, task
 from fabric.network import disconnect_all
 
 # Common variables
-
 dependency_URL = "http://s3.amazonaws.com/VIGOR-GSC"
 
 # Viral Assembly
-
 viral_dirs = {}
 viral_urls = {}
 viral_tars = {}
+
+# GSC Setup - Patches to integrate Viral Assembly and Annotation tools in Galaxy and enabling galaxy to write to /usr/local
+
+def install_GSC_patches(env):
+	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tool_conf.xml.patch %s/tool_conf.xml.patch" % dependency_URL)
+	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tools/viral-assembly-annotation.patch %s/viral-assembly-annotation.patch" % dependency_URL)
+	with cd(/mnt/galaxyTools/galaxy-central):
+		sudo(patch tool_conf.xml < tool_conf.xml.patch)
+	with cd(/mnt/galaxyTools/galaxy-central/tools):
+		sudo(patch -p1 < viral-assembly-annotation.patch)
+	
+	sudo("if grep -q \"galaxy ALL=(ALL) NOPASSWD: ALL\" /etc/sudoers; then echo \"User galaxy already listed on sudo.\"; else echo \"galaxy ALL=(ALL) NOPASSWD: ALL\" | sudo tee -a /etc/sudoers; fi")
 
 # Viral Assembly - install methods
 
 def install_viralassembly(env):
 	try:
-		_enable_galaxy_on_sudo()
 		_initialize_area_viral()
 		_add_tools_viral()
 		_add_refs()
@@ -121,7 +130,6 @@ vigor_names = {}
 
 def install_viralvigor(env):
 	try:
-		_enable_galaxy_on_sudo()
 		_initialize_area_vigor()
 		_initialize_host()
 		_add_vigor()
@@ -312,9 +320,6 @@ def _remove_symlinks(link_from_filespec, link_to_dir):
 
 
 # Common methods
-
-def _enable_galaxy_on_sudo():
-	sudo("if grep -q \"galaxy\" /etc/sudoers; then echo \"User galaxy already listed on sudo.\"; else echo \"galaxy ALL=(ALL) NOPASSWD: ALL\" | sudo tee -a /etc/sudoers; fi")
 
 def _initialize_env(pipeline):
 	if pipeline == "viral":
