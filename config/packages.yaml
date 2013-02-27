@@ -43,6 +43,7 @@ minimal:
     - swig
   util:
     - axel
+    - gawk
     - rsync
     - openssh-server
     - screen
