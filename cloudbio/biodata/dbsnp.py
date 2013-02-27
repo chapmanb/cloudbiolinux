@@ -41,9 +41,13 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
                "{bundle}/{gid}/{fname}.gz".format(
                    bundle=bundle_version, fname=broad_fname, gid=gid)
     if not exists(fname):
-        run("wget %s" % base_url)
-        run("gunzip %s" % os.path.basename(base_url))
-        run("mv %s %s" % (broad_fname, fname))
+        with warn_only():
+            dl = run("wget %s" % base_url)
+        if dl.succeeded:
+            run("gunzip %s" % os.path.basename(base_url))
+            run("mv %s %s" % (broad_fname, fname))
+        else:
+            env.logger.warn("dbSNP resources not available for %s" % gid)
     return fname
 
 def _download_background_vcf(gid):
