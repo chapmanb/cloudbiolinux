@@ -35,6 +35,7 @@ libraries:
   - ncurses-devel
   - libxml2-devel
   - zlib-devel
+documentation:
 desktop:
   - gnome-panel
   - freenx
@@ -52,7 +53,6 @@ programming:
   version_control:
     - cvs
     - bzr
-  documentation:
   build:
     - swig
     - curl-devel

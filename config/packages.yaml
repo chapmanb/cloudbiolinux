@@ -81,6 +81,10 @@ libraries:
   - xz-utils
   - liblzma-dev
   - zlib1g-dev
+documentation:
+  - texlive-latex-base
+  - texlive-latex-recommended
+  - texlive-latex-extra
 desktop:
   #Packages to support a remote desktop
   all:
@@ -115,10 +119,6 @@ programming:
     - emacsen-common
     - exuberant-ctags
     - gedit
-  documentation:
-    - texlive-latex-base
-    - texlive-latex-recommended
-    - texlive-latex-extra
   build:
     - xfsprogs
     - stow

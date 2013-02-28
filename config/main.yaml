@@ -8,6 +8,8 @@ packages:
   - desktop
   - programming
   - distributed
+  - documentation
+  - libraries
   - hadoop
   - amazon
   - python
