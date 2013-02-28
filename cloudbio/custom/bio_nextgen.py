@@ -513,7 +513,7 @@ def install_snpeff(env):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     env.safe_sudo("mv *.jar %s" % install_dir)
-                    run("sed -i.bak -r -e 's/^data_dir = *$/data_dir = %s\/data/' %s" %
+                    run("sed -i.bak -r -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
                         (install_dir.replace("/", "\/"), "snpEff.config"))
                     run("chmod a+r *.config")
                     env.safe_sudo("mv *.config %s" % install_dir)
