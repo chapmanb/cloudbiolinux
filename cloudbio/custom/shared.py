@@ -115,12 +115,18 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _fetch_and_unpack(url, need_dir=True, dir_name=None):
+def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
         if exists(base):
             env.safe_sudo("rm -rf {0}".format(base))
         run(url)
+        if revision:
+            if url.startswith("git"):
+                with cd(base):
+                    run("git checkout %s" % revision)
+            else:
+                raise ValueError("Need to implement revision retrieval for %s" % url.split()[0])
         return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name)
@@ -146,12 +152,12 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
-def _get_install(url, env, make_command, post_unpack_fn=None):
+def _get_install(url, env, make_command, post_unpack_fn=None, revision=None):
     """Retrieve source from a URL and install in our system directory.
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            dir_name = _fetch_and_unpack(url)
+            dir_name = _fetch_and_unpack(url, revision=revision)
             with cd(dir_name):
                 if post_unpack_fn:
                     post_unpack_fn(env)

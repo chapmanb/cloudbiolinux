@@ -12,6 +12,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _java_install, _pip_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
+from cloudbio.custom import shared
 
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
@@ -545,12 +546,56 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "github"
+    version = "d0c1f12"
     repository = "git clone --recursive git://github.com/ekg/freebayes.git"
-    def _fix_library_order(env):
+    def _fix_tabixpp_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
-                 post_unpack_fn=_fix_library_order)
+                 post_unpack_fn=_fix_tabixpp_library_order,
+                 revision=version)
+
+@_if_not_installed("vcffilter")
+def install_vcflib(env):
+    """Utilities for parsing and manipulating VCF files.
+    https://github.com/ekg/vcflib
+    """
+    version = "06e664c"
+    repository = "git clone --recursive git://github.com/ekg/vcflib.git"
+    def _fix_tabixpp_library_order(env):
+        sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+    _get_install(repository, env,
+                 _make_copy("find -perm -100 -type f -name 'vcf*'"
+                            " | grep -v '.sh$' | grep -v '.r$'"),
+                 post_unpack_fn=_fix_tabixpp_library_order,
+                 revision=version)
+
+@_if_not_installed("bamtools")
+def install_bamtools(env):
+    """command-line toolkit for working with BAM data
+    https://github.com/pezmaster31/bamtools
+    """
+    version = "3fe66b9"
+    repository = "git clone --recursive git://github.com/pezmaster31/bamtools.git"
+    def _cmake_bamtools(env):
+        run("mkdir build")
+        with cd("build"):
+            run("cmake ..")
+            run("make")
+        env.safe_sudo("cp bin/* %s" % shared._get_bin_dir(env))
+        env.safe_sudo("cp lib/* %s" % shared._get_lib_dir(env))
+    _get_install(repository, env, _cmake_bamtools,
+                 revision=version)
+
+@_if_not_installed("ogap")
+def install_ogap(env):
+    """gap opening realigner for BAM data streams
+    https://github.com/ekg/ogap
+    """
+    version = "652c525"
+    repository = "git clone --recursive git://github.com/ekg/ogap.git"
+    _get_install(repository, env, _make_copy("ls ogap"),
+                 revision=version)
+
 
 def _install_samtools_libs(env):
     repository = "svn co --non-interactive " \
