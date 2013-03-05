@@ -197,7 +197,7 @@ def _initialize_area_vigor():
 	
 	vigor_names["BLAST_NAME"] = 'blast-2.2.15'
 	vigor_names["CLUSTALW_NAME"] = 'clustalw-1.83'
-	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud-release-20121204'
+	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud-release-20130301'
 	
 	vigor_tars["VIGOR_TAR_FILENAME"] = "%s.tgz"                              % vigor_names["VIGOR_NAME"]
 	vigor_tars["BLAST_TAR_FILENAME"] = "%s-%s.tar.gz"                  % (vigor_names["BLAST_NAME"],env.ARCH)
