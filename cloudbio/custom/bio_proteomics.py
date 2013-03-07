@@ -351,6 +351,7 @@ def install_idpqonvert(env):
     run("chmod 755 idpQonvert")
     env.safe_sudo("mkdir -p '%s/bin'" % env["system_install"])
     env.safe_sudo("mv %s '%s/bin'" % ("idpQonvert", env["system_install"]))
+    env.safe_sudo("chmod +x '%s/bin/idpQonvert'" % env["system_install"])
 
 
 def _install_tabb_tool(env, default_version, download_name, exec_names):

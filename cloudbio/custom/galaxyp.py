@@ -40,7 +40,7 @@ def install_protkgem(env):
         version = version_and_revision
 
     ruby_version = "1.9.3"
-    force_rvm_install = True
+    force_rvm_install = False
     with prefix("HOME=~%s" % env.galaxy_user):
         def rvm_exec(env, cmd="", rvm_cmd="use"):
             prefix = ". $HOME/.rvm/scripts/rvm; rvm %s %s; " % (rvm_cmd, ruby_version)
@@ -48,14 +48,13 @@ def install_protkgem(env):
         if not exists("$HOME/.rvm") or force_rvm_install:
             env.safe_sudo("curl -L get.rvm.io | bash -s stable; source ~%s/.rvm/scripts/rvm" % (env.galaxy_user), user=env.galaxy_user)
             rvm_exec(env, rvm_cmd="install")
-            if not install_from_source:
-                # Typical rubygem install
-                rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version)
-            else:
-                with cd("~%s" % env.galaxy_user):
-                    env.safe_sudo("hg clone '%s' protk_source" % url, user=env.galaxy_user)
-                    rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk")
-            rvm_exec(env, "protk_setup.rb galaxy")
+        if not install_from_source:
+            # Typical rubygem install
+            rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version)
+        else:
+            with cd("~%s" % env.galaxy_user):
+                env.safe_sudo("rm -rf protk_source; hg clone '%s' protk_source" % url, user=env.galaxy_user)
+                rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk")
 
         protk_properties = {}
         protk_properties["tpp_root"] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default")
@@ -65,7 +64,12 @@ def install_protkgem(env):
         protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast", "default")
         protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
         # Other properties: log_file, blast_root
-        _write_to_file(yaml.dump(protk_properties), "/home/galaxy/.protk/config.yml", 0755)
+        env.safe_sudo("mkdir -p \"$HOME/.protk\"", user=env.galaxy_user)
+        env.safe_sudo("mkdir -p \"$HOME/.protk/Databases\"", user=env.galaxy_user)
+
+        _write_to_file(yaml.dump(protk_properties), "/home/%s/.protk/config.yml" % env.galaxy_user, 0755)
+
+        rvm_exec(env, "protk_setup.rb galaxy")
 
         install_dir = os.path.join(env.galaxy_tools_dir, "protkgem", version)
         env.safe_sudo("mkdir -p '%s'" % install_dir)
@@ -85,7 +89,7 @@ def install_protvis(env):
     env.safe_sudo("sudo apt-get -y --force-yes install libxml2-dev libxslt-dev")
 
     run("rm -rf protvis")
-    run("git clone -b lorikeet-reintegration git://github.com/jmchilton/protvis.git")
+    run("git clone -b lorikeet git://github.com/jmchilton/protvis.git")
     with cd("protvis"):
         run("git submodule init")
         run("git submodule update")

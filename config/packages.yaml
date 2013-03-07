@@ -418,6 +418,8 @@ bio_proteomics:
   - libboost-serialization-dev
   - zlib1g-dev
   - libboost-dev
+  # needed for 32bit execs distributed with searchgui.
+  - ia32-libs
 bio_proteomics_wine:
   - wine
 bio_utils:
