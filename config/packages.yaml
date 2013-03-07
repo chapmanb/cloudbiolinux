@@ -503,10 +503,11 @@ cloudman:
     - libcurl4-openssl-dev
     - libxml2-dev
     - mime-support
-    # Required to get HTCondor
-    - condor
     # Required for novnc
     - vnc4server
+  ubuntu_quantal:
+    # Required to get HTCondor, not available on 12.04 (latest LTS release).
+    - condor
 galaxy:
   all:
     - postgresql
