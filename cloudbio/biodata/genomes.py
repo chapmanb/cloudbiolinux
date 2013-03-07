@@ -299,7 +299,7 @@ def _get_genomes(config_source):
     genomes = []
     genomes_config = config["genomes"] or []
     env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"\
-        .format(config_source, ', '.join(g['name'] for g in genomes_config)))
+        .format(config_source, ', '.join(g.get('name', g["dbkey"]) for g in genomes_config)))
     for g in genomes_config:
         ginfo = None
         for info in GENOMES_SUPPORTED:

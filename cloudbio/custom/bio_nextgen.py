@@ -596,7 +596,6 @@ def install_ogap(env):
     _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
-
 def _install_samtools_libs(env):
     repository = "svn co --non-interactive " \
                  "https://samtools.svn.sourceforge.net/svnroot/samtools/trunk/samtools"
