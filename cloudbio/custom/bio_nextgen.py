@@ -460,16 +460,6 @@ def install_gatk(env):
             env.safe_sudo("ant gsalib")
         _get_install(git_repo, env, install_gsalib)
 
-def install_gatk_queue(env):
-    """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
-    http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
-    """
-    version = "2.3-9-gdcdccbb"
-    ext = ".tar.bz2"
-    url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
-          "QueueLite-%s%s" % (version, ext)
-    _java_install("gatk_queue", version, url, env)
-
 def install_varscan(env):
     """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/

@@ -51,7 +51,6 @@ bio_nextgen:
     - crisp
     - freebayes
     - gatk
-    - gatk_queue
     - gemini
     - tassel
     - snpeff
