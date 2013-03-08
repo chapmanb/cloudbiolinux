@@ -214,14 +214,19 @@ def _java_install(pname, version, url, env, install_fn=None):
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
+    to_check = ["pip"]
     if env.has_key("pip_cmd") and env.pip_cmd:
-        return env.pip_cmd
-    elif not env.use_sudo:
-        return os.path.join(env.system_install, "bin", "pip")
-    elif env.has_key("python_version_ext") and env.python_version_ext:
-        return "pip-{0}".format(env.python_version_ext)
-    else:
-        return "pip"
+        to_check.append(env.pip_cmd)
+    if not env.use_sudo:
+        to_check.append(os.path.join(env.system_install, "bin", "pip"))
+    if env.has_key("python_version_ext") and env.python_version_ext:
+        to_check.append("pip-{0}".format(env.python_version_ext))
+    for cmd in to_check:
+        with quiet():
+            pip_version = run("%s --version" % cmd)
+        if pip_version.succeeded:
+            return cmd
+    raise ValueError("Could not find pip installer from: %s" % to_check)
 
 def _python_make(env):
     env.safe_sudo("%s install --upgrade `pwd`" % _pip_cmd(env))
