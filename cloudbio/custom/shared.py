@@ -67,11 +67,12 @@ def _if_not_python_lib(library):
 
 @contextmanager
 def _make_tmp_dir():
-    tmp_dir = run("echo $TMPDIR").strip()
-    if not tmp_dir:
+    with quiet():
+        tmp_dir = run("echo $TMPDIR")
+    if tmp_dir.failed or not tmp_dir.strip():
         home_dir = run("echo $HOME")
         tmp_dir = os.path.join(home_dir, "tmp")
-    work_dir = os.path.join(tmp_dir, "cloudbiolinux")
+    work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
     if not exists(work_dir):
         run("mkdir -p %s" % work_dir)
     yield work_dir
