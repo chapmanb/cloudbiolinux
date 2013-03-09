@@ -36,7 +36,7 @@ def _if_not_installed(pname):
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = run(pname)
+        result = run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
     return result.return_code == 127
 
 
@@ -230,7 +230,7 @@ def _pip_cmd(env):
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
 def _python_make(env):
-    env.safe_sudo("%s install --upgrade `pwd`" % _pip_cmd(env))
+    env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
