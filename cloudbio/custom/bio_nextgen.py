@@ -9,7 +9,7 @@ import yaml
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _java_install, _pip_cmd,
+                    _java_install, _pip_cmd, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
 from cloudbio.custom import shared
@@ -283,7 +283,7 @@ def install_gemini(env):
         _python_make(env)
         env.safe_sudo("mkdir -p {0}".format(data_dir))
         env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
-        run("python{0} gemini/install-data.py {1}".format(env.python_version_ext, data_dir))
+        run("{0} gemini/install-data.py {1}".format(_python_cmd(env), data_dir))
         env.safe_sudo("rm -rf gemini.egg-info")
     _get_install(repository, env, _gemini_install)
 

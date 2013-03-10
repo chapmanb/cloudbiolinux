@@ -58,8 +58,7 @@ def _if_not_python_lib(library):
         functools.wraps(func)
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
-                pyver = env.python_version_ext if env.has_key("python_version_ext") else ""
-                result = run("python%s -c 'import %s'" % (pyver, library))
+                result = run("%s -c 'import %s'" % (_python_cmd(env), library))
             if result.failed:
                 return func(*args, **kwargs)
         return decorator
@@ -211,6 +210,19 @@ def _java_install(pname, version, url, env, install_fn=None):
                         install_fn(env, install_dir)
                     else:
                         env.safe_sudo("mv *.jar %s" % install_dir)
+
+def _python_cmd(env):
+    """Retrieve python command, handling tricky situations on CentOS.
+    """
+    if env.has_key("python_version_ext") and env.python_version_ext:
+        major, minor = run("python --version").split()[-1].split(".")[:2]
+        check_major, check_minor = env.python_version_ext.split(".")[:2]
+        if major != check_major or int(check_minor) > int(minor):
+            return "python%s" % env.python_version_ext
+        else:
+            return "python"
+    else:
+        return "python"
 
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
