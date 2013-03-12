@@ -242,7 +242,8 @@ def _pip_cmd(env):
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
 def _python_make(env):
-    env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
+    env.safe_sudo('%s install --upgrade --install-option="--prefix=%s" .' %
+                 (_pip_cmd(env), env.system_install))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
