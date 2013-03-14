@@ -10,6 +10,11 @@ from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
+try:
+    quiet
+except NameError:
+    def quiet():
+        return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
@@ -442,8 +447,32 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
     # First make sure virtualenv-burrito is installed
     install_venvburrito()
     activate_vburrito = ". $HOME/.venvburrito/startup.sh"
-    if venv_name in run("{0}; lsvirtualenv | grep {1} || true"
-        .format(activate_vburrito, venv_name)):
+    with prefix(activate_vburrito):
+        print env
+        if "venv_directory" not in env:
+            _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+        else:
+            _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+
+
+def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
+    """
+    Use virtualenv directly to setup virtualenv in specified directory.
+    """
+    venv_directory = env.get("venv_directory")
+    if not exists(venv_directory):
+        if reqs_url:
+                env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+        env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
+        env.safe_sudo(". %s/bin/activate; pip install -r '%s'" % (venv_directory, reqs_file))
+
+
+def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
+    """
+    Use mkvirtualenv to setup this virtualenv globally for user.
+    """
+    if venv_name in run("lsvirtualenv | grep {0} || true"
+        .format(venv_name)):
         env.logger.info("Virtualenv {0} already exists".format(venv_name))
     else:
         with _make_tmp_dir():
@@ -456,7 +485,7 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
                 cmd = "mkvirtualenv {0}".format(venv_name)
             if reqs_url:
                 run("wget --output-document=%s %s" % (reqs_file, reqs_url))
-            run("{0}; {1}".format(activate_vburrito, cmd))
+            run(cmd)
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
 
 

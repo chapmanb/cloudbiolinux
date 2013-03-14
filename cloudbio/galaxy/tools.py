@@ -95,6 +95,7 @@ def _build_tool_env(env, name, version):
     for key, value in env.iteritems():
         tool_env[key] = value
     tool_env["system_install"] = os.path.join(env.galaxy_tools_dir, name, version)
+    tool_env["venv_directory"] = "%s/%s" % (tool_env["system_install"], "venv")
     return AttributeDict(tool_env)
 
 
@@ -123,7 +124,11 @@ def _install_galaxy_config(tool_env, bin_dirs):
     if len(path_pieces) > 0 and not exists(env_path):
         path_addtion = ":".join(path_pieces)
         # Standard bin install, just add it to path
-        sudo("echo 'PATH=%s:$PATH' > %s/env.sh" % (path_addtion, install_dir))
-        sudo("chmod +x %s/env.sh" % install_dir)
+        sudo("echo 'PATH=%s:$PATH' > %s" % (path_addtion, env_path))
+        venv_path = "%s/%s" % (install_dir, "venv")
+        if exists(venv_path):
+            #  Have env.sh activate virtualdirectory
+            sudo("echo '. %s/bin/activate' >> %s" % (venv_path, env_path))
+        sudo("chmod +x %s" % env_path)
 
     _set_default_config(tool_env, install_dir)
