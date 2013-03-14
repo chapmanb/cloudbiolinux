@@ -10,7 +10,8 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _symlinked_java_version_dir,
                     _get_bin_dir, _get_install_subdir,
-                    _fetch_and_unpack, _python_make)
+                    _fetch_and_unpack, _python_make,
+                    _create_python_virtualenv)
 import re
 
 # Tools from Tabb lab are only available via TeamCity builds that
@@ -157,6 +158,22 @@ def install_searchgui(env):
             env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "SearchCLI"), os.path.join(bin_dir, "SearchCLI")))
 
     _unzip_install("SearchGUI", version, url, env, install_fn)
+
+
+@_if_not_installed("psm_eval")
+def install_psm_eval(env):
+    default_version = "0.1.0"
+    version = env.get("tool_version", default_version)
+    url = "git clone git://github.com/jmchilton/psm-eval.git"
+
+    def install_fn(env, install_dir):
+        env.safe_sudo("mv psm-eval/* '%s'" % install_dir)
+        _create_python_virtualenv(env, "psme", "%s/requirements.txt" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "psm_eval"), os.path.join(bin_dir, "psm_eval")))
+
+    _unzip_install("psm_eval", version, url, env, install_fn)
 
 
 @_if_not_installed("PeptideShaker")

@@ -25,3 +25,4 @@ applications:
   ipig: "r5"
   searchgui: "1.11.0"
   peptide_shaker: "0.19.0"
+  psm_eval: "0.1.0"
