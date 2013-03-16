@@ -1,0 +1,14 @@
+---
+bio_proteomics_wine:
+  - proteomics_wine_env
+  - proteowizard
+bio_proteomics:
+  - idpqonvert
+  - myrimatch
+#  - transproteomic_pipeline
+#  - omssa
+#  - mzmine
+#  - directag
+#  - tagrecon
+#  - pepitome
+#  - percolator

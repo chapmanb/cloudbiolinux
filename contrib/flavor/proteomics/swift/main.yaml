@@ -1,0 +1,11 @@
+---
+packages:
+  # Editors, utils, build systems, system administration, etc..
+  - minimal
+  # Brings in JDK and maven
+  - java
+  # R packages determined in r-libs.yaml in this directory.
+  - r
+  # See custom.yaml for what subsets of these packages are imported.
+  - bio_proteomics_wine
+  - bio_proteomics
