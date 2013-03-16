@@ -208,10 +208,8 @@ def _read_main_config():
     yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
-    packages = full_data['packages']
-    packages = packages if packages else []
-    libraries = full_data['libraries']
-    libraries = libraries if libraries else []
+    packages = full_data.get('packages', [])
+    libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
