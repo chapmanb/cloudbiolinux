@@ -17,7 +17,7 @@ viral_tars = {}
 
 # GSC Setup - Patches to integrate Viral Assembly and Annotation tools in Galaxy and enabling galaxy to write to /usr/local
 
-def install_GSC_patches(env):
+def install_gsc_patches(env):
 	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tool_conf.xml.patch %s/tool_conf.xml.patch" % dependency_URL)
 	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tools/viral-assembly-annotation.patch %s/viral-assembly-annotation.patch" % dependency_URL)
 	with cd("/mnt/galaxyTools/galaxy-central"):
