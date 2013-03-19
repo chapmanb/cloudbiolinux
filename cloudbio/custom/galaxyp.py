@@ -29,7 +29,7 @@ def install_protkgem(env):
     gem will be cloned with hg and installed from source.
     """
     _prep_galaxy(env)
-    default_version = "1.1.5"
+    default_version = "1.2.0"
     version_and_revision = env.get("protk_version", default_version)
     install_from_source = version_and_revision.find("@") > 0
     # e.g. protk_version = 1.1.5@https://bitbucket.org/iracooke/protk-working
@@ -57,9 +57,10 @@ def install_protkgem(env):
                 rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk")
 
         protk_properties = {}
+        ## ProtK can set these up itself, should make that an option.
         protk_properties["tpp_root"] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default")
-        protk_properties['openms_root'] = "/usr"
-        #os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
+        protk_properties['openms_root'] = "/usr"  # os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
+        ### Assumes omssa, blast, and transproteomic_pipeline CBL galaxy installs.
         protk_properties['omssa_root'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
         protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast", "default")
         protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
@@ -69,7 +70,7 @@ def install_protkgem(env):
 
         _write_to_file(yaml.dump(protk_properties), "/home/%s/.protk/config.yml" % env.galaxy_user, 0755)
 
-        rvm_exec(env, "protk_setup.rb galaxy")
+        rvm_exec(env, "protk_setup.rb galaxyenv")
 
         install_dir = os.path.join(env.galaxy_tools_dir, "protkgem", version)
         env.safe_sudo("mkdir -p '%s'" % install_dir)
