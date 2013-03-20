@@ -66,7 +66,7 @@ def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.6.2"
+    default_version = "0.7.3a"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
@@ -75,7 +75,7 @@ def install_bwa(env):
         # if not 64bit, remove the appropriate flag
         if arch.find("x86_64") == -1:
             run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
-    _get_install(url, env, _make_copy("ls -1 bwa solid2fastq.pl qualfa2fq.pl",
+    _get_install(url, env, _make_copy("ls -1 bwa bwamem-lite qualfa2fq.pl",
                                         _fix_makefile))
 
 @_if_not_installed("bfast")
@@ -233,7 +233,7 @@ def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
     """
-    default_version = "0.1.18"
+    default_version = "0.1.19"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
