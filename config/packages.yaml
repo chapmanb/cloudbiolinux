@@ -420,6 +420,9 @@ bio_proteomics:
   - libboost-dev
   # needed for 32bit execs distributed with searchgui.
   - ia32-libs
+  # needed for building OpenMS
+  - libtool
+  - qt4-dev-tools
 bio_proteomics_wine:
   - wine
 bio_utils:
@@ -572,9 +575,19 @@ galaxyp:
      - zlib1g-dev
      - libboost-dev
 
-     # Needed for nbic galaxy stuff
+     # needed for 32bit execs distributed with searchgui.
+     - ia32-libs
+
+     # needed for building OpenMS
+     - libtool
+     - qt4-dev-tools
+
+     # Needed for nbic galaxy database utilities
      - liblog-log4perl-perl
      - libswiss-perl
+
+     # Needed  for psm-eval
+     - libyaml-dev
 
 # To do -- in Deb Med but not propogated
 # squizz
