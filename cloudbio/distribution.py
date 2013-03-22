@@ -27,7 +27,7 @@ def _setup_distribution_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _validate_target_distribution(env.distribution)
+    _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
     _configure_sudo(env)
@@ -60,7 +60,7 @@ def _cloudman_compatibility(env):
     """
     env.install_dir = env.system_install
 
-def _validate_target_distribution(dist):
+def _validate_target_distribution(dist, dist_name=None):
     """Check target matches environment setting (for sanity)
 
     Throws exception on error
@@ -73,6 +73,15 @@ def _validate_target_distribution(dist):
            tag2 = run("cat /etc/issue")
            if tag2.lower().find(dist) == -1:
                raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
+        if env.edition.short_name in ["minimal"]:
+            # "minimal editions don't actually change any of the apt source except adding biolinux, so won't cause this problem and don't need to match dist_name"
+            return
+        if not dist_name:
+            raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
+        # Does this new method work with CentOS, do we need this.
+        actual_dist_name = run("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+        if actual_dist_name.lower().find(dist_name) == -1:
+            raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
         env.logger.debug("Unknown target distro")
 
