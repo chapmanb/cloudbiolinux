@@ -487,6 +487,35 @@ def install_cram(env):
                 run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
+@_if_not_installed("bam")
+def install_bamutil(env):
+    """Utilities for working with BAM files, from U of M Center for Statistical Genetics.
+    http://genome.sph.umich.edu/wiki/BamUtil
+    """
+    version = "1.0.7"
+    url = "http://genome.sph.umich.edu/w/images/5/5d/BamUtilLibStatGen.%s.tgz" % version
+    _get_install(url, env, _make_copy("ls -1 bamUtil/bin/bam"),
+                 dir_name="bamUtil_%s" % version)
+
+@_if_not_installed("tabix")
+def install_tabix(env):
+    """Generic indexer for TAB-delimited genome position files
+    http://samtools.sourceforge.net/tabix.shtml
+    """
+    version = "0.2.6"
+    url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
+    _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
+
+@_if_not_installed("grabix")
+def install_grabix(env):
+    """a wee tool for random access into BGZF files
+    https://github.com/arq5x/grabix
+    """
+    version = "fda4d26"
+    repository = "git clone git://github.com/arq5x/grabix.git"
+    _get_install(repository, env, _make_copy("ls -1 grabix"),
+                 revision=version)
+
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/

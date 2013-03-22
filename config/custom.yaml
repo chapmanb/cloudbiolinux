@@ -47,11 +47,14 @@ bio_nextgen:
   sv:
     - hydra
   variant:
+    - bamutil
     - bcbio_variation
     - crisp
     - freebayes
     - gatk
     - gemini
+    - grabix
+    - tabix
     - tassel
     - snpeff
     - stacks

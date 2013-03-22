@@ -655,12 +655,13 @@ def _upload_genomes(genomes, genome_indexes):
 def _upload_to_s3(tarball, bucket):
     """Upload the genome tarball to s3.
     """
-    upload_script = os.path.join(os.path.dirname(__file__), "utils", "s3_multipart_upload.py")
+    upload_script = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
+                                 "utils", "s3_multipart_upload.py")
     s3_key_name = os.path.join("genomes", os.path.basename(tarball))
     if not bucket.get_key(s3_key_name):
         gb_size = int(run("du -sm %s" % tarball).split()[0]) / 1000.0
         print "Uploading %s %.1fGb" % (s3_key_name, gb_size)
-        cl = ["python2.6", upload_script, tarball, bucket.name, s3_key_name, "--public"]
+        cl = ["python", upload_script, tarball, bucket.name, s3_key_name, "--public"]
         subprocess.check_call(cl)
 
 def _tar_directory(dir, tar_name):

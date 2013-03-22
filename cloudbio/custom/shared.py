@@ -157,12 +157,12 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
-def _get_install(url, env, make_command, post_unpack_fn=None, revision=None):
+def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None):
     """Retrieve source from a URL and install in our system directory.
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            dir_name = _fetch_and_unpack(url, revision=revision)
+            dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name)
             with cd(dir_name):
                 if post_unpack_fn:
                     post_unpack_fn(env)

@@ -68,7 +68,6 @@ def install_biolinux(target=None, flavor=None):
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
 
-
 def _perform_install(target=None, flavor=None):
     """
     Once CBL/fabric environment is setup, this method actually
@@ -208,9 +207,12 @@ def _read_main_config():
     yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
-    packages = full_data.get('packages', [])
-    libraries = full_data.get('libraries', [])
-    custom_ignore = full_data.get('custom_ignore', [])
+    packages = full_data.get('packages')
+    libraries = full_data.get('libraries')
+    custom_ignore = full_data.get('custom_ignore')
+    if packages is None: packages = []
+    if libraries is None: libraries = []
+    if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
     return packages, sorted(libraries), custom_ignore
