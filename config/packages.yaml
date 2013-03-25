@@ -549,6 +549,7 @@ galaxyp:
      # Required for protk
      - libxml2-dev
      - libreadline-dev
+     - libxslt-dev
      # Required for protvis
      - python-virtualenv
      - python-setuptools
