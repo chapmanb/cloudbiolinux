@@ -1,11 +1,11 @@
 ---
 applications:
   transproteomic_pipeline: 
-    - version: "4.6.1-occupy"
+    - version: "4.6.2-occupy"
       bin_dirs:
         - bin
         - cgi-bin
-  openms: "1.9.0"
+  openms: "1.10.0"
   omssa: "2.1.9"
   tint_proteomics_scripts: "1.19.18"
   superhirn: "0.03"

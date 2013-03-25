@@ -26,7 +26,7 @@ def install_transproteomic_pipeline(env):
     """
     """
     ## version should be of form X.X.X-codename
-    default_version = "4.6.1-occupy"
+    default_version = "4.6.2-occupy"
     version = env.get("tool_version", default_version)
     version_parts = re.match("(\d\.\d)\.(\d)-(.*)", version)
     major_version = version_parts.group(1)
@@ -43,7 +43,7 @@ def install_transproteomic_pipeline(env):
 
     def _chdir_src(work_cmd):
         def do_work(env):
-            with cd("trans_proteomic_pipeline/src"):
+            with cd("src"):
                 append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
                 append("Makefile.config.incl", "TPP_WEB=/tpp/")
                 append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
@@ -78,18 +78,25 @@ def install_openms(env):
     See comments above, working on getting this to compile from source. In
     the meantime installing from deb will have to do.
     """
-    default_version = "1.9.0"
+    default_version = "1.10.0"
     version = env.get("tool_version", default_version)
     dot_version = version[0:version.rindex('.')]
-    url = 'http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-%s/OpenMS-%s-Linux_64bit.deb' % (dot_version, version)
-    with settings(warn_only=True):
-        if(run("dpkg-query -l openms").find(version)) >= 0:
-            return
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget --no-check-certificate '%s'" % url)
-            env.safe_sudo("apt-get -y --force-yes install gdebi-core")
-            env.safe_sudo("gdebi -n OpenMS-%s-Linux_64bit.deb" % version)
+    url = 'http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-%s/OpenMS-%s.tar.gz' % (dot_version, version)
+
+    def _make(env):
+        with cd("contrib"):
+            run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+            run("make")
+        run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+        run("make")
+        env.safe_sudo("make install")
+    _get_install(url, env, _make)
+    #with _make_tmp_dir() as work_dir:
+    #    with cd(work_dir):
+    #        run("wget --no-check-certificate '%s'" % url)
+    #        http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-1.10/OpenMS-1.10.0.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopen-ms%2Ffiles%2FOpenMS%2FOpenMS-1.10%2F%3F&ts=1364007422&use_mirror=superb-dca2
+    #        env.safe_sudo("apt-get -y --force-yes install gdebi-core")
+    #        env.safe_sudo("gdebi -n OpenMS-%s-Linux_64bit.deb" % version)
 
 
 @_if_not_installed("LTQ-iQuant")
