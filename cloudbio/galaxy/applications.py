@@ -373,20 +373,17 @@ def install_eigenstrat(env):
     _update_default(env, install_dir)
 
 
-
 @_if_not_installed("augustus")
 def install_augustus(env):
-    version = env.tool_version
+    default_version = "2.7"
+    version = env.get('tool_version', default_version)
     url = "http://bioinf.uni-greifswald.de/augustus/binaries/augustus.%s.tar.gz" % version
     install_dir = env.system_install
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _fetch_and_unpack(url, need_dir=False)
             env.safe_sudo("mkdir -p '%s'" % install_dir)
-            env.safe_sudo("mv * '%s'" % install_dir)
-    env.safe_sudo("echo 'PATH=%s/bin:%s/scripts:$PATH' > %s/env.sh" % (install_dir, install_dir, install_dir))
-    env.safe_sudo("echo 'export AUGUSTUS_CONFIG_PATH=%s/config' >> %s/env.sh" % (install_dir, install_dir))
-    _update_default(env, install_dir)
+            env.safe_sudo("mv augustus.%s/* '%s'" % (version, install_dir))
 
 
 @_if_not_installed("SortSam.jar")
