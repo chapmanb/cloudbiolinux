@@ -148,7 +148,7 @@ def install_mzmine(env):
 
 @_if_not_installed("SearchGUI")
 def install_searchgui(env):
-    default_version = "1.11.0"
+    default_version = "1.12.0"
     version = env.get("tool_version", default_version)
     url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
 
@@ -185,7 +185,7 @@ def install_psm_eval(env):
 
 @_if_not_installed("PeptideShaker")
 def install_peptide_shaker(env):
-    default_version = "0.19.0"
+    default_version = "0.19.1"
     version = env.get("tool_version", default_version)
     url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
 
