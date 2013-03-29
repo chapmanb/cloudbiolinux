@@ -318,6 +318,14 @@ def _remove_symlinks(link_from_filespec, link_to_dir):
 	if _path_is_dir(link_to_dir):
 		sudo("find %s -lname '%s' -delete" % (link_to_dir, link_from_filespec))
 
+# VICVB - install methods
+
+def install_vicvb(env):
+	with cd("~"):
+		sudo("git clone git://github.com/JCVI-Cloud/VICVB.git")
+	with cd("~/VICVB"):
+		sudo("lib/VICVB/data/install/install_to_dir_full.sh /usr/local/VICVB /mnt/galaxyTools/galaxy-central /")
+
 
 # Common methods
 
