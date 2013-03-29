@@ -477,7 +477,7 @@ def install_cram(env):
     """Highly efficient and tunable reference-based compression of sequence data.
     http://www.ebi.ac.uk/ena/about/cram_toolkit/
     """
-    version = "1.0"
+    version = "2.0"
     url = "https://github.com/vadimzalunin/crammer/raw/master/" \
           "cramtools-%s.jar" % version
     install_dir = _symlinked_java_version_dir("cram", version, env)

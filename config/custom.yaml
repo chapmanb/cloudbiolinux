@@ -47,7 +47,6 @@ bio_nextgen:
   sv:
     - hydra
   variant:
-    - bamutil
     - bcbio_variation
     - crisp
     - freebayes
