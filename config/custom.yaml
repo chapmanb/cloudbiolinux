@@ -112,6 +112,7 @@ vcr:
   - viralvigor_test
   - viralvigor_validate
   - viralvigor_cleanall
+  - vicvb
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma
