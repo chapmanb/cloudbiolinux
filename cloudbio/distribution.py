@@ -8,7 +8,7 @@ import subprocess
 
 from fabric.api import env, run, sudo
 
-def _setup_distribution_environment():
+def _setup_distribution_environment(ignore_distcheck=False):
     """Setup distribution environment
     """
     env.logger.info("Distribution %s" % env.distribution)
@@ -27,7 +27,8 @@ def _setup_distribution_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _validate_target_distribution(env.distribution, env.get('dist_name', None))
+    if not ignore_distcheck:
+        _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
     _configure_sudo(env)

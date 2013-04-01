@@ -63,7 +63,9 @@ def install_biolinux(target=None, flavor=None):
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
-    _configure_fabric_environment(env, flavor)
+    _configure_fabric_environment(env, flavor,
+                                  ignore_distcheck=(target is not None
+                                                    and target in ["libraries", "custom"]))
     env.logger.debug("Target is '%s'" % target)
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
@@ -173,7 +175,7 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     p = p.lower() # All packages listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _configure_fabric_environment(env, flavor)
+        _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
 
@@ -283,7 +285,7 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
-    _configure_fabric_environment(env)
+    _configure_fabric_environment(env, ignore_distcheck=True)
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):

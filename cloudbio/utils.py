@@ -83,14 +83,16 @@ def _update_biolinux_log(env, target, flavor):
         env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
 
 
-def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None):
+def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None,
+                                  ignore_distcheck=False):
     if not fabricrc_loader:
         fabricrc_loader = _parse_fabricrc
 
     _setup_flavor(env, flavor)
     fabricrc_loader(env)
     _setup_edition(env)
-    _setup_distribution_environment()  # get parameters for distro, packages etc.
+    # get parameters for distro, packages etc.
+    _setup_distribution_environment(ignore_distcheck=ignore_distcheck)
     _create_local_paths(env)
 
 
