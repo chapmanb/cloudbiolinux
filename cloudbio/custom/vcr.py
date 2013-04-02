@@ -321,6 +321,8 @@ def _remove_symlinks(link_from_filespec, link_to_dir):
 # VICVB - install methods
 
 def install_vicvb(env):
+	_apt_get_install("libperlio-gzip-perl")
+	_apt_get_install("liblocal-lib-perl")
 	with cd("~"):
 		sudo("git clone git://github.com/JCVI-Cloud/VICVB.git")
 	with cd("~/VICVB"):
