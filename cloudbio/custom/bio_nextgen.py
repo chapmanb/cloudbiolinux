@@ -228,7 +228,7 @@ def install_mosaik(env):
 
 # --- Utilities
 
-@_if_not_installed("samtools")
+@_if_not_installed("nosamtools")
 def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
@@ -237,7 +237,21 @@ def install_samtools(env):
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
-    _get_install(url, env, _make_copy("find -perm -100 -type f"))
+    def _safe_ncurses_make(env):
+        """Combine samtools, removing ncurses refs if not present on system.
+        """
+        with settings(warn_only=True):
+            result = run("make")
+        # no ncurses, fix Makefile and rebuild
+        if result.failed:
+            sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
+            sed("Makefile", "-lcurses", "# -lcurses")
+            run("make clean")
+            run("make")
+        install_dir = shared._get_bin_dir(env)
+        for fname in run("find -perm -100 -type f").split("\n"):
+            env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
+    _get_install(url, env, _safe_ncurses_make)
 
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
 def install_fastx_toolkit(env):
