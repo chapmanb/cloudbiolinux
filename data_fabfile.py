@@ -25,8 +25,7 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
     sys.path.remove(to_remove)
 sys.path.append(os.path.dirname(__file__))
 
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging
+from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.biodata import genomes
 
 # -- Host specific setup
@@ -38,7 +37,7 @@ def setup_environment():
     """
     _setup_logging(env)
     _add_defaults()
-    _setup_distribution_environment()
+    _configure_fabric_environment(env, ignore_distcheck=True)
 
 def _add_defaults():
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
