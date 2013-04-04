@@ -228,7 +228,7 @@ def install_mosaik(env):
 
 # --- Utilities
 
-@_if_not_installed("nosamtools")
+@_if_not_installed("samtools")
 def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
