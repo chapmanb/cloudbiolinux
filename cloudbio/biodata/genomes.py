@@ -627,6 +627,9 @@ def _download_genomes(genomes, genome_indexes):
             with cd(org_dir):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
+                    # Remove any preexisting, potentially truncated files
+                    if exists(os.path.basename(url)):
+                        run("rm -f %s" % os.path.basename(url))
                     run("wget --no-check-certificate %s" % url)
                     run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
                     run("rm -f %s" % os.path.basename(url))
