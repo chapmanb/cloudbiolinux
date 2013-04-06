@@ -159,8 +159,8 @@ def install_novoalign(env):
     """Novoalign short read aligner using Needleman-Wunsch algorithm with affine gap penalties.
     http://www.novocraft.com/main/index.php
     """
-    base_version = "V2.08.02"
-    cs_version = "V1.02.02"
+    base_version = "V3.00.02"
+    cs_version = "V1.03.02"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
@@ -189,8 +189,8 @@ def install_novosort(env):
     """Multithreaded sort and merge for BAM files.
     http://www.novocraft.com/wiki/tiki-index.php?page=Novosort
     """
-    base_version = "V2.08.02"
-    version = "V1.00.01"
+    base_version = "V3.00.02"
+    version = "V1.00.02"
     url = "http://www.novocraft.com/downloads/%s/novosort%s.gcc.tar.gz" % (base_version, version)
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     install_dir = os.path.join(env.system_install, "bin")
