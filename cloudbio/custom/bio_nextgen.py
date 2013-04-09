@@ -457,22 +457,25 @@ def install_gatk(env):
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
     # Install R gsalib for report and pdf generation
-    with quiet():
-        have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
-    if have_gsalib and "FALSE" in have_gsalib:
-        # install dependencies for gsalib
-        rlib_config = get_config_file(env, "r-libs.yaml").base
-        with open(rlib_config) as in_handle:
-            config = yaml.load(in_handle)
-        config["bioc"] = []
-        config["update_packages"] = False
-        config["cran"] = ["ggplot2", "gplots"]
-        libraries.r_library_installer(config)
-        # install gsalib
-        git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
-        def install_gsalib(env):
-            env.safe_sudo("ant gsalib")
-        _get_install(git_repo, env, install_gsalib)
+    # XXX Currently have issues with gsalib R installation.
+    # Need to make this into a proper R package and re-enable
+    if False:
+        with quiet():
+            have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
+        if have_gsalib and "FALSE" in have_gsalib:
+            # install dependencies for gsalib
+            rlib_config = get_config_file(env, "r-libs.yaml").base
+            with open(rlib_config) as in_handle:
+                config = yaml.load(in_handle)
+            config["bioc"] = []
+            config["update_packages"] = False
+            config["cran"] = ["ggplot2", "gplots"]
+            libraries.r_library_installer(config)
+            # install gsalib
+            git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
+            def install_gsalib(env):
+                env.safe_sudo("ant gsalib")
+            _get_install(git_repo, env, install_gsalib)
 
 def install_varscan(env):
     """Variant detection in massively parallel sequencing data
