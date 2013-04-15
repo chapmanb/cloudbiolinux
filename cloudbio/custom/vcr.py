@@ -12,90 +12,52 @@ dependency_URL = "http://s3.amazonaws.com/VIGOR-GSC"
 
 
 # Galaxy VCR
-
 galaxy_VCR_path = "/mnt/galaxyTools/galaxy-central/tools/viral_assembly_annotation"
 
 # Galaxy VCR - install method
-
 def install_galaxy_vcr(env):
 	with cd("~"):
 		print("Installing galaxy VCR tools (python and xml scripts).")
 		sudo("git clone git://github.com/JCVI-Cloud/galaxy-tools-vcr.git")
 		sudo("cp -R galaxy-tools-vcr/tools/viral_assembly_annotation %s" % galaxy_VCR_path)
 		sudo("chown -R galaxy:galaxy %s" % galaxy_VCR_path)
-	with cd("/mnt/galaxyTools/galaxy-central/")
+	with cd("/mnt/galaxyTools/galaxy-central/"):
 		print("Adding VCR to tool_conf.xml.")
 		tcx_file = "tool_conf.xml"
+		_set_pre_VCR(tcx_file,"galaxy","galaxy")
+		tcx_string = _get_file_string(tcx_file)
 		
-		f = open(tcx_file)
-		s = mmap.mmap(f.fileno(),0,access=mmap.ACCESS_READ)
-		f.close()
+		vcr_header = "<section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\""
+		vcr_body="""  <section name="Viral Assembly and Annotation" id="viral_assembly_annotation">
+		    <tool file="viral_assembly_annotation/viral_assembly.xml" />
+		    <tool file="viral_assembly_annotation/VIGOR.xml" />
+		  </section>
+		</toolbox>"""
 		
-		if s.find('<section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\"') != -1:
-			print("Galaxy VCR tools already including in tools_conf.xml")
+		if (tcx_string.find(vcr_header) != -1):
+			print("Galaxy VCR tools already included in tools_conf.xml!")
 		else:
-			tcx_temp = "%s_temp" % tcx_file
-			sudo("sed '$d' < %s > %s") % (tcx_file,tcx_temp)
-			sudo("echo -e \"  <section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\" >> tool_conf.xml_temp") % tcx_temp
-			sudo("echo -e \"    <tool file=\"viral_assembly_annotation/viral_assembly.xml\" /> >> %s") % tcx_temp
-			sudo("echo -e \"    <tool file=\"viral_assembly_annotation/VIGOR.xml\" /> >> %s") % tcx_temp
-			sudo("echo -e \"  </section>\" >> %s") % tcx_temp
-			sudo("echo -e \"<toolbox>\" >> %s") % tcx_temp
-			sudo("mv %s %s_pre_VCR") % (tcx_file,tcx_file)
-			sudo("mv %s %s") % (tcx_temp,tcx_file)
-			sudo("chown -R galaxy:galaxy %s") % tcx_file 
-	with cd (""):
+			sudo("sed -i \"/</toolbox>/c\%s\" %s" % (vcr_body,tcx_file))
+		
 		print("Adding 'sanitize_all_html = False' to universe_wsgi.ini to enable JBrowse for VICVB.")
 		uwi_file = "universe_wsgi.ini"
-		sah_string = "sanitize_all_html = False"
+		_set_pre_VCR(uwi_file,"galaxy","galaxy")
+		uwi_sting = _get_file_string(uwi_file)
 		
-		sudo("cp %s %s_pre_VCR" %(uwi_file,uwi_file))
-		sudo("chown galaxy:galaxy %s_pre_VCR" % uwi_file) 
-		
-		f = open(universe_wsgi_ini_file)
-		s = mmap.mmap(f.fileno(),0,access=mmap.ACCESS_READ)
-		f.close()
-		
-		if s.find('#sanitize_all_html = True') != -1:
-			print("sanitize_all_html already present, True, and commented out! Modifying...")
-			_modify_file(uwi_file,"#sanitize_all_html = True",sah_string)
-		elif s.find('#sanitize_all_html = False') != -1:
-			print("sanitize_all_html already present, False, and commented out! Modifying...")
-			modify_file(uwi_file,"#sanitize_all_html = False",sah_string)
-		elif s.find('sanitize_all_html = True') != -1:
-			print("sanitize_all_html already present and True! Modifying...")
-			modify_file(uwi_file,"sanitize_all_html = True",sah_string)
-		elif s.find('sanitize_all_html = False') != -1:
-			print("sanitize_all_html already present and False! No need to modifying.")
+		if (uwi_string.find("sanitize_all_html") != -1):
+			print("Setting sanitize_all_html in %s to False." % uwi_file)
+			sudo("sed -i \"/sanitize_all_html/c\sanitize_all_html = False\" %s" % uwi_file)
 		else:
 			print("No sanitize_all_html present! Adding...")
-			sudo("echo -e \"sanitize_all_html = False\" >> universe_wsgi.ini")
-		
-		sudo("chown galaxy:galaxy %s" % uwi_file)
-
-def _modify_file(filename,old_string,new_string):
-	temp_file = "%s_temp" % filename
-	sudo("touch %s" % temp_file)
-	new_file = open(temp_file,'w')
-	
-	with open(filename,'r') as f:
-		for line in f:
-			new_file.write(line.replace(old_string,new_string))
-	
-    new_file.close()
-    f.close()
-	
-	sudo("move %s %s" % (temp_file,filename))
+			sudo("echo -e \"sanitize_all_html = False\" >> %s" % uwi_file)
 
 
 # Viral Assembly
-
 viral_dirs = {}
 viral_urls = {}
 viral_tars = {}
 
 # Viral Assembly - install methods
-
 def install_viralassembly(env):
 	try:
 		_initialize_area_viral()
@@ -153,7 +115,18 @@ def _initialize_area_viral():
 		print("%s:   %s" % (name,viral_tars[name]))
 
 def _add_tools_viral():
-	sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> /home/ubuntu/.bashrc")
+	with cd("/home/ubuntu/"):
+		bashrc_file = ".bashrc"
+		_set_pre_VCR(bashrc_file,"ubuntu","ubuntu")
+		bashrc_sting = _get_file_string(bashrc_file)
+		
+		if (bashrc_string.find("DEBIAN_FRONTEND") != -1):
+			print("Setting DEBIAN_FRONTEND in %s to noninteractive." % bashrc_file)
+			sudo("sed -i \"/DEBIAN_FRONTEND/c\DEBIAN_FRONTEND=noninteractive\" %s" % bashrc_file)
+		else:
+			print("No DEBIAN_FRONTEND present! Adding...")
+			sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> %s" % bashrc_file)
+	
 	sudo("wget --no-check-certificate -O %s/vir-assembly-pipeline.sh %s" % (env.VIRAL_ROOT_DIR,env.VIRAL_SCRIPT))
 	_add_package(dependency_URL,viral_tars["BINARIES_TARBALL"],viral_dirs["TOOLS_BINARIES_DIR"],"tar")
 	_add_package(dependency_URL,viral_tars["PERL_TARBALL"],viral_dirs["TOOLS_PERL_DIR"],"tar")
@@ -219,8 +192,9 @@ def install_viralvigor_validate(env):
 	try:
 		_initialize_area_vigor()
 		sudo("rm -f %s/westnile.rpt" % vigor_dirs["VIGOR_TEST_OUTPUT_DIR"])
+		sudo("rm -f %s/westnile.rpt" % vigor_dirs["VIGOR_SAMPLE_DATA_DIR"])
 		with settings(hide("running","stdout")):
-			results = run("""diff -Bwr %s %s || echo 'VALIDATION FAILED'""" % (vigor_dirs["VIGOR_VALIDATION_TEST_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"]))
+			results = run("""diff -Bwr %s %s || echo 'VALIDATION FAILED'""" % (vigor_dirs["VIGOR_SAMPLE_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"]))
 		if results:
 			print("\n\nValidation Failed:\n\n%s\n" % results)
 	finally:
@@ -254,7 +228,6 @@ def _initialize_area_vigor():
 	vigor_dirs["VIGOR_TEMPSPACE_DIR"] = "%s/tempspace"                       % vigor_dirs["VIGOR_SCRATCH_DIR"]
 	vigor_dirs["VIGOR_SAMPLE_DATA_DIR"] = "%s/samples"                       % vigor_dirs["VIGOR_STORED_DIR"]
 	vigor_dirs["VIGOR_TEST_OUTPUT_DIR"] = "%s/test"                          % vigor_dirs["VIGOR_STORED_DIR"]
-	vigor_dirs["VIGOR_VALIDATION_TEST_DATA_DIR"] = "%s/samples_valid_output" % vigor_dirs["VIGOR_STORED_DIR"]
 	vigor_dirs["BLAST_DIR"] = "%s/blast"                                     % vigor_dirs["TOOLS_DIR"]
 	vigor_dirs["CLUSTALW_DIR"] = "%s/clustalw"                               % vigor_dirs["TOOLS_DIR"]
 	vigor_dirs["EXE_DIR"] = vigor_dirs["VIGOR_RUNTIME_DIR"]
@@ -359,7 +332,6 @@ def _remove_vigor():
 	_remove_dir(env.VIGOR_SAMPLE_DATA_DIR)
 	_remove_dir(env.VIGOR_TEMPSPACE_DIR)
 	_remove_dir(env.VIGOR_TEST_OUTPUT_DIR)
-	_remove_dir(env.VIGOR_VALIDATION_TEST_DATA_DIR)
 	_remove_dir(env.VIGOR_SCRATCH_DIR)
 
 def _remove_tools():
@@ -459,3 +431,13 @@ def _path_is_dir(path):
 		result = sudo("test -d '%s' || echo 'FALSE'" % path)
 	if result != "FALSE": found = True
 	return found
+
+def _set_pre_VCR(filename,user,group):
+	sudo("cp %s %s_pre_VCR" %(filename,filename))
+	sudo("chown %s:%s %s_pre_VCR" % (user,group,filename)
+
+def _get_file_string(filename):
+	fh = open(filename)
+	string = mmap.mmap(fh.fileno(),0,access=mmap.ACCESS_READ)
+	fh.close()
+	return string
