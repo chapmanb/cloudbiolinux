@@ -12,7 +12,8 @@ dependency_URL = "http://s3.amazonaws.com/VIGOR-GSC"
 
 
 # Galaxy VCR
-galaxy_VCR_path = "/mnt/galaxyTools/galaxy-central/tools/viral_assembly_annotation"
+galaxy_central = "/mnt/galaxyTools/galaxy-central"
+galaxy_VCR_path = "/%s/tools/viral_assembly_annotation" % galaxy_central
 
 # Galaxy VCR - install method
 def install_galaxy_vcr(env):
@@ -21,32 +22,31 @@ def install_galaxy_vcr(env):
 		sudo("git clone git://github.com/JCVI-Cloud/galaxy-tools-vcr.git")
 		sudo("cp -R galaxy-tools-vcr/tools/viral_assembly_annotation %s" % galaxy_VCR_path)
 		sudo("chown -R galaxy:galaxy %s" % galaxy_VCR_path)
-	with cd("/mnt/galaxyTools/galaxy-central/"):
+	with cd(galaxy_central):
 		print("Adding VCR to tool_conf.xml.")
 		tcx_file = "tool_conf.xml"
 		_set_pre_VCR(tcx_file,"galaxy","galaxy")
-		tcx_string = _get_file_string(tcx_file)
+		tcx_string = _get_file_string(tcx_file,galaxy_central)
 		
 		vcr_header = "<section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\""
-		vcr_body="""  <section name="Viral Assembly and Annotation" id="viral_assembly_annotation">
-		    <tool file="viral_assembly_annotation/viral_assembly.xml" />
-		    <tool file="viral_assembly_annotation/VIGOR.xml" />
-		  </section>
-		</toolbox>"""
-		
 		if (tcx_string.find(vcr_header) != -1):
 			print("Galaxy VCR tools already included in tools_conf.xml!")
 		else:
-			sudo("sed -i \"/</toolbox>/c\%s\" %s" % (vcr_body,tcx_file))
+			sudo("sed -i '$d' %s/%s" % (galaxy_central,tcx_file))
+			sudo("echo -e '  <section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">' >> %s" % tcx_file)
+			sudo("echo -e '    <tool file=\"viral_assembly_annotation/viral_assembly.xml\" />' >> %s" % tcx_file)
+			sudo("echo -e '    <tool file=\"viral_assembly_annotation/VIGOR.xml\" />' >> %s" % tcx_file)
+			sudo("echo -e '  </section>' >> %s" % tcx_file)
+			sudo("echo -e '</toolbox>' >> %s" % tcx_file)
 		
 		print("Adding 'sanitize_all_html = False' to universe_wsgi.ini to enable JBrowse for VICVB.")
 		uwi_file = "universe_wsgi.ini"
 		_set_pre_VCR(uwi_file,"galaxy","galaxy")
-		uwi_sting = _get_file_string(uwi_file)
+		uwi_string = _get_file_string(uwi_file,galaxy_central)
 		
 		if (uwi_string.find("sanitize_all_html") != -1):
 			print("Setting sanitize_all_html in %s to False." % uwi_file)
-			sudo("sed -i \"/sanitize_all_html/c\sanitize_all_html = False\" %s" % uwi_file)
+			sudo("sed -i \"/sanitize_all_html/c\sanitize_all_html = False\" %s/%s" % (galaxy_central,uwi_file))
 		else:
 			print("No sanitize_all_html present! Adding...")
 			sudo("echo -e \"sanitize_all_html = False\" >> %s" % uwi_file)
@@ -118,11 +118,11 @@ def _add_tools_viral():
 	with cd("/home/ubuntu/"):
 		bashrc_file = ".bashrc"
 		_set_pre_VCR(bashrc_file,"ubuntu","ubuntu")
-		bashrc_sting = _get_file_string(bashrc_file)
+		bashrc_string = _get_file_string(bashrc_file,"/home/ubuntu/")
 		
 		if (bashrc_string.find("DEBIAN_FRONTEND") != -1):
 			print("Setting DEBIAN_FRONTEND in %s to noninteractive." % bashrc_file)
-			sudo("sed -i \"/DEBIAN_FRONTEND/c\DEBIAN_FRONTEND=noninteractive\" %s" % bashrc_file)
+			sudo("sed -i \"/DEBIAN_FRONTEND/c\DEBIAN_FRONTEND=noninteractive\" %s/%s" % ("/home/ubuntu",bashrc_file))
 		else:
 			print("No DEBIAN_FRONTEND present! Adding...")
 			sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> %s" % bashrc_file)
@@ -234,7 +234,7 @@ def _initialize_area_vigor():
 	
 	vigor_names["BLAST_NAME"] = 'blast-2.2.15'
 	vigor_names["CLUSTALW_NAME"] = 'clustalw-1.83'
-	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud-release-20130301'
+	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud'
 	
 	vigor_tars["VIGOR_TAR_FILENAME"] = "%s.tgz"                              % vigor_names["VIGOR_NAME"]
 	vigor_tars["BLAST_TAR_FILENAME"] = "%s-%s.tar.gz"                        % (vigor_names["BLAST_NAME"],env.ARCH)
@@ -434,10 +434,10 @@ def _path_is_dir(path):
 
 def _set_pre_VCR(filename,user,group):
 	sudo("cp %s %s_pre_VCR" %(filename,filename))
-	sudo("chown %s:%s %s_pre_VCR" % (user,group,filename)
+	sudo("chown %s:%s %s_pre_VCR" % (user,group,filename))
 
-def _get_file_string(filename):
-	fh = open(filename)
+def _get_file_string(filename,directory):
+	fh = open("%s/%s" % (directory,filename))
 	string = mmap.mmap(fh.fileno(),0,access=mmap.ACCESS_READ)
 	fh.close()
 	return string
