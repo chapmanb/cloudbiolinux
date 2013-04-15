@@ -3,29 +3,96 @@
 #  - Configures the environment for running the Viral Assembly (vir-assembly-pipeline.sh) and VIGOR (VIGOR3.pl) pipelines (creating directory structure and installs software). 
 #
 
-import os.path, re
+import os.path, re, mmap
 from fabric.api import cd, env, hide, local, run, settings, sudo, task
 from fabric.network import disconnect_all
 
 # Common variables
 dependency_URL = "http://s3.amazonaws.com/VIGOR-GSC"
 
+
+# Galaxy VCR
+
+galaxy_VCR_path = "/mnt/galaxyTools/galaxy-central/tools/viral_assembly_annotation"
+
+# Galaxy VCR - install method
+
+def install_galaxy_vcr(env):
+	with cd("~"):
+		print("Installing galaxy VCR tools (python and xml scripts).")
+		sudo("git clone git://github.com/JCVI-Cloud/galaxy-tools-vcr.git")
+		sudo("cp -R galaxy-tools-vcr/tools/viral_assembly_annotation %s" % galaxy_VCR_path)
+		sudo("chown -R galaxy:galaxy %s" % galaxy_VCR_path)
+	with cd("/mnt/galaxyTools/galaxy-central/")
+		print("Adding VCR to tool_conf.xml.")
+		tcx_file = "tool_conf.xml"
+		
+		f = open(tcx_file)
+		s = mmap.mmap(f.fileno(),0,access=mmap.ACCESS_READ)
+		f.close()
+		
+		if s.find('<section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\"') != -1:
+			print("Galaxy VCR tools already including in tools_conf.xml")
+		else:
+			tcx_temp = "%s_temp" % tcx_file
+			sudo("sed '$d' < %s > %s") % (tcx_file,tcx_temp)
+			sudo("echo -e \"  <section name=\"Viral Assembly and Annotation\" id=\"viral_assembly_annotation\">\" >> tool_conf.xml_temp") % tcx_temp
+			sudo("echo -e \"    <tool file=\"viral_assembly_annotation/viral_assembly.xml\" /> >> %s") % tcx_temp
+			sudo("echo -e \"    <tool file=\"viral_assembly_annotation/VIGOR.xml\" /> >> %s") % tcx_temp
+			sudo("echo -e \"  </section>\" >> %s") % tcx_temp
+			sudo("echo -e \"<toolbox>\" >> %s") % tcx_temp
+			sudo("mv %s %s_pre_VCR") % (tcx_file,tcx_file)
+			sudo("mv %s %s") % (tcx_temp,tcx_file)
+			sudo("chown -R galaxy:galaxy %s") % tcx_file 
+	with cd (""):
+		print("Adding 'sanitize_all_html = False' to universe_wsgi.ini to enable JBrowse for VICVB.")
+		uwi_file = "universe_wsgi.ini"
+		sah_string = "sanitize_all_html = False"
+		
+		sudo("cp %s %s_pre_VCR" %(uwi_file,uwi_file))
+		sudo("chown galaxy:galaxy %s_pre_VCR" % uwi_file) 
+		
+		f = open(universe_wsgi_ini_file)
+		s = mmap.mmap(f.fileno(),0,access=mmap.ACCESS_READ)
+		f.close()
+		
+		if s.find('#sanitize_all_html = True') != -1:
+			print("sanitize_all_html already present, True, and commented out! Modifying...")
+			_modify_file(uwi_file,"#sanitize_all_html = True",sah_string)
+		elif s.find('#sanitize_all_html = False') != -1:
+			print("sanitize_all_html already present, False, and commented out! Modifying...")
+			modify_file(uwi_file,"#sanitize_all_html = False",sah_string)
+		elif s.find('sanitize_all_html = True') != -1:
+			print("sanitize_all_html already present and True! Modifying...")
+			modify_file(uwi_file,"sanitize_all_html = True",sah_string)
+		elif s.find('sanitize_all_html = False') != -1:
+			print("sanitize_all_html already present and False! No need to modifying.")
+		else:
+			print("No sanitize_all_html present! Adding...")
+			sudo("echo -e \"sanitize_all_html = False\" >> universe_wsgi.ini")
+		
+		sudo("chown galaxy:galaxy %s" % uwi_file)
+
+def _modify_file(filename,old_string,new_string):
+	temp_file = "%s_temp" % filename
+	sudo("touch %s" % temp_file)
+	new_file = open(temp_file,'w')
+	
+	with open(filename,'r') as f:
+		for line in f:
+			new_file.write(line.replace(old_string,new_string))
+	
+    new_file.close()
+    f.close()
+	
+	sudo("move %s %s" % (temp_file,filename))
+
+
 # Viral Assembly
+
 viral_dirs = {}
 viral_urls = {}
 viral_tars = {}
-
-# GSC Setup - Patches to integrate Viral Assembly and Annotation tools in Galaxy and enabling galaxy to write to /usr/local
-
-def install_gsc_patches(env):
-	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tool_conf.xml.patch %s/tool_conf.xml.patch" % dependency_URL)
-	sudo("wget --no-check-certificate -O /mnt/galaxyTools/galaxy-central/tools/viral-assembly-annotation.patch %s/viral-assembly-annotation.patch" % dependency_URL)
-	with cd("/mnt/galaxyTools/galaxy-central"):
-		sudo("patch tool_conf.xml < tool_conf.xml.patch")
-	with cd("/mnt/galaxyTools/galaxy-central/tools"):
-		sudo("patch -p1 < viral-assembly-annotation.patch")
-	
-	sudo("if grep -q \"galaxy ALL=(ALL) NOPASSWD: ALL\" /etc/sudoers; then echo \"User galaxy already listed on sudo.\"; else echo \"galaxy ALL=(ALL) NOPASSWD: ALL\" | sudo tee -a /etc/sudoers; fi")
 
 # Viral Assembly - install methods
 
@@ -49,9 +116,6 @@ def install_viralassembly_cleanall(env):
 # Viral Assembly - utility methods
 
 def _initialize_area_viral():
-	print("user: %(user)s" % env)
-	print("host: %(host)s" % env)
-	
 	_initialize_env("viral")
 	
 	env.VIRAL_SCRIPT = "%s/vir-assembly-pipeline.sh" % dependency_URL
@@ -74,19 +138,19 @@ def _initialize_area_viral():
 	viral_tars["SFF_TARBALL"] = "seq454-64_v2.6.tgz"
 	viral_tars["FASTX_TARBALL"] = "fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2"
 	
-	print("user:                      %(user)s" % env)
-	print("host:                      %(host)s" % env)
-	print("ROOT DIR:                  %(VIRAL_ROOT_DIR)s" % env)
-	print("VIRAL ASSEMBLY SCRIPT:     %(VIRAL_SCRIPT)s" % env)
+	print("user:   %(user)s" % env)
+	print("host:   %(host)s" % env)
+	print("ROOT DIR:   %(VIRAL_ROOT_DIR)s" % env)
+	print("VIRAL ASSEMBLY SCRIPT:   %(VIRAL_SCRIPT)s" % env)
 	for name in sorted(viral_dirs.keys()):
 		if not _path_is_dir(viral_dirs[name]):
 			sudo("mkdir -p %s" % viral_dirs[name])
-		print("%s:                        %s" % (name,viral_dirs[name]))
+		print("%s:   %s" % (name,viral_dirs[name]))
 	print("VIRAL ASSEMBLY REFS FILES: %(VIRAL_REF_FILES)s" % env)
 	for name in sorted(viral_urls.keys()):
-		print("%s:                        %s" % (name,viral_urls[name]))
+		print("%s:   %s" % (name,viral_urls[name]))
 	for name in sorted(viral_tars.keys()):
-		print("%s:\t\t%s" % (name,viral_tars[name]))
+		print("%s:   %s" % (name,viral_tars[name]))
 
 def _add_tools_viral():
 	sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> /home/ubuntu/.bashrc")
@@ -200,23 +264,23 @@ def _initialize_area_vigor():
 	vigor_names["VIGOR_NAME"] = 'vigor-GSCcloud-release-20130301'
 	
 	vigor_tars["VIGOR_TAR_FILENAME"] = "%s.tgz"                              % vigor_names["VIGOR_NAME"]
-	vigor_tars["BLAST_TAR_FILENAME"] = "%s-%s.tar.gz"                  % (vigor_names["BLAST_NAME"],env.ARCH)
-	vigor_tars["CLUSTALW_TAR_FILENAME"] = "%s-%s.deb"                  % (vigor_names["CLUSTALW_NAME"],env.ARCH)
+	vigor_tars["BLAST_TAR_FILENAME"] = "%s-%s.tar.gz"                        % (vigor_names["BLAST_NAME"],env.ARCH)
+	vigor_tars["CLUSTALW_TAR_FILENAME"] = "%s-%s.deb"                        % (vigor_names["CLUSTALW_NAME"],env.ARCH)
 	
-	print("user:                           %(user)s"                         % env)
-	print("host:                           %(host)s"                         % env)
-	print("ARCH:                           %(ARCH)s"                         % env)
-	print("ROOT DIR:                       %(VIGOR_ROOT_DIR)s"               % env)
-	print("SCRATCH DIR:                    %(SCRATCH_DIR)s"                  % env)
+	print("user:   %(user)s" % env)
+	print("host:   %(host)s" % env)
+	print("ARCH:   %(ARCH)s" % env)
+	print("ROOT DIR:   %(VIGOR_ROOT_DIR)s" % env)
+	print("SCRATCH DIR:   %(SCRATCH_DIR)s" % env)
 	for name in sorted(vigor_dirs.keys()):
-		print("%s:                             %s"                           % (name,vigor_dirs[name]))
+		print("%s:   %s" % (name,vigor_dirs[name]))
 	for name in sorted(vigor_urls.keys()):
-		print("%s:                             %s"                           % (name,vigor_urls[name]))
-	print("BLAST_NAME:                     %s"                               % vigor_names["BLAST_NAME"])
-	print("CLUSTALW_NAME:                  %s"                               % vigor_names["CLUSTALW_NAME"])
-	print("VIGOR_NAME:                     %s"                               % vigor_names["VIGOR_NAME"])
+		print("%s:   %s" % (name,vigor_urls[name]))
+	print("BLAST_NAME:   %s" % vigor_names["BLAST_NAME"])
+	print("CLUSTALW_NAME:   %s" % vigor_names["CLUSTALW_NAME"])
+	print("VIGOR_NAME:   %s" % vigor_names["VIGOR_NAME"])
 	for name in sorted(vigor_tars.keys()):
-		print("%s:                             %s"                           % (name,vigor_tars[name]))
+		print("%s:   %s" % (name,vigor_tars[name]))
 
 def _initialize_host():
 	local("ssh-keygen -R %(host)s" % env)
