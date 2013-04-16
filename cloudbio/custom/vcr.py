@@ -46,10 +46,10 @@ def install_galaxy_vcr(env):
 		
 		if (uwi_string.find("sanitize_all_html") != -1):
 			print("Setting sanitize_all_html in %s to False." % uwi_file)
-			sudo("sed -i \"/sanitize_all_html/c\sanitize_all_html = False\" %s/%s" % (galaxy_central,uwi_file))
+			sudo("sed -i '/^sanitize_all_html/c\sanitize_all_html = False' %s" % uwi_file)
 		else:
 			print("No sanitize_all_html present! Adding...")
-			sudo("echo -e \"sanitize_all_html = False\" >> %s" % uwi_file)
+			sudo("sed -i '/^\[app:main\]/a\\\nsanitize_all_html = False' %s" % uwi_file)
 
 
 # Viral Assembly
@@ -396,11 +396,6 @@ def _add_package(download_url, filename, install_dir, type):
 				sudo("cp %s/usr/bin/* %s/%s" % (install_dir,install_dir,vigor_names["CLUSTALW_NAME"]))
 	sudo("chown -R %s:%s %s" % (env.user, env.user, install_dir))
 	sudo("find %s -type d -exec chmod 755 {} \;" % install_dir)
-
-def _add_tarball(download_url,tarball,install_dir,options):
-	sudo("wget --no-check-certificate -O %s %s" % (tarball,download_url))
-	sudo("mv %s %s" % (tarball,install_dir))
-	sudo("tar %s %s/%s -C %s" % (options,install_dir,tarball,install_dir))
 
 def _remove_dir(dirspec):
 	if _path_is_dir(dirspec):
