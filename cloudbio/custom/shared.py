@@ -41,7 +41,7 @@ def _if_not_installed(pname):
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
+        result = env.safe_run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
     return result.return_code == 127
 
 
@@ -63,7 +63,7 @@ def _if_not_python_lib(library):
         functools.wraps(func)
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
-                result = run("%s -c 'import %s'" % (_python_cmd(env), library))
+                result = env.safe_run("%s -c 'import %s'" % (_python_cmd(env), library))
             if result.failed:
                 return func(*args, **kwargs)
         return decorator
@@ -72,16 +72,16 @@ def _if_not_python_lib(library):
 @contextmanager
 def _make_tmp_dir():
     with quiet():
-        tmp_dir = run("echo $TMPDIR")
+        tmp_dir = env.safe_run("echo $TMPDIR")
     if tmp_dir.failed or not tmp_dir.strip():
-        home_dir = run("echo $HOME")
+        home_dir = env.safe_run("echo $HOME")
         tmp_dir = os.path.join(home_dir, "tmp")
     work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
-    if not exists(work_dir):
-        run("mkdir -p %s" % work_dir)
+    if not env.safe_exists(work_dir):
+        env.safe_run("mkdir -p %s" % work_dir)
     yield work_dir
-    if exists(work_dir):
-        run("rm -rf %s" % work_dir)
+    if env.safe_exists(work_dir):
+        env.safe_run("rm -rf %s" % work_dir)
 
 # -- Standard build utility simplifiers
 
@@ -104,7 +104,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     replace_try = ["", "-src", "_core"]
     for replace in replace_try:
         check = dir_name.replace(replace, "")
-        if exists(check):
+        if env.safe_exists(check):
             return check
     # still couldn't find it, it's a nasty one
     for check_part in (dir_name.split("-")[0].split("_")[0],
@@ -113,7 +113,7 @@ def _safe_dir_name(dir_name, need_dir=True):
                        dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            dirs = run("ls -d1 *%s*/" % check_part).split("\n")
+            dirs = env.safe_run("ls -d1 *%s*/" % check_part).split("\n")
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
         if len(dirs) == 1:
             return dirs[0]
@@ -123,26 +123,25 @@ def _safe_dir_name(dir_name, need_dir=True):
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
-        if exists(base):
+        if env.safe_exists(base):
             env.safe_sudo("rm -rf {0}".format(base))
-        run(url)
+        env.safe_run(url)
         if revision:
             if url.startswith("git"):
-                with cd(base):
-                    run("git checkout %s" % revision)
+                env.safe_run("cd %s && git checkout %s" % (base, revision))
             else:
                 raise ValueError("Need to implement revision retrieval for %s" % url.split()[0])
         return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name)
-        if not exists(tar_file):
-            run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
-        run("%s %s" % (tar_cmd, tar_file))
+        if not env.safe_exists(tar_file):
+            env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
+        env.safe_run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
 def _configure_make(env):
-    run("./configure --disable-werror --prefix=%s " % env.system_install)
-    run("make")
+    env.safe_run("./configure --disable-werror --prefix=%s " % env.system_install)
+    env.safe_run("make")
     env.safe_sudo("make install")
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
@@ -150,10 +149,10 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if premake_cmd:
             premake_cmd()
         if do_make:
-            run("make")
+            env.safe_run("make")
         if find_cmd:
             install_dir = _get_bin_dir(env)
-            for fname in run(find_cmd).split("\n"):
+            for fname in env.safe_run(find_cmd).split("\n"):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
@@ -163,10 +162,10 @@ def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name)
-            with cd(dir_name):
-                if post_unpack_fn:
-                    post_unpack_fn(env)
-                make_command(env)
+        with cd(os.path.join(work_dir, dir_name)):
+            if post_unpack_fn:
+                post_unpack_fn(env)
+            make_command(env)
 
 def _get_install_local(url, env, make_command, dir_name=None,
                        post_unpack_fn=None):
@@ -282,7 +281,6 @@ def _write_to_file(contents, path, mode):
     finally:
         os.unlink(local_path)
 
-
 def _get_bin_dir(env):
     """
     When env.system_install is /usr this exists, but in the Galaxy
@@ -301,10 +299,9 @@ def _get_lib_dir(env):
 
 def _get_install_subdir(env, subdir):
     path = os.path.join(env.system_install, subdir)
-    if not exists(path):
+    if not env.safe_exists(path):
         env.safe_sudo("mkdir -p '%s'" % path)
     return path
-
 
 def _set_default_config(env, install_dir, sym_dir_name="default"):
     """

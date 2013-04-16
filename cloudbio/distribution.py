@@ -6,7 +6,8 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env, run, sudo
+from fabric.api import env, run, sudo, local, settings, hide
+from fabric.contrib.files import exists
 
 def _setup_distribution_environment(ignore_distcheck=False):
     """Setup distribution environment
@@ -31,24 +32,52 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
-    _configure_sudo(env)
+    _configure_runsudo(env)
     _setup_fullpaths(env)
     # allow us to check for packages only available on 64bit machines
-    machine = run("uname -m")
+    machine = env.safe_run("uname -m")
     env.is_64bit = machine.find("_64") > 0
 
-def _configure_sudo(env):
-    """Setup env variable and safe_sudo supporting non-privileged users.
+def local_exists(path):
+    cmd = 'test -e "$(echo %s)"' % path
+    with settings(hide('everything'), warn_only=True):
+        env.lcwd = env.cwd
+        return not local(cmd).failed
+
+def run_local(use_sudo):
+    def _run(command, *args, **kwags):
+        if use_sudo:
+            command = "sudo " + command
+        env.lcwd = env.cwd
+        return local(command, capture=True)
+    return _run
+
+def _configure_runsudo(env):
+    """Setup env variable with safe_sudo and safe_run,
+    supporting non-privileged users and local execution.
     """
-    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
-        env.safe_sudo = sudo
-        env.use_sudo = True
+    env.is_local = env.hosts == ["localhost"]
+    if env.is_local:
+        env.safe_exists = local_exists
+        env.safe_run = run_local(False)
     else:
-        env.safe_sudo = run
+        env.safe_exists = exists
+        env.safe_run = run
+    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
+        env.use_sudo = True
+        if env.is_local:
+            env.safe_sudo = run_local(True)
+        else:
+            env.safe_sudo = sudo
+    else:
         env.use_sudo = False
+        if env.is_local:
+            env.safe_sudo = run_local(False)
+        else:
+            env.safe_sudo = run
 
 def _setup_fullpaths(env):
-    home_dir = run("echo $HOME")
+    home_dir = env.safe_run("echo $HOME")
     for attr in ["data_files", "galaxy_home", "local_install"]:
         if hasattr(env, attr):
             x = getattr(env, attr)
@@ -68,19 +97,21 @@ def _validate_target_distribution(dist, dist_name=None):
     """
     env.logger.debug("Checking target distribution " + env.distribution)
     if dist in ["debian", "ubuntu"]:
-        tag = run("cat /proc/version")
+        tag = env.safe_run("cat /proc/version")
         if tag.lower().find(dist) == -1:
            # hmmm, test issue file
-           tag2 = run("cat /etc/issue")
-           if tag2.lower().find(dist) == -1:
-               raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
+            tag2 = env.safe_run("cat /etc/issue")
+            if tag2.lower().find(dist) == -1:
+                raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
         if env.edition.short_name in ["minimal"]:
-            # "minimal editions don't actually change any of the apt source except adding biolinux, so won't cause this problem and don't need to match dist_name"
+            # "minimal editions don't actually change any of the apt
+            # source except adding biolinux, so won't cause this
+            # problem and don't need to match dist_name"
             return
         if not dist_name:
             raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
         # Does this new method work with CentOS, do we need this.
-        actual_dist_name = run("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+        actual_dist_name = env.safe_run("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
         if actual_dist_name.lower().find(dist_name) == -1:
             raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
@@ -91,17 +122,17 @@ def _setup_ubuntu():
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     sources = [
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe",  # unsupported repos
       "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
-      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/", # lastest R versions
-      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
-      "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main", # Free-NX
-      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main", # Free-NX
+      "deb http://archive.canonical.com/ubuntu %s partner",  # partner repositories
+      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen",  # mongodb
+      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/",  # lastest R versions
+      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib",  # Hadoop
+      "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main",  # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main",  # Free-NX
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 

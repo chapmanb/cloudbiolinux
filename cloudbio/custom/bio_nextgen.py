@@ -241,13 +241,13 @@ def install_samtools(env):
         """Combine samtools, removing ncurses refs if not present on system.
         """
         with settings(warn_only=True):
-            result = run("make")
+            result = env.safe_run("make")
         # no ncurses, fix Makefile and rebuild
         if result.failed:
             sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
             sed("Makefile", "-lcurses", "# -lcurses")
-            run("make clean")
-            run("make")
+            env.safe_run("make clean")
+            env.safe_run("make")
         install_dir = shared._get_bin_dir(env)
         for fname in run("find -perm -100 -type f").split("\n"):
             env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
@@ -528,7 +528,7 @@ def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "fda4d26"
+    version = "fda4d2609"
     repository = "git clone git://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=version)
