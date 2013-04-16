@@ -11,7 +11,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _pip_cmd, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
+                    _get_bin_dir, _get_lib_dir, _get_include_dir)
 from cloudbio.custom import shared
 
 from cloudbio import libraries
@@ -172,9 +172,9 @@ def install_novoalign(env):
             run("tar -xzvpf novocraft%s.gcc.tar.gz" % base_version)
             with cd("novocraft"):
                 for fname in ["isnovoindex", "novo2maq", "novo2paf",
-                        "novo2sam.pl", "novoalign", "novobarcode",
-                        "novoindex", "novope2bed.pl", "novorun.pl",
-                        "novoutil"]:
+                              "novo2sam.pl", "novoalign", "novobarcode",
+                              "novoindex", "novope2bed.pl", "novorun.pl",
+                              "novoutil"]:
                     env.safe_sudo("mv %s %s" % (fname, install_dir))
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
@@ -244,12 +244,12 @@ def install_samtools(env):
             result = env.safe_run("make")
         # no ncurses, fix Makefile and rebuild
         if result.failed:
-            sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
-            sed("Makefile", "-lcurses", "# -lcurses")
+            env.safe_sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
+            env.safe_sed("Makefile", "-lcurses", "# -lcurses")
             env.safe_run("make clean")
             env.safe_run("make")
         install_dir = shared._get_bin_dir(env)
-        for fname in run("find -perm -100 -type f").split("\n"):
+        for fname in env.safe_run_output("find -perm -100 -type f").split("\n"):
             env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     _get_install(url, env, _safe_ncurses_make)
 
@@ -288,7 +288,7 @@ def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
-    version = "github"
+    version = "a823879"
     repository = "git clone git://github.com/arq5x/gemini.git"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
     def _gemini_install(env):
@@ -299,7 +299,7 @@ def install_gemini(env):
         env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
         run("{0} gemini/install-data.py {1}".format(_python_cmd(env), data_dir))
         env.safe_sudo("rm -rf gemini.egg-info")
-    _get_install(repository, env, _gemini_install)
+    _get_install(repository, env, _gemini_install, revision=version)
 
 @_if_not_installed("vcftools")
 def install_vcftools(env):
@@ -573,7 +573,7 @@ def install_vep(env):
     cache_dbs = "24"
     def _vep_install(env):
         sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
-        sed("INSTALL.pl", ", <>\)",  ', "{0}")'.format(cache_dbs))
+        sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
         run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
 
@@ -660,7 +660,7 @@ def _install_boost(env):
     thread_lib = "libboost_thread.so.%s" % version
     final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
     if (not exists(boost_version_file) or not contains(boost_version_file, check_version)
-        or not exists(final_thread_lib)):
+            or not exists(final_thread_lib)):
         _get_install(url, env, _boost_build)
         orig_lib = os.path.join(boost_dir, "lib", thread_lib)
         if not exists(final_thread_lib):
@@ -671,7 +671,7 @@ def _cufflinks_configure_make(env):
     need_eigen = "%s/include/eigen3/include" % env.system_install
     if not exists(need_eigen):
         env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
-    run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
+    run("./configure --disable-werror --prefix=%s --with-eigen=%s"
         % (env.system_install, orig_eigen))
     #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
     #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
@@ -692,7 +692,7 @@ def SRC_install_tophat(env):
 
 @_if_not_installed("cufflinks")
 def SRC_install_cufflinks(env):
-    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
     _install_samtools_libs(env)
@@ -716,7 +716,7 @@ def install_tophat(env):
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
-    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
     default_version = "2.0.2"
@@ -874,11 +874,9 @@ def install_lumpy(env):
     """a general probabilistic framework for structural variant discovery
     https://github.com/arq5x/lumpy-sv
     """
-    version = "github"
+    version = "8978e209c1"
     repository = "git clone git://github.com/arq5x/lumpy-sv.git"
-    _get_install(repository, env, _make_copy("ls -1 bin/*"))
-    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
-                 post_unpack_fn=clean_libs)
+    _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):

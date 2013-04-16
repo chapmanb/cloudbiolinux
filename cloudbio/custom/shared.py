@@ -113,9 +113,9 @@ def _safe_dir_name(dir_name, need_dir=True):
                        dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            dirs = env.safe_run("ls -d1 *%s*/" % check_part).split("\n")
+            dirs = env.safe_run_output("ls -d1 *%s*/" % check_part).split("\n")
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
-        if len(dirs) == 1:
+        if len(dirs) == 1 and dirs[0]:
             return dirs[0]
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
@@ -152,7 +152,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
             env.safe_run("make")
         if find_cmd:
             install_dir = _get_bin_dir(env)
-            for fname in env.safe_run(find_cmd).split("\n"):
+            for fname in env.safe_run_output(find_cmd).split("\n"):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 

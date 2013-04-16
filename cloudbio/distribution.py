@@ -6,8 +6,9 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env, run, sudo, local, settings, hide
-from fabric.contrib.files import exists
+from fabric.api import env
+
+from cloudbio.fabutils import configure_runsudo
 
 def _setup_distribution_environment(ignore_distcheck=False):
     """Setup distribution environment
@@ -32,49 +33,11 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
-    _configure_runsudo(env)
+    configure_runsudo(env)
     _setup_fullpaths(env)
     # allow us to check for packages only available on 64bit machines
     machine = env.safe_run("uname -m")
     env.is_64bit = machine.find("_64") > 0
-
-def local_exists(path):
-    cmd = 'test -e "$(echo %s)"' % path
-    with settings(hide('everything'), warn_only=True):
-        env.lcwd = env.cwd
-        return not local(cmd).failed
-
-def run_local(use_sudo):
-    def _run(command, *args, **kwags):
-        if use_sudo:
-            command = "sudo " + command
-        env.lcwd = env.cwd
-        return local(command, capture=True)
-    return _run
-
-def _configure_runsudo(env):
-    """Setup env variable with safe_sudo and safe_run,
-    supporting non-privileged users and local execution.
-    """
-    env.is_local = env.hosts == ["localhost"]
-    if env.is_local:
-        env.safe_exists = local_exists
-        env.safe_run = run_local(False)
-    else:
-        env.safe_exists = exists
-        env.safe_run = run
-    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
-        env.use_sudo = True
-        if env.is_local:
-            env.safe_sudo = run_local(True)
-        else:
-            env.safe_sudo = sudo
-    else:
-        env.use_sudo = False
-        if env.is_local:
-            env.safe_sudo = run_local(False)
-        else:
-            env.safe_sudo = run
 
 def _setup_fullpaths(env):
     home_dir = env.safe_run("echo $HOME")
