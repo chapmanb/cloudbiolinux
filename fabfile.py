@@ -141,8 +141,8 @@ def _check_fabric_version():
         raise NotImplementedError("Please install fabric version 1 or higher")
 
 def _custom_installs(to_install, ignore=None):
-    if not exists(env.local_install):
-        run("mkdir -p %s" % env.local_install)
+    if not env.safe_exists(env.local_install) and env.local_install:
+        env.safe_run("mkdir -p %s" % env.local_install)
     pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
     packages = [p for p in packages if ignore is None or p not in ignore]
