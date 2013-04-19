@@ -209,19 +209,19 @@ amazon:
   - ec2-api-tools
   - python-vm-builder-ec2
 python:
-  meta:
-    - python
-    - python-dev
-    - python-setuptools
-    - python-distutils-extra
-    - python3
-    - python3-dev
-    - python-pip
-  wrappers:
-    - python-rpy
+  - python
+  - python-dev
+  - python-distutils-extra
+  - python-pip
+  - python-setuptools
+  - python-virtualenv
+  - python3
+  - python3-dev
+  - python-rpy
 ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
+  - ruby-rvm
   - ruby1.8
   - ruby1.8-dev
 r:
@@ -236,6 +236,9 @@ perl:
   - perl-tk
   - parrot
   - parrot-devel
+  - cpanminus
+  - libextutils-autoinstall-perl
+  - libextutils-cbuilder-perl
 java:
   # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
   # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
@@ -423,6 +426,8 @@ bio_proteomics:
   # needed for building OpenMS
   - libtool
   - qt4-dev-tools
+  - libqtwebkit-dev
+  - libqtwebkit4
 bio_proteomics_wine:
   - wine
 bio_utils:
@@ -582,6 +587,8 @@ galaxyp:
      # needed for building OpenMS
      - libtool
      - qt4-dev-tools
+     - libqtwebkit-dev
+     - libqtwebkit4
 
      # Needed for nbic galaxy database utilities
      - liblog-log4perl-perl

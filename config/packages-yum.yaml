@@ -106,9 +106,10 @@ amazon:
 python:
   - python
   - python-devel
+  - python-pip
+  - python-virtualenv
   - boost-python-devel
   - numpy
-  - python-pip
 ruby:
   - ruby
   - ruby-devel
@@ -122,6 +123,10 @@ r:
   - libRmath-devel
 perl: 
   - perl
+  - perl-ExtUtils-MakeMaker
+  - perl-ExtUtils-AutoInstall
+  - perl-ExtUtils-CBuilder
+  - perl-CPAN
 java:
   - ant
   - ant-junit
@@ -181,3 +186,8 @@ bio_utils:
 phylogeny:
   all:
   needs_64bit:
+galaxyp:
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+  
