@@ -29,18 +29,18 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
+    configure_runsudo(env)
     if not ignore_distcheck:
         _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
-    configure_runsudo(env)
     _setup_fullpaths(env)
     # allow us to check for packages only available on 64bit machines
-    machine = env.safe_run("uname -m")
+    machine = env.safe_run_output("uname -m")
     env.is_64bit = machine.find("_64") > 0
 
 def _setup_fullpaths(env):
-    home_dir = env.safe_run("echo $HOME")
+    home_dir = env.safe_run_output("echo $HOME")
     for attr in ["data_files", "galaxy_home", "local_install"]:
         if hasattr(env, attr):
             x = getattr(env, attr)
@@ -60,10 +60,10 @@ def _validate_target_distribution(dist, dist_name=None):
     """
     env.logger.debug("Checking target distribution " + env.distribution)
     if dist in ["debian", "ubuntu"]:
-        tag = env.safe_run("cat /proc/version")
+        tag = env.safe_run_output("cat /proc/version")
         if tag.lower().find(dist) == -1:
            # hmmm, test issue file
-            tag2 = env.safe_run("cat /etc/issue")
+            tag2 = env.safe_run_output("cat /etc/issue")
             if tag2.lower().find(dist) == -1:
                 raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
         if env.edition.short_name in ["minimal"]:
@@ -74,7 +74,7 @@ def _validate_target_distribution(dist, dist_name=None):
         if not dist_name:
             raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
         # Does this new method work with CentOS, do we need this.
-        actual_dist_name = env.safe_run("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+        actual_dist_name = env.safe_run_output("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
         if actual_dist_name.lower().find(dist_name) == -1:
             raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
