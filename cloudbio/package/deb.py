@@ -88,8 +88,8 @@ def _setup_apt_automation():
     if not contains(env.shell_config, interactive_cmd):
         append(env.shell_config, interactive_cmd)
     package_info = [
-            "postfix postfix/main_mailer_type select No configuration",
-            "postfix postfix/mailname string notusedexample.org",
+            "postfix postfix/not_configured boolean true",
+            "postfix postfix/main_mailer_type select 'No configuration'",
             "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
             "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
             "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",

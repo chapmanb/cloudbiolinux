@@ -72,9 +72,9 @@ def _if_not_python_lib(library):
 @contextmanager
 def _make_tmp_dir():
     with quiet():
-        tmp_dir = env.safe_run("echo $TMPDIR")
+        tmp_dir = env.safe_run_output("echo $TMPDIR")
     if tmp_dir.failed or not tmp_dir.strip():
-        home_dir = env.safe_run("echo $HOME")
+        home_dir = env.safe_run_output("echo $HOME")
         tmp_dir = os.path.join(home_dir, "tmp")
     work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
     if not env.safe_exists(work_dir):
