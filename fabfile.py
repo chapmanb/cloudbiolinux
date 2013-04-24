@@ -30,7 +30,7 @@ sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
 from cloudbio import libraries
-from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
+from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
@@ -88,7 +88,6 @@ def _perform_install(target=None, flavor=None):
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
-        _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
         _custom_installs(pkg_install, custom_ignore)
     if target is None or target == "libraries":
@@ -98,7 +97,7 @@ def _perform_install(target=None, flavor=None):
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
-        if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+        if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             if env.distribution in ["ubuntu"]:
                 # For the time being (Dec 2012), must install development version
                 # of cloud-init because of a boto & cloud-init bug:
