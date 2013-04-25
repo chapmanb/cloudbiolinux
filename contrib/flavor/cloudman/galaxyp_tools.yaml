@@ -23,9 +23,9 @@ applications:
   mayu: "1.06"
   pepnovo: "20120423"
   ipig: "r5"
-  searchgui: "1.12.0"
+  searchgui: "1.12.2"
   peptide_shaker: 
-    - version: "0.19.1"
+    - version: "0.19.3"
       env_vars:
         DISPLAY: ":42"
   psm_eval: "0.1.0"

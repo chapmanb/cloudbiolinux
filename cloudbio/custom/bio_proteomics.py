@@ -59,12 +59,13 @@ def install_transproteomic_pipeline(env):
 
 @_if_not_installed("omssacl")
 def install_omssa(env):
-    print "Installing OMSSA"
     default_version = "2.1.9"
     version = env.get("tool_version", default_version)
     url = 'ftp://ftp.ncbi.nih.gov/pub/lewisg/omssa/%s/omssa-%s.linux.tar.gz' % (version, version)
     env.safe_sudo("mkdir -p '%s'" % env["system_install"])
-    _get_install(url, env, _make_copy(find_cmd="find -perm -100 -name 'omssa*'", do_make=False))
+    ## OMSSA really wants mods.xml, usermods.xml, etc... in the same directory
+    ## so just copying everything there.
+    _get_install(url, env, _make_copy(find_cmd="ls -1", do_make=False))
 
 
 # OpenMS
@@ -148,7 +149,7 @@ def install_mzmine(env):
 
 @_if_not_installed("SearchGUI")
 def install_searchgui(env):
-    default_version = "1.12.0"
+    default_version = "1.12.2"
     version = env.get("tool_version", default_version)
     url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
 
@@ -185,7 +186,7 @@ def install_psm_eval(env):
 
 @_if_not_installed("PeptideShaker")
 def install_peptide_shaker(env):
-    default_version = "0.19.1"
+    default_version = "0.19.3"
     version = env.get("tool_version", default_version)
     url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
 
