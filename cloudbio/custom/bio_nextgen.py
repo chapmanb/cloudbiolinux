@@ -582,7 +582,7 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "d0c1f12"
+    version = "296a0fa"
     repository = "git clone --recursive git://github.com/ekg/freebayes.git"
     def _fix_tabixpp_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
