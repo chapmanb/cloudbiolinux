@@ -139,3 +139,8 @@ def _install_galaxy_config(tool_env, bin_dirs, env_vars):
             sudo("echo 'export %s=%s' >> %s" % (env_var, expanded_env_var_value, env_path))
 
     _set_default_config(tool_env, install_dir)
+    if _read_boolean(tool_env, "autoload_galaxy_tools", False) and exists(env_path):
+        # In this case, the web user (e.g. ubuntu) should auto-load all of
+        # galaxy's default env.sh files so they are available for direct use
+        # as well.
+        _add_to_profiles(". %s" % env_path, profiles=["~/.bashrc"])
