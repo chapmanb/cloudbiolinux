@@ -27,5 +27,6 @@ applications:
   peptide_shaker: 
     - version: "0.19.3"
       env_vars:
-        DISPLAY: ":42"
+        # If DISPLAY set keep it the same, otherwise use XVFB
+        DISPLAY: "$${DISPLAY:-:42}"
   psm_eval: "0.1.0"

@@ -159,6 +159,9 @@ def install_searchgui(env):
         with cd(dir_name):
             _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/77aa11751a9e747c3b75afa13c591413bce182ec/SearchGUI")
             _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/b97fb4d9fe9927de1cfc5433dd1702252e9c0348/SearchCLI")
+            # Fix known bug with SearchGUI version 1.12.2
+            env.safe_sudo("find -iname \"*.exe\" -exec rename s/.exe// {} \;")
+
             env.safe_sudo("mv * '%s'" % install_dir)
             bin_dir = os.path.join(env.get("system_install"), "bin")
             env.safe_sudo("mkdir -p '%s'" % bin_dir)
