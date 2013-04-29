@@ -292,7 +292,6 @@ databases:
     - mongodb-10gen
     - couchdb
     - tokyocabinet-bin
-    - libtokyocabinet9
     - libtokyocabinet-dev
   hdf:
     - libhdf5-7
