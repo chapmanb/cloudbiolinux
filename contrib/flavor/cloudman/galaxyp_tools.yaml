@@ -5,11 +5,14 @@ applications:
       bin_dirs:
         - bin
         - cgi-bin
-  openms: "1.10.0"
+  openms: 
+    - version: "1.10.0"
+      env_vars:
+        LD_LIBRARY_PATH: "${system_install}/lib:$$LD_LIBRARY_PATH"
   omssa: "2.1.9"
   tint_proteomics_scripts: "1.19.18"
   superhirn: "0.03"
-  mzmine: "2.9.1"
+  mzmine: "2.10"
   percolator: "2_04"
   myrimatch: "2.1.131"
   directag: "1.3.62"
@@ -17,8 +20,8 @@ applications:
   pepitome: "1.0.45"
   tagrecon: "1.4.63"
   fido: "2011"
-  pride_inspector: "1.2.4"
-  pride_converter2: "2.0.6"
+  pride_inspector: "1.3.0"
+  pride_converter2: "2.0.17"
   ms2preproc: "2009"
   mayu: "1.06"
   pepnovo: "20120423"

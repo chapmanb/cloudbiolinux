@@ -68,11 +68,6 @@ def install_omssa(env):
     _get_install(url, env, _make_copy(find_cmd="ls -1", do_make=False))
 
 
-# OpenMS
-# qt4-dev-tools libtool
-# cd contrib; cmake -D INSTALL_PREFIX=/opt/galaxy/tools/openms/1.9.0 .; cd ..; cmake -D INSTALL_PREFIX=/opt/galaxy/tools/openms/1.9.0 .; make; make install
-
-# If not going with contrib: libxerces-c2-dev libgsl0-dev (cannot get seqan-dev to work though)
 @_if_not_installed("OpenMSInfo")
 def install_openms(env):
     """
@@ -92,12 +87,6 @@ def install_openms(env):
         run("make")
         env.safe_sudo("make install")
     _get_install(url, env, _make)
-    #with _make_tmp_dir() as work_dir:
-    #    with cd(work_dir):
-    #        run("wget --no-check-certificate '%s'" % url)
-    #        http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-1.10/OpenMS-1.10.0.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopen-ms%2Ffiles%2FOpenMS%2FOpenMS-1.10%2F%3F&ts=1364007422&use_mirror=superb-dca2
-    #        env.safe_sudo("apt-get -y --force-yes install gdebi-core")
-    #        env.safe_sudo("gdebi -n OpenMS-%s-Linux_64bit.deb" % version)
 
 
 @_if_not_installed("LTQ-iQuant")
@@ -131,18 +120,22 @@ def install_ms2preproc(env):
             run("chmod +x ms2preproc-x86_64")
             env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
 
+
 @_if_not_installed("MZmine")
 def install_mzmine(env):
-    default_version = "2.9.1"
+    default_version = "2.10"
     version = env.get("tool_version", default_version)
-    point_version = version.rsplit('.', 1)[0]
-    url = "http://downloads.sourceforge.net/project/mzmine/mzmine2/%s/MZmine-%s.zip" % (point_version, version)
+    url = "http://downloads.sourceforge.net/project/mzmine/mzmine2/%s/MZmine-%s.zip" % (version, version)
 
     def install_fn(env, install_dir):
+        ## Enhanced MZmine startup script that works when used a symbolic link and tailored for CloudBioLinux.
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5474421/raw/15f3b817fa82d5f5e2143ee08bd248efee951d6a/MZmine")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w conf")
         env.safe_sudo("mv * '%s'" % install_dir)
         bin_dir = os.path.join(env.get("system_install"), "bin")
         env.safe_sudo("mkdir -p '%s'" % bin_dir)
-        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "startMZmine_Linux.sh"), os.path.join(bin_dir, "MZmine")))
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "MZmine"), os.path.join(bin_dir, "MZmine")))
 
     _java_install("mzmine2", version, url, env, install_fn)
 
@@ -157,11 +150,12 @@ def install_searchgui(env):
         dir_name = "SearchGUI-%s_mac_and_linux" % version
         env.safe_sudo("tar -xf %s.tar" % dir_name)
         with cd(dir_name):
-            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/77aa11751a9e747c3b75afa13c591413bce182ec/SearchGUI")
+            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/dc9fa36dd0e6eddcdf43cd2b659e4ecee5ad29df/SearchGUI")
             _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/b97fb4d9fe9927de1cfc5433dd1702252e9c0348/SearchCLI")
             # Fix known bug with SearchGUI version 1.12.2
             env.safe_sudo("find -iname \"*.exe\" -exec rename s/.exe// {} \;")
-
+            # Hack for multi-user environment.
+            env.safe_sudo("chmod -R o+w resources")
             env.safe_sudo("mv * '%s'" % install_dir)
             bin_dir = os.path.join(env.get("system_install"), "bin")
             env.safe_sudo("mkdir -p '%s'" % bin_dir)
@@ -194,8 +188,10 @@ def install_peptide_shaker(env):
     url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
 
     def install_fn(env, install_dir):
-        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/ed9b48a0f01cb975f8a9e6e126965c955bbee848/PeptideShaker")
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/f1fe76d6e6eed99a768ed0b9f41c2d0a6a4b24b7/PeptideShaker")
         _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/8a17d5fb589984365284e55a98a455c2b47da54f/PeptideShakerCLI")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w resources")
         env.safe_sudo("mv * '%s'" % install_dir)
         bin_dir = os.path.join(env.get("system_install"), "bin")
         env.safe_sudo("mkdir -p '%s'" % bin_dir)
@@ -229,23 +225,35 @@ def install_mayu(env):
 
 
 def install_pride_inspector(env):
-    default_version = "1.2.4"
+    default_version = "1.3.0"
     version = env.get("tool_version", default_version)
     url = "http://pride-toolsuite.googlecode.com/files/pride-inspector-%s.zip" % version
 
     def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5474788/raw/6bcffd8680ec0e0301af44961184529a1f76dd3b/pride-inspector")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w log config")
         env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "pride-inspector"), os.path.join(bin_dir, "pride-inspector")))
 
     _unzip_install("pride_inspector", version, url, env, install_fn, "PRIDE_Inspector")
 
 
 def install_pride_converter2(env):
-    default_version = "2.0.6"
+    default_version = "2.0.17"
     version = env.get("tool_version", default_version)
-    url = "http://pride-converter-2.googlecode.com/files/pride-converter-%s.zip" % version
+    url = "http://pride-converter-2.googlecode.com/files/pride-converter-%s-bin.zip" % version
 
     def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5475119/raw/4e9135ada5114ba149f3ebc8965aee242bfc776f/pride-converter")
+        # Hack for multi-user environment.
+        env.safe_sudo("mkdir log; chmod o+w log")
         env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "pride-converter"), os.path.join(bin_dir, "pride-converter")))
 
     _unzip_install("pride_converter2", version, url, env, install_fn, ".")
 
