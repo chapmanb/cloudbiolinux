@@ -1,7 +1,14 @@
 ---
 packages:
   - minimal
+  - ruby
+#  - python
+#  - databases
   - cloudman
   - galaxy
   - galaxyp
+  - java
+  - desktop
 libraries:
+  - ruby-libs
+  - r-libs
