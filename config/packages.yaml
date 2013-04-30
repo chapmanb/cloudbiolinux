@@ -81,6 +81,7 @@ libraries:
   - xz-utils
   - liblzma-dev
   - zlib1g-dev
+  - libnetcdf-dev
 documentation:
   - texlive-latex-base
   - texlive-latex-recommended
