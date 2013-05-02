@@ -61,21 +61,21 @@ def install_bowtie2(env):
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
-@_if_not_installed("bwa")
+@_if_not_installed("nbwa")
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.7.3a"
+    default_version = "0.7.4"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
-        arch = run("uname -m")
+        arch = env.safe_run_output("uname -m")
         # if not 64bit, remove the appropriate flag
         if arch.find("x86_64") == -1:
-            run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
-    _get_install(url, env, _make_copy("ls -1 bwa bwamem-lite qualfa2fq.pl",
+            env.safe_run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
+    _get_install(url, env, _make_copy("ls -1 bwa qualfa2fq.pl",
                                         _fix_makefile))
 
 @_if_not_installed("bfast")
