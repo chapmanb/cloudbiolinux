@@ -283,23 +283,21 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
-@_if_not_installed("gemini")
+@_if_not_installed("nogemini")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
-    version = "a823879"
-    repository = "git clone git://github.com/arq5x/gemini.git"
+    version = "github"
+    installer = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
-    def _gemini_install(env):
-        env.safe_sudo("{0} install --upgrade cython".format(_pip_cmd(env)))
-        env.safe_sudo("{0} install --upgrade distribute".format(_pip_cmd(env)))
-        _python_make(env)
-        env.safe_sudo("mkdir -p {0}".format(data_dir))
-        env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
-        run("{0} gemini/install-data.py {1}".format(_python_cmd(env), data_dir))
-        env.safe_sudo("rm -rf gemini.egg-info")
-    _get_install(repository, env, _gemini_install, revision=version)
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            env.safe_run("wget --no-check-certificate %s" % installer)
+            env.safe_run("%s gemini_install.py %s %s %s" %
+                         (_python_cmd(env), "" if env.use_sudo else "--nosudo",
+                          env.system_install, data_dir))
+            env.safe_run("rm -f gemini_install.py")
 
 @_if_not_installed("vcftools")
 def install_vcftools(env):
@@ -833,7 +831,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.0.7"
+    version = "0.0.8"
     url = "https://s3.amazonaws.com/bcbio.variation/" \
           "bcbio.variation-%s-standalone.jar" % version
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
