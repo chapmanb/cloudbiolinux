@@ -71,12 +71,16 @@ def _install_applications(env, tools_conf):
             versions = [versions]
         for version_info in versions:
             if type(version_info) is str:
-                _install_tool(env, name, version_info)
+                _install_tool(env, name, version=version_info, requirement_name=name)
             else:
                 version = version_info["version"]
                 bin_dirs = version_info.get("bin_dirs", ["bin"])
                 env_vars = version_info.get("env_vars", {})
-                tool_env = _install_tool(env, name, version, bin_dirs, env_vars)
+                # Some requirements (e.g. blast+) maybe not have valid python
+                # identifiers as name. Use install_blast to setup but override
+                # requirement directory name with requirement_name field.
+                requirement_name = version_info.get("requirement_name", name)
+                tool_env = _install_tool(env, name, version, bin_dirs=bin_dirs, env_vars=env_vars, requirement_name=requirement_name)
                 symlink_versions = version_info.get("symlink_versions", [])
                 if type(symlink_versions) is str:
                     symlink_versions = [symlink_versions]
@@ -84,8 +88,8 @@ def _install_applications(env, tools_conf):
                     _set_default_config(tool_env, tool_env["system_install"], symlink_version)
 
 
-def _install_tool(env, name, version, bin_dirs=["bin"], env_vars={}):
-    tool_env = _build_tool_env(env, name, version)
+def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}):
+    tool_env = _build_tool_env(env, requirement_name, version)
     eval("install_%s" % name)(tool_env)
     _install_galaxy_config(tool_env, bin_dirs, env_vars=env_vars)
     return tool_env
