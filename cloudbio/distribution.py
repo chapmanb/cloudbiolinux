@@ -96,6 +96,7 @@ def _setup_ubuntu():
       "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main",  # Free-NX
       "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main",  # Free-NX
+      "deb [arch=amd64 trusted=yes] http://research.cs.wisc.edu/htcondor/debian/stable/ squeeze contrib"  # HTCondor
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
