@@ -28,6 +28,7 @@ libraries:
   - libpng-devel
   - openssl-devel
   - ncurses-devel
+documentation:
 programming:
   - protobuf-c
   - protobuf-compiler

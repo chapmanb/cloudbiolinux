@@ -36,9 +36,13 @@ def install_proftpd(env):
     """Highly configurable GPL-licensed FTP server software.
     http://proftpd.org/
     """
-    version = "1.3.4a"
+    version = "1.3.4c"
     postgres_ver = "9.1"
     url = "ftp://ftp.tpnet.pl/pub/linux/proftpd/distrib/source/proftpd-%s.tar.gz" % version
+    modules = "mod_sql:mod_sql_postgres:mod_sql_passwd"
+    extra_modules = env.get("extra_proftp_modules", "")  # Comma separated list of extra modules
+    if extra_modules:
+        modules = "%s:%s" % (modules, extra_modules.replace(",", ":"))
     install_dir = os.path.join(env.install_dir, 'proftpd')
     remote_conf_dir = os.path.join(install_dir, "etc")
     # skip install if already present
@@ -53,8 +57,8 @@ def install_proftpd(env):
             with cd("proftpd-%s" % version):
                 run("CFLAGS='-I/usr/include/postgresql' ./configure --prefix=%s " \
                     "--disable-auth-file --disable-ncurses --disable-ident --disable-shadow " \
-                    "--enable-openssl --with-modules=mod_sql:mod_sql_postgres:mod_sql_passwd " \
-                    "--with-libraries=/usr/lib/postgresql/%s/lib" % (install_dir, postgres_ver))
+                    "--enable-openssl --with-modules=%s " \
+                    "--with-libraries=/usr/lib/postgresql/%s/lib" % (install_dir, modules, postgres_ver))
                 sudo("make")
                 sudo("make install")
                 sudo("make clean")

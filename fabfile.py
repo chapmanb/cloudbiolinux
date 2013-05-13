@@ -30,7 +30,7 @@ sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
 from cloudbio import libraries
-from cloudbio.utils import _setup_logging, _update_biolinux_log, _configure_fabric_environment
+from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
 from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
@@ -39,6 +39,8 @@ from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
+from cloudbio.config_management.puppet import _puppet_provision
+from cloudbio.config_management.chef import _chef_provision, chef, _configure_chef
 
 # ### Shared installation targets for all platforms
 
@@ -56,6 +58,7 @@ def install_biolinux(target=None, flavor=None):
 
       - packages     Install distro packages
       - custom       Install custom packages
+      - chef_recipes Provision chef recipes
       - libraries    Install programming language libraries
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
@@ -63,11 +66,12 @@ def install_biolinux(target=None, flavor=None):
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
-    _configure_fabric_environment(env, flavor)
+    _configure_fabric_environment(env, flavor,
+                                  ignore_distcheck=(target is not None
+                                                    and target in ["libraries", "custom"]))
     env.logger.debug("Target is '%s'" % target)
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
-
 
 def _perform_install(target=None, flavor=None):
     """
@@ -87,9 +91,12 @@ def _perform_install(target=None, flavor=None):
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
-        _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
         _custom_installs(pkg_install, custom_ignore)
+    if target is None or target == "chef_recipes":
+        _provision_chef_recipes(pkg_install, custom_ignore)
+    if target is None or target == "puppet_classes":
+        _provision_puppet_classes(pkg_install, custom_ignore)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -97,7 +104,7 @@ def _perform_install(target=None, flavor=None):
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
-        if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+        if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             if env.distribution in ["ubuntu"]:
                 # For the time being (Dec 2012), must install development version
                 # of cloud-init because of a boto & cloud-init bug:
@@ -140,13 +147,85 @@ def _check_fabric_version():
         raise NotImplementedError("Please install fabric version 1 or higher")
 
 def _custom_installs(to_install, ignore=None):
-    if not exists(env.local_install):
-        run("mkdir -p %s" % env.local_install)
+    if not env.safe_exists(env.local_install) and env.local_install:
+        env.safe_run("mkdir -p %s" % env.local_install)
     pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
     packages = [p for p in packages if ignore is None or p not in ignore]
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
+
+
+def _provision_chef_recipes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "chef_recipes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    recipes = [recipe for recipe in env.flavor.rewrite_config_items("chef_recipes", packages)]
+    if recipes:  # Don't bother running chef if nothing to configure
+        install_chef_recipe(recipes, True)
+
+
+def _provision_puppet_classes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "puppet_classes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    classes = [recipe for recipe in env.flavor.rewrite_config_items("puppet_classes", packages)]
+    if classes:  # Don't bother running chef if nothing to configure
+        install_puppet_class(classes, True)
+
+
+def install_chef_recipe(recipe, automated=False, flavor=None):
+    """Install one or more chef recipes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_chef_recipe:recipe
+
+    :type recipe:  string or list
+    :param recipe: TODO
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded.
+    """
+    _setup_logging(env)
+    if not automated:
+        _configure_fabric_environment(env, flavor)
+
+    time_start = _print_time_stats("Chef provision for recipe(s) '{0}'".format(recipe), "start")
+    _configure_chef(env, chef)
+    recipes = recipe if isinstance(recipe, list) else [recipe]
+    for recipe_to_add in recipes:
+        chef.add_recipe(recipe_to_add)
+    _chef_provision(env, recipes)
+    _print_time_stats("Chef provision for recipe(s) '%s'" % recipe, "end", time_start)
+
+
+def install_puppet_class(classes, automated=False, flavor=None):
+    """Install one or more puppet classes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_puppet_class:class
+
+    :type classes:  string or list
+    :param classes: TODO
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded.
+    """
+    _setup_logging(env)
+    if not automated:
+        _configure_fabric_environment(env, flavor)
+
+    time_start = _print_time_stats("Puppet provision for class(es) '{0}'".format(classes), "start")
+    classes = classes if isinstance(classes, list) else [classes]
+    _puppet_provision(env, classes)
+    _print_time_stats("Puppet provision for classes(s) '%s'" % classes, "end", time_start)
+
 
 def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     """
@@ -174,7 +253,7 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     p = p.lower() # All packages listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _configure_fabric_environment(env, flavor)
+        _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
 
@@ -208,11 +287,12 @@ def _read_main_config():
     yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
-    packages = full_data['packages']
-    packages = packages if packages else []
-    libraries = full_data['libraries']
-    libraries = libraries if libraries else []
+    packages = full_data.get('packages', [])
+    libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
+    if packages is None: packages = []
+    if libraries is None: libraries = []
+    if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
     return packages, sorted(libraries), custom_ignore
@@ -283,7 +363,7 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
-    _configure_fabric_environment(env)
+    _configure_fabric_environment(env, ignore_distcheck=True)
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):

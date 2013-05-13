@@ -10,7 +10,8 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _symlinked_java_version_dir,
                     _get_bin_dir, _get_install_subdir,
-                    _fetch_and_unpack, _python_make)
+                    _fetch_and_unpack, _python_make,
+                    _create_python_virtualenv)
 import re
 
 # Tools from Tabb lab are only available via TeamCity builds that
@@ -25,7 +26,7 @@ def install_transproteomic_pipeline(env):
     """
     """
     ## version should be of form X.X.X-codename
-    default_version = "4.6.1-occupy"
+    default_version = "4.6.2-occupy"
     version = env.get("tool_version", default_version)
     version_parts = re.match("(\d\.\d)\.(\d)-(.*)", version)
     major_version = version_parts.group(1)
@@ -42,7 +43,7 @@ def install_transproteomic_pipeline(env):
 
     def _chdir_src(work_cmd):
         def do_work(env):
-            with cd("trans_proteomic_pipeline/src"):
+            with cd("src"):
                 append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
                 append("Makefile.config.incl", "TPP_WEB=/tpp/")
                 append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
@@ -58,49 +59,45 @@ def install_transproteomic_pipeline(env):
 
 @_if_not_installed("omssacl")
 def install_omssa(env):
-    print "Installing OMSSA"
     default_version = "2.1.9"
     version = env.get("tool_version", default_version)
     url = 'ftp://ftp.ncbi.nih.gov/pub/lewisg/omssa/%s/omssa-%s.linux.tar.gz' % (version, version)
     env.safe_sudo("mkdir -p '%s'" % env["system_install"])
-    _get_install(url, env, _make_copy(find_cmd="find -perm -100 -name 'omssa*'", do_make=False))
+    ## OMSSA really wants mods.xml, usermods.xml, etc... in the same directory
+    ## so just copying everything there.
+    _get_install(url, env, _make_copy(find_cmd="ls -1", do_make=False))
 
 
-# OpenMS
-# qt4-dev-tools libtool
-# cd contrib; cmake -D INSTALL_PREFIX=/opt/galaxy/tools/openms/1.9.0 .; cd ..; cmake -D INSTALL_PREFIX=/opt/galaxy/tools/openms/1.9.0 .; make; make install
-
-# If not going with contrib: libxerces-c2-dev libgsl0-dev (cannot get seqan-dev to work though)
 @_if_not_installed("OpenMSInfo")
 def install_openms(env):
     """
     See comments above, working on getting this to compile from source. In
     the meantime installing from deb will have to do.
     """
-    default_version = "1.9.0"
+    default_version = "1.10.0"
     version = env.get("tool_version", default_version)
     dot_version = version[0:version.rindex('.')]
-    url = 'http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-%s/OpenMS-%s-Linux_64bit.deb' % (dot_version, version)
-    with settings(warn_only=True):
-        if(run("dpkg-query -l openms").find(version)) >= 0:
-            return
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget --no-check-certificate '%s'" % url)
-            env.safe_sudo("apt-get -y --force-yes install gdebi-core")
-            env.safe_sudo("gdebi -n OpenMS-%s-Linux_64bit.deb" % version)
+    url = 'http://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-%s/OpenMS-%s.tar.gz' % (dot_version, version)
+
+    def _make(env):
+        with cd("contrib"):
+            run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+            run("make")
+        run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+        run("make")
+        env.safe_sudo("make install")
+    _get_install(url, env, _make)
 
 
 @_if_not_installed("LTQ-iQuant")
 def install_tint_proteomics_scripts(env):
-    default_version = "1.19.14"
+    default_version = "1.19.19"
     version = env.get("tool_version", default_version)
     url = "http://artifactory.msi.umn.edu/simple/ext-release-local/msi/umn/edu/tint-proteomics-scripts/%s/tint-proteomics-scripts-%s.zip" % (version, version)
 
     def install_fn(env, install_dir):
         env.safe_sudo("mv * '%s'" % install_dir)
-        bin_dir = os.path.join(env.get("system_install"), "bin")
-        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        bin_dir = _get_bin_dir(env)
         for script in ["ITraqScanSummarizer", "LTQ-iQuant", "LTQ-iQuant-cli", "MgfFormatter"]:
             env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, script), bin_dir))
         env.safe_sudo("chmod +x '%s'/*" % bin_dir)
@@ -122,20 +119,91 @@ def install_ms2preproc(env):
             run("chmod +x ms2preproc-x86_64")
             env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
 
+
 @_if_not_installed("MZmine")
 def install_mzmine(env):
-    default_version = "2.9.1"
+    default_version = "2.10"
     version = env.get("tool_version", default_version)
-    point_version = version.rsplit('.', 1)[0]
-    url = "http://downloads.sourceforge.net/project/mzmine/mzmine2/%s/MZmine-%s.zip" % (point_version, version)
+    url = "http://downloads.sourceforge.net/project/mzmine/mzmine2/%s/MZmine-%s.zip" % (version, version)
 
     def install_fn(env, install_dir):
+        ## Enhanced MZmine startup script that works when used a symbolic link and tailored for CloudBioLinux.
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5474421/raw/15f3b817fa82d5f5e2143ee08bd248efee951d6a/MZmine")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w conf")
         env.safe_sudo("mv * '%s'" % install_dir)
         bin_dir = os.path.join(env.get("system_install"), "bin")
         env.safe_sudo("mkdir -p '%s'" % bin_dir)
-        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "startMZmine_Linux.sh"), os.path.join(bin_dir, "MZmine")))
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "MZmine"), os.path.join(bin_dir, "MZmine")))
 
     _java_install("mzmine2", version, url, env, install_fn)
+
+
+@_if_not_installed("SearchGUI")
+def install_searchgui(env):
+    default_version = "1.13.0"
+    version = env.get("tool_version", default_version)
+    url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
+
+    def install_fn(env, install_dir):
+        dir_name = "SearchGUI-%s_mac_and_linux" % version
+        env.safe_sudo("tar -xf %s.tar" % dir_name)
+        with cd(dir_name):
+            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/dc9fa36dd0e6eddcdf43cd2b659e4ecee5ad29df/SearchGUI")
+            _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/b97fb4d9fe9927de1cfc5433dd1702252e9c0348/SearchCLI")
+            # Fix known bug with SearchGUI version 1.12.2
+            env.safe_sudo("find -iname \"*.exe\" -exec rename s/.exe// {} \;")
+            # Hack for multi-user environment.
+            env.safe_sudo("chmod -R o+w resources")
+            env.safe_sudo("mv * '%s'" % install_dir)
+            bin_dir = os.path.join(env.get("system_install"), "bin")
+            env.safe_sudo("mkdir -p '%s'" % bin_dir)
+            env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "SearchGUI"), os.path.join(bin_dir, "SearchGUI")))
+            env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "SearchCLI"), os.path.join(bin_dir, "SearchCLI")))
+
+    _unzip_install("SearchGUI", version, url, env, install_fn)
+
+
+@_if_not_installed("psm_eval")
+def install_psm_eval(env):
+    default_version = "0.1.0"
+    version = env.get("tool_version", default_version)
+    url = "git clone git://github.com/jmchilton/psm-eval.git"
+
+    def install_fn(env, install_dir):
+        env.safe_sudo("mv psm-eval/* '%s'" % install_dir)
+        _create_python_virtualenv(env, "psme", "%s/requirements.txt" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "psm_eval"), os.path.join(bin_dir, "psm_eval")))
+
+    _unzip_install("psm_eval", version, url, env, install_fn)
+
+
+@_if_not_installed("PeptideShaker")
+def install_peptide_shaker(env):
+    default_version = "0.20.0"
+    version = env.get("tool_version", default_version)
+    url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
+
+    def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/f1fe76d6e6eed99a768ed0b9f41c2d0a6a4b24b7/PeptideShaker")
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5002161/raw/8a17d5fb589984365284e55a98a455c2b47da54f/PeptideShakerCLI")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w resources")
+        env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "PeptideShaker"), os.path.join(bin_dir, "PeptideShaker")))
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "PeptideShakerCLI"), os.path.join(bin_dir, "PeptideShakerCLI")))
+
+    _java_install("PeptideShaker", version, url, env, install_fn)
+
+
+def _get_gist_script(env, url):
+    name = url.split("/")[-1]
+    env.safe_sudo("wget '%s'" % url)
+    env.safe_sudo("chmod +x '%s'" % name)
 
 
 @_if_not_installed("Mayu")
@@ -156,23 +224,35 @@ def install_mayu(env):
 
 
 def install_pride_inspector(env):
-    default_version = "1.2.4"
+    default_version = "1.3.0"
     version = env.get("tool_version", default_version)
     url = "http://pride-toolsuite.googlecode.com/files/pride-inspector-%s.zip" % version
 
     def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5474788/raw/6bcffd8680ec0e0301af44961184529a1f76dd3b/pride-inspector")
+        # Hack for multi-user environment.
+        env.safe_sudo("chmod -R o+w log config")
         env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "pride-inspector"), os.path.join(bin_dir, "pride-inspector")))
 
     _unzip_install("pride_inspector", version, url, env, install_fn, "PRIDE_Inspector")
 
 
 def install_pride_converter2(env):
-    default_version = "2.0.6"
+    default_version = "2.0.17"
     version = env.get("tool_version", default_version)
-    url = "http://pride-converter-2.googlecode.com/files/pride-converter-%s.zip" % version
+    url = "http://pride-converter-2.googlecode.com/files/pride-converter-%s-bin.zip" % version
 
     def install_fn(env, install_dir):
+        _get_gist_script(env, "https://gist.github.com/jmchilton/5475119/raw/4e9135ada5114ba149f3ebc8965aee242bfc776f/pride-converter")
+        # Hack for multi-user environment.
+        env.safe_sudo("mkdir log; chmod o+w log")
         env.safe_sudo("mv * '%s'" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, "pride-converter"), os.path.join(bin_dir, "pride-converter")))
 
     _unzip_install("pride_converter2", version, url, env, install_fn, ".")
 
@@ -222,7 +302,7 @@ def install_percolator(env):
 def install_pepnovo(env):
     default_version = "20120423"
     version = env.get("tool_version", default_version)
-    url = "http://proteomics.ucsd.edu/Downloads/PepNovo.20120423.zip"
+    url = "http://proteomics.ucsd.edu/Downloads/PepNovo.%s.zip" % version
 
     def install_fn(env, install_dir):
         with cd("src"):
@@ -233,6 +313,20 @@ def install_pepnovo(env):
             env.safe_sudo("cp -r '../Models' '%s/share/pepnovo'" % env.system_install)
 
     _unzip_install("pepnovo", version, url, env, install_fn)
+
+
+@_if_not_installed("crux")
+def install_crux(env):
+    default_version = "1.39"
+    version = env.get("tool_version", default_version)
+    url = "http://noble.gs.washington.edu/proj/crux/download/crux_%s-x86_64-Linux.zip" % version
+
+    def _move(env):
+        bin_dir = _get_bin_dir(env)
+        env.safe_sudo("mv bin/* '%s'" % (bin_dir, bin_dir))
+
+    _get_install(url, env, _move)
+
 
 @_if_not_installed("Fido")
 def install_fido(env):
@@ -306,6 +400,7 @@ def install_idpqonvert(env):
     run("chmod 755 idpQonvert")
     env.safe_sudo("mkdir -p '%s/bin'" % env["system_install"])
     env.safe_sudo("mv %s '%s/bin'" % ("idpQonvert", env["system_install"]))
+    env.safe_sudo("chmod +x '%s/bin/idpQonvert'" % env["system_install"])
 
 
 def _install_tabb_tool(env, default_version, download_name, exec_names):

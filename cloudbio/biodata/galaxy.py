@@ -25,6 +25,8 @@ org_remap = {"phix": "phiX",
              "WS210": "ce10",
              "WS220": "ce10"}
 
+galaxy_subdirs = ["", "/microbes"]
+
 # ## Galaxy location files
 
 class LocCols(object):
@@ -180,17 +182,27 @@ def _get_galaxy_genomes(gid, genome_dir, genomes, genome_indexes):
 def _rsync_genome_index(gid, idx, org_dir):
     """Retrieve index for a genome from rsync server, returning path to files.
     """
-    org_rsync = "{server}/indexes/{gid}/{idx}/".format(
-        server=server, gid=gid, idx=idx)
     idx_dir = os.path.join(org_dir, idx)
     if not exists(idx_dir):
+        org_rsync = None
+        for subdir in galaxy_subdirs:
+            test_rsync = "{server}/indexes{subdir}/{gid}/{idx}/".format(
+                server=server, subdir=subdir, gid=gid, idx=idx)
+            with quiet():
+                check_dir = run("rsync --list-only {server}".format(server=test_rsync))
+            if check_dir.succeeded:
+                org_rsync = test_rsync
+                break
+        if org_rsync is None:
+            raise ValueError("Could not find genome %s on Galaxy rsync" % gid)
         with quiet():
             check_dir = run("rsync --list-only {server}".format(server=org_rsync))
         if check_dir.succeeded:
             if not exists(idx_dir):
                 run('mkdir -p %s' % idx_dir)
             with cd(idx_dir):
-                run("rsync -avzP {server} .".format(server=org_rsync))
+                run("rsync -avzP {server} {idx_dir}".format(server=org_rsync,
+                                                            idx_dir=idx_dir))
     if exists(idx_dir):
         with quiet():
             has_fa_ext = run("ls {idx_dir}/{gid}.fa*".format(idx_dir=idx_dir,

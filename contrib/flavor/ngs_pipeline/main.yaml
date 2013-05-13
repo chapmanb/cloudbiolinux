@@ -4,6 +4,7 @@
 packages:
   - minimal
   - libraries
+  - documentation
   - python
   - java
   - r

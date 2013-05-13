@@ -43,6 +43,7 @@ minimal:
     - swig
   util:
     - axel
+    - gawk
     - rsync
     - openssh-server
     - screen
@@ -80,6 +81,11 @@ libraries:
   - xz-utils
   - liblzma-dev
   - zlib1g-dev
+  - libnetcdf-dev
+documentation:
+  - texlive-latex-base
+  - texlive-latex-recommended
+  - texlive-latex-extra
 desktop:
   #Packages to support a remote desktop
   all:
@@ -114,10 +120,6 @@ programming:
     - emacsen-common
     - exuberant-ctags
     - gedit
-  documentation:
-    - texlive-latex-base
-    - texlive-latex-recommended
-    - texlive-latex-extra
   build:
     - xfsprogs
     - stow
@@ -208,16 +210,15 @@ amazon:
   - ec2-api-tools
   - python-vm-builder-ec2
 python:
-  meta:
-    - python
-    - python-dev
-    - python-setuptools
-    - python-distutils-extra
-    - python3
-    - python3-dev
-    - python-pip
-  wrappers:
-    - python-rpy
+  - python
+  - python-dev
+  - python-distutils-extra
+  - python-pip
+  - python-setuptools
+  - python-virtualenv
+  - python3
+  - python3-dev
+  - python-rpy
 ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
@@ -235,6 +236,9 @@ perl:
   - perl-tk
   - parrot
   - parrot-devel
+  - cpanminus
+  - libextutils-autoinstall-perl
+  - libextutils-cbuilder-perl
 java:
   # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
   # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
@@ -289,7 +293,6 @@ databases:
     - mongodb-10gen
     - couchdb
     - tokyocabinet-bin
-    - libtokyocabinet9
     - libtokyocabinet-dev
   hdf:
     - libhdf5-7
@@ -417,6 +420,13 @@ bio_proteomics:
   - libboost-serialization-dev
   - zlib1g-dev
   - libboost-dev
+  # needed for 32bit execs distributed with searchgui.
+  - ia32-libs
+  # needed for building OpenMS
+  - libtool
+  - qt4-dev-tools
+  - libqtwebkit-dev
+  - libqtwebkit4
 bio_proteomics_wine:
   - wine
 bio_utils:
@@ -500,10 +510,11 @@ cloudman:
     - libcurl4-openssl-dev
     - libxml2-dev
     - mime-support
-    # Required to get HTCondor
-    - condor
     # Required for novnc
     - vnc4server
+  ubuntu_quantal:
+    # Required to get HTCondor, not available on 12.04 (latest LTS release).
+    - condor
 galaxy:
   all:
     - postgresql
@@ -542,6 +553,7 @@ galaxyp:
      # Required for protk
      - libxml2-dev
      - libreadline-dev
+     - libxslt-dev
      # Required for protvis
      - python-virtualenv
      - python-setuptools
@@ -568,9 +580,21 @@ galaxyp:
      - zlib1g-dev
      - libboost-dev
 
-     # Needed for nbic galaxy stuff
+     # needed for 32bit execs distributed with searchgui.
+     - ia32-libs
+
+     # needed for building OpenMS
+     - libtool
+     - qt4-dev-tools
+     - libqtwebkit-dev
+     - libqtwebkit4
+
+     # Needed for nbic galaxy database utilities
      - liblog-log4perl-perl
      - libswiss-perl
+
+     # Needed  for psm-eval
+     - libyaml-dev
 
 # To do -- in Deb Med but not propogated
 # squizz

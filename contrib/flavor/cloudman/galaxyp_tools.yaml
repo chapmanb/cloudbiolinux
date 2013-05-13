@@ -1,25 +1,36 @@
 ---
 applications:
   transproteomic_pipeline: 
-    - version: "4.6.1-occupy"
+    - version: "4.6.2-occupy"
       bin_dirs:
         - bin
         - cgi-bin
-  openms: "1.9.0"
+  openms: 
+    - version: "1.10.0"
+      env_vars:
+        LD_LIBRARY_PATH: "${system_install}/lib:$$LD_LIBRARY_PATH"
   omssa: "2.1.9"
-  tint_proteomics_scripts: "1.19.18"
+  tint_proteomics_scripts: "1.19.19"
   superhirn: "0.03"
-  mzmine: "2.9.1"
+  mzmine: "2.10"
   percolator: "2_04"
   myrimatch: "2.1.131"
   directag: "1.3.62"
   idpqonvert: "3.0.475"
   pepitome: "1.0.45"
   tagrecon: "1.4.63"
+  crux: "1.39"
   fido: "2011"
-  pride_inspector: "1.2.4"
-  pride_converter2: "2.0.6"
+  pride_inspector: "1.3.0"
+  pride_converter2: "2.0.17"
   ms2preproc: "2009"
   mayu: "1.06"
   pepnovo: "20120423"
   ipig: "r5"
+  searchgui: "1.13.0"
+  peptide_shaker: 
+    - version: "0.20.0"
+      env_vars:
+        # If DISPLAY set keep it the same, otherwise use XVFB
+        DISPLAY: "$${DISPLAY:-:42}"
+  psm_eval: "0.1.0"

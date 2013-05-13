@@ -6,9 +6,11 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env, run, sudo
+from fabric.api import env
 
-def _setup_distribution_environment():
+from cloudbio.fabutils import configure_runsudo
+
+def _setup_distribution_environment(ignore_distcheck=False):
     """Setup distribution environment
     """
     env.logger.info("Distribution %s" % env.distribution)
@@ -27,27 +29,18 @@ def _setup_distribution_environment():
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    _validate_target_distribution(env.distribution)
+    configure_runsudo(env)
+    if not ignore_distcheck:
+        _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
     _setup_nixpkgs()
-    _configure_sudo(env)
     _setup_fullpaths(env)
     # allow us to check for packages only available on 64bit machines
-    machine = run("uname -m")
+    machine = env.safe_run_output("uname -m")
     env.is_64bit = machine.find("_64") > 0
 
-def _configure_sudo(env):
-    """Setup env variable and safe_sudo supporting non-privileged users.
-    """
-    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
-        env.safe_sudo = sudo
-        env.use_sudo = True
-    else:
-        env.safe_sudo = run
-        env.use_sudo = False
-
 def _setup_fullpaths(env):
-    home_dir = run("echo $HOME")
+    home_dir = env.safe_run_output("echo $HOME")
     for attr in ["data_files", "galaxy_home", "local_install"]:
         if hasattr(env, attr):
             x = getattr(env, attr)
@@ -60,19 +53,30 @@ def _cloudman_compatibility(env):
     """
     env.install_dir = env.system_install
 
-def _validate_target_distribution(dist):
+def _validate_target_distribution(dist, dist_name=None):
     """Check target matches environment setting (for sanity)
 
     Throws exception on error
     """
     env.logger.debug("Checking target distribution " + env.distribution)
     if dist in ["debian", "ubuntu"]:
-        tag = run("cat /proc/version")
+        tag = env.safe_run_output("cat /proc/version")
         if tag.lower().find(dist) == -1:
            # hmmm, test issue file
-           tag2 = run("cat /etc/issue")
-           if tag2.lower().find(dist) == -1:
-               raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
+            tag2 = env.safe_run_output("cat /etc/issue")
+            if tag2.lower().find(dist) == -1:
+                raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
+        if env.edition.short_name in ["minimal"]:
+            # "minimal editions don't actually change any of the apt
+            # source except adding biolinux, so won't cause this
+            # problem and don't need to match dist_name"
+            return
+        if not dist_name:
+            raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
+        # Does this new method work with CentOS, do we need this.
+        actual_dist_name = env.safe_run_output("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+        if actual_dist_name.lower().find(dist_name) == -1:
+            raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
         env.logger.debug("Unknown target distro")
 
@@ -81,17 +85,18 @@ def _setup_ubuntu():
     shared_sources = _setup_deb_general()
     # package information. This is ubuntu/debian based and could be generalized.
     sources = [
-      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe", # unsupported repos
+      "deb http://us.archive.ubuntu.com/ubuntu/ %s universe",  # unsupported repos
       "deb http://us.archive.ubuntu.com/ubuntu/ %s multiverse",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
-      "deb http://archive.canonical.com/ubuntu %s partner", # partner repositories
-      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen", # mongodb
-      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/", # lastest R versions
-      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib", # Hadoop
-      "deb http://archive.canonical.com/ubuntu %s partner", # sun-java
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main", # Free-NX
-      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main", # Free-NX
+      "deb http://archive.canonical.com/ubuntu %s partner",  # partner repositories
+      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen",  # mongodb
+      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/",  # lastest R versions
+      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib",  # Hadoop
+      "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
+      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main",  # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main",  # Free-NX
+      "deb [arch=amd64 trusted=yes] http://research.cs.wisc.edu/htcondor/debian/stable/ squeeze contrib"  # HTCondor
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 

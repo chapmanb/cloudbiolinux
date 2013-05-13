@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import yaml
 
-from cloudbio.deploy import deploy, DEFAULT_CLOUDBIOLINUX_FLAVOR, DEFAULT_CLOUDBIOLINUX_TARGET
+from cloudbio.deploy import deploy
 
 DESC = "Creates an on-demand cloud instance, sets up applications, and transfer files to it."
 
@@ -41,8 +41,8 @@ def parse_args():
     parser.add_argument('--runtime_property', dest="runtime_properties", action="append", default=[])
     parser.add_argument('--compressed_file', dest="compressed_files", action="append", default=[], help="file to transfer to new instance and decompress")
     parser.add_argument('--file', dest="files", action="append", default=[], help="file to transfer to new instance")
-    parser.add_argument("--target", dest="target", default=DEFAULT_CLOUDBIOLINUX_TARGET)
-    parser.add_argument("--flavor", dest="flavor", default=DEFAULT_CLOUDBIOLINUX_FLAVOR)
+    parser.add_argument("--target", dest="target", default=None)
+    parser.add_argument("--flavor", dest="flavor", default=None)
     parser.add_argument("--vm_provider", dest="vm_provider", default=None, help="libcloud driver to use (or vagrant) (e.g. aws, openstack)")
     args = parser.parse_args()
     if len(args.actions) == 0:

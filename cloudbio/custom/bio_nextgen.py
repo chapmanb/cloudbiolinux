@@ -9,9 +9,10 @@ import yaml
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _java_install, _pip_cmd,
+                    _java_install, _pip_cmd, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_bin_dir, _get_lib_dir, _get_include_dir, _executable_not_on_path)
+                    _get_bin_dir, _get_lib_dir, _get_include_dir)
+from cloudbio.custom import shared
 
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
@@ -60,21 +61,21 @@ def install_bowtie2(env):
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
-@_if_not_installed("bwa")
+@_if_not_installed("nbwa")
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.6.2"
+    default_version = "0.7.4"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
-        arch = run("uname -m")
+        arch = env.safe_run_output("uname -m")
         # if not 64bit, remove the appropriate flag
         if arch.find("x86_64") == -1:
-            run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
-    _get_install(url, env, _make_copy("ls -1 bwa solid2fastq.pl qualfa2fq.pl",
+            env.safe_run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
+    _get_install(url, env, _make_copy("ls -1 bwa qualfa2fq.pl",
                                         _fix_makefile))
 
 @_if_not_installed("bfast")
@@ -158,8 +159,8 @@ def install_novoalign(env):
     """Novoalign short read aligner using Needleman-Wunsch algorithm with affine gap penalties.
     http://www.novocraft.com/main/index.php
     """
-    base_version = "V2.08.02"
-    cs_version = "V1.02.02"
+    base_version = "V3.00.02"
+    cs_version = "V1.03.02"
     _url = "http://www.novocraft.com/downloads/%s/" % base_version
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
@@ -171,9 +172,9 @@ def install_novoalign(env):
             run("tar -xzvpf novocraft%s.gcc.tar.gz" % base_version)
             with cd("novocraft"):
                 for fname in ["isnovoindex", "novo2maq", "novo2paf",
-                        "novo2sam.pl", "novoalign", "novobarcode",
-                        "novoindex", "novope2bed.pl", "novorun.pl",
-                        "novoutil"]:
+                              "novo2sam.pl", "novoalign", "novobarcode",
+                              "novoindex", "novope2bed.pl", "novorun.pl",
+                              "novoutil"]:
                     env.safe_sudo("mv %s %s" % (fname, install_dir))
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
@@ -188,8 +189,8 @@ def install_novosort(env):
     """Multithreaded sort and merge for BAM files.
     http://www.novocraft.com/wiki/tiki-index.php?page=Novosort
     """
-    base_version = "V2.08.02"
-    version = "V1.00.01"
+    base_version = "V3.00.02"
+    version = "V1.00.02"
     url = "http://www.novocraft.com/downloads/%s/novosort%s.gcc.tar.gz" % (base_version, version)
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     install_dir = os.path.join(env.system_install, "bin")
@@ -232,11 +233,25 @@ def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
     """
-    default_version = "0.1.18"
+    default_version = "0.1.19"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
-    _get_install(url, env, _make_copy("find -perm -100 -type f"))
+    def _safe_ncurses_make(env):
+        """Combine samtools, removing ncurses refs if not present on system.
+        """
+        with settings(warn_only=True):
+            result = env.safe_run("make")
+        # no ncurses, fix Makefile and rebuild
+        if result.failed:
+            env.safe_sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
+            env.safe_sed("Makefile", "-lcurses", "# -lcurses")
+            env.safe_run("make clean")
+            env.safe_run("make")
+        install_dir = shared._get_bin_dir(env)
+        for fname in env.safe_run_output("find -perm -100 -type f").split("\n"):
+            env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
+    _get_install(url, env, _safe_ncurses_make)
 
 @_if_not_installed("fastq_quality_boxplot_graph.sh")
 def install_fastx_toolkit(env):
@@ -268,23 +283,21 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
-@_if_not_installed("gemini")
+@_if_not_installed("nogemini")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
     version = "github"
-    repository = "git clone git://github.com/arq5x/gemini.git"
+    installer = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
     data_dir = os.path.join(env.system_install, "local", "share", "gemini")
-    def _gemini_install(env):
-        env.safe_sudo("{0} install --upgrade cython".format(_pip_cmd(env)))
-        env.safe_sudo("{0} install --upgrade distribute".format(_pip_cmd(env)))
-        _python_make(env)
-        env.safe_sudo("mkdir -p {0}".format(data_dir))
-        env.safe_sudo("chown {0} {1}".format(env.user, data_dir))
-        run("python{0} gemini/install-data.py {1}".format(env.python_version_ext, data_dir))
-        env.safe_sudo("rm -rf gemini.egg-info")
-    _get_install(repository, env, _gemini_install)
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            env.safe_run("wget --no-check-certificate %s" % installer)
+            env.safe_run("%s gemini_install.py %s %s %s" %
+                         (_python_cmd(env), "" if env.use_sudo else "--nosudo",
+                          env.system_install, data_dir))
+            env.safe_run("rm -f gemini_install.py")
 
 @_if_not_installed("vcftools")
 def install_vcftools(env):
@@ -426,7 +439,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.82"
+    version = "1.86"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
@@ -442,32 +455,25 @@ def install_gatk(env):
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
     # Install R gsalib for report and pdf generation
-    with quiet():
-        have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
-    if have_gsalib and "FALSE" in have_gsalib:
-        # install dependencies for gsalib
-        rlib_config = get_config_file(env, "r-libs.yaml").base
-        with open(rlib_config) as in_handle:
-            config = yaml.load(in_handle)
-        config["bioc"] = []
-        config["update_packages"] = False
-        config["cran"] = ["ggplot2", "gplots"]
-        libraries.r_library_installer(config)
-        # install gsalib
-        git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
-        def install_gsalib(env):
-            env.safe_sudo("ant gsalib")
-        _get_install(git_repo, env, install_gsalib)
-
-def install_gatk_queue(env):
-    """Command-line scripting framework for defining multi-stage genomic analysis pipelines.
-    http://www.broadinstitute.org/gsa/wiki/index.php/GATK-Queue
-    """
-    version = "2.3-9-gdcdccbb"
-    ext = ".tar.bz2"
-    url = "ftp://ftp.broadinstitute.org/pub/gsa/Queue/"\
-          "QueueLite-%s%s" % (version, ext)
-    _java_install("gatk_queue", version, url, env)
+    # XXX Currently have issues with gsalib R installation.
+    # Need to make this into a proper R package and re-enable
+    if False:
+        with quiet():
+            have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
+        if have_gsalib and "FALSE" in have_gsalib:
+            # install dependencies for gsalib
+            rlib_config = get_config_file(env, "r-libs.yaml").base
+            with open(rlib_config) as in_handle:
+                config = yaml.load(in_handle)
+            config["bioc"] = []
+            config["update_packages"] = False
+            config["cran"] = ["ggplot2", "gplots"]
+            libraries.r_library_installer(config)
+            # install gsalib
+            git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
+            def install_gsalib(env):
+                env.safe_sudo("ant gsalib")
+            _get_install(git_repo, env, install_gsalib)
 
 def install_varscan(env):
     """Variant detection in massively parallel sequencing data
@@ -486,7 +492,7 @@ def install_cram(env):
     """Highly efficient and tunable reference-based compression of sequence data.
     http://www.ebi.ac.uk/ena/about/cram_toolkit/
     """
-    version = "1.0"
+    version = "2.0"
     url = "https://github.com/vadimzalunin/crammer/raw/master/" \
           "cramtools-%s.jar" % version
     install_dir = _symlinked_java_version_dir("cram", version, env)
@@ -495,6 +501,35 @@ def install_cram(env):
             with cd(work_dir):
                 run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
+
+@_if_not_installed("bam")
+def install_bamutil(env):
+    """Utilities for working with BAM files, from U of M Center for Statistical Genetics.
+    http://genome.sph.umich.edu/wiki/BamUtil
+    """
+    version = "1.0.7"
+    url = "http://genome.sph.umich.edu/w/images/5/5d/BamUtilLibStatGen.%s.tgz" % version
+    _get_install(url, env, _make_copy("ls -1 bamUtil/bin/bam"),
+                 dir_name="bamUtil_%s" % version)
+
+@_if_not_installed("tabix")
+def install_tabix(env):
+    """Generic indexer for TAB-delimited genome position files
+    http://samtools.sourceforge.net/tabix.shtml
+    """
+    version = "0.2.6"
+    url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
+    _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
+
+@_if_not_installed("grabix")
+def install_grabix(env):
+    """a wee tool for random access into BGZF files
+    https://github.com/arq5x/grabix
+    """
+    version = "fda4d2609"
+    repository = "git clone git://github.com/arq5x/grabix.git"
+    _get_install(repository, env, _make_copy("ls -1 grabix"),
+                 revision=version)
 
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.
@@ -513,7 +548,7 @@ def install_snpeff(env):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     env.safe_sudo("mv *.jar %s" % install_dir)
-                    run("sed -i.bak -r -e 's/^data_dir = *$/data_dir = %s\/data/' %s" %
+                    run("sed -i.bak -r -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
                         (install_dir.replace("/", "\/"), "snpEff.config"))
                     run("chmod a+r *.config")
                     env.safe_sudo("mv *.config %s" % install_dir)
@@ -536,7 +571,7 @@ def install_vep(env):
     cache_dbs = "24"
     def _vep_install(env):
         sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
-        sed("INSTALL.pl", ", <>\)",  ', "{0}")'.format(cache_dbs))
+        sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
         run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
 
@@ -545,12 +580,55 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "github"
+    version = "296a0fa"
     repository = "git clone --recursive git://github.com/ekg/freebayes.git"
-    def _fix_library_order(env):
+    def _fix_tabixpp_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
-                 post_unpack_fn=_fix_library_order)
+                 post_unpack_fn=_fix_tabixpp_library_order,
+                 revision=version)
+
+@_if_not_installed("vcffilter")
+def install_vcflib(env):
+    """Utilities for parsing and manipulating VCF files.
+    https://github.com/ekg/vcflib
+    """
+    version = "06e664c"
+    repository = "git clone --recursive git://github.com/ekg/vcflib.git"
+    def _fix_tabixpp_library_order(env):
+        sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+    _get_install(repository, env,
+                 _make_copy("find -perm -100 -type f -name 'vcf*'"
+                            " | grep -v '.sh$' | grep -v '.r$'"),
+                 post_unpack_fn=_fix_tabixpp_library_order,
+                 revision=version)
+
+@_if_not_installed("bamtools")
+def install_bamtools(env):
+    """command-line toolkit for working with BAM data
+    https://github.com/pezmaster31/bamtools
+    """
+    version = "3fe66b9"
+    repository = "git clone --recursive git://github.com/pezmaster31/bamtools.git"
+    def _cmake_bamtools(env):
+        run("mkdir build")
+        with cd("build"):
+            run("cmake ..")
+            run("make")
+        env.safe_sudo("cp bin/* %s" % shared._get_bin_dir(env))
+        env.safe_sudo("cp lib/* %s" % shared._get_lib_dir(env))
+    _get_install(repository, env, _cmake_bamtools,
+                 revision=version)
+
+@_if_not_installed("ogap")
+def install_ogap(env):
+    """gap opening realigner for BAM data streams
+    https://github.com/ekg/ogap
+    """
+    version = "652c525"
+    repository = "git clone --recursive git://github.com/ekg/ogap.git"
+    _get_install(repository, env, _make_copy("ls ogap"),
+                 revision=version)
 
 def _install_samtools_libs(env):
     repository = "svn co --non-interactive " \
@@ -580,7 +658,7 @@ def _install_boost(env):
     thread_lib = "libboost_thread.so.%s" % version
     final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
     if (not exists(boost_version_file) or not contains(boost_version_file, check_version)
-        or not exists(final_thread_lib)):
+            or not exists(final_thread_lib)):
         _get_install(url, env, _boost_build)
         orig_lib = os.path.join(boost_dir, "lib", thread_lib)
         if not exists(final_thread_lib):
@@ -591,7 +669,7 @@ def _cufflinks_configure_make(env):
     need_eigen = "%s/include/eigen3/include" % env.system_install
     if not exists(need_eigen):
         env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
-    run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
+    run("./configure --disable-werror --prefix=%s --with-eigen=%s"
         % (env.system_install, orig_eigen))
     #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
     #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
@@ -612,7 +690,7 @@ def SRC_install_tophat(env):
 
 @_if_not_installed("cufflinks")
 def SRC_install_cufflinks(env):
-    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
     _install_samtools_libs(env)
@@ -636,7 +714,7 @@ def install_tophat(env):
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
-    """Cufflinks assembles transcripts, estimates their abundances, and tests for differential expression and regulation in RNA-Seq samples.
+    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
     default_version = "2.0.2"
@@ -753,7 +831,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.0.6"
+    version = "0.0.8"
     url = "https://s3.amazonaws.com/bcbio.variation/" \
           "bcbio.variation-%s-standalone.jar" % version
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
@@ -794,11 +872,9 @@ def install_lumpy(env):
     """a general probabilistic framework for structural variant discovery
     https://github.com/arq5x/lumpy-sv
     """
-    version = "github"
+    version = "8978e209c1"
     repository = "git clone git://github.com/arq5x/lumpy-sv.git"
-    _get_install(repository, env, _make_copy("ls -1 bin/*"))
-    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
-                 post_unpack_fn=clean_libs)
+    _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):

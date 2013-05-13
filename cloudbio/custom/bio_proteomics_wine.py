@@ -29,7 +29,9 @@ def install_multiplierz(env):
 
 
 def install_proteowizard(env):
-    url = "http://teamcity.labkey.org:8080/repository/download/bt36/75846:id/pwiz-bin-windows-x86-vc100-release-3_0_4309.tar.bz2?guest=1"
+    build_id = "83083"
+    version = "3_0_4472"
+    url = "http://teamcity.labkey.org:8080/repository/download/bt36/%s:id/pwiz-bin-windows-x86-vc100-release-%s.tar.bz2?guest=1" % (build_id, version)
     install_dir = env.get("install_dir")
     share_dir = "%s/share/proteowizard" % install_dir
     with _make_tmp_dir() as work_dir:

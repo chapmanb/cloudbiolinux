@@ -1,0 +1,21 @@
+[submodule "config/puppet/modules/apache"]
+	path = config/puppet/modules/apache
+	url = git://github.com/puppetlabs/puppetlabs-apache.git
+[submodule "config/puppet/modules/concat"]
+	path = config/puppet/modules/concat
+	url = git://github.com/puppetlabs/puppetlabs-concat.git
+[submodule "config/puppet/modules/firewall"]
+	path = config/puppet/modules/firewall
+	url = git://github.com/puppetlabs/puppetlabs-firewall.git
+[submodule "config/puppet/modules/stdlib"]
+	path = config/puppet/modules/stdlib
+	url = git://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "config/puppet/modules/vcsrepo"]
+	path = config/puppet/modules/vcsrepo
+	url = git://github.com/puppetlabs/puppetlabs-vcsrepo.git
+[submodule "config/puppet/modules/biocloudcentral"]
+	path = config/puppet/modules/biocloudcentral
+	url = git://github.com/bioconfig/puppet-biocloudcentral.git
+[submodule "config/puppet/modules/python"]
+	path = config/puppet/modules/python
+	url = git://github.com/bioconfig/puppet-python.git

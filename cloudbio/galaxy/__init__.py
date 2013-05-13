@@ -331,6 +331,9 @@ def _setup_xvfb(env):
     _setup_conf_file(env, "/etc/default/xvfb", "xvfb_default", default_source="xvfb_default")
     _setup_simple_service("xvfb")
     env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")
+    display_export = "-v DIPSLAY=:42"
+    _add_to_profiles(display_export, profiles=["/home/%s/.sge_request" % env.get("galaxy_user", "galaxy")])
+
 
 
 def _setup_nginx_service(env):

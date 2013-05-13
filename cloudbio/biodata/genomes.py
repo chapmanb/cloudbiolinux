@@ -299,7 +299,7 @@ def _get_genomes(config_source):
     genomes = []
     genomes_config = config["genomes"] or []
     env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"\
-        .format(config_source, ', '.join(g['name'] for g in genomes_config)))
+        .format(config_source, ', '.join(g.get('name', g["dbkey"]) for g in genomes_config)))
     for g in genomes_config:
         ginfo = None
         for info in GENOMES_SUPPORTED:
@@ -627,6 +627,9 @@ def _download_genomes(genomes, genome_indexes):
             with cd(org_dir):
                 if not exists(idx):
                     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
+                    # Remove any preexisting, potentially truncated files
+                    if exists(os.path.basename(url)):
+                        run("rm -f %s" % os.path.basename(url))
                     run("wget --no-check-certificate %s" % url)
                     run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
                     run("rm -f %s" % os.path.basename(url))
@@ -655,12 +658,13 @@ def _upload_genomes(genomes, genome_indexes):
 def _upload_to_s3(tarball, bucket):
     """Upload the genome tarball to s3.
     """
-    upload_script = os.path.join(os.path.dirname(__file__), "utils", "s3_multipart_upload.py")
+    upload_script = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
+                                 "utils", "s3_multipart_upload.py")
     s3_key_name = os.path.join("genomes", os.path.basename(tarball))
     if not bucket.get_key(s3_key_name):
         gb_size = int(run("du -sm %s" % tarball).split()[0]) / 1000.0
         print "Uploading %s %.1fGb" % (s3_key_name, gb_size)
-        cl = ["python2.6", upload_script, tarball, bucket.name, s3_key_name, "--public"]
+        cl = ["python", upload_script, tarball, bucket.name, s3_key_name, "--public"]
         subprocess.check_call(cl)
 
 def _tar_directory(dir, tar_name):

@@ -1,0 +1,10 @@
+minimal:
+biocloudcentral:
+  # Idea is still being developed, I wonder if actually defining a puppet class
+  # like cloudbiolinux::biocloudcentral that in turn brings in these classes might
+  # be a better idea.
+  - "concat::setup" # Required for apache
+  - "apache"
+  - "apache::mod::wsgi"
+  - "biocloudcentral"
+  - "biocloudcentral::apache"

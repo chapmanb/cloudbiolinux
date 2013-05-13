@@ -10,6 +10,11 @@ from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
+try:
+    quiet
+except NameError:
+    def quiet():
+        return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
@@ -36,7 +41,7 @@ def _if_not_installed(pname):
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = run(pname)
+        result = env.safe_run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
     return result.return_code == 127
 
 
@@ -58,8 +63,7 @@ def _if_not_python_lib(library):
         functools.wraps(func)
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
-                pyver = env.python_version_ext if env.has_key("python_version_ext") else ""
-                result = run("python%s -c 'import %s'" % (pyver, library))
+                result = env.safe_run("%s -c 'import %s'" % (_python_cmd(env), library))
             if result.failed:
                 return func(*args, **kwargs)
         return decorator
@@ -67,16 +71,17 @@ def _if_not_python_lib(library):
 
 @contextmanager
 def _make_tmp_dir():
-    tmp_dir = run("echo $TMPDIR").strip()
-    if not tmp_dir:
-        home_dir = run("echo $HOME")
+    with quiet():
+        tmp_dir = env.safe_run_output("echo $TMPDIR")
+    if tmp_dir.failed or not tmp_dir.strip():
+        home_dir = env.safe_run_output("echo $HOME")
         tmp_dir = os.path.join(home_dir, "tmp")
-    work_dir = os.path.join(tmp_dir, "cloudbiolinux")
-    if not exists(work_dir):
-        run("mkdir -p %s" % work_dir)
+    work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
+    if not env.safe_exists(work_dir):
+        env.safe_run("mkdir -p %s" % work_dir)
     yield work_dir
-    if exists(work_dir):
-        run("rm -rf %s" % work_dir)
+    if env.safe_exists(work_dir):
+        env.safe_run("rm -rf %s" % work_dir)
 
 # -- Standard build utility simplifiers
 
@@ -99,7 +104,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     replace_try = ["", "-src", "_core"]
     for replace in replace_try:
         check = dir_name.replace(replace, "")
-        if exists(check):
+        if env.safe_exists(check):
             return check
     # still couldn't find it, it's a nasty one
     for check_part in (dir_name.split("-")[0].split("_")[0],
@@ -108,30 +113,35 @@ def _safe_dir_name(dir_name, need_dir=True):
                        dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            dirs = run("ls -d1 *%s*/" % check_part).split("\n")
+            dirs = env.safe_run_output("ls -d1 *%s*/" % check_part).split("\n")
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
-        if len(dirs) == 1:
+        if len(dirs) == 1 and dirs[0]:
             return dirs[0]
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _fetch_and_unpack(url, need_dir=True, dir_name=None):
+def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
-        if exists(base):
+        if env.safe_exists(base):
             env.safe_sudo("rm -rf {0}".format(base))
-        run(url)
+        env.safe_run(url)
+        if revision:
+            if url.startswith("git"):
+                env.safe_run("cd %s && git checkout %s" % (base, revision))
+            else:
+                raise ValueError("Need to implement revision retrieval for %s" % url.split()[0])
         return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name)
-        if not exists(tar_file):
-            run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
-        run("%s %s" % (tar_cmd, tar_file))
+        if not env.safe_exists(tar_file):
+            env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
+        env.safe_run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
 def _configure_make(env):
-    run("./configure --disable-werror --prefix=%s " % env.system_install)
-    run("make")
+    env.safe_run("./configure --disable-werror --prefix=%s " % env.system_install)
+    env.safe_run("make")
     env.safe_sudo("make install")
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
@@ -139,23 +149,23 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if premake_cmd:
             premake_cmd()
         if do_make:
-            run("make")
+            env.safe_run("make")
         if find_cmd:
             install_dir = _get_bin_dir(env)
-            for fname in run(find_cmd).split("\n"):
+            for fname in env.safe_run_output(find_cmd).split("\n"):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
-def _get_install(url, env, make_command, post_unpack_fn=None):
+def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None):
     """Retrieve source from a URL and install in our system directory.
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            dir_name = _fetch_and_unpack(url)
-            with cd(dir_name):
-                if post_unpack_fn:
-                    post_unpack_fn(env)
-                make_command(env)
+            dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name)
+        with cd(os.path.join(work_dir, dir_name)):
+            if post_unpack_fn:
+                post_unpack_fn(env)
+            make_command(env)
 
 def _get_install_local(url, env, make_command, dir_name=None,
                        post_unpack_fn=None):
@@ -205,20 +215,38 @@ def _java_install(pname, version, url, env, install_fn=None):
                     else:
                         env.safe_sudo("mv *.jar %s" % install_dir)
 
+def _python_cmd(env):
+    """Retrieve python command, handling tricky situations on CentOS.
+    """
+    if env.has_key("python_version_ext") and env.python_version_ext:
+        major, minor = run("python --version").split()[-1].split(".")[:2]
+        check_major, check_minor = env.python_version_ext.split(".")[:2]
+        if major != check_major or int(check_minor) > int(minor):
+            return "python%s" % env.python_version_ext
+        else:
+            return "python"
+    else:
+        return "python"
+
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
+    to_check = ["pip"]
     if env.has_key("pip_cmd") and env.pip_cmd:
-        return env.pip_cmd
-    elif not env.use_sudo:
-        return os.path.join(env.system_install, "bin", "pip")
-    elif env.has_key("python_version_ext") and env.python_version_ext:
-        return "pip-{0}".format(env.python_version_ext)
-    else:
-        return "pip"
+        to_check.append(env.pip_cmd)
+    if not env.use_sudo:
+        to_check.append(os.path.join(env.system_install, "bin", "pip"))
+    if env.has_key("python_version_ext") and env.python_version_ext:
+        to_check.append("pip-{0}".format(env.python_version_ext))
+    for cmd in to_check:
+        with quiet():
+            pip_version = run("%s --version" % cmd)
+        if pip_version.succeeded:
+            return cmd
+    raise ValueError("Could not find pip installer from: %s" % to_check)
 
 def _python_make(env):
-    env.safe_sudo("%s install --upgrade `pwd`" % _pip_cmd(env))
+    env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
@@ -253,7 +281,6 @@ def _write_to_file(contents, path, mode):
     finally:
         os.unlink(local_path)
 
-
 def _get_bin_dir(env):
     """
     When env.system_install is /usr this exists, but in the Galaxy
@@ -272,10 +299,9 @@ def _get_lib_dir(env):
 
 def _get_install_subdir(env, subdir):
     path = os.path.join(env.system_install, subdir)
-    if not exists(path):
+    if not env.safe_exists(path):
         env.safe_sudo("mkdir -p '%s'" % path)
     return path
-
 
 def _set_default_config(env, install_dir, sym_dir_name="default"):
     """
@@ -418,8 +444,32 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
     # First make sure virtualenv-burrito is installed
     install_venvburrito()
     activate_vburrito = ". $HOME/.venvburrito/startup.sh"
-    if venv_name in run("{0}; lsvirtualenv | grep {1} || true"
-        .format(activate_vburrito, venv_name)):
+    with prefix(activate_vburrito):
+        print env
+        if "venv_directory" not in env:
+            _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+        else:
+            _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+
+
+def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
+    """
+    Use virtualenv directly to setup virtualenv in specified directory.
+    """
+    venv_directory = env.get("venv_directory")
+    if not exists(venv_directory):
+        if reqs_url:
+                env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+        env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
+        env.safe_sudo(". %s/bin/activate; pip install -r '%s'" % (venv_directory, reqs_file))
+
+
+def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
+    """
+    Use mkvirtualenv to setup this virtualenv globally for user.
+    """
+    if venv_name in run("lsvirtualenv | grep {0} || true"
+        .format(venv_name)):
         env.logger.info("Virtualenv {0} already exists".format(venv_name))
     else:
         with _make_tmp_dir():
@@ -432,7 +482,7 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
                 cmd = "mkvirtualenv {0}".format(venv_name)
             if reqs_url:
                 run("wget --output-document=%s %s" % (reqs_file, reqs_url))
-            run("{0}; {1}".format(activate_vburrito, cmd))
+            run(cmd)
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
 
 

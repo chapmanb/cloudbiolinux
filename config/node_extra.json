@@ -1,0 +1,4 @@
+// Properties used by chef to configure node. Merged with fabric
+// properties to produce final node.json file used by Chef.
+{
+}

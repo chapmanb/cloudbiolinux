@@ -11,6 +11,7 @@ cran:
  - bitops
  - boot
  - car
+ - caret
  - caTools
  - chron
  - class
@@ -23,6 +24,7 @@ cran:
  - devtools
  - digest
  - effects
+ - FactoMineR
  - flashClust
  - foreign
  - gdata
@@ -84,6 +86,7 @@ cran:
  - testthat
  - vegan
  - vgam
+ - VennDiagram 
  - vr
  - XML
  - xtable
@@ -172,6 +175,7 @@ bioc:
  - MEDIPS
  - multtest
  - MotIV
+ - mzR
  - oneChannelGUI
  #- org.At.tair.db
  #- org.Ce.eg.db
@@ -211,4 +215,5 @@ bioc:
  - VariantAnnotation
  - vsn
  - widgetTools
+ - xcms
  - zlibbioc

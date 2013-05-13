@@ -83,14 +83,16 @@ def _update_biolinux_log(env, target, flavor):
         env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
 
 
-def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None):
+def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None,
+                                  ignore_distcheck=False):
     if not fabricrc_loader:
         fabricrc_loader = _parse_fabricrc
 
     _setup_flavor(env, flavor)
     fabricrc_loader(env)
     _setup_edition(env)
-    _setup_distribution_environment()  # get parameters for distro, packages etc.
+    # get parameters for distro, packages etc.
+    _setup_distribution_environment(ignore_distcheck=ignore_distcheck)
     _create_local_paths(env)
 
 
@@ -138,7 +140,7 @@ def _create_local_paths(env):
         # This is the first point we call into a remote host - make sure
         # it does not fail silently by calling a dummy run
         env.logger.info("Now, testing connection to host...")
-        test = run("pwd")
+        test = env.safe_run("pwd")
         # If there is a connection failure, the rest of the code is (sometimes) not
         # reached - for example with Vagrant the program just stops after above run
         # command.
@@ -147,9 +149,11 @@ def _create_local_paths(env):
         else:
             raise NotImplementedError("Connection to host failed")
         env.logger.debug("Expand paths")
-        if env.has_key("local_install"):
-            if not exists(env.local_install):
-                run("mkdir -p %s" % env.local_install)
+        if "local_install" in env:
+            if not env.safe_exists(env.local_install):
+                env.safe_sudo("mkdir -p %s" % env.local_install)
+                user = env.safe_run("echo $USER")
+                env.safe_sudo("chown -R %s %s" % (user, env.local_install))
             with cd(env.local_install):
-                result = run("pwd")
+                result = env.safe_run("pwd")
                 env.local_install = result

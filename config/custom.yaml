@@ -18,25 +18,23 @@ bio_nextgen:
     - snap
     - stampy
   utilitites:
+    - bamtools
     - bedtools
     - cram
     - dwgsim
     - fastqc
     - fastx_toolkit
+    - ogap
     # - solexaqa
     - varianttools
     - vcftools
   analysis:
     - cufflinks
     # - echo # build problems on ubuntu 12.10
-    - freebayes
-    - gatk
-    - gatk_queue
     - picard
     - samtools
     - sambamba
     - shrec
-    - snpeff
     - tophat
     - vep
   assembly:
@@ -51,10 +49,16 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - crisp
+    - freebayes
+    - gatk
     - gemini
+    - grabix
+    - tabix
     - tassel
+    - snpeff
     - stacks
     - varscan
+    - vcflib
   chip:
     - macs
   needs_64bit:
@@ -86,7 +90,7 @@ galaxy:
   - galaxy_webapp
   - galaxy_tools
 galaxyp:
-  - protk
+  - protkgem
   - protvis
   - proteomics_tools
 distributed:

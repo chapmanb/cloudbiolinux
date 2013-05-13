@@ -39,6 +39,7 @@ pypi:
   # science
   - biopython
   - bcbio-nextgen
+  - cutadapt
   - ruffus
   #- cogent
   - DendroPy
