@@ -27,9 +27,9 @@ applications:
   mayu: "1.06"
   pepnovo: "20120423"
   ipig: "r5"
-  searchgui: "1.13.0"
+  searchgui: "1.13.1"
   peptide_shaker: 
-    - version: "0.20.0"
+    - version: "0.20.1"
       env_vars:
         # If DISPLAY set keep it the same, otherwise use XVFB
         DISPLAY: "$${DISPLAY:-:42}"
