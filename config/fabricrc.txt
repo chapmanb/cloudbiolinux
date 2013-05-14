@@ -89,6 +89,10 @@ data_files = /mnt/biodata
 # Location of Galaxy's .loc files
 #galaxy_loc_files = /mnt/biodata/galaxy/galaxy-data
 
+# Location of files required by Galaxy Trackster
+# This path needs to match what will be set in Galaxy's universe_wsgi.ini
+#galaxy_len_files = /mnt/galaxy/configuration_data/len
+
 # Galaxy requires Java tools to have their jar files places in a specific
 # directory, so specify it here.
 #galaxy_jars_dir = /mnt/galaxyTools/galaxy-central/tool-data/shared/jars
@@ -124,7 +128,7 @@ data_files = /mnt/biodata
 picard_home = /usr/share/java/picard
 
 # -- novnc configuration options
-# Configure novnc along with CloudMan, disabled 
+# Configure novnc along with CloudMan, disabled
 # by default for now.
 #configure_novnc = False
 # Where to install novnc
