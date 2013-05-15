@@ -28,9 +28,9 @@ def _setup_users(env):
         """ Add user with username to the system """
         if not contains('/etc/passwd', "%s:" % username):
             uid_str = "--uid %s" % uid if uid else ""
-            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' \
-                 '-c"Galaxy-required user" %s --user-group %s' % \
-                     (username, uid_str, username))
+            sudo('useradd -d /home/%s --create-home --shell /bin/bash '
+                 '-c"Galaxy-required user" %s --user-group %s' %
+                 (username, uid_str, username))
     # Must specify uid for 'galaxy' user because of the
     # configuration for proFTPd
     _add_user('galaxy', '1001')
@@ -83,8 +83,9 @@ def _install_galaxy(env):
     setup_service = _read_boolean(env, "galaxy_setup_service", False)
     if setup_service:
         _setup_service(env)
-    _install_tools(env)
     _setup_trackster(env)
+    _setup_shed_tools_dir(env)
+    _install_tools(env)
     setup_xvfb = _read_boolean(env, "galaxy_setup_xvfb", False)
     if setup_xvfb:
         _setup_xvfb(env)
@@ -104,8 +105,8 @@ def _clone_galaxy_repo(env):
     galaxy_exists = False
     if exists(env.galaxy_home):
         if exists(os.path.join(env.galaxy_home, '.hg')):
-            env.logger.warning("Galaxy install dir {0} exists and seems to have " \
-                "a Mercurial repository already there. Galaxy already installed?"\
+            env.logger.warning("Galaxy install dir {0} exists and seems to have "
+                "a Mercurial repository already there. Galaxy already installed?"
                 .format(env.galaxy_home))
             galaxy_exists = True
     else:
@@ -183,8 +184,8 @@ def _galaxy_db_exists(env):
                 started = True
         # Check if galaxy DB already exists
         if 'galaxy' in sudo("{0} -P pager --list | grep {1} || true".format(c['psql_cmd'],
-            c['galaxy_db_name']), user=c['psql_user']):
-            env.logger.warning("Galaxy database {0} already exists in {1}! Not creating it."\
+           c['galaxy_db_name']), user=c['psql_user']):
+            env.logger.warning("Galaxy database {0} already exists in {1}! Not creating it."
                 .format(c['galaxy_db_name'], c['psql_data_dir']))
             db_exists = True
         if started:
@@ -279,6 +280,13 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
             contents = "[app:main]\n%s=%s" % (key, value)
             _write_to_file(contents, conf_file, 0700)
             _chown_galaxy(env, conf_file)
+
+
+def _setup_shed_tools_dir(env):
+    ts_dir = "%s/../shed_tools" % env.galaxy_home
+    if not exists(ts_dir):
+        _make_dir_for_galaxy(env, ts_dir)
+        env.logger.info("Setup Tool Shed directory {0}".format(ts_dir))
 
 
 def _setup_trackster(env):
@@ -515,3 +523,8 @@ def _postgres_running(env):
     if 'no server running' in sudo("{0} status || true".format(c['pg_ctl_cmd']), user=c['psql_user']):
         return False
     return True
+
+
+def _make_dir_for_galaxy(env, path):
+    sudo("mkdir -p '%s'" % path)
+    _chown_galaxy(env, path)
