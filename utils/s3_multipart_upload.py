@@ -6,6 +6,9 @@ box images we need to use boto's multipart file support.
 
 This parallelizes the task over available cores using multiprocessing.
 
+It checks for an up to date version of the file remotely, skipping transfer
+if found.
+
 Usage:
   s3_multipart_upload.py <file_to_transfer> <bucket_name> [<s3_key_name>]
     if <s3_key_name> is not specified, the filename will be used.
@@ -25,6 +28,7 @@ import functools
 import multiprocessing
 from multiprocessing.pool import IMapIterator
 from optparse import OptionParser
+import rfc822
 
 import boto
 
@@ -36,6 +40,10 @@ def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
     bucket = conn.lookup(bucket_name)
     if bucket is None:
         bucket = conn.create_bucket(bucket_name)
+    if s3_has_uptodate_file(bucket, transfer_file, s3_key_name):
+        print "S3 has up to date version of %s in %s. Not transferring." % \
+            (s3_key_name, bucket.name)
+        return
     mb_size = os.path.getsize(transfer_file) / 1e6
     if mb_size < 50:
         _standard_transfer(bucket, s3_key_name, transfer_file, use_rr)
@@ -45,6 +53,18 @@ def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
     s3_key = bucket.get_key(s3_key_name)
     if make_public:
         s3_key.set_acl("public-read")
+
+def s3_has_uptodate_file(bucket, transfer_file, s3_key_name):
+    """Check if S3 has an existing, up to date version of this file.
+    """
+    s3_key = bucket.get_key(s3_key_name)
+    if s3_key:
+        s3_size = s3_key.size
+        local_size = os.path.getsize(transfer_file)
+        s3_time = rfc822.mktime_tz(rfc822.parsedate_tz(s3_key.last_modified))
+        local_time = os.path.getmtime(transfer_file)
+        return s3_size == local_size and s3_time >= local_time
+    return False
 
 def upload_cb(complete, total):
     sys.stdout.write(".")

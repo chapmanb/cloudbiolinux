@@ -49,7 +49,8 @@ def _build_class_include(env, class_name):
     for name, value in env.iteritems():
         if name.startswith(property_prefix):
             property_name = name[len(property_prefix):]
-            include_def += "  %s => '%s',\n" % (property_name, value)
+            if not property_name.startswith("_"):  # else subclass property
+                include_def += "  %s => '%s',\n" % (property_name, value)
     include_def += "\n}"
     return include_def
 

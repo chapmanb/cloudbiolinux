@@ -91,14 +91,13 @@ def install_openms(env):
 
 @_if_not_installed("LTQ-iQuant")
 def install_tint_proteomics_scripts(env):
-    default_version = "1.19.14"
+    default_version = "1.19.19"
     version = env.get("tool_version", default_version)
     url = "http://artifactory.msi.umn.edu/simple/ext-release-local/msi/umn/edu/tint-proteomics-scripts/%s/tint-proteomics-scripts-%s.zip" % (version, version)
 
     def install_fn(env, install_dir):
         env.safe_sudo("mv * '%s'" % install_dir)
-        bin_dir = os.path.join(env.get("system_install"), "bin")
-        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        bin_dir = _get_bin_dir(env)
         for script in ["ITraqScanSummarizer", "LTQ-iQuant", "LTQ-iQuant-cli", "MgfFormatter"]:
             env.safe_sudo("ln -s '%s' %s" % (os.path.join(install_dir, script), bin_dir))
         env.safe_sudo("chmod +x '%s'/*" % bin_dir)
@@ -142,7 +141,7 @@ def install_mzmine(env):
 
 @_if_not_installed("SearchGUI")
 def install_searchgui(env):
-    default_version = "1.12.2"
+    default_version = "1.13.0"
     version = env.get("tool_version", default_version)
     url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
 
@@ -183,7 +182,7 @@ def install_psm_eval(env):
 
 @_if_not_installed("PeptideShaker")
 def install_peptide_shaker(env):
-    default_version = "0.19.3"
+    default_version = "0.20.0"
     version = env.get("tool_version", default_version)
     url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
 
@@ -303,7 +302,7 @@ def install_percolator(env):
 def install_pepnovo(env):
     default_version = "20120423"
     version = env.get("tool_version", default_version)
-    url = "http://proteomics.ucsd.edu/Downloads/PepNovo.20120423.zip"
+    url = "http://proteomics.ucsd.edu/Downloads/PepNovo.%s.zip" % version
 
     def install_fn(env, install_dir):
         with cd("src"):
@@ -314,6 +313,20 @@ def install_pepnovo(env):
             env.safe_sudo("cp -r '../Models' '%s/share/pepnovo'" % env.system_install)
 
     _unzip_install("pepnovo", version, url, env, install_fn)
+
+
+@_if_not_installed("crux")
+def install_crux(env):
+    default_version = "1.39"
+    version = env.get("tool_version", default_version)
+    url = "http://noble.gs.washington.edu/proj/crux/download/crux_%s-x86_64-Linux.zip" % version
+
+    def _move(env):
+        bin_dir = _get_bin_dir(env)
+        env.safe_sudo("mv bin/* '%s'" % (bin_dir, bin_dir))
+
+    _get_install(url, env, _move)
+
 
 @_if_not_installed("Fido")
 def install_fido(env):

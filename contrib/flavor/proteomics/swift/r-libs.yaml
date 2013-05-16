@@ -1,0 +1,10 @@
+---
+# Configuration file defining R specific libraries that are installed 
+# via CRAN and Bioconductor.
+cranrepo: http://watson.nci.nih.gov/cran_mirror/
+cran:
+ - caTools
+ - gam
+ - png
+ - bitops
+ - akima

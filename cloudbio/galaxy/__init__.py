@@ -11,7 +11,7 @@ from fabric.contrib.files import exists, contains, sed, append
 from fabric.colors import red
 
 from cloudbio.custom.shared import (_write_to_file, _setup_conf_file,
-                                    _setup_simple_service,  _make_tmp_dir,
+                                    _setup_simple_service, _make_tmp_dir,
                                     _add_to_profiles)
 from cloudbio.galaxy.tools import _install_tools
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean, _dir_is_empty
@@ -28,9 +28,9 @@ def _setup_users(env):
         """ Add user with username to the system """
         if not contains('/etc/passwd', "%s:" % username):
             uid_str = "--uid %s" % uid if uid else ""
-            sudo('useradd -d /home/%s --create-home --shell /bin/bash ' \
-                 '-c"Galaxy-required user" %s --user-group %s' % \
-                     (username, uid_str, username))
+            sudo('useradd -d /home/%s --create-home --shell /bin/bash '
+                 '-c"Galaxy-required user" %s --user-group %s' %
+                 (username, uid_str, username))
     # Must specify uid for 'galaxy' user because of the
     # configuration for proFTPd
     _add_user('galaxy', '1001')
@@ -63,6 +63,8 @@ def _setup_galaxy_env_defaults(env):
         env.galaxy_data_mount = "/mnt/galaxyData"
     if "galaxy_init_database" not in env:
         env.galaxy_init_database = False
+    if "galaxy_len_files" not in env:
+        env.galaxy_len_files = "/mnt/galaxy/configuration_data/len"
 
 
 def _install_galaxy(env):
@@ -81,6 +83,8 @@ def _install_galaxy(env):
     setup_service = _read_boolean(env, "galaxy_setup_service", False)
     if setup_service:
         _setup_service(env)
+    _setup_trackster(env)
+    _setup_shed_tools_dir(env)
     _install_tools(env)
     setup_xvfb = _read_boolean(env, "galaxy_setup_xvfb", False)
     if setup_xvfb:
@@ -101,8 +105,8 @@ def _clone_galaxy_repo(env):
     galaxy_exists = False
     if exists(env.galaxy_home):
         if exists(os.path.join(env.galaxy_home, '.hg')):
-            env.logger.warning("Galaxy install dir {0} exists and seems to have " \
-                "a Mercurial repository already there. Galaxy already installed?"\
+            env.logger.warning("Galaxy install dir {0} exists and seems to have "
+                "a Mercurial repository already there. Galaxy already installed?"
                 .format(env.galaxy_home))
             galaxy_exists = True
     else:
@@ -180,8 +184,8 @@ def _galaxy_db_exists(env):
                 started = True
         # Check if galaxy DB already exists
         if 'galaxy' in sudo("{0} -P pager --list | grep {1} || true".format(c['psql_cmd'],
-            c['galaxy_db_name']), user=c['psql_user']):
-            env.logger.warning("Galaxy database {0} already exists in {1}! Not creating it."\
+           c['galaxy_db_name']), user=c['psql_user']):
+            env.logger.warning("Galaxy database {0} already exists in {1}! Not creating it."
                 .format(c['galaxy_db_name'], c['psql_data_dir']))
             db_exists = True
         if started:
@@ -278,6 +282,29 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
             _chown_galaxy(env, conf_file)
 
 
+def _setup_shed_tools_dir(env):
+    ts_dir = "%s/../shed_tools" % env.galaxy_home
+    if not exists(ts_dir):
+        _make_dir_for_galaxy(env, ts_dir)
+        env.logger.info("Setup Tool Shed directory {0}".format(ts_dir))
+
+
+def _setup_trackster(env):
+    """
+    Download .len files required by Trackster:
+    http://wiki.galaxyproject.org/Learn/Visualization#Setup_for_Local_Instances
+    """
+    if not exists(env.galaxy_len_files):
+        sudo("mkdir -p {0}".format(env.galaxy_len_files))
+    with cd(env.galaxy_len_files):
+        local_fn = "len-files.tar.gz"
+        sudo('wget --output-document={0} '
+             'https://s3.amazonaws.com/usegalaxy/len-files.tar.gz'.format(local_fn))
+        sudo("tar xzf {0}".format(local_fn))
+        sudo("rm {0}".format(local_fn))
+    _chown_galaxy(env, env.galaxy_len_files)
+
+
 def _configure_galaxy_repository(env):
     """
     Custom-configure Galaxy repository. This is primarily targeted at a cloud
@@ -333,7 +360,6 @@ def _setup_xvfb(env):
     env.safe_sudo("mkdir /var/lib/xvfb; chown root:root /var/lib/xvfb; chmod 0755 /var/lib/xvfb")
     display_export = "-v DIPSLAY=:42"
     _add_to_profiles(display_export, profiles=["/home/%s/.sge_request" % env.get("galaxy_user", "galaxy")])
-
 
 
 def _setup_nginx_service(env):
@@ -497,3 +523,8 @@ def _postgres_running(env):
     if 'no server running' in sudo("{0} status || true".format(c['pg_ctl_cmd']), user=c['psql_user']):
         return False
     return True
+
+
+def _make_dir_for_galaxy(env, path):
+    sudo("mkdir -p '%s'" % path)
+    _chown_galaxy(env, path)
