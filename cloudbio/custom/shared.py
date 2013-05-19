@@ -140,7 +140,9 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
         return _safe_dir_name(dir_name, need_dir)
 
 def _configure_make(env):
-    env.safe_run("./configure --disable-werror --prefix=%s " % env.system_install)
+    env.safe_run("export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:%s/lib/pkgconfig && " \
+                 "./configure --disable-werror --prefix=%s " %
+                 (env.system_install, env.system_install))
     env.safe_run("make")
     env.safe_sudo("make install")
 
@@ -192,8 +194,13 @@ def _get_install_local(url, env, make_command, dir_name=None,
 
 # --- Language specific utilities
 
-def _symlinked_java_version_dir(pname, version, env):
-    base_dir = os.path.join(env.system_install, "share", "java", pname)
+def _symlinked_shared_dir(pname, version, env, extra_dir=None):
+    """Create a symlinked directory of files inside the shared environment.
+    """
+    if extra_dir:
+        base_dir = os.path.join(env.system_install, "share", extra_dir, pname)
+    else:
+        base_dir = os.path.join(env.system_install, "share", pname)
     install_dir = "%s-%s" % (base_dir, version)
     if not exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
@@ -202,6 +209,9 @@ def _symlinked_java_version_dir(pname, version, env):
         env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
     return None
+
+def _symlinked_java_version_dir(pname, version, env):
+    return _symlinked_shared_dir(pname, version, env, extra_dir="java")
 
 def _java_install(pname, version, url, env, install_fn=None):
     install_dir = _symlinked_java_version_dir(pname, version, env)

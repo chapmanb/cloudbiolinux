@@ -23,6 +23,7 @@ bio_nextgen:
     - cram
     - dwgsim
     - fastqc
+    - fastq_screen
     - fastx_toolkit
     - ogap
     # - solexaqa
@@ -101,6 +102,7 @@ system:
   - s3fs
 python:
   - bx-python
+  - netsa-python
   - rpy
 java:
   - leiningen

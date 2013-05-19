@@ -45,7 +45,7 @@ def install_bowtie(env):
     """The bowtie short read aligner.
     http://bowtie-bio.sourceforge.net/index.shtml
     """
-    default_version = "0.12.9"
+    default_version = "1.0.0"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
           "bowtie-%s-src.zip" % (version, version)
@@ -56,7 +56,7 @@ def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
     http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
-    version = "2.0.5"
+    version = "2.1.0"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
@@ -258,7 +258,7 @@ def install_fastx_toolkit(env):
     """FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing.
     http://hannonlab.cshl.edu/fastx_toolkit/
     """
-    default_version = "0.0.13"
+    default_version = "0.0.13.2"
     version = env.get("tool_version", default_version)
     gtext_version = "0.6"
     url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
@@ -378,6 +378,26 @@ def install_fastqc(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
+@_if_not_installed("fastq_screen")
+def install_fastq_screen(env):
+    """A screening application for high througput sequence data.
+    http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/
+    """
+    version = "0.4"
+    url = "http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/" \
+          "fastq_screen_v%s.tar.gz" % version
+    install_dir = shared._symlinked_shared_dir("fastqc_screen", version, env)
+    executable = "fastq_screen"
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                env.safe_run("wget %s" % (url))
+                env.safe_run("tar -xzvpf %s" % os.path.basename(url))
+                with cd("fastq_screen_v%s" % version):
+                    env.safe_sudo("mv * %s" % install_dir)
+                env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
+                                                         env.system_install, executable))
+
 @_if_not_installed("bedtools")
 def install_bedtools(env):
     """A flexible suite of utilities for comparing genomic features.
@@ -439,7 +459,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.86"
+    version = "1.91"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
@@ -705,7 +725,7 @@ def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
-    default_version = "2.0.7"
+    default_version = "2.0.8b"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
@@ -717,7 +737,7 @@ def install_cufflinks(env):
     """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
-    default_version = "2.0.2"
+    default_version = "2.1.1"
     version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/" \
           "cufflinks-%s.Linux_x86_64.tar.gz" % version
