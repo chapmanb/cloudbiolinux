@@ -31,12 +31,14 @@ from optparse import OptionParser
 import rfc822
 
 import boto
+from boto.s3.connection import S3Connection
 
 def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
          make_public=True, cores=None):
     if s3_key_name is None:
         s3_key_name = os.path.basename(transfer_file)
-    conn = boto.connect_s3()
+    calling_format=boto.s3.connection.OrdinaryCallingFormat()
+    conn = boto.connect_s3(calling_format=calling_format)
     bucket = conn.lookup(bucket_name)
     if bucket is None:
         bucket = conn.create_bucket(bucket_name)
