@@ -171,7 +171,7 @@ def install_psm_eval(env):
     url = "git clone https://github.com/jmchilton/psm-eval.git"
 
     def install_fn(env, install_dir):
-        env.safe_sudo("mv psm-eval/* '%s'" % install_dir)
+        env.safe_sudo("cp -r psm-eval/* '%s'" % install_dir)
         _create_python_virtualenv(env, "psme", "%s/requirements.txt" % install_dir)
         bin_dir = os.path.join(env.get("system_install"), "bin")
         env.safe_sudo("mkdir -p '%s'" % bin_dir)
@@ -364,6 +364,22 @@ def install_ipig(env):
         install_cmd("unzip -u %s" % (os.path.split(url)[-1]))
         install_cmd("rm %s" % (os.path.split(url)[-1]))
         install_cmd('chown --recursive %s:%s %s' % (env.galaxy_user, env.galaxy_user, install_dir))
+
+
+def install_peptide_to_gff(env):
+    default_version = "master"
+    version = env.get("tool_version", default_version)
+    repository = "hg clone https://jmchilton@bitbucket.org/galaxyp/peptide_to_gff"
+
+    def install_fn(env, install_dir):
+        env.safe_sudo("cp -r peptide_to_gff/* '%s'" % install_dir)
+        _create_python_virtualenv(env, "peptide_to_gff", "%s/requirements.txt" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' '%s'" % (os.path.join(install_dir, "peptide_to_gff"), os.path.join(bin_dir, "peptide_to_gff")))
+
+    _unzip_install("peptide_to_gff", version, repository, env, install_fn)
+
 
 
 @_if_not_installed("myrimatch")

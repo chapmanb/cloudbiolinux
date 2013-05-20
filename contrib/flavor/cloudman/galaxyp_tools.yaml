@@ -1,5 +1,6 @@
 ---
 applications:
+  peptide_to_gff: "master"
   transproteomic_pipeline: 
     - version: "4.6.2-occupy"
       bin_dirs:
