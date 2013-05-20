@@ -9,13 +9,14 @@ import yaml
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _java_install, _pip_cmd, _python_cmd,
+                    _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir)
 from cloudbio.custom import shared
 
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
+
 
 @_if_not_installed("twoBitToFa")
 def install_ucsc_tools(env):
@@ -31,12 +32,30 @@ def install_ucsc_tools(env):
              "fetchChromSizes", "wigToBigWig", "faSize", "twoBitInfo",
              "twoBitToFa", "faCount"]
     url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/"
+    _download_executables(env, url, tools)
+
+
+@_if_not_installed("blat")
+def install_kent_tools(env):
+    """
+
+    Please note that the Blat source and executables are freely available for
+    academic, nonprofit and personal use. Commercial licensing information is
+    available on the Kent Informatics website (http://www.kentinformatics.com/).
+    """
+    tools = ["blat", "gfClient", "gfServer"]
+    url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/"
+    _download_executables(env, url, tools)
+
+
+def _download_executables(env, base_url, tools):
     install_dir = _get_bin_dir(env)
     for tool in tools:
         with cd(install_dir):
             if not exists(tool):
-                env.safe_sudo("wget %s%s" % (url, tool))
+                env.safe_sudo("wget %s%s" % (base_url, tool))
                 env.safe_sudo("chmod a+rwx %s" % tool)
+
 
 # --- Alignment tools
 
