@@ -85,9 +85,9 @@ def _make_tmp_dir():
 
 # -- Standard build utility simplifiers
 
-def _get_expected_file(url, dir_name=None):
+def _get_expected_file(url, dir_name=None, safe_tar=False):
     tar_file = os.path.split(url.split("?")[0])[-1]
-    safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'"
+    safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'" if safe_tar else ""
     exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
             (".tar",) : "tar %s -xpf" % safe_tar,
             (".tar.bz2",): "tar %s -xjpf" % safe_tar,
@@ -120,7 +120,8 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
+def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
+                      safe_tar=False):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
         if env.safe_exists(base):
@@ -133,7 +134,7 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None):
                 raise ValueError("Need to implement revision retrieval for %s" % url.split()[0])
         return base
     else:
-        tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name)
+        tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar)
         if not env.safe_exists(tar_file):
             env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
         env.safe_run("%s %s" % (tar_cmd, tar_file))
@@ -158,22 +159,24 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
-def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None):
+def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None,
+                 safe_tar=False):
     """Retrieve source from a URL and install in our system directory.
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name)
+            dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name,
+                                         safe_tar=safe_tar)
         with cd(os.path.join(work_dir, dir_name)):
             if post_unpack_fn:
                 post_unpack_fn(env)
             make_command(env)
 
 def _get_install_local(url, env, make_command, dir_name=None,
-                       post_unpack_fn=None):
+                       post_unpack_fn=None, safe_tar=False):
     """Build and install in a local directory.
     """
-    (_, test_name, _) = _get_expected_file(url)
+    (_, test_name, _) = _get_expected_file(url, safe_tar=safe_tar)
     test1 = os.path.join(env.local_install, test_name)
     if dir_name is not None:
         test2 = os.path.join(env.local_install, dir_name)
@@ -184,7 +187,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
     if not exists(test1) and not exists(test2):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                dir_name = _fetch_and_unpack(url, dir_name=dir_name)
+                dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar)
                 if not exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
