@@ -892,7 +892,7 @@ def install_lumpy(env):
     """a general probabilistic framework for structural variant discovery
     https://github.com/arq5x/lumpy-sv
     """
-    version = "8978e209c1"
+    version = "fca4706573"
     repository = "git clone https://github.com/arq5x/lumpy-sv.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
 
