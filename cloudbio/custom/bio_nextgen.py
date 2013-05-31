@@ -490,7 +490,7 @@ def install_gatk(env):
             config["cran"] = ["ggplot2", "gplots"]
             libraries.r_library_installer(config)
             # install gsalib
-            git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
+            git_repo = "git clone --depth 1 https://github.com/broadgsa/gatk.git"
             def install_gsalib(env):
                 env.safe_sudo("ant gsalib")
             _get_install(git_repo, env, install_gsalib)
@@ -547,7 +547,7 @@ def install_grabix(env):
     https://github.com/arq5x/grabix
     """
     version = "fda4d2609"
-    repository = "git clone git://github.com/arq5x/grabix.git"
+    repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=version)
 
@@ -601,7 +601,7 @@ def install_freebayes(env):
     https://github.com/ekg/freebayes
     """
     version = "296a0fa"
-    repository = "git clone --recursive git://github.com/ekg/freebayes.git"
+    repository = "git clone --recursive https://github.com/ekg/freebayes.git"
     def _fix_tabixpp_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
@@ -614,7 +614,7 @@ def install_vcflib(env):
     https://github.com/ekg/vcflib
     """
     version = "06e664c"
-    repository = "git clone --recursive git://github.com/ekg/vcflib.git"
+    repository = "git clone --recursive https://github.com/ekg/vcflib.git"
     def _fix_tabixpp_library_order(env):
         sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env,
@@ -629,7 +629,7 @@ def install_bamtools(env):
     https://github.com/pezmaster31/bamtools
     """
     version = "3fe66b9"
-    repository = "git clone --recursive git://github.com/pezmaster31/bamtools.git"
+    repository = "git clone --recursive https://github.com/pezmaster31/bamtools.git"
     def _cmake_bamtools(env):
         run("mkdir build")
         with cd("build"):
@@ -646,7 +646,7 @@ def install_ogap(env):
     https://github.com/ekg/ogap
     """
     version = "652c525"
-    repository = "git clone --recursive git://github.com/ekg/ogap.git"
+    repository = "git clone --recursive https://github.com/ekg/ogap.git"
     _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
@@ -893,7 +893,7 @@ def install_lumpy(env):
     https://github.com/arq5x/lumpy-sv
     """
     version = "8978e209c1"
-    repository = "git clone git://github.com/arq5x/lumpy-sv.git"
+    repository = "git clone https://github.com/arq5x/lumpy-sv.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
 
 @_if_not_installed("CRISP.py")
