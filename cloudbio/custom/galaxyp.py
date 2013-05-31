@@ -90,7 +90,7 @@ def install_protvis(env):
     env.safe_sudo("sudo apt-get -y --force-yes install libxml2-dev libxslt-dev")
 
     run("rm -rf protvis")
-    run("git clone -b lorikeet git://github.com/jmchilton/protvis.git")
+    run("git clone -b lorikeet https://github.com/jmchilton/protvis.git")
     with cd("protvis"):
         run("git submodule init")
         run("git submodule update")
