@@ -168,7 +168,7 @@ def install_searchgui(env):
 def install_psm_eval(env):
     default_version = "0.1.0"
     version = env.get("tool_version", default_version)
-    url = "git clone git://github.com/jmchilton/psm-eval.git"
+    url = "git clone https://github.com/jmchilton/psm-eval.git"
 
     def install_fn(env, install_dir):
         env.safe_sudo("mv psm-eval/* '%s'" % install_dir)
