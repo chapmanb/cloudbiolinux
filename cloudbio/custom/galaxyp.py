@@ -62,7 +62,7 @@ def install_protkgem(env):
         protk_properties['openms_root'] = "/usr"  # os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
         ### Assumes omssa, blast, and transproteomic_pipeline CBL galaxy installs.
         protk_properties['omssa_root'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
-        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast", "default")
+        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast+", "default")
         protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
         # Other properties: log_file, blast_root
         env.safe_sudo("mkdir -p \"$HOME/.protk\"", user=env.galaxy_user)
