@@ -1,7 +1,7 @@
-from fabric.api import put, cd, run
+from fabric.api import put, cd
 from fabric.contrib.files import exists
 
-from shared import (_make_tmp_dir, _fetch_and_unpack, _get_install, _make_copy, _write_to_file, _get_bin_dir)
+from shared import (_make_tmp_dir, _fetch_and_unpack, _write_to_file, _get_bin_dir)
 
 import os
 
@@ -19,6 +19,8 @@ def install_multiplierz(env):
     in C:\Python26.
     """
     wine_user = _get_wine_user(env)
+
+    install_proteomics_wine_env(env)
     env.safe_sudo("setup_proteomics_wine_env.sh", user=wine_user)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
@@ -39,6 +41,19 @@ def install_proteowizard(env):
             _fetch_and_unpack(url, need_dir=False)
             env.safe_sudo("cp -r . '%s'" % share_dir)
     proteowizard_apps = ["msconvert", "msaccess", "chainsaw", "msdiff", "mspicture", "mscat", "txt2mzml", "MSConvertGUI", "Skyline", "Topograph", "SeeMS"]
+    for app in proteowizard_apps:
+        setup_wine_wrapper(env, "%s/%s" % (share_dir, app))
+
+
+def install_morpheus(env):
+    url = "http://www.chem.wisc.edu/~coon/Downloads/Morpheus/latest/Morpheus.zip"  # TODO:
+    install_dir = env.get("install_dir")
+    share_dir = "%s/share/morpheus" % install_dir
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            _fetch_and_unpack(url, need_dir=False)
+            env.safe_sudo("cp -r Morpheus/* '%s'" % share_dir)
+    proteowizard_apps = ["morpheus_cl.exe", "Morpheus.exe"]
     for app in proteowizard_apps:
         setup_wine_wrapper(env, "%s/%s" % (share_dir, app))
 

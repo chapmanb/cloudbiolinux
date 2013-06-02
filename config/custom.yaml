@@ -82,6 +82,7 @@ bio_proteomics_wine:
   - proteomics_wine_env
   #- multiplierz
   - proteowizard
+  - morpheus
 cloudman:
   - nginx
   - proftpd
