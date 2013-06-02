@@ -26,7 +26,7 @@ def install_transproteomic_pipeline(env):
     """
     """
     ## version should be of form X.X.X-codename
-    default_version = "4.6.2-occupy"
+    default_version = "4.6.1-occupy"
     version = env.get("tool_version", default_version)
     version_parts = re.match("(\d\.\d)\.(\d)-(.*)", version)
     major_version = version_parts.group(1)
@@ -39,11 +39,11 @@ def install_transproteomic_pipeline(env):
     download_version = ("%s%s" % (major_version, download_rev))
     url_pieces = (major_version, codename, revision, download_version)
     url = 'http://sourceforge.net/projects/sashimi/files/Trans-Proteomic Pipeline (TPP)/TPP v%s (%s) rev %s/TPP-%s.tgz' % url_pieces
-    #install_dir = os.path.join(env["system_install"], "bin")
 
     def _chdir_src(work_cmd):
         def do_work(env):
-            with cd("src"):
+            src_dir = "trans_proteomic_pipeline/src" if version == "4.6.1-occupy" else "src"
+            with cd(src_dir):
                 append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
                 append("Makefile.config.incl", "TPP_WEB=/tpp/")
                 append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
