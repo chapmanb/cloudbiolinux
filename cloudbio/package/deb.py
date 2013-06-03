@@ -100,6 +100,8 @@ def _setup_apt_automation():
             "acroread acroread/default-viewer boolean false",
             "rabbitmq-server rabbitmq-server/upgrade_previous note",
             "condor condor/wantdebconf boolean false",
+            "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula boolean true",
+            "ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
