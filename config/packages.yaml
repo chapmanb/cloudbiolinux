@@ -562,6 +562,7 @@ galaxyp:
      - libxml2-dev
      - libreadline-dev
      - libxslt-dev
+     
      # Required for protvis
      - python-virtualenv
      - python-setuptools
@@ -603,6 +604,16 @@ galaxyp:
 
      # Needed  for psm-eval
      - libyaml-dev
+
+     # Needed for RVM
+     - libbison-dev
+     - ncurses-dev 
+     - automake 
+     - libtool  
+     - bison
+     - subversion
+     - libgdbm-dev
+     - libffi-dev
 
 # To do -- in Deb Med but not propogated
 # squizz
