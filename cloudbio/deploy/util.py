@@ -1,7 +1,9 @@
+from string import Template
+from time import strftime
+import os
+
 from fabric.api import local, sudo, env, put, get
 from fabric.contrib.files import exists, append
-
-import os
 
 
 def setup_install_dir():
@@ -10,7 +12,17 @@ def setup_install_dir():
         sudo("mkdir -p %s" % env.install_dir)
     if not exists(env.jars_dir):
         sudo("mkdir -p %s" % env.jars_dir)
+    # TODO: Fix bug here
     chown_galaxy(os.path.split(env.install_dir)[0])
+
+
+def eval_template(env, template_str):
+    props = {
+        "env": env,
+        "the_date": strftime('%Y%m%d'),
+        "the_date_with_time": strftime('%Y%m%d_%H%M%S'),
+    }
+    return Template(template_str).safe_substitute(props)
 
 
 def ensure_can_sudo_into(user):

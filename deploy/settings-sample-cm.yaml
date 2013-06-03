@@ -1,0 +1,121 @@
+---                                                                                                                                                                          
+vm_provider: aws                                                                                                                                                             
+                                                                                                                                                                             
+hostname: cloudman                                                                                                                                                                
+
+fabricrc_overrides:
+  ## CloudBioLinux fabric property overrides
+
+  ## Mercurial repository for Galaxy (default is https://bitbucket.org/galaxy/galaxy-central/)
+  ## e.g. for galaxyp
+  #galaxy_repository: https://bitbucket.org/galaxyp/cloud-galaxyp-central
+
+  # Location to install galaxy
+  galaxy_home: /mnt/galaxy/galaxy-central
+  # Location to setup galaxy tool dependencies
+  galaxy_tools_dir: /mnt/galaxy/tools
+  galaxy_jars_dir: /mnt/galaxy/jars
+
+  # Configure biodata location
+  data_files: "/mnt/galaxyIndices"
+  galaxy_base: "/mnt/galaxyIndices/galaxy"
+
+  galaxy_data_mount: "/mnt/galaxy"
+  galaxy_indices_mount: "/mnt/galaxyIndices"
+
+  galaxy_install_dependencies: True
+
+  # Setup an init service for Galaxy and virtual frame buffer
+  galaxy_setup_xvfb: True
+
+  distribution: ubuntu
+  # UPDATE: Change this if you are targetting quantal or even newer Ubuntu.
+  dist_name: precise
+
+  ## UPDATE: Override tools that galaxy will install, defaults to *cloudbiolinux*/contrib/flavor/cloudman/tools.yaml
+  # galaxy_tools_conf: /home/gxadmin/cloud_manage/tools.yaml
+
+aws:
+  # UPDATE: Path to your galaxy keys file
+  key_file: keys/galaxy1.pem
+  # UPDATE: Set this to the name of the keypair corresponding to the above key_file.
+  keypair_name: "galaxy1"
+  # UPDATE: Set this to you access_id
+  access_id: "XXXXXXXXXXXXXXXXXXXXXX"
+  # UPDATE: Set this to your secret key.
+  secret_key: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  # UPDATE: Set this to the size you want.
+  size_id: "m1.small"
+  # UPDATE: set this to the Ubuntu AMI you would like to target.
+  image_id: ami-9b85eef2 # EBS backed 12.04.2 (64-bit)
+  # UPDATE: Set this to the availability zone to target.
+  availability_zone: us-east-1
+
+  # Create a new instnace on first use, then reuses same instance for subsequent calls.
+  use_existing_instance: __auto__
+
+  ## Packing Options  
+
+  # Use Amazon's create image API, only works with EBS volumes and AWS.
+  package_type: create_image
+
+  # Make new AMI public
+  make_public: True
+
+  # UPDATE: Name to give AMI image.
+  package_image_name: "marys_cloudman_${the_date_with_time}"
+
+volumes:
+  
+  - id: vol-XXXXXXX  # UPDATE with volume id created via AWS console.
+    path: /mnt/galaxyIndices
+    device: /dev/xvdj
+    description: "Galaxy Indices"
+    format: __auto__  # Attempt to auto-format new partitions if needed, deactivate by setting to False.
+
+  - id: vol-XXXXXX  # UPDATE with volume id created via AWS console.
+    path: /mnt/galaxy
+    device: /dev/xvdk
+    description: "Galaxy Tools and Data"
+    format: __auto__  # Attempt to auto-format new partitions if needed, deactivate by setting to False.
+
+
+## CloudMan Options (mostly used after image is created for launching new CloudMan instance)
+cloudman:
+  bucket_source: /home/mary/marys_cloudman_bucket_contents
+
+  ## Id of image containing cloudman to launch
+  ## Can set an AMI here, but __use_snaps__ will look in the local bucket
+  ## contents of bucket_source for a snaps.yaml file and load that AMI instead.
+  image_id: __use_snaps__
+
+  ## Size or flavor id of machine to launch. Defaults to 
+  ## cloud-specific option above.
+  # size_id:
+
+  ## access_key & secret_key to for use by CloudMan. Defaults 
+  ## to access_id & secret_key specified in cloud-spefic options above.
+  # access_key:
+  # secret_key: 
+
+  ## Name of cloudman cluster to create.
+  cluster_name: cloudtest
+
+  ## Password for CloudMan admin interface.
+  # password: adminpass
+
+  user_data:
+    # Update bucket to target.
+    bucket_default: marys_cloudman_bucket
+    # I still contend CloudMan is broken without this option enabled. -John
+    ignore_unsatisfiable_dependencies: True
+    # Disable condor because using Ubuntu Precise, can axe this if using
+    # quantal.
+    condor_enabled: False
+
+# Advanced option sections ignored for CloudMan workflow outlined in cloudman.md
+galaxy:
+
+genomes:
+
+tools:

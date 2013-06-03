@@ -1,0 +1,92 @@
+<h1>CloudBioLinux Deployer CloudMan QuickStart</h1>
+
+<p>As far as I can determine there is no current documentation on how to build
+CloudMan instances from scratch. Thus I am collecting my unofficial notes on
+how to do this here - spefically using the CloudBioLinux deployer.</p>
+
+<p>You will need to navigate the AWS management console and obtain the following
+information.</p>
+
+<ul>
+<li><code>access_id</code></li>
+<li><code>secret_key</code></li>
+<li>Ubuntu EBS-backed AMI ID to target. This writeup was tested with ami-9b85eef2 (12.04.2 (64-bit) in us-east-1)</li>
+<li>Image size to use (e.g. m1-small)</li>
+<li>Availibity zone (e.g. us-east-1)</li>
+<li>You will need to setup a bucket to store your snaps file, here you will need the bucket name.</li>
+<li>You will need to setup two volumes in your target availibity zone, one for
+Galaxy tools and data (perhaps 20Gb for testing) and one for galaxyIndices. Here you will need the volume ids.</li>
+<li>Generate a private a key (e.g. galaxy1.pem) and copy it into keys directory (or anywhere really), 
+also note the keypair_name corresponding to the key.</li>
+</ul>
+
+<p>Create a directory (e.g. <code>/home/mary/marys_cloudman_bucket_contents</code>). Copy
+the files from an existing CloudMan bucket here (e.g. http://s3.amazonaws.com
+/cloudman-dev).</p>
+
+<p>It is not really important how you download these files, but one quick option
+is to use <code>s3cmd</code> tool:</p>
+
+<pre><code>% sudo apt-get install s3cmd  # Or your OS's package manager
+% mkdir /home/mary/marys_cloudman_bucket_contents
+% s3cmd -r get s3://cloudman-dev marys_cloudman_bucket_contents
+</code></pre>
+
+<p>Here you can update cm.tar.gz or any of these files to match the customized
+setup you would like. In particular you are going to want to create a custom
+snaps.yaml file. Here is a simple outline that we will fill out as we good.</p>
+
+<pre><code>version: 1
+clouds:
+  - name: amazon
+    regions:
+    - deployments:
+      - name: GalaxyCloud
+        filesystems:
+        - name: galaxy
+          roles: galaxyTools,galaxyData
+          snap_id: snap-XXXXXXXXXXX
+        - name: galaxyIndices
+          roles: galaxyIndices
+          snap_id: snap-XXXXXXXXXXXX
+        default_mi: ami-XXXXXXXXXXXXX
+        bucket: marys_cloudman_bucket
+      name: us-east-1
+</code></pre>
+
+<p>Immediately this template can be updated to reflect the bucket created above
+and the availibity zone you are targetting. We can update teh snap<em>id's and
+the default</em>mi after creating them.</p>
+
+<p>Copy and modify <code>settings.yaml</code>:</p>
+
+<pre><code>% cp settings-sample-cm.yaml settings.yaml
+% vim settings.yaml # or your favorite editor
+</code></pre>
+
+<p>Carefully scan through that file and change the properties marked as requiring
+change. The keyword <code>UPDATE</code> indicates properties of special interest that
+either don't have reasonable defaults or have reasonable defaults but that I
+have deemed highly likely to be overridden.</p>
+
+<p>Now you can use the CloudBioLinux deployer to launch an image, attach volumes,
+install biolinux, take needed snapshots, and package the whole thing up:</p>
+
+<pre><code>% ./deploy.sh --action=launch
+% ./deploy.sh --action=attach_volumes
+% ./deploy.sh --action=install_biolinux --flavor=cloudman/cloudman_and_galaxy
+% ./deploy.sh --action=snapshot_volumes
+% ./deploy.sh --action=detach_volumes
+% ./deploy.sh --action=package
+</code></pre>
+
+<p>Finally, update snaps.yaml in your bucket directory (e.g.
+<code>/home/mary/marys_cloudman_bucket_contents</code>) to reflect the snap_ids and AMI's
+just created. These should all be available via the AWS console or by
+reviewing the output of the steps above.</p>
+
+<p>Finally, you can upload your new bucket and launch a test CloudMan instance:</p>
+
+<pre><code>% ./deploy.sh --action=sync_cloudman_bucket
+% ./deploy.sh --action=cloudman_launch
+</code></pre>

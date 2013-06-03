@@ -8,15 +8,15 @@ have been added.
 
 ## Prerequisites
 
-The `deploy.sh` script should install the needed dependencies local to
-the project and doesn't require special permissions as long as
-`python`, `easy_install`, and `git` are available.
+The `deploy.sh` script should install the needed dependencies in a Python
+virutal environment using venvburrito and doesn't require special permissions
+as long as `python`, `easy_install`, and `git` are available.
 
 ## Specify settings
 
 All deploy actions first require the existence of a setting file. 
 
-    cp settings.yaml-sample settings.yaml
+    cp settings-sample-oldgalaxyvmlauncher.yaml settings.yaml
 
 This file has numerous settings to customize how the deployer acts. Be
 default, the deployer will target Amazon Web Services and `key_file`,

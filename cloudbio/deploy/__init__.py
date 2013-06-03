@@ -17,7 +17,8 @@ from cloudman import cloudman_launch
 from image import configure_MI
 from tools import install_tools, purge_tools
 from galaxy import setup_galaxy, refresh_galaxy, seed_database, seed_workflows, wait_for_galaxy, purge_galaxy
-from util import sudoers_append, wget
+from .util import sudoers_append, wget, eval_template
+from .volume import attach_volumes, make_snapshots, sync_cloudman_bucket, detach_volumes
 
 from fabric.main import load_settings
 from fabric.api import put, run, env, settings, sudo, cd, get
@@ -47,6 +48,9 @@ def deploy(options):
             if node_name == target_name:
                 vm_launcher.destroy(node)
 
+    if _do_perform_action("sync_cloudman_bucket", actions):
+        sync_cloudman_bucket(vm_launcher, options)
+
     if _do_perform_action("cloudman_launch", actions):
         cloudman_launch(vm_launcher, options)
 
@@ -59,12 +63,14 @@ def deploy(options):
 
 def _setup_vm(options, vm_launcher, actions):
     destroy_on_complete = get_boolean_option(options, 'destroy_on_complete', False)
-    use_galaxy = get_boolean_option(options, 'use_galaxy', True)
+    use_galaxy = get_boolean_option(options, 'use_galaxy', False)
     try:
         ip = vm_launcher.get_ip()
         _setup_fabric(vm_launcher, ip, options)
         with settings(host_string=ip):
             _setup_cloudbiolinux(options)
+            if 'attach_volumes' in actions:
+                attach_volumes(vm_launcher, options)
             if 'max_lifetime' in options:
                 seconds = options['max_lifetime']
                 # Unclear why the sleep is needed, but seems to be otherwise
@@ -87,12 +93,18 @@ def _setup_vm(options, vm_launcher, actions):
             if 'transfer' in actions and use_galaxy:
                 wait_for_galaxy()
                 create_data_library_for_uploads(options)
-            if 'package' in actions:
-                vm_launcher.package()
             if 'ssh' in actions:
                 _interactive_ssh(vm_launcher)
             if 'attach_ip' in actions:
                 vm_launcher.attach_public_ip()
+            if 'snapshot_volumes' in actions:
+                make_snapshots(vm_launcher, options)
+            if 'detach_volumes' in actions:
+                detach_volumes(vm_launcher, options)
+            if 'package' in actions:
+                name_template = vm_launcher.package_image_name()
+                name = eval_template(env, name_template)
+                vm_launcher.package(name=name)
             if not destroy_on_complete:
                 print 'Your Galaxy instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
     finally:
@@ -119,6 +131,10 @@ def _expand_actions(actions):
                           "cloudman_launch",
                           "ssh",
                           "attach_ip",
+                          "snapshot_volumes",
+                          "attach_volumes",
+                          "detach_volumes",
+                          "sync_cloudman_bucket",
                           ]:
         if simple_action in actions:
             unique_actions.add(simple_action)

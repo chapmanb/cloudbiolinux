@@ -1,0 +1,95 @@
+# CloudBioLinux Deployer CloudMan QuickStart
+
+As far as I can determine there is no current documentation on how to build
+CloudMan instances from scratch. Thus I am collecting my unofficial notes on
+how to do this here - spefically using the CloudBioLinux deployer.
+
+You will need to navigate the AWS management console and obtain the following
+information.
+
+* `access_id`
+* `secret_key`
+* Ubuntu EBS-backed AMI ID to target. This writeup was tested with ami-9b85eef2 (12.04.2 (64-bit) in us-east-1)
+* Image size to use (e.g. m1-small)
+* Availibity zone (e.g. us-east-1)
+* You will need to setup a bucket to store your snaps file, here you will need the bucket name.
+* You will need to setup two volumes in your target availibity zone, one for
+  Galaxy tools and data (perhaps 20Gb for testing) and one for galaxyIndices. Here you will need the volume ids.
+* Generate a private a key (e.g. galaxy1.pem) and copy it into keys directory (or anywhere really), 
+  also note the keypair_name corresponding to the key.
+
+Create a directory (e.g. `/home/mary/marys_cloudman_bucket_contents`). Copy
+the files from an existing CloudMan bucket here (e.g. http://s3.amazonaws.com
+/cloudman-dev).
+
+It is not really important how you download these files, but one quick option
+is to use `s3cmd` tool:
+
+    % sudo apt-get install s3cmd  # Or your OS's package manager
+    % mkdir /home/mary/marys_cloudman_bucket_contents
+    % s3cmd -r get s3://cloudman-dev /home/mary/marys_cloudman_bucket_contents
+
+Here you can replace the CloudMan source (i.e. `cm.tar.gz`) or any of these
+files to match the customized setup you would like. In particular you are
+going to want to create a custom snaps.yaml file. Here is a simple outline
+that we will fill out as we good.
+
+    version: 1
+    clouds:
+      - name: amazon
+        regions:
+        - deployments:
+          - name: GalaxyCloud
+            filesystems:
+            - name: galaxy
+              roles: galaxyTools,galaxyData
+              snap_id: snap-XXXXXXXXXXX
+              mount_point: /mnt/galaxy
+            - name: galaxyIndices
+              roles: galaxyIndices
+              snap_id: snap-XXXXXXXXXXXX
+              mount_point: /mnt/galaxyIndices
+            default_mi: ami-XXXXXXXXXXXXX
+            bucket: marys_cloudman_bucket
+          name: us-east-1
+
+Immediately this template can be updated to reflect the bucket created above
+and the availibity zone you are targetting. We can update teh snap_id's and
+the default_mi after creating them.
+
+Copy and modify `settings.yaml`:
+
+    % git clone git://github.com/chapmanb/cloudbiolinux.git
+    % cd cloudbiolinux/deploy
+    % cp settings-sample-cm.yaml settings.yaml
+    % vim settings.yaml # or your favorite editor
+
+Carefully scan through `settings.yaml` and change the properties marked as requiring
+change. The word `UPDATE` in the comments indicates properties of special
+interest that either don't have reasonable defaults or have reasonable
+defaults but that I have deemed highly likely to be overridden.
+
+Now you can use the CloudBioLinux deployer to launch an image, attach volumes,
+install biolinux, take needed snapshots, and package the whole thing up:
+
+    % ./deploy.sh --action=launch
+    % ./deploy.sh --action=attach_volumes
+    % ./deploy.sh --action=install_biolinux --flavor=cloudman/cloudman_and_galaxy
+    % ./deploy.sh --action=snapshot_volumes
+    % ./deploy.sh --action=detach_volumes
+    % ./deploy.sh --action=package
+
+If at any point in the above process you need to interactively inspect the
+state of the instance being configured you can do this via the following command:
+
+    % ./deploy.sh --action=ssh
+
+Once a CloudMan AMI has been created, update `snaps.yaml` in your bucket
+directory (e.g. `/home/mary/marys_cloudman_bucket_contents`) to reflect the
+`snap_id`s and AMI created. These should all be available via the AWS
+management console or by reviewing the output of the steps above.
+
+Finally, you can upload your new bucket and launch a test CloudMan instance:
+
+    % ./deploy.sh --action=sync_cloudman_bucket
+    % ./deploy.sh --action=cloudman_launch
