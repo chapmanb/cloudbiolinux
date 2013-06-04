@@ -13,7 +13,7 @@ from cloudbio.package.deb import _apt_packages
 from fabfile import _perform_install
 
 
-from cloudman import cloudman_launch
+from .cloudman import cloudman_launch, bundle_cloudman
 from image import configure_MI
 from tools import install_tools, purge_tools
 from galaxy import setup_galaxy, refresh_galaxy, seed_database, seed_workflows, wait_for_galaxy, purge_galaxy
@@ -47,6 +47,9 @@ def deploy(options):
             node_name = node.name
             if node_name == target_name:
                 vm_launcher.destroy(node)
+
+    if _do_perform_action("bundle_cloudman", actions):
+        bundle_cloudman(options)
 
     if _do_perform_action("sync_cloudman_bucket", actions):
         sync_cloudman_bucket(vm_launcher, options)
@@ -128,13 +131,15 @@ def _expand_actions(actions):
                           "setup_image",
                           "launch",  # Dummy action justs launches image
                           "install_biolinux",
-                          "cloudman_launch",
                           "ssh",
                           "attach_ip",
                           "snapshot_volumes",
                           "attach_volumes",
                           "detach_volumes",
+                          # Special CloudMan tasks not tied to a particular remote instance
+                          "cloudman_launch",
                           "sync_cloudman_bucket",
+                          "bundle_cloudman",
                           ]:
         if simple_action in actions:
             unique_actions.add(simple_action)

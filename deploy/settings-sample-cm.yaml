@@ -104,6 +104,11 @@ cloudman:
   ## Password for CloudMan admin interface.
   # password: adminpass
 
+  ## Local copy of CloudMan source. It can be packaged and 
+  ## inserted into bucket_source using: 
+  ##   ./deploy.sh --action=bundle_cloudman 
+  # cloudman_repository: /path/to/cloudman_source
+
   user_data:
     # Update bucket to target.
     bucket_default: marys_cloudman_bucket

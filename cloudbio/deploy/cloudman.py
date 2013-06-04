@@ -1,8 +1,21 @@
 import yaml
 from os.path import exists, join
+from fabric.api import local, lcd
 
 DEFAULT_CLOUDMAN_PASSWORD = 'adminpass'
 DEFAULT_CLOUDMAN_CLUSTER_NAME = 'cloudman'
+
+
+def bundle_cloudman(options):
+    cloudman_options = options.get('cloudman')
+    cloudman_repository_path = cloudman_options['cloudman_repository']
+    bucket_source = cloudman_options.get("bucket_source")
+    with lcd(cloudman_repository_path):
+        try:
+            local("tar czvf cm.tar.gz *")
+            local("mv cm.tar.gz '%s'" % bucket_source)
+        finally:
+            local("rm -f cm.tar.gz")
 
 
 def cloudman_launch(vm_launcher, options):
