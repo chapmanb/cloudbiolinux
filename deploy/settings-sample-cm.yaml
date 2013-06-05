@@ -8,10 +8,10 @@ fabricrc_overrides:
 
   ## Mercurial repository for Galaxy (default is https://bitbucket.org/galaxy/galaxy-central/)
   ## e.g. for galaxyp
-  #galaxy_repository: https://bitbucket.org/galaxyp/cloud-galaxyp-central
+  #galaxy_repository: https://bitbucket.org/galaxyp/galaxyp-central
 
   # Location to install galaxy
-  galaxy_home: /mnt/galaxy/galaxy-central
+  galaxy_home: /mnt/galaxy/galaxy-app
   # Location to setup galaxy tool dependencies
   galaxy_tools_dir: /mnt/galaxy/tools
   galaxy_jars_dir: /mnt/galaxy/jars
