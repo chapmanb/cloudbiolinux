@@ -341,9 +341,9 @@ def _configure_galaxy_repository(env):
         srma_dir = os.path.join(env.galaxy_tools_dir, 'srma', 'default')
         haploview_dir = os.path.join(env.galaxy_tools_dir, 'haploview', 'default')
         picard_dir = os.path.join(env.galaxy_tools_dir, 'picard', 'default')
-        sudo('ln -s %s/srma.jar %s' % (srma_dir, env.galaxy_jars_dir), user=env.galaxy_user)
-        sudo('ln -s %s/haploview.jar %s' % (haploview_dir, env.galaxy_jars_dir), user=env.galaxy_user)
-        sudo('ln -s %s/*.jar %s' % (picard_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        sudo('ln -s -f %s/srma.jar %s' % (srma_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        sudo('ln -s -f %s/haploview.jar %s' % (haploview_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        sudo('ln -s -f %s/*.jar %s' % (picard_dir, env.galaxy_jars_dir), user=env.galaxy_user)
     return True
 
 
