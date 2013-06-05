@@ -93,3 +93,43 @@ Finally, you can upload your new bucket and launch a test CloudMan instance:
 
     % ./deploy.sh --action=sync_cloudman_bucket
     % ./deploy.sh --action=cloudman_launch
+
+
+## Customizing Galaxy
+
+Installing a customized Galaxy is as simple as overriding the
+`galaxy_repository` variable in the `fabricrc_overrides` section of the
+`settings.yaml`.
+
+## Customizing Tools
+
+Out of the box, CloudBioLinux can be configured to install dozens of
+bioinformatic packages out of the box and adding additional packages is fairly
+straight forward. One simply need to create a CloudBioLinux flavor that
+configures which such packages are installed and specify that flavor (either
+in the command-line as shown above or in `settings.yaml`).
+
+Your custom flavor should include the `cloudman` packages. If your flavor
+additionally includes `galaxy` (as the flavor `cloudman_and_galaxy` shown
+above) packages and `install_tool_dependencies` is set to `True` in
+`settings.yaml` - CloudBioLinux will setup a tool dependencies directory for
+Galaxy. This allows multiple versions of an application to be installed in
+isolation.
+
+When enabled, the list of tools and versions that is installed can be found in
+``cloudbiolinux/contrib/flavor/cloudman/tools.yaml <https://github.com/chapmanb/cloudbiolinux/blob/master/contrib/flavor/cloudman/tools.yaml>``. One can
+modify that file directly or specify an entirely new file by setting the
+``galaxy_tools_conf`` property in the `fabric_overrides` section of `settings.yaml`.
+
+## Customizing CloudMan
+
+CloudMan is downloaded from the bucket you specify and installed at system
+startup. Hence one can simply place a customized version of CloudMan (tarred
+up and named `cm.tar.gz`) in the bucket.
+
+If `cloudman_repository`, `bucket_source`, and `bucket_default` are set in the
+`cloudman` section of `settings.yaml`, then one can execute the following
+command to quickly tar up the local copy of CloudMan (in
+`cloudman_repository`) and update your target bucket.
+
+    % ./deploy.sh --action=bundle_cloudman --action=sync_cloudman_bucket
