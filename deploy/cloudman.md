@@ -7,8 +7,7 @@ how to do this here - spefically using the CloudBioLinux deployer.
 You will need to navigate the AWS management console and obtain the following
 information.
 
-* `access_id`
-* `secret_key`
+* Your AWS Access ID and secret key (`access_id`, `secret_key`)
 * Ubuntu EBS-backed AMI ID to target. This writeup was tested with ami-9b85eef2 (12.04.2 (64-bit) in us-east-1)
 * Image size to use (e.g. m1-small)
 * Availibity zone (e.g. us-east-1)
@@ -94,14 +93,20 @@ Finally, you can upload your new bucket and launch a test CloudMan instance:
     % ./deploy.sh --action=sync_cloudman_bucket
     % ./deploy.sh --action=cloudman_launch
 
+## Customizing
 
-## Customizing Galaxy
+The above example uses the `cloudman/cloudman_and_galaxy` CloudBioLinux
+flavor, but there are additional flavors of CloudBioLinux available. Please
+consult [this page][1] 
+and choose the most appropriate flavor:
+
+### Customizing Galaxy
 
 Installing a customized Galaxy is as simple as overriding the
 `galaxy_repository` variable in the `fabricrc_overrides` section of the
 `settings.yaml`.
 
-## Customizing Tools
+### Customizing Tools
 
 Out of the box, CloudBioLinux can be configured to install dozens of
 bioinformatic packages out of the box and adding additional packages is fairly
@@ -121,7 +126,7 @@ When enabled, the list of tools and versions that is installed can be found in
 modify that file directly or specify an entirely new file by setting the
 ``galaxy_tools_conf`` property in the `fabric_overrides` section of `settings.yaml`.
 
-## Customizing CloudMan
+### Customizing CloudMan
 
 CloudMan is downloaded from the bucket you specify and installed at system
 startup. Hence one can simply place a customized version of CloudMan (tarred
@@ -133,3 +138,5 @@ command to quickly tar up the local copy of CloudMan (in
 `cloudman_repository`) and update your target bucket.
 
     % ./deploy.sh --action=bundle_cloudman --action=sync_cloudman_bucket
+
+[1]: https://github.com/chapmanb/cloudbiolinux/tree/master/contrib/flavor/cloudman

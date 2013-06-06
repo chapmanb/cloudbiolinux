@@ -1,14 +1,8 @@
 ---
 packages:
   - minimal
-  - ruby
-#  - python
-#  - databases
   - cloudman
   - galaxy
   - galaxyp
-  - java
-  - desktop
+  - bio_proteomics_wine
 libraries:
-  - ruby-libs
-  - r-libs
