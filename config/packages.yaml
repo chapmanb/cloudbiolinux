@@ -409,6 +409,7 @@ bio_proteomics:
   - libxml-sax-expat-perl
   - libgd2-xpm-dev
   - libbz2-dev
+  - gnuplot  
   # Needed for percolator
   - libxerces-c3.1
   - libxerces-c-dev
@@ -576,6 +577,7 @@ galaxyp:
      - libxml-sax-expat-perl
      - libgd2-xpm-dev
      - libbz2-dev
+     - gnuplot
 
      # Needed for percolator
      - libxerces-c3.1
