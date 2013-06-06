@@ -102,6 +102,9 @@ def _setup_apt_automation():
             "condor condor/wantdebconf boolean false",
             "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula boolean true",
             "ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note",
+            "gdm     shared/default-x-display-manager        select  gdm",
+            "lightdm shared/default-x-display-manager        select  gdm",
+            "postfix postfix/mailname        string  notusedexample.org",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
