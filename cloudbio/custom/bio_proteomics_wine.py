@@ -52,9 +52,9 @@ def install_morpheus(env):
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _fetch_and_unpack(url, need_dir=False)
-            env.safe_sudo("cp -r Morpheus/* '%s'" % share_dir)
-    proteowizard_apps = ["morpheus_cl.exe", "Morpheus.exe"]
-    for app in proteowizard_apps:
+            env.safe_sudo("cp -r Morpheus '%s'" % share_dir)
+    morpheus_exes = ["morpheus_cl.exe", "Morpheus.exe"]
+    for app in morpheus_exes:
         setup_wine_wrapper(env, "%s/%s" % (share_dir, app))
 
 
