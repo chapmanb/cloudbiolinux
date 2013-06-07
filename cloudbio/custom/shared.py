@@ -74,17 +74,25 @@ def _if_not_python_lib(library):
 
 @contextmanager
 def _make_tmp_dir():
-    with quiet():
-        tmp_dir = env.safe_run_output("echo $TMPDIR")
-    if tmp_dir.failed or not tmp_dir.strip():
-        home_dir = env.safe_run_output("echo $HOME")
-        tmp_dir = os.path.join(home_dir, "tmp")
-    work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
+    work_dir = __work_dir()
     if not env.safe_exists(work_dir):
         env.safe_run("mkdir -p %s" % work_dir)
     yield work_dir
     if env.safe_exists(work_dir):
         env.safe_run("rm -rf %s" % work_dir)
+
+
+def __work_dir():
+    work_dir = env.get("work_dir", None)
+    if not work_dir:
+        with quiet():
+            tmp_dir = env.safe_run_output("echo $TMPDIR")
+        if tmp_dir.failed or not tmp_dir.strip():
+            home_dir = env.safe_run_output("echo $HOME")
+            tmp_dir = os.path.join(home_dir, "tmp")
+        work_dir = os.path.join(tmp_dir.strip(), "cloudbiolinux")
+    return work_dir
+
 
 # -- Standard build utility simplifiers
 
