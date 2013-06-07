@@ -74,12 +74,28 @@ def _if_not_python_lib(library):
 
 @contextmanager
 def _make_tmp_dir():
+    """
+    Setup a temporary working directory for building custom software. First checks
+    fabric environment for a `work_dir` path, if that is not set it will use the
+    remote path $TMPDIR/cloudbiolinux if $TMPDIR is defined remotely, finally falling
+    back on remote $HOME/cloudbiolinux otherwise.
+    """
     work_dir = __work_dir()
+    use_sudo = False
     if not env.safe_exists(work_dir):
-        env.safe_run("mkdir -p %s" % work_dir)
+        with settings(warn_only=True):
+            # Try to create this directory without using sudo, but
+            # if needed fallback.
+            result = env.safe_run("mkdir -p '%s'" % work_dir)
+            if result.return_code != 0:
+                use_sudo = True
+        if use_sudo:
+            env.safe_sudo("mkdir -p '%s'" % work_dir)
+            env.safe_sudo("chown -R %s '%s'" % (env.user, work_dir))
     yield work_dir
     if env.safe_exists(work_dir):
-        env.safe_run("rm -rf %s" % work_dir)
+        run_func = env.safe_sudo if use_sudo else env.safe_run
+        run_func("rm -rf %s" % work_dir)
 
 
 def __work_dir():
