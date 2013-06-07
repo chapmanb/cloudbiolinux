@@ -20,6 +20,7 @@ CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
 # -- decorators and context managers
 
+
 def _if_not_installed(pname):
     """Decorator that checks if a callable program is installed.
     """
@@ -61,6 +62,7 @@ def _if_not_python_lib(library):
     """
     def argcatcher(func):
         functools.wraps(func)
+
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
                 result = env.safe_run("%s -c 'import %s'" % (_python_cmd(env), library))
@@ -68,6 +70,7 @@ def _if_not_python_lib(library):
                 return func(*args, **kwargs)
         return decorator
     return argcatcher
+
 
 @contextmanager
 def _make_tmp_dir():
@@ -85,13 +88,14 @@ def _make_tmp_dir():
 
 # -- Standard build utility simplifiers
 
+
 def _get_expected_file(url, dir_name=None, safe_tar=False):
     tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'" if safe_tar else ""
-    exts = {(".tar.gz", ".tgz") : "tar %s -xzpf" % safe_tar,
-            (".tar",) : "tar %s -xpf" % safe_tar,
+    exts = {(".tar.gz", ".tgz"): "tar %s -xzpf" % safe_tar,
+            (".tar",): "tar %s -xpf" % safe_tar,
             (".tar.bz2",): "tar %s -xjpf" % safe_tar,
-            (".zip",) : "unzip"}
+            (".zip",): "unzip"}
     for ext_choices, tar_cmd in exts.iteritems():
         for ext in ext_choices:
             if tar_file.endswith(ext):
@@ -99,6 +103,7 @@ def _get_expected_file(url, dir_name=None, safe_tar=False):
                     dir_name = tar_file[:-len(ext)]
                 return tar_file, dir_name, tar_cmd
     raise ValueError("Did not find extract command for %s" % url)
+
 
 def _safe_dir_name(dir_name, need_dir=True):
     replace_try = ["", "-src", "_core"]
@@ -120,6 +125,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
+
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
                       safe_tar=False):
     if url.startswith(("git", "svn", "hg", "cvs")):
@@ -140,12 +146,14 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
         env.safe_run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
+
 def _configure_make(env):
     env.safe_run("export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:%s/lib/pkgconfig && " \
                  "./configure --disable-werror --prefix=%s " %
                  (env.system_install, env.system_install))
     env.safe_run("make")
     env.safe_sudo("make install")
+
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
     def _do_work(env):
@@ -159,6 +167,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
                 env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
+
 def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None,
                  safe_tar=False):
     """Retrieve source from a URL and install in our system directory.
@@ -171,6 +180,7 @@ def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir
             if post_unpack_fn:
                 post_unpack_fn(env)
             make_command(env)
+
 
 def _get_install_local(url, env, make_command, dir_name=None,
                        post_unpack_fn=None, safe_tar=False):
@@ -197,6 +207,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
 
 # --- Language specific utilities
 
+
 def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     """Create a symlinked directory of files inside the shared environment.
     """
@@ -213,8 +224,10 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
         return install_dir
     return None
 
+
 def _symlinked_java_version_dir(pname, version, env):
     return _symlinked_shared_dir(pname, version, env, extra_dir="java")
+
 
 def _java_install(pname, version, url, env, install_fn=None):
     install_dir = _symlinked_java_version_dir(pname, version, env)
@@ -228,10 +241,11 @@ def _java_install(pname, version, url, env, install_fn=None):
                     else:
                         env.safe_sudo("mv *.jar %s" % install_dir)
 
+
 def _python_cmd(env):
     """Retrieve python command, handling tricky situations on CentOS.
     """
-    if env.has_key("python_version_ext") and env.python_version_ext:
+    if "python_version_ext" in env and env.python_version_ext:
         major, minor = run("python --version").split()[-1].split(".")[:2]
         check_major, check_minor = env.python_version_ext.split(".")[:2]
         if major != check_major or int(check_minor) > int(minor):
@@ -241,15 +255,16 @@ def _python_cmd(env):
     else:
         return "python"
 
+
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
     to_check = ["pip"]
-    if env.has_key("pip_cmd") and env.pip_cmd:
+    if "pip_cmd" in env and env.pip_cmd:
         to_check.append(env.pip_cmd)
     if not env.use_sudo:
         to_check.append(os.path.join(env.system_install, "bin", "pip"))
-    if env.has_key("python_version_ext") and env.python_version_ext:
+    if "python_version_ext" in env and env.python_version_ext:
         to_check.append("pip-{0}".format(env.python_version_ext))
     for cmd in to_check:
         with quiet():
@@ -258,10 +273,12 @@ def _pip_cmd(env):
             return cmd
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
+
 def _python_make(env):
     env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
+
 
 def _get_installed_file(env, local_file):
     installed_files_dir = \
@@ -294,6 +311,7 @@ def _write_to_file(contents, path, mode):
     finally:
         os.unlink(local_path)
 
+
 def _get_bin_dir(env):
     """
     When env.system_install is /usr this exists, but in the Galaxy
@@ -315,6 +333,7 @@ def _get_install_subdir(env, subdir):
     if not env.safe_exists(path):
         env.safe_sudo("mkdir -p '%s'" % path)
     return path
+
 
 def _set_default_config(env, install_dir, sym_dir_name="default"):
     """
