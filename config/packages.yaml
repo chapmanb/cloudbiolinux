@@ -616,6 +616,8 @@ galaxyp:
      - subversion
      - libgdbm-dev
      - libffi-dev
+     - libsqlite3-dev
+     - sqlite3
 
 # To do -- in Deb Med but not propogated
 # squizz
