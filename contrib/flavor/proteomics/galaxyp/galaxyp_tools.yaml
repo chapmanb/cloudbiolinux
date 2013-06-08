@@ -1,4 +1,19 @@
----
+--- 
+
+# This file contains the install procedures for Galaxy tools used by #
+# the stock Galaxy-P configuration (hosted on usegalaxyp.org) directly
+# related to mass spec and/or proteomic data analysis..
+
+# Install these tools using the proteoimcs_tools custom install function, 
+# either directly using:
+#
+#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:proteomics_tools
+#
+# Or as part of a full flavor install that include galaxyp, for instance using
+# the cloudman/cloudman_and_galaxyp flavor.
+#
+#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:flavor=cloudman/cloudman_and_galaxyp
+#
 applications:
   peptide_to_gff: "master"
   transproteomic_pipeline: 

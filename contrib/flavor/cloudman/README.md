@@ -42,6 +42,19 @@ A subset of the parameters you may override via this mechanism includes (see
 
 There are two additional flavors assembled for the [Galaxy-P][4] project. 
 
+Below are some recommended fabricrc.txt overrides for Galaxy-P.
+  
+* `dist_name = precise`
+* `galaxy_repository = https://bitbucket.org/galaxyp/galaxyp-central/`
+* `galaxy_tool_conf = /path/to/cloudbiolinux/contrib/flavor/proteomics/galaxyp/galaxy_tools.yaml`
+
+Side Note: Galaxy-P is actively developed, tested, and deployed with Ubuntu 12.04
+LTS, so this is what to target for best results. Feel free to let me
+(jmchilton@gmail.com) know if there are issues or if you would like
+help deploying in other environments and I will attempt to help in
+whatever way I can.
+
+
 #### The Galaxy-P Server Flavor
 
 This flavor is used to build the internal and [public][5] Galaxy-P servers

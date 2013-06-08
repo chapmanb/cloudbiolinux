@@ -18,7 +18,7 @@ def install_proteomics_tools(env):
     _prep_galaxy(env)
     tools_conf_path = env.get("galaxyp_tools_conf",
                               os.path.join(env.config_dir, os.pardir,
-                                           "contrib", "flavor", "cloudman", "galaxyp_tools.yaml"))
+                                           "contrib", "flavor", "proteomics", "galaxyp", "galaxyp_tools.yaml"))
     galaxyp_tools_conf = yaml.load(open(tools_conf_path, "r"))
     _install_tools(env, galaxyp_tools_conf)
 
