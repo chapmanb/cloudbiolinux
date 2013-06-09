@@ -302,14 +302,16 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
-@_if_not_installed("nogemini")
+@_if_not_installed("gemini")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
     version = "github"
     installer = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
-    data_dir = os.path.join(env.system_install, "local", "share", "gemini")
+    data_dir = os.path.join(env.system_install,
+                            "local" if env.system_install.find("/local") == -1 else "",
+                            "share", "gemini")
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             env.safe_run("wget --no-check-certificate %s" % installer)
