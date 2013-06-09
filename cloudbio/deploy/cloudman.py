@@ -1,6 +1,7 @@
 import yaml
 from os.path import exists, join
-from fabric.api import local, lcd
+from fabric.api import local, lcd, env
+from .util import eval_template
 
 DEFAULT_CLOUDMAN_PASSWORD = 'adminpass'
 DEFAULT_CLOUDMAN_CLUSTER_NAME = 'cloudman'
@@ -59,6 +60,7 @@ def _prepare_user_data(vm_launcher, cloudman_options):
 
     _set_property_if_needed(cloudman_user_data, 'access_key', access_key)
     _set_property_if_needed(cloudman_user_data, 'secret_key', secret_key)
+    cluster_name = eval_template(env, cluster_name)
     _set_property_if_needed(cloudman_user_data, 'cluster_name', cluster_name)
     _set_property_if_needed(cloudman_user_data, 'password', password)
 
