@@ -5,6 +5,7 @@ from time import sleep
 from datetime import datetime
 from boto.exception import EC2ResponseError, S3ResponseError
 from boto.s3.key import Key
+from .util import eval_template
 
 DEFAULT_BUCKET_NAME = 'cloudman'
 
@@ -72,7 +73,6 @@ def detach_volumes(vm_launcher, options):
     for volume in volumes:
         volume_id = volume['id']
         path = volume.get("path")
-
         env.safe_sudo("umount '%s'" % path)
         _detach(boto_connection, instance_id, volume_id)
 
@@ -82,6 +82,7 @@ def make_snapshots(vm_launcher, options):
     for volume in volumes:
         path = volume.get("path")
         desc = volume.get("description", "Snapshot of path %s" % path)
+        desc = eval_template(env, desc)
         # Allow volume to specify it should not be snapshotted, e.g. if
         # piggy backing on core teams snapshots for galaxyIndicies for instance.
         snapshot = volume.get("snapshot", True)

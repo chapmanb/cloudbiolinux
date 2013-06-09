@@ -70,13 +70,13 @@ volumes:
   - id: vol-XXXXXXX  # UPDATE with volume id created via AWS console.
     path: /mnt/galaxyIndices
     device: /dev/xvdj
-    description: "Galaxy Indices"
+    description: "Galaxy Indices [${the_date_with_time}]"
     format: __auto__  # Attempt to auto-format new partitions if needed, deactivate by setting to False.
 
   - id: vol-XXXXXX  # UPDATE with volume id created via AWS console.
     path: /mnt/galaxy
     device: /dev/xvdk
-    description: "Galaxy Tools and Data"
+    description: "Galaxy Tools and Data [${the_date_with_time}]"
     format: __auto__  # Attempt to auto-format new partitions if needed, deactivate by setting to False.
 
 
@@ -99,7 +99,7 @@ cloudman:
   # secret_key: 
 
   ## Name of cloudman cluster to create.
-  cluster_name: cloudtest
+  cluster_name: "cloud_test_${the_date_with_time}"
 
   ## Password for CloudMan admin interface.
   # password: adminpass
