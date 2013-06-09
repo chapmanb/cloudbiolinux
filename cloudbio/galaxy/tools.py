@@ -76,6 +76,10 @@ def _install_applications(env, tools_conf):
                 version = version_info["version"]
                 bin_dirs = version_info.get("bin_dirs", ["bin"])
                 env_vars = version_info.get("env_vars", {})
+                provides = version_info.get("provides", [])
+                if isinstance(provides, (str, unicode, basestring)):
+                    provides = [provides]
+
                 # Some requirements (e.g. blast+) maybe not have valid python
                 # identifiers as name. Use install_blast to setup but override
                 # requirement directory name with requirement_name field.
@@ -86,6 +90,15 @@ def _install_applications(env, tools_conf):
                     symlink_versions = [symlink_versions]
                 for symlink_version in symlink_versions:
                     _set_default_config(tool_env, tool_env["system_install"], symlink_version)
+
+                if provides:
+                    install_dir = tool_env["system_install"]
+                    ## Create additional symlinked packages from this one.
+                    tool_dir = "%s/.." % install_dir
+                    tools_dir = "%s/.." % tool_dir
+                    for package in provides:
+                        link_dir = "%s/%s" % (tools_dir, package)
+                        env.safe_sudo("ln -f -s '%s' '%s'" % (requirement_name, link_dir))
 
 
 def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}):

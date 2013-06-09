@@ -21,6 +21,9 @@ applications:
       bin_dirs:
         - bin
         - cgi-bin
+      provides:
+        - "proteowizard"
+        - "xtandem"
   openms: 
     - version: "1.10.0"
       env_vars:
