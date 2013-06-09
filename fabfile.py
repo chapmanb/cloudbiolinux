@@ -256,6 +256,27 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
         _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+    ## TODO: Replace the previous 4 lines with the following one, barring
+    ## objections. Slightly different behavior because pkg_to_group will be
+    ## loaded regardless of automated if it is None, but IMO this shouldn't
+    ## matter because the following steps look like they would fail if
+    ## automated is True and pkg_to_group is None.
+    # _install_custom(p, pkg_to_group)
+    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+
+
+def _install_custom(p, pkg_to_group=None):
+    if pkg_to_group is None:
+        pkg_config = get_config_file(env, "custom.yaml").base
+        packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+
+
+def _custom_install_function(env, p, pkg_to_group):
+    """ Find custom install function to execute based on package name to pkg_to_group dict. """
 
     try:
         env.logger.debug("Import %s" % p)
@@ -276,8 +297,8 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
-    fn(env)
-    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+    return fn
+
 
 def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
