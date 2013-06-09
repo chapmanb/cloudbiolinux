@@ -104,8 +104,9 @@ cloudman:
   ## Password for CloudMan admin interface.
   # password: adminpass
 
-  ## Local copy of CloudMan source. It can be packaged and 
-  ## inserted into bucket_source using: 
+  ## CloudMan source (local_path, mercurial repo (e.g. https://bitbucket.org/galaxy/cloudman), 
+  ## or git repo (https://github.com/jmchilton/cloudman.git).
+  ## It can be packaged and inserted into bucket_source using: 
   ##   ./deploy.sh --action=bundle_cloudman 
   # cloudman_repository: /path/to/cloudman_source
 
