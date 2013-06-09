@@ -119,6 +119,14 @@ cloudman:
     # quantal.
     condor_enabled: False
 
+## Uncomment and update this to specify default user data properties for this
+## AMI.
+## I suppose all custom CloudMan AMIs should at least specify a new bucket 
+## default right? -John
+#image_user_data:
+#  bucket_default: marys_cloudman_bucket
+
+
 # Advanced option sections ignored for CloudMan workflow outlined in cloudman.md
 galaxy:
 

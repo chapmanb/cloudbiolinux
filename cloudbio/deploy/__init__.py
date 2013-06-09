@@ -176,6 +176,7 @@ def _setup_cloudbiolinux(options):
     flavor = get_main_options_string(options, "flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
     _setup_logging(env)
     _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
+    _setup_image_user_data(env, options)
 
 
 def _setup_cloudbiolinux_fabric_properties(env, options):
@@ -193,6 +194,11 @@ def _setup_cloudbiolinux_fabric_properties(env, options):
             overrides[key] = str(value)
     env.update(overrides)
     _setup_galaxy_env_defaults(env)
+
+
+def _setup_image_user_data(env, options):
+    if "image_user_data" in options:
+        env["image_user_data"] = options["image_user_data"]
 
 
 def purge_genomes():
