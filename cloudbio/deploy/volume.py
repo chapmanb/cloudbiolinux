@@ -90,14 +90,22 @@ def make_snapshots(vm_launcher, options):
 
 
 def sync_cloudman_bucket(vm_launcher, options):
-    cloudman_options = options.get("cloudman", {})
-    bucket = cloudman_options.get("user_data", {}).get("bucket_default", None)
-    bucket_source = cloudman_options.get("bucket_source", None)
+    bucket = options.get("target_bucket", None)
+    if not bucket:
+        bucket = __get_bucket_default(options)
+    bucket_source = options.get("cloudman", {}).get("bucket_source", None)
     if not bucket or not bucket_source:
+        print "Warning: Failed to sync cloud bucket, bucket or bucket_source is undefined."
         return
     conn = vm_launcher.boto_s3_connection()
     for file_name in listdir(bucket_source):
         _save_file_to_bucket(conn, bucket, file_name, join(bucket_source, file_name))
+
+
+def __get_bucket_default(options):
+    cloudman_options = options.get("cloudman", {})
+    bucket = cloudman_options.get("user_data", {}).get("bucket_default", None)
+    return bucket
 
 
 def _get_attached(conn, instance_id, device_id, valid_states=['attached']):

@@ -15,6 +15,7 @@ ARG_PROPERTIES = [
   "target",
   "flavor",
   "vm_provider",
+  "target_bucket",
 ]
 
 
@@ -43,6 +44,7 @@ def parse_args():
     parser.add_argument('--file', dest="files", action="append", default=[], help="file to transfer to new instance")
     parser.add_argument("--target", dest="target", default=None)
     parser.add_argument("--flavor", dest="flavor", default=None)
+    parser.add_argument("--target_bucket", dest="target_bucket", default=None, help="Specify a target bucket for CloudMan bucket related actions.")
     parser.add_argument("--vm_provider", dest="vm_provider", default=None, help="libcloud driver to use (or vagrant) (e.g. aws, openstack)")
     args = parser.parse_args()
     if len(args.actions) == 0:
