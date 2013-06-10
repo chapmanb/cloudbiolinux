@@ -113,11 +113,6 @@ cloudman:
   user_data:
     # Update bucket to target.
     bucket_default: marys_cloudman_bucket
-    # I still contend CloudMan is broken without this option enabled. -John
-    ignore_unsatisfiable_dependencies: True
-    # Disable condor because using Ubuntu Precise, can axe this if using
-    # quantal.
-    condor_enabled: False
 
 ## Uncomment and update this to specify default user data properties for this
 ## AMI.

@@ -198,7 +198,7 @@ def _setup_cloudbiolinux_fabric_properties(env, options):
 
 def _setup_image_user_data(env, options):
     if "image_user_data" in options:
-        env["image_user_data"] = options["image_user_data"]
+        env["image_user_data_dict"] = options["image_user_data"]
 
 
 def purge_genomes():
