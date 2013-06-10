@@ -105,7 +105,8 @@ def sync_cloudman_bucket(vm_launcher, options):
 
 def __get_bucket_default(options):
     cloudman_options = options.get("cloudman", {})
-    bucket = cloudman_options.get("user_data", {}).get("bucket_default", None)
+    user_data = cloudman_options = cloudman_options.get('user_data', None) or {}
+    bucket = user_data.get("bucket_default", None)
     return bucket
 
 

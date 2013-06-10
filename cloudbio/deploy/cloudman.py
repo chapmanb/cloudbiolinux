@@ -71,7 +71,7 @@ def cloudman_launch(vm_launcher, options):
 
 
 def _prepare_user_data(vm_launcher, cloudman_options):
-    cloudman_user_data = cloudman_options.get('user_data', {})
+    cloudman_user_data = cloudman_options.get('user_data', None) or {}
     cluster_name = \
         cloudman_options.get('cluster_name', DEFAULT_CLOUDMAN_CLUSTER_NAME)
     password = cloudman_options.get('password', DEFAULT_CLOUDMAN_PASSWORD)
