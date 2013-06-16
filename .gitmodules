@@ -19,3 +19,6 @@
 [submodule "config/puppet/modules/python"]
 	path = config/puppet/modules/python
 	url = git://github.com/bioconfig/puppet-python.git
+[submodule "config/chef/cookbooks/globus"]
+	path = config/chef/cookbooks/globus
+	url = git://github.com/bioconfig/chef-globus.git
