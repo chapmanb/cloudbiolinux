@@ -14,6 +14,7 @@ ARG_PROPERTIES = [
   "actions",
   "runtime_properties",
   "vm_provider",
+  "hostname",
 
   # CloudBioLinux options
   "target",
@@ -49,6 +50,7 @@ def parse_args():
     parser.add_argument('--compressed_file', dest="compressed_files", action="append", default=[], help="file to transfer to new instance and decompress")
     parser.add_argument('--file', dest="files", action="append", default=[], help="file to transfer to new instance")
     parser.add_argument("--vm_provider", dest="vm_provider", default=None, help="libcloud driver to use (or vagrant) (e.g. aws, openstack)")
+    parser.add_argument("--hostname", dest="hostname", default=None, help="Newly created nodes are created with this specified hostname.")
 
     # CloudBioLinux options
     parser.add_argument("--target", dest="target", default=None, help="Specify a CloudBioLinux target, used with action install_biolinux action")
