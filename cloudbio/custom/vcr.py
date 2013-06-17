@@ -182,7 +182,7 @@ def install_viralvigor_test(env):
 				-i %s/westnile.fasta \
 				-O %s/westnile \
 				> %s/westnile_test_run.log 2>&1 \
-				""") % (vigor_dirs["VIGOR_RUNTIME_DIR"],vigor_dirs["VIGOR_SAMPLE_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"],vigor_dirs["VIGOR_SCRATCH_DIR"])
+				""") % (vigor_dirs["VIGOR_RUNTIME_DIR"],vigor_dirs["VIGOR_SAMPLE_DATA_DIR"],vigor_dirs["VIGOR_TEST_OUTPUT_DIR"],env.VIGOR_SCRATCH_DIR)
 		print("DEBUG: cmd[%s]" % cmd)
 		run(cmd)
 	finally:
@@ -204,7 +204,7 @@ def install_viralvigor_cleanall(env):
 	try:
 		_initialize_env("vigor")
 		_remove_dir(env.VIGOR_ROOT_DIR)
-		_remove_dir(env.SCRATCH_DIR)
+		_remove_dir(env.VIGOR_SCRATCH_DIR)
 		print("Vigor Removed\n")
 	finally:
 		disconnect_all()
@@ -221,11 +221,10 @@ def _initialize_area_vigor():
 	
 	_initialize_env("vigor")
 	
-	vigor_dirs["TOOLS_DIR"] = "%(VIGOR_ROOT_DIR)s/tools"                     % env
+	vigor_dirs["TOOLS_DIR"] = "%s/tools"                                     % env.VIGOR_ROOT_DIR
 	vigor_dirs["VIGOR_STORED_DIR"] = "%s/vigor"                              % vigor_dirs["TOOLS_DIR"]
 	vigor_dirs["VIGOR_RUNTIME_DIR"] = "%s/prod3"                             % vigor_dirs["VIGOR_STORED_DIR"]
-	vigor_dirs["VIGOR_SCRATCH_DIR"] = "%(SCRATCH_DIR)s/vigor"                % env
-	vigor_dirs["VIGOR_TEMPSPACE_DIR"] = "%s/tempspace"                       % vigor_dirs["VIGOR_SCRATCH_DIR"]
+	vigor_dirs["VIGOR_TEMPSPACE_DIR"] = "%s/tempspace"                       % env.VIGOR_SCRATCH_DIR
 	vigor_dirs["VIGOR_SAMPLE_DATA_DIR"] = "%s/samples"                       % vigor_dirs["VIGOR_STORED_DIR"]
 	vigor_dirs["VIGOR_TEST_OUTPUT_DIR"] = "%s/test"                          % vigor_dirs["VIGOR_STORED_DIR"]
 	vigor_dirs["BLAST_DIR"] = "%s/blast"                                     % vigor_dirs["TOOLS_DIR"]
@@ -244,7 +243,7 @@ def _initialize_area_vigor():
 	print("host:   %(host)s" % env)
 	print("ARCH:   %(ARCH)s" % env)
 	print("ROOT DIR:   %(VIGOR_ROOT_DIR)s" % env)
-	print("SCRATCH DIR:   %(SCRATCH_DIR)s" % env)
+	print("SCRATCH DIR:   %(VIGOR_SCRATCH_DIR)s" % env)
 	for name in sorted(vigor_dirs.keys()):
 		print("%s:   %s" % (name,vigor_dirs[name]))
 	for name in sorted(vigor_urls.keys()):
@@ -258,7 +257,7 @@ def _initialize_area_vigor():
 def _initialize_host():
 	local("ssh-keygen -R %(host)s" % env)
 	_fix_etc_hosts()
-	_create_scratch_dir()
+	_create_vigor_scratch_dir()
 
 def _add_vigor():
 	print("Installing VIGOR...")
@@ -286,12 +285,6 @@ def _fix_etc_hosts():
 	filespec = "/etc/hosts"
 	sudo("echo '127.0.0.1 %s' >> %s" % (internal_ip, filespec))
 
-def _create_scratch_dir():
-	if not _path_is_dir(env.SCRATCH_DIR):
-		sudo("mkdir -p %(SCRATCH_DIR)s" % env)
-	sudo("chown -R %(user)s:%(user)s %(SCRATCH_DIR)s" % env)
-	sudo("find %(SCRATCH_DIR)s -type d -exec chmod 775 {} \;" % env)
-
 def _create_vigor_tempspace_dir():
 	if not _path_is_dir(vigor_dirs["VIGOR_TEMPSPACE_DIR"]):
 		sudo("mkdir -p %s" % vigor_dirs["VIGOR_TEMPSPACE_DIR"])
@@ -299,10 +292,10 @@ def _create_vigor_tempspace_dir():
 		sudo("find %s -type d -exec chmod 777 {} \;" % vigor_dirs["VIGOR_TEMPSPACE_DIR"])
 
 def _create_vigor_scratch_dir():
-	if not _path_is_dir(vigor_dirs["VIGOR_SCRATCH_DIR"]):
-		sudo("mkdir -p %(VIGOR_SCRATCH_DIR)s" % env)
-	sudo("find %s -type f -exec chmod 666 {} \;" % vigor_dirs["VIGOR_SCRATCH_DIR"])
-	sudo("find %s -type d -exec chmod 777 {} \;" % vigor_dirs["VIGOR_SCRATCH_DIR"])
+	if not _path_is_dir(env.VIGOR_SCRATCH_DIR):
+		sudo("mkdir -p %s" % env.VIGOR_SCRATCH_DIR)
+	sudo("find %s -type f -exec chmod 666 {} \;" % env.VIGOR_SCRATCH_DIR)
+	sudo("find %s -type d -exec chmod 777 {} \;" % env.VIGOR_SCRATCH_DIR)
 
 def _create_tools_dir():
 	if not _path_is_dir(vigor_dirs["TOOLS_DIR"]):
@@ -326,34 +319,6 @@ def _add_clustalw():
 	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "clustalw")):
 		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["CLUSTALW_DIR"], vigor_names["CLUSTALW_NAME"], "clustalw"), vigor_dirs["EXE_DIR"]))
 
-def _remove_vigor():
-	print("Removing VIGOR...")
-	_remove_dir(env.VIGOR_RUNTIME_DIR)
-	_remove_dir(env.VIGOR_SAMPLE_DATA_DIR)
-	_remove_dir(env.VIGOR_TEMPSPACE_DIR)
-	_remove_dir(env.VIGOR_TEST_OUTPUT_DIR)
-	_remove_dir(env.VIGOR_SCRATCH_DIR)
-
-def _remove_tools():
-	print("Removing tools...")
-	_remove_blast()
-	_remove_clustalw()
-	_remove_dir(env.TOOLS_DIR)
-
-def _remove_blast():
-	print("    Removing blast...")
-	_remove_symlinks(os.path.join(env.BLAST_DIR, vigor_names["BLAST_NAME"], "bin", "*"), env.EXE_DIR)
-	_remove_dir(env.BLAST_DIR)
-
-def _remove_clustalw():
-	print("    Removing clustalw...")
-	_remove_symlinks(os.path.join(env.CLUSTALW_DIR, vigor_names["CLUSTALW_NAME"], "*"), env.EXE_DIR)
-	_remove_dir(env.CLUSTALW_DIR)
-
-def _remove_symlinks(link_from_filespec, link_to_dir):
-	if _path_is_dir(link_to_dir):
-		sudo("find %s -lname '%s' -delete" % (link_to_dir, link_from_filespec))
-
 # VICVB - install methods
 
 def install_vicvb(env):
@@ -376,9 +341,11 @@ def _initialize_env(pipeline):
 		env.VIGOR_ROOT_DIR = "/usr/local/VIGOR"
 		if not _path_exists(env.VIGOR_ROOT_DIR):
 			sudo("mkdir -p %s" % env.VIGOR_ROOT_DIR)
-		env.SCRATCH_DIR = "/usr/local/scratch"
-		if not _path_exists(env.SCRATCH_DIR):
-			sudo("mkdir -p %s" % env.SCRATCH_DIR)
+		env.VIGOR_SCRATCH_DIR = "/usr/local/scratch/vigor"
+		if not _path_exists(env.VIGOR_SCRATCH_DIR):
+			sudo("mkdir -p %s" % env.VIGOR_SCRATCH_DIR)
+			sudo("find %s -type f -exec chmod 666 {} \;" % env.VIGOR_SCRATCH_DIR)
+			sudo("find %s -type d -exec chmod 777 {} \;" % env.VIGOR_SCRATCH_DIR)
 
 def _add_package(download_url, filename, install_dir, type):
 	if not _path_is_dir(install_dir):
