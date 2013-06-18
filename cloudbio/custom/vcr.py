@@ -319,15 +319,42 @@ def _add_clustalw():
 	if not _path_exists(os.path.join(vigor_dirs["EXE_DIR"], "clustalw")):
 		sudo("ln -sf %s %s" % (os.path.join(vigor_dirs["CLUSTALW_DIR"], vigor_names["CLUSTALW_NAME"], "clustalw"), vigor_dirs["EXE_DIR"]))
 
+
 # VICVB - install methods
 
 def install_vicvb(env):
-	_apt_get_install("libperlio-gzip-perl")
-	_apt_get_install("liblocal-lib-perl")
-	with cd("~"):
-		sudo("git clone git://github.com/JCVI-Cloud/VICVB.git")
-	with cd("~/VICVB"):
-		sudo("lib/VICVB/data/install/install_to_dir_full.sh /usr/local/VICVB /mnt/galaxyTools/galaxy-central /")
+	try:
+		_initialize_env("vicvb")
+		
+		_apt_get_install("libperlio-gzip-perl")
+		_apt_get_install("liblocal-lib-perl")
+		
+		tbl2asn_download_dir = "/usr/local/tbl2asn_download"
+		tbl2asn_dir = "/usr/local/bin"
+		if _path_exists(os.path.join(tbl2asn_dir,"tbl2asn")):
+			sudo("mv %s/tbl2asn %s/tbl2asn_pre_VCR" % (tbl2asn_dir,tbl2asn_dir))
+		_add_package("ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn","linux64.tbl2asn.gz",tbl2asn_download_dir,"gzip")
+		sudo("chmod 777 %s/linux64.tbl2asn" % tbl2asn_download_dir)
+		sudo("mv %s/linux64.tbl2asn %s/tbl2asn" % (tbl2asn_download_dir,tbl2asn_dir))
+		_remove_dir(tbl2asn_download_dir)
+		
+		with cd("~"):
+			sudo("git clone git://github.com/JCVI-Cloud/VICVB.git")
+		with cd("~/VICVB"):
+			sudo("lib/VICVB/data/install/install_to_dir_full.sh %s /mnt/galaxyTools/galaxy-central /" % (env.VICVB_LOCAL_DIR))
+	finally:
+		disconnect_all()
+
+def install_vicvb_cleanall(env):
+	try:
+		_initialize_env("vicvb")
+		_remove_dir(env.VICVB_LOCAL_DIR)
+		_remove_dir(env.VICVB_GALAXY_DIR)
+		with cd ("~"):
+			sudo("rm -fr ~/VICVB")
+		print("VICVB Removed\n")
+	finally:
+		disconnect_all()
 
 
 # Common methods
@@ -337,7 +364,7 @@ def _initialize_env(pipeline):
 		env.VIRAL_ROOT_DIR = "/usr/local/VHTNGS"
 		if not _path_exists(env.VIRAL_ROOT_DIR):
 			sudo("mkdir -p %s" % env.VIRAL_ROOT_DIR)
-	else:
+	elif pipeline == "vigor":
 		env.VIGOR_ROOT_DIR = "/usr/local/VIGOR"
 		if not _path_exists(env.VIGOR_ROOT_DIR):
 			sudo("mkdir -p %s" % env.VIGOR_ROOT_DIR)
@@ -346,6 +373,9 @@ def _initialize_env(pipeline):
 			sudo("mkdir -p %s" % env.VIGOR_SCRATCH_DIR)
 			sudo("find %s -type f -exec chmod 666 {} \;" % env.VIGOR_SCRATCH_DIR)
 			sudo("find %s -type d -exec chmod 777 {} \;" % env.VIGOR_SCRATCH_DIR)
+	else:
+		env.VICVB_LOCAL_DIR = "/usr/local/VICVB";
+		env.VICVB_GALAXY_DIR = "/mnt/galaxyTools/galaxy-central/static/vicvb";
 
 def _add_package(download_url, filename, install_dir, type):
 	if not _path_is_dir(install_dir):
@@ -356,7 +386,9 @@ def _add_package(download_url, filename, install_dir, type):
 			if type == "tar":
 				sudo("tar xvfz %s" % filename)
 			elif type == "bz2":
-				sudo("tar xfj %s" % filename) 
+				sudo("tar xfj %s" % filename)
+			elif type == "gzip":
+				sudo("gunzip %s" % filename)
 			else: 
 				sudo("dpkg -x %s %s" % (filename,install_dir))
 				sudo("mkdir %s/%s" % (install_dir, vigor_names["CLUSTALW_NAME"]))
