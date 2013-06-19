@@ -22,3 +22,6 @@
 [submodule "config/chef/cookbooks/globus"]
 	path = config/chef/cookbooks/globus
 	url = git://github.com/bioconfig/chef-globus.git
+[submodule "config/puppet/modules/lwr"]
+	path = config/puppet/modules/lwr
+	url = git://github.com/bioconfig/puppet-lwr.git

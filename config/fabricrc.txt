@@ -117,6 +117,9 @@ data_files = /mnt/biodata
 #galaxy_indices_mount = /mnt/biodata
 #extra_nfs_exports = comma,separate,desired,paths
 
+## Defaults for CloudMan LWR
+puppet_lwr_user = galaxy
+puppet_lwr_destination = /mnt/galaxy/lwr
 
 # -- Tool-specific configurations
 
