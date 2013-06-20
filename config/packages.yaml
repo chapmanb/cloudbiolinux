@@ -238,7 +238,6 @@ perl:
   - parrot-devel
   - cpanminus
   - libextutils-autoinstall-perl
-  - libextutils-cbuilder-perl
 java:
   # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
   # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
@@ -368,11 +367,10 @@ bio_sequencing:
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
-  - bio-linux-mira
-  - bio-linux-mira-3rd-party
   # - bio-linux-staden # broken Depends: ia32-libs
   # - bio-linux-stars # broken Depends: bio-linux-staden
   - bio-linux-tablet
+  - mira-assembler
 bio_annotation:
   - mcl
   - predictprotein
