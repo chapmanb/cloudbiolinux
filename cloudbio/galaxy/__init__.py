@@ -297,11 +297,12 @@ def _setup_trackster(env):
     if not exists(env.galaxy_len_files):
         sudo("mkdir -p {0}".format(env.galaxy_len_files))
     with cd(env.galaxy_len_files):
-        local_fn = "len-files.tar.gz"
-        sudo('wget --output-document={0} '
-             'https://s3.amazonaws.com/usegalaxy/len-files.tar.gz'.format(local_fn))
-        sudo("tar xzf {0}".format(local_fn))
-        sudo("rm {0}".format(local_fn))
+        if not exists(os.path.join(env.galaxy_len_files, "hg19.len")):
+            local_fn = "len-files.tar.gz"
+            sudo('wget --output-document={0} '
+                 'https://s3.amazonaws.com/usegalaxy/len-files.tar.gz'.format(local_fn))
+            sudo("tar xzf {0}".format(local_fn))
+            sudo("rm {0}".format(local_fn))
     _chown_galaxy(env, env.galaxy_len_files)
 
 
