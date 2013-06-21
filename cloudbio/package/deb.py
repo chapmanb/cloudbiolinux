@@ -24,7 +24,8 @@ def _apt_packages(to_install=None, pkg_list=None):
     """
     if env.edition.short_name not in ["minimal"]:
         env.logger.info("Update the system")
-        sudo("apt-get update")
+        with settings(warn_only=True):
+            sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
         env.edition.apt_upgrade_system()
@@ -68,8 +69,9 @@ def _add_apt_gpg_keys():
         sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
-    sudo("apt-get update")
-    sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
+    with settings(warn_only=True):
+        sudo("apt-get update")
+        sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
 
 
 def _setup_apt_automation():

@@ -103,6 +103,7 @@ def _install_applications(env, tools_conf):
 
 def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}):
     tool_env = _build_tool_env(env, requirement_name, version)
+    env.logger.debug("Installing a Galaxy tool via 'install_%s'" % name)
     eval("install_%s" % name)(tool_env)
     _install_galaxy_config(tool_env, bin_dirs, env_vars=env_vars)
     return tool_env
@@ -154,6 +155,7 @@ def _install_galaxy_config(tool_env, bin_dirs, env_vars):
             env_var_template = Template(env_var_value)
             expanded_env_var_value = env_var_template.substitute(tool_env)
             sudo("echo 'export %s=%s' >> %s" % (env_var, expanded_env_var_value, env_path))
+        env.logger.debug("Added Galaxy env.sh file: %s" % env_path)
 
     _set_default_config(tool_env, install_dir)
     if _read_boolean(tool_env, "autoload_galaxy_tools", False) and exists(env_path):
