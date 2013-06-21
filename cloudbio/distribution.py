@@ -186,7 +186,7 @@ def _setup_vagrant_environment():
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
-    env.key_filename = ssh_config["IdentityFile"]
+    env.key_filename = ssh_config["IdentityFile"].replace('"', '')
     env.logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):

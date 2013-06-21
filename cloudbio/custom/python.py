@@ -14,6 +14,7 @@ def install_bx_python(env):
     """
     version = "bitbucket"
     url = "https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2"
+    env.safe_sudo("%s install --upgrade distribute" % _pip_cmd(env))
     env.safe_sudo("%s install --upgrade %s" % (_pip_cmd(env), url))
 
 @_if_not_python_lib("rpy")

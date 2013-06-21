@@ -163,7 +163,7 @@ programming:
     - pbuilder
     - unzip
   virtual:
-    - virtualbox-4.1
+    - virtualbox-4.2
     - dkms
   util:
     - mc
@@ -294,8 +294,7 @@ databases:
     - tokyocabinet-bin
     - libtokyocabinet-dev
   hdf:
-    - libhdf5-7
-    - libhdf5-dev
+    - libhdf5-serial-dev
 math:
   - prover9
   - octave
@@ -452,7 +451,7 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    - bio-linux-arb
+    #- bio-linux-arb # problematic install questions
     - bio-linux-archaeopteryx
     - bio-linux-cytoscape
     - bio-linux-dendroscope
