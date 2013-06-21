@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# This script is required because of CloudMan - CloudMan's path resolution
+# code would result in using the latest version of PostgreSQL installed via
+# a package manager. However, if a user switches images, the database data
+# may not match the version of PostgreSQL being invoked so this script
+# is used to differentiate which PostgreSQL version is actually invoked.
+# This had to be done here because it was the only variable for old
+# clusters being invoked with a new image. Also note that this script
+# is image dependent (because PostgreSQL v9.1 will be the default version).
+
+versions=( "9.1" "8.4" )
+
+args=""
+for arg in "$@"; do
+    # If there are spaces in an argument, surround it with quotes or psql won’t work
+    [[ "$arg" = "${arg% *}" ]] && args="$args $arg" || args="$args \"$arg\""
+done
+
+for ver in "${versions[@]}"; do
+    if [ "$ver" == "9.1" ]; then
+       cmd="/usr/lib/postgresql/$ver/bin/psql_orig $args"
+    else
+       cmd="/usr/lib/postgresql/$ver/bin/psql $args"
+    fi
+    echo “Running command: $cmd”
+    # Must eval here; otherwise quotes in the args don’t get passed through properly
+    eval $cmd
+    ec=$?
+    if [ $ec -eq 0 ]; then
+        echo "Version $ver seems to work"
+        exit $ec
+    fi
+done
+# Didn’t find a working solution it seems
+exit 1
