@@ -80,12 +80,12 @@ def install_bowtie2(env):
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
-@_if_not_installed("nbwa")
+@_if_not_installed("bwa")
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.7.4"
+    default_version = "0.7.5a"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
@@ -480,7 +480,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.91"
+    version = "1.93"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
