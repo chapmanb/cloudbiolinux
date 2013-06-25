@@ -23,7 +23,7 @@ def install_proteomics_tools(env):
     _install_tools(env, galaxyp_tools_conf)
 
 
-def install_protkgem(env):
+def install_galaxy_protk(env):
     """This method installs Ira Cooke's ProtK framework for the galaxy user.
 
     By default this will install ProtK from rubygems server, but if
@@ -32,7 +32,7 @@ def install_protkgem(env):
     gem will be cloned with hg and installed from source.
     """
     _prep_galaxy(env)
-    default_version = "1.2.0"
+    default_version = "1.2.2"
     version_and_revision = env.get("protk_version", default_version)
     install_from_source = version_and_revision.find("@") > 0
     # e.g. protk_version = 1.1.5@https://bitbucket.org/iracooke/protk-working
@@ -45,19 +45,21 @@ def install_protkgem(env):
     ruby_version = "1.9.3"
     force_rvm_install = False
     with prefix("HOME=~%s" % env.galaxy_user):
-        def rvm_exec(env, cmd="", rvm_cmd="use"):
-            prefix = ". $HOME/.rvm/scripts/rvm; rvm %s %s; " % (rvm_cmd, ruby_version)
+        def rvm_exec(env, cmd="", rvm_cmd="use", with_gemset=False):
+            target = ruby_version if not with_gemset else "%s@%s" % (ruby_version, "protk-%s" % version)
+            prefix = ". $HOME/.rvm/scripts/rvm; rvm %s %s; " % (rvm_cmd, target)
             env.safe_sudo("%s %s" % (prefix, cmd), user=env.galaxy_user)
         if not exists("$HOME/.rvm") or force_rvm_install:
             env.safe_sudo("curl -L get.rvm.io | bash -s stable; source ~%s/.rvm/scripts/rvm" % (env.galaxy_user), user=env.galaxy_user)
             rvm_exec(env, rvm_cmd="install")
+            rvm_exec(env, cmd="rvm gemset create protk-%s" % version)
         if not install_from_source:
             # Typical rubygem install
-            rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version)
+            rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version, with_gemset=True)
         else:
             with cd("~%s" % env.galaxy_user):
                 env.safe_sudo("rm -rf protk_source; hg clone '%s' protk_source" % url, user=env.galaxy_user)
-                rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk")
+                rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk", with_gemset=True)
 
         protk_properties = {}
         ## ProtK can set these up itself, should make that an option.
@@ -73,9 +75,9 @@ def install_protkgem(env):
 
         _write_to_file(yaml.dump(protk_properties), "/home/%s/.protk/config.yml" % env.galaxy_user, 0755)
 
-        rvm_exec(env, "protk_setup.rb galaxyenv")
+        rvm_exec(env, "protk_setup.rb galaxyenv", with_gemset=True)
 
-        install_dir = os.path.join(env.galaxy_tools_dir, "protkgem", version)
+        install_dir = os.path.join(env.galaxy_tools_dir, "galaxy_protk", version)
         env.safe_sudo("mkdir -p '%s'" % install_dir)
         _chown_galaxy(env, install_dir)
         env.safe_sudo('ln -s -f "$HOME/.protk/galaxy/env.sh" "%s/env.sh"' % install_dir, user=env.galaxy_user)

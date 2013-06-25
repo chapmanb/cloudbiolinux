@@ -95,7 +95,7 @@ galaxy:
 galaxy_tools:
   - cbl_galaxy_tools
 galaxyp:
-  - protkgem
+  - galaxy_protk
   - protvis
   - proteomics_tools
 distributed:
