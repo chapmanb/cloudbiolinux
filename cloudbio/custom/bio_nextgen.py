@@ -365,7 +365,7 @@ def install_dwgsim(env):
     http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Main_Page
     """
     version = "0.1.10"
-    samtools_version = "0.1.19"
+    samtools_version = "0.1.18"
     url = "http://downloads.sourceforge.net/project/dnaa/dwgsim/" \
           "dwgsim-{0}.tar.gz".format(version)
     samtools_url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
