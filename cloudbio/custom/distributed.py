@@ -5,9 +5,8 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import (_if_not_installed, _make_tmp_dir, _if_not_python_lib,
-                    _fetch_and_unpack, _pip_cmd,
-                    _get_install, _configure_make)
+from shared import (_if_not_installed, _if_not_python_lib,
+                    _pip_cmd, _get_install, _configure_make)
 
 @_if_not_installed("parallel -h")
 def install_gnu_parallel(env):

@@ -124,7 +124,7 @@ def _setup_deb_general():
     env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
-        env.java_home = "/usr/lib/jvm/java-6-openjdk"
+        env.java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
     shared_sources = [
         "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox

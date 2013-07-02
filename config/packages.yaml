@@ -253,7 +253,6 @@ java:
   - maven2
   - libjline-java
   - libjhdf5-java
-  - clojure
   - jruby
   - jython
   - scala
@@ -360,7 +359,7 @@ bio_nextgen:
   - plink
   - last-align
   - tabix
-  - samtools # now up-to-date again
+  # - samtools # only on 0.18, prefer custom build
 bio_sequencing:
   #- bio-linux-assembly-conversion-tools # broken Depends: bio-linux-staden
   - bio-linux-cap3
@@ -369,7 +368,7 @@ bio_sequencing:
   # - bio-linux-staden # broken Depends: ia32-libs
   # - bio-linux-stars # broken Depends: bio-linux-staden
   - bio-linux-tablet
-  - mira-assembler
+  # - mira-assembler # broken on ubuntu 13.04
 bio_annotation:
   - mcl
   - predictprotein

@@ -89,6 +89,9 @@ def _setup_apt_automation():
     interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
     if not contains(env.shell_config, interactive_cmd):
         append(env.shell_config, interactive_cmd)
+    # Remove interactive checks in .bashrc which prevent
+    # bash customizations
+    comment(env.shell_config, "^[ ]+\*\) return;;$")
     package_info = [
             "postfix postfix/not_configured boolean true",
             "postfix postfix/main_mailer_type select 'No configuration'",
@@ -104,16 +107,15 @@ def _setup_apt_automation():
             "condor condor/wantdebconf boolean false",
             "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula boolean true",
             "ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note",
-            "gdm     shared/default-x-display-manager        select  gdm",
-            "lightdm shared/default-x-display-manager        select  gdm",
-            "postfix postfix/mailname        string  notusedexample.org",
+            "gdm shared/default-x-display-manager select gdm",
+            "lightdm shared/default-x-display-manager select gdm",
+            "postfix postfix/mailname string notusedexample.org",
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
         cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
     sudo(cmd)
-
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.

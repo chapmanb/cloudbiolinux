@@ -292,7 +292,7 @@ def _pip_cmd(env):
         to_check.append("pip-{0}".format(env.python_version_ext))
     for cmd in to_check:
         with quiet():
-            pip_version = run("%s --version" % cmd)
+            pip_version = env.safe_run("%s --version" % cmd)
         if pip_version.succeeded:
             return cmd
     raise ValueError("Could not find pip installer from: %s" % to_check)

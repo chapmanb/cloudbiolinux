@@ -5,7 +5,31 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import (_if_not_installed, _get_install, _configure_make, _java_install)
+from shared import (_if_not_installed, _get_install, _configure_make, _java_install,
+                    _make_tmp_dir)
+
+def install_anaconda(env):
+    """Pre-packaged Anaconda Python installed from Continuum.
+    http://docs.continuum.io/anaconda/index.html
+    """
+    version = "1.6.0"
+    outdir = os.path.join(env.system_install, "anaconda")
+    if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian"]:
+        platform = "Linux"
+    elif env.distribution in ["macosx"]:
+        platform = "MacOSX"
+    else:
+        raise ValueError("Unexpected distribution: %s" % env.distribution)
+    url = "http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/" \
+          "Anaconda-%s-%s-x86_64.sh" % (version, platform)
+    if not env.safe_exists(outdir):
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                env.safe_run("wget %s" % url)
+                env.safe_sudo("echo -e '\nyes\n%s\nyes\n' | bash %s" % (outdir, os.path.basename(url)))
+                env.safe_sudo("chown -R %s %s" % (env.user, outdir))
+                # remove curl library with broken certificates
+                env.safe_run("%s/bin/conda remove curl" % out_dir)
 
 @_if_not_installed("embossversion")
 def install_emboss(env):

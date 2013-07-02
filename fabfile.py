@@ -249,10 +249,10 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     :param automated: If set to True, the environment is not loaded and reading of
                       the ``custom.yaml`` is skipped.
     """
-    _setup_logging(env)
     p = p.lower() # All packages listed in custom.yaml are in lower case
     time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
+        _setup_logging(env)
         _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
@@ -273,7 +273,6 @@ def _install_custom(p, pkg_to_group=None):
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
-
 
 def _custom_install_function(env, p, pkg_to_group):
     """ Find custom install function to execute based on package name to pkg_to_group dict. """
@@ -327,6 +326,8 @@ def _python_library_installer(config):
     env.safe_sudo("easy_install%s -U pip" % version_ext)
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
         env.safe_sudo("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
+    for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
+        env.save_sudo("conda install {1}".format(pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.

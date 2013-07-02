@@ -341,10 +341,9 @@ def install_varianttools(env):
     """Annotation, selection, and analysis of variants in the context of next-gen sequencing analysis.
     http://varianttools.sourceforge.net/
     """
-    version = "1.0.3"
-    version_ext = "b"
+    version = "1.0.6"
     url = "http://downloads.sourceforge.net/project/varianttools/" \
-          "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
+          "{ver}/variant_tools-{ver}-src.tar.gz".format(ver=version)
     _get_install(url, env, _python_make)
 
 @_if_not_installed("pseq")
@@ -366,7 +365,7 @@ def install_dwgsim(env):
     http://sourceforge.net/apps/mediawiki/dnaa/index.php?title=Main_Page
     """
     version = "0.1.10"
-    samtools_version = "0.1.18"
+    samtools_version = "0.1.19"
     url = "http://downloads.sourceforge.net/project/dnaa/dwgsim/" \
           "dwgsim-{0}.tar.gz".format(version)
     samtools_url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
@@ -816,7 +815,7 @@ def install_ray(env):
     """Ray -- Parallel genome assemblies for parallel DNA sequencing
     http://denovoassembler.sourceforge.net/
     """
-    default_version = "2.1.0"
+    default_version = "2.2.0"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/denovoassembler/Ray-v%s.tar.bz2" % version
     def _ray_do_nothing(env):
@@ -840,7 +839,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.16"
+    version = "1.0.5.18"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
@@ -873,7 +872,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.0.8"
+    version = "0.0.9"
     url = "https://s3.amazonaws.com/bcbio.variation/" \
           "bcbio.variation-%s-standalone.jar" % version
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)

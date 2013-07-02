@@ -4,6 +4,7 @@
 # define the steps for downloading, building, and installing the package.
 bio_general:
  #- bio4j # no easy download for 0.8
+ - anaconda
  - emboss
  - pgdspider
 bio_nextgen:

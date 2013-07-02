@@ -5,21 +5,16 @@ pypi:
   # infrastructure
   - amqplib
   - BeautifulSoup
-  - boto
   - distribute
   - fabric
-  - ipython
   - Logbook
   - lxml
   - mako
-  - nose
-  - numpy
   - paste
   - pastescript
   - pycrypto
   - python-cjson
   - pyOpenSSL
-  - pyyaml
   - routes
   - simplejson
   - sphinx
@@ -29,42 +24,28 @@ pypi:
   - xlrd
   - yolk
   # build
-  - cython
   - Pyrex
   - virtualenv
   # concurrency/web
-  - pyzmq
-  - tornado
   - Twisted
   # science
-  - biopython
   - bcbio-nextgen
   - cutadapt
   - ruffus
-  #- cogent
   - DendroPy
   - HTSeq
-  - matplotlib
-  - networkx
-  - pandas
   - pybedtools
   - pygr
-  - pysam
   - PyVCF
   - rpy2
   - rpy2-bioconductor-extensions
-  - scikit-learn
-  - statsmodels
   - ramp
-  - scipy
   # databases
   - CouchDB
-  - h5py
   - MySQL-python
   - pymongo
   - pysqlite
   - psycopg2
-  - SQLAlchemy
   # visualization
   - gnuplot-py
   - PIL
@@ -76,8 +57,28 @@ pypi:
   - oca
   - hoover
   - Mako
-
+conda:
+  - boto
+  - biopython
+  - cython
+  - h5py
+  - ipython
+  - matplotlib
+  - networkx
+  - nose
+  - numpy
+  - pandas
+  - pysam
+  - pyyaml
+  - pyzmq
+  - scikit-learn
+  - scipy
+  - SQLAlchemy
+  - statsmodels
+  - tornado
+  
 ## compile problems
+  #- cogent
   #- tables
   #- pygraphviz
   #- pysparse
