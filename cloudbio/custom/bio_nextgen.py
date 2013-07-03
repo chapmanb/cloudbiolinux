@@ -12,7 +12,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir)
-from cloudbio.custom import shared
+from cloudbio.custom import shared, versioncheck
 
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
@@ -80,13 +80,14 @@ def install_bowtie2(env):
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
-@_if_not_installed("bwa")
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
     default_version = "0.7.5a"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "bwa", version, stdout_flag="Version:"):
+        return
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
@@ -247,13 +248,14 @@ def install_mosaik(env):
 
 # --- Utilities
 
-@_if_not_installed("samtools")
 def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
     """
     default_version = "0.1.19"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "samtools", version, stdout_flag="Version:"):
+        return
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
     def _safe_ncurses_make(env):

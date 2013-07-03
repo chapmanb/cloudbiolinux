@@ -250,12 +250,12 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
                       the ``custom.yaml`` is skipped.
     """
     p = p.lower() # All packages listed in custom.yaml are in lower case
-    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
         _setup_logging(env)
         _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
     ## TODO: Replace the previous 4 lines with the following one, barring
