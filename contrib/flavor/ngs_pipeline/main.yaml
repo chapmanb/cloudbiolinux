@@ -12,6 +12,7 @@ packages:
   - distributed
 libraries:
 custom_ignore:
+  - anaconda
   - bfast
   - gmap
   - lastz

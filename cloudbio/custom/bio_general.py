@@ -29,7 +29,7 @@ def install_anaconda(env):
                 env.safe_sudo("echo -e '\nyes\n%s\nyes\n' | bash %s" % (outdir, os.path.basename(url)))
                 env.safe_sudo("chown -R %s %s" % (env.user, outdir))
                 # remove curl library with broken certificates
-                env.safe_run("%s/bin/conda remove curl" % out_dir)
+                env.safe_run("%s/bin/conda remove --yes curl" % outdir)
 
 @_if_not_installed("embossversion")
 def install_emboss(env):

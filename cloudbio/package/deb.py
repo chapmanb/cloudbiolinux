@@ -110,6 +110,9 @@ def _setup_apt_automation():
             "gdm shared/default-x-display-manager select gdm",
             "lightdm shared/default-x-display-manager select gdm",
             "postfix postfix/mailname string notusedexample.org",
+            # Work harder to avoid gdm dialogs
+            # https://bugs.launchpad.net/ubuntu/+source/gdm/+bug/1020770
+            "debconf debconf/priority select critical"
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
