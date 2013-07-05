@@ -25,11 +25,9 @@ pypi:
   - yolk
   # build
   - Pyrex
-  - virtualenv
   # concurrency/web
   - Twisted
   # science
-  - bcbio-nextgen
   - cutadapt
   - ruffus
   - DendroPy
@@ -49,7 +47,6 @@ pypi:
   # visualization
   - gnuplot-py
   - PIL
-  - pydot
   - pygooglechart
   - pypdf
   - reportlab
@@ -83,3 +80,4 @@ conda:
   #- pygraphviz
   #- pysparse
   #- sympy
+  #- pydot # references python 3-only pyparsing

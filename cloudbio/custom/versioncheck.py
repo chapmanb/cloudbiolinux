@@ -10,10 +10,10 @@ from fabric.api import quiet
 
 from cloudbio.custom import shared
 
-def _parse_from_stdoutflag(stdout, flag):
+def _parse_from_stdoutflag(out, flag):
     """Extract version information from a flag in verbose stdout.
     """
-    for line in stdout.split("\n"):
+    for line in out.split("\n") + out.stderr.split("\n"):
         if line.find(flag) >= 0:
             parts = [x for x in line.split() if not x.startswith(flag)]
             return parts[0]

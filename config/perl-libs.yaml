@@ -203,7 +203,7 @@ cpan:
   - 'Bio::ASN1::EntrezGene'
   - 'Bio::Graphics'
   - 'Bio::Phylo'
-  - 'BioPerl'
+  - 'http://www.cpan.org/authors/id/C/CJ/CJFIELDS/BioPerl-1.6.901.tar.gz'
   - 'Bio::Das'
   - 'Bio::GFF3::LowLevel'
 # Currently have problems building on CentOS

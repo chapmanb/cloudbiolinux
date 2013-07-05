@@ -321,13 +321,20 @@ def _read_main_config():
 
 def _python_library_installer(config):
     """Install python specific libraries using easy_install.
+    Handles using isolated anaconda environments.
     """
-    version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
-    env.safe_sudo("easy_install%s -U pip" % version_ext)
+    with quiet():
+        is_anaconda = env.safe_run("conda -V").startswith("conda")
+    if is_anaconda:
+        for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
+            env.safe_run("conda install --yes {0}".format(pname))
+        cmd = env.safe_run
+    else:
+        version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
+        env.safe_sudo("easy_install%s -U pip" % version_ext)
+        cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        env.safe_sudo("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
-    for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
-        env.save_sudo("conda install {1}".format(pname))
+        cmd("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
