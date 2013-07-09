@@ -124,7 +124,7 @@ def _setup_deb_general():
     env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
-        env.java_home = "/usr/lib/jvm/java-6-openjdk"
+        env.java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
     shared_sources = [
         "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
@@ -186,7 +186,7 @@ def _setup_vagrant_environment():
     env.hosts = [ssh_config["HostName"]]
     env.port = ssh_config["Port"]
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
-    env.key_filename = ssh_config["IdentityFile"]
+    env.key_filename = ssh_config["IdentityFile"].replace('"', '')
     env.logger.debug("ssh %s" % env.host_string)
 
 def _add_source_versions(version, sources):

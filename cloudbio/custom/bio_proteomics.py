@@ -26,7 +26,7 @@ def install_transproteomic_pipeline(env):
     """
     """
     ## version should be of form X.X.X-codename
-    default_version = "4.6.2-occupy"
+    default_version = "4.6.1-occupy"
     version = env.get("tool_version", default_version)
     version_parts = re.match("(\d\.\d)\.(\d)-(.*)", version)
     major_version = version_parts.group(1)
@@ -39,11 +39,11 @@ def install_transproteomic_pipeline(env):
     download_version = ("%s%s" % (major_version, download_rev))
     url_pieces = (major_version, codename, revision, download_version)
     url = 'http://sourceforge.net/projects/sashimi/files/Trans-Proteomic Pipeline (TPP)/TPP v%s (%s) rev %s/TPP-%s.tgz' % url_pieces
-    #install_dir = os.path.join(env["system_install"], "bin")
 
     def _chdir_src(work_cmd):
         def do_work(env):
-            with cd("src"):
+            src_dir = "trans_proteomic_pipeline/src" if version == "4.6.1-occupy" else "src"
+            with cd(src_dir):
                 append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
                 append("Makefile.config.incl", "TPP_WEB=/tpp/")
                 append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
@@ -141,7 +141,7 @@ def install_mzmine(env):
 
 @_if_not_installed("SearchGUI")
 def install_searchgui(env):
-    default_version = "1.13.0"
+    default_version = "1.13.1"
     version = env.get("tool_version", default_version)
     url = "http://searchgui.googlecode.com/files/SearchGUI-%s_mac_and_linux.zip" % version
 
@@ -168,10 +168,10 @@ def install_searchgui(env):
 def install_psm_eval(env):
     default_version = "0.1.0"
     version = env.get("tool_version", default_version)
-    url = "git clone git://github.com/jmchilton/psm-eval.git"
+    url = "git clone https://github.com/jmchilton/psm-eval.git"
 
     def install_fn(env, install_dir):
-        env.safe_sudo("mv psm-eval/* '%s'" % install_dir)
+        env.safe_sudo("cp -r psm-eval/* '%s'" % install_dir)
         _create_python_virtualenv(env, "psme", "%s/requirements.txt" % install_dir)
         bin_dir = os.path.join(env.get("system_install"), "bin")
         env.safe_sudo("mkdir -p '%s'" % bin_dir)
@@ -182,7 +182,7 @@ def install_psm_eval(env):
 
 @_if_not_installed("PeptideShaker")
 def install_peptide_shaker(env):
-    default_version = "0.20.0"
+    default_version = "0.20.1"
     version = env.get("tool_version", default_version)
     url = "http://peptide-shaker.googlecode.com/files/PeptideShaker-%s.zip" % version
 
@@ -323,7 +323,7 @@ def install_crux(env):
 
     def _move(env):
         bin_dir = _get_bin_dir(env)
-        env.safe_sudo("mv bin/* '%s'" % (bin_dir, bin_dir))
+        env.safe_sudo("mv bin/* '%s'" % (bin_dir))
 
     _get_install(url, env, _move)
 
@@ -364,6 +364,22 @@ def install_ipig(env):
         install_cmd("unzip -u %s" % (os.path.split(url)[-1]))
         install_cmd("rm %s" % (os.path.split(url)[-1]))
         install_cmd('chown --recursive %s:%s %s' % (env.galaxy_user, env.galaxy_user, install_dir))
+
+
+def install_peptide_to_gff(env):
+    default_version = "master"
+    version = env.get("tool_version", default_version)
+    repository = "hg clone https://jmchilton@bitbucket.org/galaxyp/peptide_to_gff"
+
+    def install_fn(env, install_dir):
+        env.safe_sudo("cp -r peptide_to_gff/* '%s'" % install_dir)
+        _create_python_virtualenv(env, "peptide_to_gff", "%s/requirements.txt" % install_dir)
+        bin_dir = os.path.join(env.get("system_install"), "bin")
+        env.safe_sudo("mkdir -p '%s'" % bin_dir)
+        env.safe_sudo("ln -s '%s' '%s'" % (os.path.join(install_dir, "peptide_to_gff"), os.path.join(bin_dir, "peptide_to_gff")))
+
+    _unzip_install("peptide_to_gff", version, repository, env, install_fn)
+
 
 
 @_if_not_installed("myrimatch")

@@ -9,7 +9,7 @@ from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists, settings, hide, sed
 
 from cloudbio.custom.shared import _make_tmp_dir
-from cloudbio.cloudman import _configure_cloudman, _configure_novnc
+from cloudbio.cloudman import _configure_cloudman, _configure_novnc, _configure_ec2_autorun
 from cloudbio.galaxy import _install_nginx
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
@@ -25,6 +25,11 @@ def install_cloudman(env):
     install_nginx(env)
     install_proftpd(env)
     install_sge(env)
+
+
+def install_ec2_autorun(env):
+    _configure_ec2_autorun(env)
+
 
 def install_novnc(env):
     _configure_novnc(env)

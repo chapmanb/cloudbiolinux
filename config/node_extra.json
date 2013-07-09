@@ -1,4 +1,7 @@
 // Properties used by chef to configure node. Merged with fabric
 // properties to produce final node.json file used by Chef.
 {
+  "globus": {
+    "repository_deb_url" : "http://www.globus.org/ftppub/gt5/5.2/5.2.4/installers/repo/globus-repository-5.2-stable-quantal_0.0.3_all.deb"
+  }
 }

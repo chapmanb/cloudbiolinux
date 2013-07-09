@@ -163,7 +163,7 @@ programming:
     - pbuilder
     - unzip
   virtual:
-    - virtualbox-4.1
+    - virtualbox-4.2
     - dkms
   util:
     - mc
@@ -238,7 +238,6 @@ perl:
   - parrot-devel
   - cpanminus
   - libextutils-autoinstall-perl
-  - libextutils-cbuilder-perl
 java:
   # - sun-java6-bin # Sun Java removed from Ubuntu package repositories
   # - sun-java6-jre # Package 'sun-java6-jre' has no installation candidate
@@ -254,7 +253,6 @@ java:
   - maven2
   - libjline-java
   - libjhdf5-java
-  - clojure
   - jruby
   - jython
   - scala
@@ -295,8 +293,7 @@ databases:
     - tokyocabinet-bin
     - libtokyocabinet-dev
   hdf:
-    - libhdf5-7
-    - libhdf5-dev
+    - libhdf5-serial-dev
 math:
   - prover9
   - octave
@@ -362,17 +359,16 @@ bio_nextgen:
   - plink
   - last-align
   - tabix
-  - samtools # now up-to-date again
+  # - samtools # only on 0.18, prefer custom build
 bio_sequencing:
   #- bio-linux-assembly-conversion-tools # broken Depends: bio-linux-staden
   - bio-linux-cap3
   - bio-linux-dust
   - bio-linux-lucy
-  - bio-linux-mira
-  - bio-linux-mira-3rd-party
   # - bio-linux-staden # broken Depends: ia32-libs
   # - bio-linux-stars # broken Depends: bio-linux-staden
   - bio-linux-tablet
+  # - mira-assembler # broken on ubuntu 13.04
 bio_annotation:
   - mcl
   - predictprotein
@@ -409,6 +405,7 @@ bio_proteomics:
   - libxml-sax-expat-perl
   - libgd2-xpm-dev
   - libbz2-dev
+  - gnuplot  
   # Needed for percolator
   - libxerces-c3.1
   - libxerces-c-dev
@@ -453,7 +450,7 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    - bio-linux-arb
+    #- bio-linux-arb # problematic install questions
     - bio-linux-archaeopteryx
     - bio-linux-cytoscape
     - bio-linux-dendroscope
@@ -532,9 +529,11 @@ galaxy:
     - libncurses5-dev
     # Required by Compute q-values
     - liblzma-dev
-    - r-base
-    - r-base-core
-    - r-base-dev
+    # Latest python-rpy not currently compatible with R 3.0.1 at least on precise (presumably 
+    # quantal as well), hack below is to specify an older version of R compabile with python-rpy.    
+    #- r-base
+    #- r-base-core
+    #- r-base-dev
     - r-cran-lattice
     - r-cran-qvalue
     # Required by HVIS
@@ -548,12 +547,19 @@ galaxy:
     - pdfjam
     - python-scipy
     - libsparsehash-dev
+  ubuntu_quantal:
+    - "r-base-core=3.0.0-2quantal"
+    - "r-base-dev=3.0.0-2quantal"
+  ubuntu_precise:
+    - "r-base-core=3.0.0-2precise"
+    - "r-base-dev=3.0.0-2precise"        
 galaxyp:
   all:
      # Required for protk
      - libxml2-dev
      - libreadline-dev
      - libxslt-dev
+     
      # Required for protvis
      - python-virtualenv
      - python-setuptools
@@ -567,6 +573,7 @@ galaxyp:
      - libxml-sax-expat-perl
      - libgd2-xpm-dev
      - libbz2-dev
+     - gnuplot
 
      # Needed for percolator
      - libxerces-c3.1
@@ -595,6 +602,18 @@ galaxyp:
 
      # Needed  for psm-eval
      - libyaml-dev
+
+     # Needed for RVM
+     - libbison-dev
+     - ncurses-dev 
+     - automake 
+     - libtool  
+     - bison
+     - subversion
+     - libgdbm-dev
+     - libffi-dev
+     - libsqlite3-dev
+     - sqlite3
 
 # To do -- in Deb Med but not propogated
 # squizz

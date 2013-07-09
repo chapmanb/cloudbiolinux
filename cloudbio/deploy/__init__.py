@@ -10,14 +10,15 @@ from cloudbio.biodata.genomes import install_data, install_data_s3
 from cloudbio.galaxy import _setup_galaxy_env_defaults
 from cloudbio.galaxy.utils import _chown_galaxy
 from cloudbio.package.deb import _apt_packages
-from fabfile import _perform_install
+from fabfile import _perform_install, _install_custom
 
 
-from cloudman import cloudman_launch
+from .cloudman import cloudman_launch, bundle_cloudman
 from image import configure_MI
 from tools import install_tools, purge_tools
 from galaxy import setup_galaxy, refresh_galaxy, seed_database, seed_workflows, wait_for_galaxy, purge_galaxy
-from util import sudoers_append, wget
+from .util import sudoers_append, wget, eval_template
+from .volume import attach_volumes, make_snapshots, sync_cloudman_bucket, detach_volumes
 
 from fabric.main import load_settings
 from fabric.api import put, run, env, settings, sudo, cd, get
@@ -47,6 +48,12 @@ def deploy(options):
             if node_name == target_name:
                 vm_launcher.destroy(node)
 
+    if _do_perform_action("bundle_cloudman", actions):
+        bundle_cloudman(options)
+
+    if _do_perform_action("sync_cloudman_bucket", actions):
+        sync_cloudman_bucket(vm_launcher, options)
+
     if _do_perform_action("cloudman_launch", actions):
         cloudman_launch(vm_launcher, options)
 
@@ -59,12 +66,14 @@ def deploy(options):
 
 def _setup_vm(options, vm_launcher, actions):
     destroy_on_complete = get_boolean_option(options, 'destroy_on_complete', False)
-    use_galaxy = get_boolean_option(options, 'use_galaxy', True)
+    use_galaxy = get_boolean_option(options, 'use_galaxy', False)
     try:
         ip = vm_launcher.get_ip()
         _setup_fabric(vm_launcher, ip, options)
         with settings(host_string=ip):
             _setup_cloudbiolinux(options)
+            if 'attach_volumes' in actions:
+                attach_volumes(vm_launcher, options)
             if 'max_lifetime' in options:
                 seconds = options['max_lifetime']
                 # Unclear why the sleep is needed, but seems to be otherwise
@@ -87,12 +96,18 @@ def _setup_vm(options, vm_launcher, actions):
             if 'transfer' in actions and use_galaxy:
                 wait_for_galaxy()
                 create_data_library_for_uploads(options)
-            if 'package' in actions:
-                vm_launcher.package()
             if 'ssh' in actions:
                 _interactive_ssh(vm_launcher)
             if 'attach_ip' in actions:
                 vm_launcher.attach_public_ip()
+            if 'snapshot_volumes' in actions:
+                make_snapshots(vm_launcher, options)
+            if 'detach_volumes' in actions:
+                detach_volumes(vm_launcher, options)
+            if 'package' in actions:
+                name_template = vm_launcher.package_image_name()
+                name = eval_template(env, name_template)
+                vm_launcher.package(name=name)
             if not destroy_on_complete:
                 print 'Your Galaxy instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
     finally:
@@ -116,9 +131,16 @@ def _expand_actions(actions):
                           "setup_image",
                           "launch",  # Dummy action justs launches image
                           "install_biolinux",
-                          "cloudman_launch",
+                          "install_custom",
                           "ssh",
                           "attach_ip",
+                          "snapshot_volumes",
+                          "attach_volumes",
+                          "detach_volumes",
+                          # Special CloudMan tasks not tied to a particular remote instance
+                          "cloudman_launch",
+                          "sync_cloudman_bucket",
+                          "bundle_cloudman",
                           ]:
         if simple_action in actions:
             unique_actions.add(simple_action)
@@ -154,6 +176,7 @@ def _setup_cloudbiolinux(options):
     flavor = get_main_options_string(options, "flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
     _setup_logging(env)
     _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
+    _setup_image_user_data(env, options)
 
 
 def _setup_cloudbiolinux_fabric_properties(env, options):
@@ -171,6 +194,11 @@ def _setup_cloudbiolinux_fabric_properties(env, options):
             overrides[key] = str(value)
     env.update(overrides)
     _setup_galaxy_env_defaults(env)
+
+
+def _setup_image_user_data(env, options):
+    if "image_user_data" in options:
+        env["image_user_data_dict"] = options["image_user_data"]
 
 
 def purge_genomes():
@@ -262,6 +290,8 @@ def configure_instance(options, actions):
         configure_sudoers(options)
     if "install_biolinux" in actions:
         install_biolinux(options)
+    if "install_custom" in actions:
+        install_custom(options)
     if "purge_tools" in actions:
         purge_tools()
     if "setup_tools" in actions:
@@ -279,6 +309,11 @@ def configure_instance(options, actions):
             seed_workflows(options)
     if "setup_ssh_key" in actions:
         configure_ssh_key(options)
+
+
+def install_custom(options):
+    package = options.get("package")
+    _install_custom(package)
 
 
 def install_biolinux(options):

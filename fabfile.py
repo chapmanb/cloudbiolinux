@@ -249,13 +249,33 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     :param automated: If set to True, the environment is not loaded and reading of
                       the ``custom.yaml`` is skipped.
     """
-    _setup_logging(env)
     p = p.lower() # All packages listed in custom.yaml are in lower case
-    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
+        _setup_logging(env)
         _configure_fabric_environment(env, flavor, ignore_distcheck=True)
         pkg_config = get_config_file(env, "custom.yaml").base
         packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+    ## TODO: Replace the previous 4 lines with the following one, barring
+    ## objections. Slightly different behavior because pkg_to_group will be
+    ## loaded regardless of automated if it is None, but IMO this shouldn't
+    ## matter because the following steps look like they would fail if
+    ## automated is True and pkg_to_group is None.
+    # _install_custom(p, pkg_to_group)
+    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+
+
+def _install_custom(p, pkg_to_group=None):
+    if pkg_to_group is None:
+        pkg_config = get_config_file(env, "custom.yaml").base
+        packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+
+def _custom_install_function(env, p, pkg_to_group):
+    """ Find custom install function to execute based on package name to pkg_to_group dict. """
 
     try:
         env.logger.debug("Import %s" % p)
@@ -276,8 +296,8 @@ def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
-    fn(env)
-    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+    return fn
+
 
 def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
@@ -301,11 +321,20 @@ def _read_main_config():
 
 def _python_library_installer(config):
     """Install python specific libraries using easy_install.
+    Handles using isolated anaconda environments.
     """
-    version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
-    env.safe_sudo("easy_install%s -U pip" % version_ext)
+    with quiet():
+        is_anaconda = env.safe_run("conda -V").startswith("conda")
+    if is_anaconda:
+        for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
+            env.safe_run("conda install --yes {0}".format(pname))
+        cmd = env.safe_run
+    else:
+        version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
+        env.safe_sudo("easy_install%s -U pip" % version_ext)
+        cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        env.safe_sudo("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
+        cmd("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.

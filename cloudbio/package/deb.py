@@ -24,7 +24,8 @@ def _apt_packages(to_install=None, pkg_list=None):
     """
     if env.edition.short_name not in ["minimal"]:
         env.logger.info("Update the system")
-        sudo("apt-get update")
+        with settings(warn_only=True):
+            sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
         env.edition.apt_upgrade_system()
@@ -68,8 +69,9 @@ def _add_apt_gpg_keys():
         sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
         sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
-    sudo("apt-get update")
-    sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
+    with settings(warn_only=True):
+        sudo("apt-get update")
+        sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
 
 
 def _setup_apt_automation():
@@ -87,6 +89,9 @@ def _setup_apt_automation():
     interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
     if not contains(env.shell_config, interactive_cmd):
         append(env.shell_config, interactive_cmd)
+    # Remove interactive checks in .bashrc which prevent
+    # bash customizations
+    comment(env.shell_config, "^[ ]+\*\) return;;$")
     package_info = [
             "postfix postfix/not_configured boolean true",
             "postfix postfix/main_mailer_type select 'No configuration'",
@@ -100,13 +105,20 @@ def _setup_apt_automation():
             "acroread acroread/default-viewer boolean false",
             "rabbitmq-server rabbitmq-server/upgrade_previous note",
             "condor condor/wantdebconf boolean false",
+            "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula boolean true",
+            "ttf-mscorefonts-installer msttcorefonts/present-mscorefonts-eula note",
+            "gdm shared/default-x-display-manager select gdm",
+            "lightdm shared/default-x-display-manager select gdm",
+            "postfix postfix/mailname string notusedexample.org",
+            # Work harder to avoid gdm dialogs
+            # https://bugs.launchpad.net/ubuntu/+source/gdm/+bug/1020770
+            "debconf debconf/priority select critical"
             ]
     package_info = env.edition.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
         cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
     sudo(cmd)
-
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.

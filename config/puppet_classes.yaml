@@ -8,3 +8,7 @@ biocloudcentral:
   - "apache::mod::wsgi"
   - "biocloudcentral"
   - "biocloudcentral::apache"
+
+## Uncomment following lines to add LWR to CloudMan meta-package.
+#cloudmn:
+#  - lwr

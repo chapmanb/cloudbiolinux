@@ -158,6 +158,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     if not exists(os.path.dirname(remote)):
         sudo('mkdir -p {0}'.format(os.path.dirname(remote)))
     if use_repo_autorun:
+        # Is this used, can we eliminate use_repo_autorun?
         url = os.path.join(MI_REPO_ROOT_URL, script)
         sudo("wget --output-document=%s %s" % (remote, url))
     else:
@@ -171,7 +172,14 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     # image_user_data_template_path). This specifies defaults for CloudMan when
     # used with resulting image, normal userdata supplied by user will override
     # these defaults.
-    _setup_conf_file(env, os.path.join(env.install_dir, "bin", "IMAGE_USER_DATA"), "image_user_data", default_source="image_user_data")
+    image_user_data_path = os.path.join(env.install_dir, "bin", "IMAGE_USER_DATA")
+    if "image_user_data_dict" in env:
+        # Explicit YAML contents defined in env, just dump them as is.
+        import yaml
+        _write_to_file(yaml.dump(env.get("image_user_data_dict")), image_user_data_path, mode=0644)
+    else:
+        # Else use file or template file.
+        _setup_conf_file(env, image_user_data_path, "image_user_data", default_source="image_user_data")
     env.logger.info("Done configuring CloudMan's ec2_autorun")
 
 

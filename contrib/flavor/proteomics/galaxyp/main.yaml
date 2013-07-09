@@ -1,8 +1,6 @@
 ---
 packages:
   - minimal
-  - cloudman
   - galaxy
   - galaxyp
-  - bio_proteomics_wine
 libraries:

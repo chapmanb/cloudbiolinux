@@ -16,7 +16,10 @@ import yaml
 
 def install_proteomics_tools(env):
     _prep_galaxy(env)
-    galaxyp_tools_conf = yaml.load(open("contrib/flavor/cloudman/galaxyp_tools.yaml", "r"))
+    tools_conf_path = env.get("galaxyp_tools_conf",
+                              os.path.join(env.config_dir, os.pardir,
+                                           "contrib", "flavor", "proteomics", "galaxyp", "galaxyp_tools.yaml"))
+    galaxyp_tools_conf = yaml.load(open(tools_conf_path, "r"))
     _install_tools(env, galaxyp_tools_conf)
 
 
@@ -62,7 +65,7 @@ def install_protkgem(env):
         protk_properties['openms_root'] = "/usr"  # os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
         ### Assumes omssa, blast, and transproteomic_pipeline CBL galaxy installs.
         protk_properties['omssa_root'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
-        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast", "default")
+        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast+", "default")
         protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
         # Other properties: log_file, blast_root
         env.safe_sudo("mkdir -p \"$HOME/.protk\"", user=env.galaxy_user)
@@ -90,7 +93,7 @@ def install_protvis(env):
     env.safe_sudo("sudo apt-get -y --force-yes install libxml2-dev libxslt-dev")
 
     run("rm -rf protvis")
-    run("git clone -b lorikeet git://github.com/jmchilton/protvis.git")
+    run("git clone -b lorikeet https://github.com/jmchilton/protvis.git")
     with cd("protvis"):
         run("git submodule init")
         run("git submodule update")

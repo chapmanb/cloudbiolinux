@@ -12,9 +12,11 @@ packages:
   - distributed
 libraries:
 custom_ignore:
+  - anaconda
   - bfast
   - gmap
   - lastz
+  - macs
   - mosaik
   - perm
   - snap
@@ -31,3 +33,4 @@ custom_ignore:
   - seal
   - bx-python
   - rpy
+  - netsa-python

@@ -5,7 +5,7 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_python_lib, _get_install, _python_make
+from shared import _if_not_python_lib, _get_install, _python_make, _pip_cmd
 
 @_if_not_python_lib("bx")
 def install_bx_python(env):
@@ -13,7 +13,9 @@ def install_bx_python(env):
     https://bitbucket.org/james_taylor/bx-python/wiki/Home
     """
     version = "bitbucket"
-    env.safe_sudo("pip install --upgrade https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2")
+    url = "https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2"
+    env.safe_sudo("%s install --upgrade distribute" % _pip_cmd(env))
+    env.safe_sudo("%s install --upgrade %s" % (_pip_cmd(env), url))
 
 @_if_not_python_lib("rpy")
 def install_rpy(env):
@@ -32,3 +34,12 @@ def install_rpy(env):
         if result.failed:
             return
     _get_install(url, env, _python_make, post_unpack_fn=_fix_libraries)
+
+@_if_not_python_lib("netsa")
+def install_netsa_python(env):
+    """A suite of open source tools for monitoring large-scale networks using flow data.
+    http://tools.netsa.cert.org/index.html
+    """
+    version = "1.3"
+    url = "http://tools.netsa.cert.org/releases/netsa-python-%s.tar.gz" % version
+    env.safe_sudo("%s install %s" % (_pip_cmd(env), url))

@@ -9,13 +9,14 @@ import yaml
 
 from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
-                    _java_install, _pip_cmd, _python_cmd,
+                    _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
                     _get_bin_dir, _get_lib_dir, _get_include_dir)
-from cloudbio.custom import shared
+from cloudbio.custom import shared, versioncheck
 
 from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
+
 
 @_if_not_installed("twoBitToFa")
 def install_ucsc_tools(env):
@@ -31,12 +32,30 @@ def install_ucsc_tools(env):
              "fetchChromSizes", "wigToBigWig", "faSize", "twoBitInfo",
              "twoBitToFa", "faCount"]
     url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/"
+    _download_executables(env, url, tools)
+
+
+@_if_not_installed("blat")
+def install_kent_tools(env):
+    """
+
+    Please note that the Blat source and executables are freely available for
+    academic, nonprofit and personal use. Commercial licensing information is
+    available on the Kent Informatics website (http://www.kentinformatics.com/).
+    """
+    tools = ["blat", "gfClient", "gfServer"]
+    url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/"
+    _download_executables(env, url, tools)
+
+
+def _download_executables(env, base_url, tools):
     install_dir = _get_bin_dir(env)
     for tool in tools:
         with cd(install_dir):
             if not exists(tool):
-                env.safe_sudo("wget %s%s" % (url, tool))
+                env.safe_sudo("wget %s%s" % (base_url, tool))
                 env.safe_sudo("chmod a+rwx %s" % tool)
+
 
 # --- Alignment tools
 
@@ -45,7 +64,7 @@ def install_bowtie(env):
     """The bowtie short read aligner.
     http://bowtie-bio.sourceforge.net/index.shtml
     """
-    default_version = "0.12.9"
+    default_version = "1.0.0"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
           "bowtie-%s-src.zip" % (version, version)
@@ -56,18 +75,19 @@ def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
     http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
-    version = "2.0.5"
+    version = "2.1.0"
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
 
-@_if_not_installed("nbwa")
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
     http://bio-bwa.sourceforge.net/
     """
-    default_version = "0.7.4"
+    default_version = "0.7.5a"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "bwa", version, stdout_flag="Version:"):
+        return
     url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
             version)
     def _fix_makefile():
@@ -228,13 +248,14 @@ def install_mosaik(env):
 
 # --- Utilities
 
-@_if_not_installed("samtools")
 def install_samtools(env):
     """SAM Tools provide various utilities for manipulating alignments in the SAM format.
     http://samtools.sourceforge.net/
     """
     default_version = "0.1.19"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "samtools", version, stdout_flag="Version:"):
+        return
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
     def _safe_ncurses_make(env):
@@ -249,7 +270,7 @@ def install_samtools(env):
             env.safe_run("make clean")
             env.safe_run("make")
         install_dir = shared._get_bin_dir(env)
-        for fname in env.safe_run_output("find -perm -100 -type f").split("\n"):
+        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools misc/wgsim").split("\n"):
             env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     _get_install(url, env, _safe_ncurses_make)
 
@@ -258,7 +279,7 @@ def install_fastx_toolkit(env):
     """FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing.
     http://hannonlab.cshl.edu/fastx_toolkit/
     """
-    default_version = "0.0.13"
+    default_version = "0.0.13.2"
     version = env.get("tool_version", default_version)
     gtext_version = "0.6"
     url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
@@ -283,14 +304,16 @@ def install_solexaqa(env):
             run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
-@_if_not_installed("nogemini")
+@_if_not_installed("gemini")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
     version = "github"
     installer = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
-    data_dir = os.path.join(env.system_install, "local", "share", "gemini")
+    data_dir = os.path.join(env.system_install,
+                            "local" if env.system_install.find("/local") == -1 else "",
+                            "share", "gemini")
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             env.safe_run("wget --no-check-certificate %s" % installer)
@@ -320,10 +343,9 @@ def install_varianttools(env):
     """Annotation, selection, and analysis of variants in the context of next-gen sequencing analysis.
     http://varianttools.sourceforge.net/
     """
-    version = "1.0.3"
-    version_ext = "b"
+    version = "1.0.6"
     url = "http://downloads.sourceforge.net/project/varianttools/" \
-          "{ver}/variant_tools-{ver}{ext}.tar.gz".format(ver=version, ext=version_ext)
+          "{ver}/variant_tools-{ver}-src.tar.gz".format(ver=version)
     _get_install(url, env, _python_make)
 
 @_if_not_installed("pseq")
@@ -374,6 +396,26 @@ def install_fastqc(env):
                 run("unzip %s" % os.path.basename(url))
                 with cd("FastQC"):
                     env.safe_sudo("chmod a+rwx %s" % executable)
+                    env.safe_sudo("mv * %s" % install_dir)
+                env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
+                                                         env.system_install, executable))
+
+@_if_not_installed("fastq_screen")
+def install_fastq_screen(env):
+    """A screening application for high througput sequence data.
+    http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/
+    """
+    version = "0.4"
+    url = "http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/" \
+          "fastq_screen_v%s.tar.gz" % version
+    install_dir = shared._symlinked_shared_dir("fastqc_screen", version, env)
+    executable = "fastq_screen"
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                env.safe_run("wget %s" % (url))
+                env.safe_run("tar -xzvpf %s" % os.path.basename(url))
+                with cd("fastq_screen_v%s" % version):
                     env.safe_sudo("mv * %s" % install_dir)
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
@@ -439,7 +481,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.86"
+    version = "1.93"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
@@ -470,7 +512,7 @@ def install_gatk(env):
             config["cran"] = ["ggplot2", "gplots"]
             libraries.r_library_installer(config)
             # install gsalib
-            git_repo = "git clone --depth 1 git://github.com/broadgsa/gatk.git"
+            git_repo = "git clone --depth 1 https://github.com/broadgsa/gatk.git"
             def install_gsalib(env):
                 env.safe_sudo("ant gsalib")
             _get_install(git_repo, env, install_gsalib)
@@ -479,7 +521,7 @@ def install_varscan(env):
     """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/
     """
-    version = "2.3.3"
+    version = "2.3.5"
     url = "http://downloads.sourceforge.net/project/varscan/VarScan.v%s.jar" % version
     install_dir = _symlinked_java_version_dir("varscan", version, env)
     if install_dir:
@@ -527,7 +569,7 @@ def install_grabix(env):
     https://github.com/arq5x/grabix
     """
     version = "fda4d2609"
-    repository = "git clone git://github.com/arq5x/grabix.git"
+    repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=version)
 
@@ -535,8 +577,9 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "3_1"
-    genomes = ["GRCh37.68", "hg19", "NCBIM37.66", "GRCm38.68", "athalianaTair10"]
+    version = "3_3"
+    genomes = ["GRCh37.71", "hg19", "GRCm38.71"]
+    #genomes_notinstalled = ["NCBIM37.66","athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
@@ -581,7 +624,7 @@ def install_freebayes(env):
     https://github.com/ekg/freebayes
     """
     version = "296a0fa"
-    repository = "git clone --recursive git://github.com/ekg/freebayes.git"
+    repository = "git clone --recursive https://github.com/ekg/freebayes.git"
     def _fix_tabixpp_library_order(env):
         sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
@@ -594,7 +637,7 @@ def install_vcflib(env):
     https://github.com/ekg/vcflib
     """
     version = "06e664c"
-    repository = "git clone --recursive git://github.com/ekg/vcflib.git"
+    repository = "git clone --recursive https://github.com/ekg/vcflib.git"
     def _fix_tabixpp_library_order(env):
         sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env,
@@ -609,7 +652,7 @@ def install_bamtools(env):
     https://github.com/pezmaster31/bamtools
     """
     version = "3fe66b9"
-    repository = "git clone --recursive git://github.com/pezmaster31/bamtools.git"
+    repository = "git clone --recursive https://github.com/pezmaster31/bamtools.git"
     def _cmake_bamtools(env):
         run("mkdir build")
         with cd("build"):
@@ -626,7 +669,7 @@ def install_ogap(env):
     https://github.com/ekg/ogap
     """
     version = "652c525"
-    repository = "git clone --recursive git://github.com/ekg/ogap.git"
+    repository = "git clone --recursive https://github.com/ekg/ogap.git"
     _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
@@ -705,7 +748,7 @@ def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
-    default_version = "2.0.7"
+    default_version = "2.0.8b"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
@@ -717,7 +760,7 @@ def install_cufflinks(env):
     """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
     http://cufflinks.cbcb.umd.edu/
     """
-    default_version = "2.0.2"
+    default_version = "2.1.1"
     version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/" \
           "cufflinks-%s.Linux_x86_64.tar.gz" % version
@@ -774,7 +817,7 @@ def install_ray(env):
     """Ray -- Parallel genome assemblies for parallel DNA sequencing
     http://denovoassembler.sourceforge.net/
     """
-    default_version = "2.1.0"
+    default_version = "2.2.0"
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/denovoassembler/Ray-v%s.tar.bz2" % version
     def _ray_do_nothing(env):
@@ -798,7 +841,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.15"
+    version = "1.0.5.18"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
@@ -831,7 +874,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.0.8"
+    version = "0.0.9"
     url = "https://s3.amazonaws.com/bcbio.variation/" \
           "bcbio.variation-%s-standalone.jar" % version
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
@@ -872,8 +915,8 @@ def install_lumpy(env):
     """a general probabilistic framework for structural variant discovery
     https://github.com/arq5x/lumpy-sv
     """
-    version = "8978e209c1"
-    repository = "git clone git://github.com/arq5x/lumpy-sv.git"
+    version = "fca4706573"
+    repository = "git clone https://github.com/arq5x/lumpy-sv.git"
     _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
 
 @_if_not_installed("CRISP.py")

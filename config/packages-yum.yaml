@@ -35,7 +35,7 @@ libraries:
   - ncurses-devel
   - libxml2-devel
   - zlib-devel
-  - libnetcdf-devel
+  - netcdf-devel
 documentation:
 desktop:
   - gnome-panel
