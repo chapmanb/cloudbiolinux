@@ -270,7 +270,7 @@ def install_samtools(env):
             env.safe_run("make clean")
             env.safe_run("make")
         install_dir = shared._get_bin_dir(env)
-        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools misc/wgsim").split("\n"):
+        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools bcftools/vcfutils.pl misc/wgsim").split("\n"):
             env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     _get_install(url, env, _safe_ncurses_make)
 
