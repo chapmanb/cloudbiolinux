@@ -196,13 +196,13 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
 
 
 def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir_name=None,
-                 safe_tar=False):
+                 safe_tar=False, tar_file_name=None):
     """Retrieve source from a URL and install in our system directory.
     """
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             dir_name = _fetch_and_unpack(url, revision=revision, dir_name=dir_name,
-                                         safe_tar=safe_tar)
+                                         safe_tar=safe_tar, tar_file_name=tar_file_name)
         with cd(os.path.join(work_dir, dir_name)):
             if post_unpack_fn:
                 post_unpack_fn(env)
@@ -210,7 +210,7 @@ def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir
 
 
 def _get_install_local(url, env, make_command, dir_name=None,
-                       post_unpack_fn=None, safe_tar=False):
+                       post_unpack_fn=None, safe_tar=False, tar_file_name=None):
     """Build and install in a local directory.
     """
     (_, test_name, _) = _get_expected_file(url, safe_tar=safe_tar)
@@ -224,7 +224,8 @@ def _get_install_local(url, env, make_command, dir_name=None,
     if not exists(test1) and not exists(test2):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar)
+                dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar,
+                    tar_file_name=tar_file_name)
                 if not exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
