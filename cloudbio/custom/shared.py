@@ -151,7 +151,7 @@ def _safe_dir_name(dir_name, need_dir=True):
 
 
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
-                      safe_tar=False):
+                      safe_tar=False, tar_file_name=None):
     if url.startswith(("git", "svn", "hg", "cvs")):
         base = os.path.splitext(os.path.basename(url.split()[-1]))[0]
         if env.safe_exists(base):
@@ -165,6 +165,9 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
         return base
     else:
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar)
+        # If tar_file_name is provided, use it instead of the inferred one
+        if tar_file_name:
+            tar_file = tar_file_name
         if not env.safe_exists(tar_file):
             env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
         env.safe_run("%s %s" % (tar_cmd, tar_file))
