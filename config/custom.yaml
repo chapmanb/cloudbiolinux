@@ -55,6 +55,7 @@ bio_nextgen:
     - gatk
     - gemini
     - grabix
+    - mutect
     - tabix
     - tassel
     - snpeff
