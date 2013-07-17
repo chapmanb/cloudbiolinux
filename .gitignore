@@ -2,6 +2,7 @@
 tags
 cloudbiolinux.egg-info/
 build/
+doc/build
 dist/
 *.pem
 dpkg.lst
