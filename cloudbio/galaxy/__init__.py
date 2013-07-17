@@ -250,7 +250,6 @@ def _init_galaxy_db(env):
             started = True
         sudo("bash -c 'export PYTHON_EGG_CACHE=eggs; python -ES ./scripts/fetch_eggs.py; ./create_db.sh'",
             user=env.galaxy_user)
-        sudo("rm universe_wsgi.ini")
         if started:
             with settings(warn_only=True):
                 sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
