@@ -113,8 +113,11 @@ def __work_dir():
 # -- Standard build utility simplifiers
 
 
-def _get_expected_file(url, dir_name=None, safe_tar=False):
-    tar_file = os.path.split(url.split("?")[0])[-1]
+def _get_expected_file(url, dir_name=None, safe_tar=False, tar_file_name=None):
+    if tar_file_name:
+        tar_file = tar_file_name
+    else:
+        tar_file = os.path.split(url.split("?")[0])[-1]
     safe_tar = "--pax-option='delete=SCHILY.*,delete=LIBARCHIVE.*'" if safe_tar else ""
     exts = {(".tar.gz", ".tgz"): "tar %s -xzpf" % safe_tar,
             (".tar",): "tar %s -xpf" % safe_tar,
@@ -164,10 +167,8 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
                 raise ValueError("Need to implement revision retrieval for %s" % url.split()[0])
         return base
     else:
-        tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar)
         # If tar_file_name is provided, use it instead of the inferred one
-        if tar_file_name:
-            tar_file = tar_file_name
+        tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar, tar_file_name=tar_file_name)
         if not env.safe_exists(tar_file):
             env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
         env.safe_run("%s %s" % (tar_cmd, tar_file))
@@ -213,7 +214,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
                        post_unpack_fn=None, safe_tar=False, tar_file_name=None):
     """Build and install in a local directory.
     """
-    (_, test_name, _) = _get_expected_file(url, safe_tar=safe_tar)
+    (_, test_name, _) = _get_expected_file(url, safe_tar=safe_tar, tar_file_name=tar_file_name)
     test1 = os.path.join(env.local_install, test_name)
     if dir_name is not None:
         test2 = os.path.join(env.local_install, dir_name)
