@@ -232,7 +232,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
                         if post_unpack_fn:
                             post_unpack_fn(env)
                         make_command(env)
-                    run("mv %s %s" % (dir_name, env.local_install))
+                    env.safe_sudo("mv -p %s %s" % (dir_name, env.local_install))
 
 # --- Language specific utilities
 
