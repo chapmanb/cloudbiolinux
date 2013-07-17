@@ -280,7 +280,7 @@ def upload_s3(config_source):
 def _install_additional_data(genomes, genome_indexes, config):
     download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
     download_transcripts(genomes, env)
-    for custom in config.get("custom", []):
+    for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
         lift_over_genomes = [g.ucsc_name() for (_, _, g) in genomes if g.ucsc_name()]

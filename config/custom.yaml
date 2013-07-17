@@ -17,7 +17,7 @@ bio_nextgen:
     - mosaik
     # - perm # difficult build process with directory names
     - snap
-    - stampy
+    #- stampy # no version names on tarballs
   utilitites:
     - bamtools
     - bedtools
@@ -55,6 +55,7 @@ bio_nextgen:
     - gatk
     - gemini
     - grabix
+    - mutect
     - tabix
     - tassel
     - snpeff

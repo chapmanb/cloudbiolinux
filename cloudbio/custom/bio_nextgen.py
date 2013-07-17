@@ -270,7 +270,7 @@ def install_samtools(env):
             env.safe_run("make clean")
             env.safe_run("make")
         install_dir = shared._get_bin_dir(env)
-        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools misc/wgsim").split("\n"):
+        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools bcftools/vcfutils.pl misc/wgsim").split("\n"):
             env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
     _get_install(url, env, _safe_ncurses_make)
 
@@ -527,8 +527,20 @@ def install_varscan(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget --no-check-certificate %s" % url)
+                env.safe_run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
+
+def install_mutect(env):
+    version = "1.1.4"
+    url = "http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/" \
+          "muTect-%s-bin.zip" % version
+    install_dir = _symlinked_java_version_dir("mutect", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                env.safe_run("wget --no-check-certificate %s" % url)
+                env.safe_run("unzip %s" % os.path.basename(url))
+                env.safe_sudo("mv *.jar version.txt LICENSE* %s" % install_dir)
 
 def install_cram(env):
     """Highly efficient and tunable reference-based compression of sequence data.

@@ -20,7 +20,7 @@ from fabric.api import sudo, run, cd
 from fabric.contrib.files import exists
 
 from cloudbio.custom.shared import _make_tmp_dir, _if_not_installed, _set_default_config
-from cloudbio.custom.shared import _get_install, _configure_make, _make_copy, _fetch_and_unpack, _get_bin_dir
+from cloudbio.custom.shared import _get_install, _configure_make, _fetch_and_unpack, _get_bin_dir
 
 
 @_if_not_installed(None)
@@ -66,39 +66,6 @@ def install_macs(env):
     sudo("echo 'PATH=%s/bin:$PATH' > %s/env.sh" % (install_dir, install_dir))
     sudo("echo 'PYTHONPATH=%s/lib/python%s/site-packages:$PYTHONPATH' >> %s/env.sh" % (env.python_version, install_dir, install_dir))
     _update_default(env, install_dir)
-
-
-@_if_not_installed("tophat")
-def install_tophat(env):
-    version = env.tool_version
-    url = 'http://tophat.cbcb.umd.edu/downloads/tophat-%s.Linux_x86_64.tar.gz' % version
-    pkg_name = "tophat"
-    install_dir = os.path.join(env.galaxy_tools_dir, pkg_name, version)
-    install_cmd = sudo if env.use_sudo else run
-    if not exists(install_dir):
-        install_cmd("mkdir -p %s" % install_dir)
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget %s" % url)
-            run("tar -xvzf %s" % os.path.split(url)[-1])
-            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
-                install_cmd("mv * %s" % install_dir)
-
-
-@_if_not_installed("cufflinks")
-def install_cufflinks(env):
-    version = env.tool_version
-    url = 'http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.Linux_x86_64.tar.gz' % version
-    install_dir = env.system_install
-    install_cmd = sudo if env.use_sudo else run
-    if not exists(install_dir):
-        install_cmd("mkdir -p %s" % install_dir)
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            run("wget %s" % url)
-            run("tar -xvzf %s" % os.path.split(url)[-1])
-            with cd(os.path.split(url)[-1].split('.tar.gz')[0]):
-                install_cmd("mv * %s" % install_dir)
 
 
 @_if_not_installed("megablast")

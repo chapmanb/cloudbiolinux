@@ -116,6 +116,7 @@ def _build_tool_env(env, name, version):
     for key, value in env.iteritems():
         tool_env[key] = value
     tool_env["system_install"] = os.path.join(env.galaxy_tools_dir, name, version)
+    tool_env["local_install"] = os.path.join(env.galaxy_tools_dir, name, version)
     tool_env["venv_directory"] = "%s/%s" % (tool_env["system_install"], "venv")
     return AttributeDict(tool_env)
 
