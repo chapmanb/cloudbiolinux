@@ -274,24 +274,30 @@ def _install_custom(p, pkg_to_group=None):
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
 
-def _custom_install_function(env, p, pkg_to_group):
-    """ Find custom install function to execute based on package name to pkg_to_group dict. """
 
+def _custom_install_function(env, p, pkg_to_group):
+    """
+    Find custom install function to execute based on package name to
+    pkg_to_group dict.
+    """
     try:
-        env.logger.debug("Import %s" % p)
         # Allow direct calling of a program install method, even if the program
         # is not listed in the custom list (ie, not contained as a key value in
         # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
+        print "pkg_to_group:", pkg_to_group
         mod_name = pkg_to_group[p] if p in pkg_to_group else p
+        env.logger.debug("Importing module cloudbio.custom.%s" % mod_name)
         mod = __import__("cloudbio.custom.%s" % mod_name,
                          fromlist=["cloudbio", "custom"])
     except ImportError:
-        raise ImportError("Need to write a %s module in custom." %
+        raise ImportError("Need to write module cloudbio.custom.%s" %
                 pkg_to_group[p])
     replace_chars = ["-"]
     try:
         for to_replace in replace_chars:
             p = p.replace(to_replace, "_")
+        env.logger.debug("Looking for custom install function %s.install_%s"
+            % (mod.__name__, p))
         fn = getattr(mod, "install_%s" % p)
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"

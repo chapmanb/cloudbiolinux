@@ -92,7 +92,8 @@ cloudman:
   - novnc
 galaxy:
   - galaxy_webapp
-  - galaxy_tools
+galaxy_tools:
+  - cbl_galaxy_tools
 galaxyp:
   - protkgem
   - protvis
