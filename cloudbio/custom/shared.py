@@ -232,7 +232,10 @@ def _get_install_local(url, env, make_command, dir_name=None,
                         if post_unpack_fn:
                             post_unpack_fn(env)
                         make_command(env)
-                    env.safe_sudo("mv -p %s %s" % (dir_name, env.local_install))
+                    # Copy instead of move because GNU mv does not have --parents flag.
+                    # The source dir will get cleaned up anyhow so just leave it.
+                    env.safe_sudo("cp --parents --recursive %s %s" % (dir_name,
+                        env.local_install))
 
 # --- Language specific utilities
 
