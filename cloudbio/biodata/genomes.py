@@ -360,7 +360,7 @@ def _data_ngs_genomes(genomes, genome_indexes):
         if not exists(cur_dir):
             run('mkdir -p %s' % cur_dir)
         with cd(cur_dir):
-            if env.remove_old_genomes:
+            if hasattr(env, "remove_old_genomes") and env.remove_old_genomes:
                 _clean_genome_directory()
             seq_dir = 'seq'
             ref_file, base_zips = manager.download(seq_dir)

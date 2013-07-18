@@ -25,8 +25,11 @@ from fabric.api import put, run, env, settings, sudo, cd, get
 from fabric.context_managers import prefix
 from fabric.colors import red
 
-from vmlauncher.transfer import FileTransferManager
-from vmlauncher import build_vm_launcher
+try:
+    from vmlauncher.transfer import FileTransferManager
+    from vmlauncher import build_vm_launcher
+except ImportError:
+    vmlauncher = None
 
 
 DEFAULT_CLOUDBIOLINUX_TARGET = None
@@ -35,7 +38,12 @@ DEFAULT_CLOUDBIOLINUX_FLAVOR = None
 
 def deploy(options):
     actions = _expand_actions(options.get("actions"))
-    vm_launcher = build_vm_launcher(options)
+    if options["vm_provider"] == "novm":
+        vm_launcher = LocalVmLauncher(options)
+    else:
+        if not vmlauncher:
+            raise ImportError("Require vmlauncher: https://github.com/jmchilton/vm-launcher")
+        vm_launcher = build_vm_launcher(options)
 
     if _do_perform_action("list", actions):
         for node in vm_launcher.list():
@@ -58,11 +66,35 @@ def deploy(options):
         cloudman_launch(vm_launcher, options)
 
     # Do we have remaining actions requiring an vm.
+    print actions
     if len(actions) > 0:
         print 'Setting up virtual machine'
         vm_launcher.boot_and_connect()
         _setup_vm(options, vm_launcher, actions)
 
+class LocalVmLauncher:
+    """Provide a lightweight real machine, non-vm class for launching.
+    """
+    def __init__(self, options):
+        self.options = options
+
+    def get_ip(self):
+        return self.options["hostname"]
+
+    def get_key_file(self):
+        return None
+
+    def boot_and_connect(self):
+        pass
+
+    def destroy(self):
+        pass
+
+    def get_user(self):
+        pass
+
+    def list(self):
+        return []
 
 def _setup_vm(options, vm_launcher, actions):
     destroy_on_complete = get_boolean_option(options, 'destroy_on_complete', False)
@@ -427,6 +459,8 @@ def _build_transfer_options(options, destination, user):
 
 
 def _do_transfer(transfer_options, files, compressed_files=[]):
+    if not vmlauncher:
+        raise ImportError("Require vmlauncher: https://github.com/jmchilton/vm-launcher")
     FileTransferManager(**transfer_options).transfer_files(files, compressed_files)
 
 
