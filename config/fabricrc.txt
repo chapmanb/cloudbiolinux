@@ -34,7 +34,7 @@ local_install = ~/install
 
 # Shell to be used by CBL scripts during runtime
 shell_config = ~/.bashrc
-shell = /bin/bash --noprofile -i -l -c
+shell = /bin/bash -i -l -c
 
 # Global setting for using sudo; allows installation of custom packages
 # by non-privileged users.
