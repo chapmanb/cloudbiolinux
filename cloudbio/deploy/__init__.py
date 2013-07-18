@@ -6,7 +6,7 @@ from tempfile import tempdir
 from subprocess import call
 
 from cloudbio.utils import _setup_logging, _configure_fabric_environment, _parse_fabricrc
-from cloudbio.biodata.genomes import install_data, install_data_s3
+from cloudbio.biodata.genomes import install_data, install_data_s3, install_data_rsync
 from cloudbio.galaxy import _setup_galaxy_env_defaults
 from cloudbio.galaxy.utils import _chown_galaxy
 from cloudbio.package.deb import _apt_packages
@@ -81,13 +81,14 @@ def _setup_vm(options, vm_launcher, actions):
                 run("bash -c 'nohup sudo shutdown -h %d &'; sleep 2" % seconds)
             configure_instance(options, actions)
             do_refresh_galaxy = get_boolean_option(options, 'refresh_galaxy', False)
-            do_upload_genomes = get_boolean_option(options, 'upload_genomes', False)
             if do_refresh_galaxy:
                 refresh_galaxy(env.galaxy_repository)
             if use_galaxy:
                 copy_runtime_properties(ip, options)
             if 'transfer' in actions:
                 transfer_files(options)
+                # Upload local compressed genomes to the cloud image, obsecure option.
+                do_upload_genomes = get_boolean_option(options, 'upload_genomes', False)
                 if do_upload_genomes:
                     upload_genomes(options)
             if not _seed_at_configure_time(options) and use_galaxy:
@@ -124,7 +125,9 @@ def _expand_actions(actions):
                           "setup_galaxy",
                           "purge_tools",
                           "setup_tools",
-                          "purge_genomes",
+                          "setup_biodata",
+                          "purge_biodata",
+                          "purge_genomes",  # *_genomes are deprecated galaxy-vm-launcher ways of handling biodata.
                           "setup_genomes",
                           "setup_ssh_key",
                           "package",
@@ -147,6 +150,7 @@ def _expand_actions(actions):
     compound_actions = {"configure": ["setup_image", "setup_tools", "setup_genomes", "setup_galaxy", "setup_ssh_key"],
                         "reinstall_galaxy": ["purge_galaxy", "setup_galaxy"],
                         "reinstall_genomes": ["purge_genomes", "setup_genomes"],
+                        "reinstall_biodata": ["purge_biodata", "setup_biodata"],
                         "reinstall_tools": ["purge_tools", "setup_tools"]}
     for compound_action in compound_actions.keys():
         if compound_action in actions:
@@ -242,10 +246,21 @@ def configure_ssh_key(options):
         _chown_galaxy(env, "/home/%s/.ssh" % env.galaxy_user)
 
 
+def setup_biodata(options):
+    install_proc = install_data
+    genome_source = options.get("genome_source", "default")
+    install_proc = {
+        "default": install_data,
+        "S3": install_data_s3,
+        "rsync": install_data_rsync,
+    }[genome_source]
+    install_proc(options["genomes"])
+
+
+## Deprecated galaxy-vm-launcher way of setting up biodata.
 def setup_genomes(options):
     install_proc = install_data
     sudo("mkdir -p %s" % env.data_files)
-    sudo("mkdir -p %s/tool-data" % env.galaxy_home)
     sudo("chown -R %s:%s %s" % (env.user, env.user, env.data_files))
     put("config/tool_data_table_conf.xml", "%s/tool_data_table_conf.xml" % env.galaxy_home)
     indexing_packages = ["bowtie", "bwa", "samtools"]
@@ -296,8 +311,10 @@ def configure_instance(options, actions):
         purge_tools()
     if "setup_tools" in actions:
         install_tools(options["tools"])
-    if "purge_genomes" in actions:
+    if "purge_genomes" in actions or "purge_biodata" in actions:
         purge_genomes()
+    if "setup_biodata" in actions:
+        setup_biodata(options)
     if "setup_genomes" in actions:
         setup_genomes(options)
     if "purge_galaxy" in actions:
