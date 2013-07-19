@@ -14,17 +14,23 @@ libraries:
 custom_ignore:
   - anaconda
   - bfast
+  - crisp
+  - fastx_toolkit
   - gmap
   - lastz
+  - leiningen
   - macs
   - mosaik
   - perm
+  - plink_seq
   - snap
   - stacks
-  - fastx_toolkit
+  - tassel
   - varianttools
+  - vcflib
   - vep
   - abyss
+  - cortex_var
   - ray
   - transabyss
   - trinity

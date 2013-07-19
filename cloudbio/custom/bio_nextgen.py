@@ -379,7 +379,7 @@ def install_dwgsim(env):
     _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
                  post_unpack_fn=_get_samtools)
 
-@_if_not_installed("fastqc")
+@_if_not_installed("fastqc --version")
 def install_fastqc(env):
     """A quality control tool for high throughput sequence data.
     http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
