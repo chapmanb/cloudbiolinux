@@ -127,6 +127,9 @@ def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     env.config_dir = os.path.join(os.path.dirname(__file__), "..", "config")
+    env.tool_data_table_conf_file = os.path.join(env.config_dir, "..",
+                                                 "installed_files",
+                                                 "tool_data_table_conf.xml")
     if not env.has_key("distribution") and not env.has_key("system_install"):
         env.logger.info("Reading default fabricrc.txt")
         env.update(load_settings(get_config_file(env, "fabricrc.txt").base))

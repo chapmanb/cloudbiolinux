@@ -45,7 +45,7 @@ class _DownloadHelper:
     def _exists(self, fname, seq_dir):
         """Check if a file exists in either download or final destination.
         """
-        return exists(fname) or exists(os.path.join(seq_dir, fname))
+        return env.safe_exists(fname) or env.safe_exists(os.path.join(seq_dir, fname))
 
 class UCSCGenome(_DownloadHelper):
     def __init__(self, genome_name, dl_name=None):
@@ -235,15 +235,21 @@ def _check_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or better")
 
-def install_data(config_source):
+def install_data(config_source, approaches=None):
     """Main entry point for installing useful biological data.
     """
+    PREP_FNS = {"s3": _download_s3_index,
+                "raw": _prep_raw_index}
+    if approaches is None: approaches = ["raw"]
+    ready_approaches = []
+    for approach in approaches:
+        ready_approaches.append((approach, PREP_FNS[approach]))
     _check_version()
     # Append a potentially custom system install path to PATH so tools are found
     with path(os.path.join(env.system_install, 'bin')):
         genomes, genome_indexes, config = _get_genomes(config_source)
         genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
-        _data_ngs_genomes(genomes, genome_indexes)
+        _prep_genomes(env, genomes, genome_indexes, ready_approaches)
         _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_s3(config_source):
@@ -313,7 +319,7 @@ def _get_genomes(config_source):
     indexes = config["genome_indexes"] or []
     return genomes, indexes, config
 
-# == Decorators and context managers
+# ## Decorators and context managers
 
 def _if_installed(pname):
     """Run if the given program name is installed.
@@ -332,22 +338,71 @@ def _if_installed(pname):
 @contextmanager
 def _make_tmp_dir():
     work_dir = os.path.join(env.data_files, "tmp")
-    if not exists(work_dir):
-        run("mkdir %s" % work_dir)
+    if not env.safe_exists(work_dir):
+        env.safe_run("mkdir %s" % work_dir)
     yield work_dir
-    if exists(work_dir):
-        run("rm -rf %s" % work_dir)
+    if env.safe_exists(work_dir):
+        env.safe_run("rm -rf %s" % work_dir)
 
-# ## Genomes index for next-gen sequencing tools
+# ## Generic preparation functions
 
 def _make_genome_dir():
     genome_dir = os.path.join(env.data_files, "genomes")
     with settings(warn_only=True):
-        result = run("mkdir -p %s" % genome_dir)
-    if result.failed:
-        sudo("mkdir -p %s" % genome_dir)
-        sudo("chown -R %s %s" % (env.user, genome_dir))
+        if not env.safe_exists(genome_dir):
+            result = env.safe_run_output("mkdir -p %s" % genome_dir)
+        else:
+            result = None
+    if result and result.failed:
+        env.safe_sudo("mkdir -p %s" % genome_dir)
+        env.safe_sudo("chown -R %s %s" % (env.user, genome_dir))
     return genome_dir
+
+def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
+    """Prepare genomes with the given indexes, supporting multiple retrieval methods.
+    """
+    genome_dir = _make_genome_dir()
+    for (orgname, gid, manager) in genomes:
+        org_dir = os.path.join(genome_dir, orgname, gid)
+        if not exists(org_dir):
+            env.safe_run('mkdir -p %s' % org_dir)
+        for idx in genome_indexes:
+            with cd(org_dir):
+                if not env.safe_exists(idx):
+                    finished = False
+                    for method, retrieve_fn in retrieve_fns:
+                        try:
+                            retrieve_fn(env, manager, gid, idx)
+                            finished = True
+                            break
+                        except:
+                            env.logger.exception("Genome preparation method {0} failed, trying next".format(method))
+                    if not finished:
+                        raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
+        ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
+        if not exists(ref_file):
+            ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)
+        assert exists(ref_file), ref_file
+        cur_indexes = manager.config.get("indexes", genome_indexes)
+        _index_to_galaxy(org_dir, ref_file, gid, cur_indexes, manager.config)
+
+# ## Genomes index for next-gen sequencing tools
+
+def _get_ref_seq(env, manager):
+    """Check for or retrieve the reference sequence.
+    """
+    seq_dir = os.path.join(env.cwd, "seq")
+    ref_file, base_zips = manager.download(seq_dir)
+    ref_file = _move_seq_files(ref_file, base_zips, seq_dir)
+    return ref_file
+
+def _prep_raw_index(env, manager, gid, idx):
+    """Prepare genome from raw downloads and indexes.
+    """
+    env.logger.info("Preparing genome {0} with index {1}".format(gid, idx))
+    ref_file = _get_ref_seq(env, manager)
+    if idx != "ref":
+        INDEX_FNS[idx](ref_file)
 
 def _data_ngs_genomes(genomes, genome_indexes):
     """Download and create index files for next generation genomes.
@@ -371,20 +426,6 @@ def _data_ngs_genomes(genomes, genome_indexes):
 def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
     """Index sequence files and update associated Galaxy loc files.
     """
-    INDEX_FNS = {
-        "seq" : _index_sam,
-        "bwa" : _index_bwa,
-        "bowtie": _index_bowtie,
-        "bowtie2": _index_bowtie2,
-        "maq": _index_maq,
-        "mosaik": _index_mosaik,
-        "novoalign": _index_novoalign,
-        "novoalign_cs": _index_novoalign_cs,
-        "ucsc": _index_twobit,
-        "eland": _index_eland,
-        "bfast": _index_bfast,
-        "arachne": _index_arachne
-        }
     indexes = {}
     with cd(work_dir):
         for idx in genome_indexes:
@@ -614,6 +655,16 @@ def _index_eland(ref_file):
 
 # -- Genome upload and download to Amazon s3 buckets
 
+def _download_s3_index(env, manager, gid, idx):
+    env.logger.info("Downloading genome from s3: {0} {1}".format(gid, idx))
+    url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
+    # Remove any preexisting, potentially truncated files
+    if exists(os.path.basename(url)):
+        env.safe_run("rm -f %s" % os.path.basename(url))
+    env.safe_run("wget --no-check-certificate %s" % url)
+    env.safe_run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
+    env.safe_run("rm -f %s" % os.path.basename(url))
+
 def _download_genomes(genomes, genome_indexes):
     """Download a group of genomes from Amazon s3 bucket.
     """
@@ -623,16 +674,9 @@ def _download_genomes(genomes, genome_indexes):
         if not exists(org_dir):
             run('mkdir -p %s' % org_dir)
         for idx in genome_indexes:
-            env.logger.info("Downloading genome {0} to {1}".format(gid, org_dir))
             with cd(org_dir):
                 if not exists(idx):
-                    url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
-                    # Remove any preexisting, potentially truncated files
-                    if exists(os.path.basename(url)):
-                        run("rm -f %s" % os.path.basename(url))
-                    run("wget --no-check-certificate %s" % url)
-                    run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
-                    run("rm -f %s" % os.path.basename(url))
+                    _download_s3_index(env, manager, gid, idx)
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
         if not exists(ref_file):
             ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)
@@ -814,3 +858,18 @@ def _index_bfast(ref_file):
             for i, mask in enumerate(bfast_color_masks):
                 run("bfast index -d 1 -n 4 -f %s -A 1 -m %s -w %s -i %s" %
                         (local_ref, mask, window_size, i + 1))
+
+INDEX_FNS = {
+    "seq" : _index_sam,
+    "bwa" : _index_bwa,
+    "bowtie": _index_bowtie,
+    "bowtie2": _index_bowtie2,
+    "maq": _index_maq,
+    "mosaik": _index_mosaik,
+    "novoalign": _index_novoalign,
+    "novoalign_cs": _index_novoalign_cs,
+    "ucsc": _index_twobit,
+    "eland": _index_eland,
+    "bfast": _index_bfast,
+    "arachne": _index_arachne
+    }

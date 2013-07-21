@@ -66,7 +66,6 @@ def deploy(options):
         cloudman_launch(vm_launcher, options)
 
     # Do we have remaining actions requiring an vm.
-    print actions
     if len(actions) > 0:
         print 'Setting up virtual machine'
         vm_launcher.boot_and_connect()
@@ -141,7 +140,7 @@ def _setup_vm(options, vm_launcher, actions):
                 name_template = vm_launcher.package_image_name()
                 name = eval_template(env, name_template)
                 vm_launcher.package(name=name)
-            if not destroy_on_complete:
+            if not destroy_on_complete and hasattr(vm_launcher, "uuid"):
                 print 'Your Galaxy instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
     finally:
         if destroy_on_complete:
@@ -217,6 +216,10 @@ def _setup_cloudbiolinux(options):
 
 def _setup_cloudbiolinux_fabric_properties(env, options):
     fabricrc_file = get_main_options_string(options, "fabricrc_file", None)
+    env.config_dir = os.path.join(os.path.dirname(__file__), "..", "..", "config")
+    env.tool_data_table_conf_file = os.path.join(env.config_dir, "..",
+                                                 "installed_files",
+                                                 "tool_data_table_conf.xml")
     if fabricrc_file:
         env.update(load_settings(fabricrc_file))
     else:
@@ -230,7 +233,6 @@ def _setup_cloudbiolinux_fabric_properties(env, options):
             overrides[key] = str(value)
     env.update(overrides)
     _setup_galaxy_env_defaults(env)
-
 
 def _setup_image_user_data(env, options):
     if "image_user_data" in options:
@@ -286,8 +288,10 @@ def setup_biodata(options):
         "S3": install_data_s3,
         "rsync": install_data_rsync,
     }[genome_source]
-    install_proc(options["genomes"])
-
+    if genome_source == "default":
+        install_proc(options["genomes"], ["s3", "raw"])
+    else:
+        install_proc(options["genomes"])
 
 ## Deprecated galaxy-vm-launcher way of setting up biodata.
 def setup_genomes(options):
