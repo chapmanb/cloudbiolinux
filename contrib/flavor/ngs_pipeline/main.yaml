@@ -1,6 +1,7 @@
 ---
-# Flavor containing more minimal instructions to install tools for
-# running next-generation sequencing pipelines.
+# Flavor containing packages for running next-generation sequencing pipelines.
+# Full featured download with lots of associated packages covering multiple
+# pipeline approaches.
 packages:
   - minimal
   - libraries

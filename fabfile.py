@@ -87,7 +87,7 @@ def _perform_install(target=None, flavor=None):
         if env.use_sudo:
             _configure_and_install_native_packages(env, pkg_install)
         else:
-            _connect_native_packages(env, pkg_install)
+            _connect_native_packages(env, pkg_install, lib_install)
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
@@ -284,7 +284,6 @@ def _custom_install_function(env, p, pkg_to_group):
         # Allow direct calling of a program install method, even if the program
         # is not listed in the custom list (ie, not contained as a key value in
         # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
-        print "pkg_to_group:", pkg_to_group
         mod_name = pkg_to_group[p] if p in pkg_to_group else p
         env.logger.debug("Importing module cloudbio.custom.%s" % mod_name)
         mod = __import__("cloudbio.custom.%s" % mod_name,

@@ -35,7 +35,7 @@ def _configure_and_install_native_packages(env, pkg_install):
     else:
         raise NotImplementedError("Unknown target distribution")
 
-def _connect_native_packages(env, pkg_install):
+def _connect_native_packages(env, pkg_install, lib_install):
     """Connect native installed packages to local versions.
 
     This helps setup a non-sudo environment to handle software
@@ -49,7 +49,7 @@ def _connect_native_packages(env, pkg_install):
         if not files.contains(env.shell_config, add_path):
             files.append(env.shell_config, comment_line)
             files.append(env.shell_config, add_path)
-    if "python" in pkg_install:
+    if "python" in pkg_install and "python" in lib_install:
         _create_local_virtualenv(env.system_install)
 
 def _create_local_virtualenv(target_dir):
