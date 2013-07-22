@@ -120,8 +120,10 @@ def _setup_deb_general():
     env.sources_file = "/etc/apt/sources.list.d/cloudbiolinux.list"
     env.global_sources_file = "/etc/apt/sources.list"
     env.apt_preferences_file = "/etc/apt/preferences"
-    env.python_version_ext = ""
-    env.ruby_version_ext = "1.9.1"
+    if not hasattr(env, "python_version_ext"):
+        env.python_version_ext = ""
+    if not hasattr(env, "ruby_version_ext"):
+        env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
@@ -133,15 +135,18 @@ def _setup_deb_general():
 
 def _setup_centos():
     env.logger.info("CentOS setup")
-    env.python_version_ext = "2.6"
-    env.ruby_version_ext = ""
+    if not hasattr(env, "python_version_ext"):
+        env.python_version_ext = "2.6"
+    if not hasattr(env, "ruby_version_ext"):
+        env.ruby_version_ext = ""
     env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
 def _setup_scientificlinux():
     env.logger.info("ScientificLinux setup")
-    env.python_version_ext = ""
+    if not hasattr(env, "python_version_ext"):
+        env.python_version_ext = ""
     env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
