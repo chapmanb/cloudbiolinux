@@ -13,3 +13,4 @@ deploy/keys
 deploy/settings.yaml
 deploy/.venv-deploy
 deploy/.vagrant
+.ropeproject

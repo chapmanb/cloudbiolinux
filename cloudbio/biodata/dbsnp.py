@@ -36,7 +36,8 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
             for dl_name, dl_ext in to_download:
                 _download_broad_bundle(manager.dl_name, bundle_version, dl_name, dl_ext)
             _download_cosmic(gid)
-            _download_background_vcf(gid)
+            # XXX Wait to get this by default until it is used more widely
+            #_download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}{ext}.vcf".format(gid=gid, name=name, ext=ext)
@@ -46,7 +47,7 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
                    bundle=bundle_version, fname=broad_fname, gid=gid)
     if not env.safe_exists(fname):
         with warn_only():
-            dl = env.safe_run("wget %s" % base_url)
+            dl = env.safe_run("wget -c %s" % base_url)
         if dl.succeeded:
             env.safe_run("gunzip %s" % os.path.basename(base_url))
             env.safe_run("mv %s %s" % (broad_fname, fname))
@@ -58,7 +59,7 @@ def _download_cosmic(gid):
     base_url = "http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/"
     base_name = "b37_cosmic_v54_120711.vcf"
     if gid in ["GRCh37"] and not env.safe_exists(base_name):
-        env.safe_run("wget {0}/{1}".format(base_url, base_name))
+        env.safe_run("wget -c {0}/{1}".format(base_url, base_name))
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.
@@ -67,4 +68,4 @@ def _download_background_vcf(gid):
     base_name = "background-diversity-1000g.vcf"
     if gid in ["GRCh37"] and not env.safe_exists("{0}.gz".format(base_name)):
         for ext in ["gz", "gz.tbi"]:
-            env.safe_run("wget {0}/{1}.{2}".format(base_url, base_name, ext))
+            env.safe_run("wget -c {0}/{1}.{2}".format(base_url, base_name, ext))
