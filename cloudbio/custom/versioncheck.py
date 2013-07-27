@@ -6,7 +6,7 @@ lightweight way to avoid out of date dependencies.
 """
 from distutils.version import LooseVersion
 
-from fabric.api import quiet
+from fabric.api import quiet, run
 
 from cloudbio.custom import shared
 
@@ -17,7 +17,8 @@ def _parse_from_stdoutflag(out, flag):
         if line.find(flag) >= 0:
             parts = [x for x in line.split() if not x.startswith(flag)]
             return parts[0]
-    return ""
+    raise IOError("Did not find version information with flag %s from: \n %s"
+                  % (flag, out))
 
 def up_to_date(env, cmd, version, args=None, stdout_flag=None):
     """Check if the given command is up to date with the provided version.
@@ -29,6 +30,11 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None):
     with quiet():
         path_safe = "export PATH=$PATH:%s/bin && "
         out = env.safe_run_output(path_safe + cmd)
+    env.safe_run(path_safe + cmd)
+    print "---"
+    run(path_safe + cmd)
+    print "---"
+    print out
     if stdout_flag:
         iversion = _parse_from_stdoutflag(out, stdout_flag)
     else:

@@ -16,7 +16,7 @@ import re
 import shutil
 
 from fabric.api import env, run, sudo, local, settings, hide
-from fabric.contrib.files import exists, sed, contains, append
+from fabric.contrib.files import exists, sed, contains, append, comment
 
 # ## Local non-ssh access
 
@@ -30,7 +30,8 @@ def local_exists(path, use_sudo=False):
 def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
         if use_sudo:
-            command = "sudo " + command
+            print command, command.replace('"', '\\"')
+            command = "sudo sh -c " + '"%s"' % command.replace('"', '\\"')
         env.lcwd = env.cwd
         return local(command, capture=capture)
     return _run
@@ -81,6 +82,24 @@ def local_sed(filename, before, after, limit='', use_sudo=False, backup='.bak',
     command = expr % context
     return func(command, shell=shell)
 
+def local_comment(filename, regex, use_sudo=False, char='#', backup='.bak', shell=False):
+    carot, dollar = '', ''
+    if regex.startswith('^'):
+        carot = '^'
+        regex = regex[1:]
+    if regex.endswith('$'):
+        dollar = '$'
+        regex = regex[:-1]
+    regex = "%s(%s)%s" % (carot, regex, dollar)
+    return local_sed(
+        filename,
+        before=regex,
+        after=r'%s\1' % char,
+        use_sudo=use_sudo,
+        backup=backup,
+        shell=shell
+    )
+
 def _escape_for_regex(text):
     """Escape ``text`` to allow literal matching using egrep"""
     regex = re.escape(text)
@@ -128,6 +147,7 @@ def configure_runsudo(env):
     if env.is_local:
         env.safe_put = local_put
         env.safe_sed = local_sed
+        env.safe_comment = local_comment
         env.safe_contains = local_contains
         env.safe_append = local_append
         env.safe_exists = local_exists
@@ -136,6 +156,7 @@ def configure_runsudo(env):
     else:
         env.safe_put = put
         env.safe_sed = sed
+        env.safe_comment = comment
         env.safe_contains = contains
         env.safe_append = append
         env.safe_exists = exists

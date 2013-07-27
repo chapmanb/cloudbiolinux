@@ -55,8 +55,8 @@ def install_pgdspider(env):
         bin_dir = os.path.join(env.system_install, "bin")
         exe_file = "PGDSpider2.sh"
         jar = "PGDSpider2.jar"
-        sed(exe_file, jar, "{dir}/{jar}".format(dir=install_dir, jar=jar))
-        run("chmod a+x {0}".format(exe_file))
+        env.safe_sed(exe_file, jar, "{dir}/{jar}".format(dir=install_dir, jar=jar))
+        env.safe_run("chmod a+x {0}".format(exe_file))
         env.safe_sudo("mv {exe} {bin}".format(exe=exe_file, bin=bin_dir))
     _java_install("PGDSpider", version, url, env, install_fn=_install_fn)
 

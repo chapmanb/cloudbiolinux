@@ -52,7 +52,7 @@ def _download_executables(env, base_url, tools):
     install_dir = _get_bin_dir(env)
     for tool in tools:
         with cd(install_dir):
-            if not exists(tool):
+            if not env.safe_exists(tool):
                 env.safe_sudo("wget %s%s" % (base_url, tool))
                 env.safe_sudo("chmod a+rwx %s" % tool)
 
@@ -123,10 +123,10 @@ def install_perm(env):
         gcc_cmd = "g++44"
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            result = run("%s -v" % gcc_cmd)
+            result = env.safe_run("%s -v" % gcc_cmd)
         print result.return_code
         if result.return_code == 0:
-            sed("makefile", "g\+\+", gcc_cmd)
+            env.safe_sed("makefile", "g\+\+", gcc_cmd)
     _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
 
 @_if_not_installed("snap")
@@ -153,7 +153,7 @@ def install_stampy(env):
     url = "http://www.well.ox.ac.uk/bioinformatics/Software/" \
           "Stampy-latest.tgz"
     def _clean_makefile(env):
-        sed("makefile", " -Wl", "")
+        env.safe_sed("makefile", " -Wl", "")
     _get_install_local(url, env, _make_copy(),
                        dir_name="stampy-{0}".format(version),
                        post_unpack_fn=_clean_makefile)
@@ -168,11 +168,11 @@ def install_gmap(env):
     _get_install(url, env, _configure_make)
 
 def _wget_with_cookies(ref_url, dl_url):
-    run("wget --cookies=on --keep-session-cookies --save-cookies=cookie.txt %s"
-            % (ref_url))
-    run("wget --referer=%s --cookies=on --load-cookies=cookie.txt "
-        "--keep-session-cookies --save-cookies=cookie.txt %s" %
-        (ref_url, dl_url))
+    env.safe_run("wget --cookies=on --keep-session-cookies --save-cookies=cookie.txt %s"
+                 % (ref_url))
+    env.safe_run("wget --referer=%s --cookies=on --load-cookies=cookie.txt "
+                 "--keep-session-cookies --save-cookies=cookie.txt %s" %
+                 (ref_url, dl_url))
 
 @_if_not_installed("novoalign")
 def install_novoalign(env):
@@ -189,7 +189,7 @@ def install_novoalign(env):
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, base_url)
-            run("tar -xzvpf novocraft%s.gcc.tar.gz" % base_version)
+            env.safe_run("tar -xzvpf novocraft%s.gcc.tar.gz" % base_version)
             with cd("novocraft"):
                 for fname in ["isnovoindex", "novo2maq", "novo2paf",
                               "novo2sam.pl", "novoalign", "novobarcode",
@@ -199,7 +199,7 @@ def install_novoalign(env):
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, cs_url)
-            run("tar -xzvpf novoalignCS%s.gcc.tar.gz" % cs_version)
+            env.safe_run("tar -xzvpf novoalignCS%s.gcc.tar.gz" % cs_version)
             with cd("novoalignCS"):
                 for fname in ["novoalignCS"]:
                     env.safe_sudo("mv %s %s" % (fname, install_dir))
@@ -217,7 +217,7 @@ def install_novosort(env):
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, url)
-            run("tar -xzvpf novosort%s.gcc.tar.gz" % version)
+            env.safe_run("tar -xzvpf novosort%s.gcc.tar.gz" % version)
             with cd("novosort"):
                 for fname in ["novosort"]:
                     env.safe_sudo("mv %s %s" % (fname, install_dir))
@@ -232,7 +232,7 @@ def install_lastz(env):
     url = "http://www.bx.psu.edu/miller_lab/dist/" \
           "lastz-%s.tar.gz" % version
     def _remove_werror(env):
-        sed("src/Makefile", " -Werror", "")
+        env.safe_sed("src/Makefile", " -Werror", "")
     _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"),
                  post_unpack_fn=_remove_werror)
 
@@ -286,7 +286,7 @@ def install_fastx_toolkit(env):
     fastx_url = "%sfastx_toolkit-%s.tar.bz2" % (url_base, version)
     gtext_url = "%slibgtextutils-%s.tar.bz2" % (url_base, gtext_version)
     def _remove_werror(env):
-        sed("configure", " -Werror", "")
+        env.safe_sed("configure", " -Werror", "")
     _get_install(gtext_url, env, _configure_make, post_unpack_fn=_remove_werror)
     _get_install(fastx_url, env, _configure_make, post_unpack_fn=_remove_werror)
 
@@ -300,8 +300,8 @@ def install_solexaqa(env):
             "SolexaQA_v.%s.pl.zip" % version
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run("wget %s" % url)
-            run("unzip %s" % os.path.basename(url))
+            env.safe_run("wget %s" % url)
+            env.safe_run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
 
 @_if_not_installed("gemini")
@@ -373,9 +373,9 @@ def install_dwgsim(env):
     samtools_url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
                    "{ver}/samtools-{ver}.tar.bz2".format(ver=samtools_version)
     def _get_samtools(env):
-        run("wget {0}".format(samtools_url))
-        run("tar jxf samtools-{0}.tar.bz2".format(samtools_version))
-        run("ln -s samtools-{0} samtools".format(samtools_version))
+        env.safe_run("wget {0}".format(samtools_url))
+        env.safe_run("tar jxf samtools-{0}.tar.bz2".format(samtools_version))
+        env.safe_run("ln -s samtools-{0} samtools".format(samtools_version))
     _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
                  post_unpack_fn=_get_samtools)
 
@@ -392,8 +392,8 @@ def install_fastqc(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % (url))
-                run("unzip %s" % os.path.basename(url))
+                env.safe_run("wget %s" % (url))
+                env.safe_run("unzip %s" % os.path.basename(url))
                 with cd("FastQC"):
                     env.safe_sudo("chmod a+rwx %s" % executable)
                     env.safe_sudo("mv * %s" % install_dir)
@@ -457,12 +457,12 @@ def install_shrec(env):
         shrec_script = "%s/shrec" % install_dir
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % (url))
-                run("unzip %s" % os.path.basename(url))
+                env.safe_run("wget %s" % (url))
+                env.safe_run("unzip %s" % os.path.basename(url))
                 env.safe_sudo("mv *.class %s" % install_dir)
                 for line in _shrec_run.split("\n"):
                     if line.strip():
-                        append(shrec_script, line, use_sudo=env.use_sudo)
+                        env.safe_append(shrec_script, line, use_sudo=env.use_sudo)
                 env.safe_sudo("chmod a+rwx %s" % shrec_script)
                 env.safe_sudo("ln -s %s %s/bin/shrec" % (shrec_script, env.system_install))
 
@@ -501,7 +501,7 @@ def install_gatk(env):
     # Need to make this into a proper R package and re-enable
     if False:
         with quiet():
-            have_gsalib = run("Rscript -e '\"gsalib\" %in% installed.packages()'")
+            have_gsalib = env.safe_run("Rscript -e '\"gsalib\" %in% installed.packages()'")
         if have_gsalib and "FALSE" in have_gsalib:
             # install dependencies for gsalib
             rlib_config = get_config_file(env, "r-libs.yaml").base
@@ -553,7 +553,7 @@ def install_cram(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget --no-check-certificate %s" % url)
+                env.safe_run("wget --no-check-certificate %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
 @_if_not_installed("bam")
@@ -603,14 +603,14 @@ def install_snpeff(env):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     env.safe_sudo("mv *.jar %s" % install_dir)
-                    run("sed -i.bak -r -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
-                        (install_dir.replace("/", "\/"), "snpEff.config"))
-                    run("chmod a+r *.config")
+                    env.safe_run("sed -i.bak -r -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
+                                 (install_dir.replace("/", "\/"), "snpEff.config"))
+                    env.safe_run("chmod a+r *.config")
                     env.safe_sudo("mv *.config %s" % install_dir)
                     data_dir = os.path.join(install_dir, "data")
                     env.safe_sudo("mkdir %s" % data_dir)
                     for org in genomes:
-                        if not exists(os.path.join(data_dir, org)):
+                        if not env.safe_exists(os.path.join(data_dir, org)):
                             gurl = genome_url_base % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
@@ -625,9 +625,9 @@ def install_vep(env):
           "&pathrev={0}".format(version)
     cache_dbs = "24"
     def _vep_install(env):
-        sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
-        sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
-        run("export FTP_PASSIVE=1 && perl INSTALL.pl")
+        env.safe_sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
+        env.safe_sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
+        env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
 
 @_if_not_installed("freebayes")
@@ -638,7 +638,7 @@ def install_freebayes(env):
     version = "296a0fa"
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
     def _fix_tabixpp_library_order(env):
-        sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+        env.safe_sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
                  post_unpack_fn=_fix_tabixpp_library_order,
                  revision=version)
@@ -651,7 +651,7 @@ def install_vcflib(env):
     version = "06e664c"
     repository = "git clone --recursive https://github.com/ekg/vcflib.git"
     def _fix_tabixpp_library_order(env):
-        sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+        env.safe_sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
     _get_install(repository, env,
                  _make_copy("find -perm -100 -type f -name 'vcf*'"
                             " | grep -v '.sh$' | grep -v '.r$'"),
@@ -666,10 +666,10 @@ def install_bamtools(env):
     version = "3fe66b9"
     repository = "git clone --recursive https://github.com/pezmaster31/bamtools.git"
     def _cmake_bamtools(env):
-        run("mkdir build")
+        env.safe_run("mkdir build")
         with cd("build"):
-            run("cmake ..")
-            run("make")
+            env.safe_run("cmake ..")
+            env.safe_run("make")
         env.safe_sudo("cp bin/* %s" % shared._get_bin_dir(env))
         env.safe_sudo("cp lib/* %s" % shared._get_lib_dir(env))
     _get_install(repository, env, _cmake_bamtools,
@@ -691,12 +691,12 @@ def _install_samtools_libs(env):
     def _samtools_lib_install(env):
         lib_dir = _get_lib_dir(env)
         include_dir = os.path.join(env.system_install, "include", "bam")
-        run("make")
+        env.safe_run("make")
         env.safe_sudo("mv -f libbam* %s" % lib_dir)
         env.safe_sudo("mkdir -p %s" % include_dir)
         env.safe_sudo("mv -f *.h %s" % include_dir)
     check_dir = os.path.join(_get_include_dir(env), "bam")
-    if not exists(check_dir):
+    if not env.safe_exists(check_dir):
         _get_install(repository, env, _samtools_lib_install)
 
 def _install_boost(env):
@@ -707,28 +707,28 @@ def _install_boost(env):
     boost_dir = os.path.join(env.system_install, "boost")
     boost_version_file = os.path.join(boost_dir, "include", "boost", "version.hpp")
     def _boost_build(env):
-        run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
-        run("./b2")
+        env.safe_run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
+        env.safe_run("./b2")
         env.safe_sudo("./b2 install")
     thread_lib = "libboost_thread.so.%s" % version
     final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
-    if (not exists(boost_version_file) or not contains(boost_version_file, check_version)
-            or not exists(final_thread_lib)):
+    if (not env.safe_exists(boost_version_file) or not env.safe_contains(boost_version_file, check_version)
+          or not env.safe_exists(final_thread_lib)):
         _get_install(url, env, _boost_build)
         orig_lib = os.path.join(boost_dir, "lib", thread_lib)
-        if not exists(final_thread_lib):
+        if not env.safe_exists(final_thread_lib):
             env.safe_sudo("ln -s %s %s" % (orig_lib, final_thread_lib))
 
 def _cufflinks_configure_make(env):
     orig_eigen = "%s/include/eigen3" % env.system_install
     need_eigen = "%s/include/eigen3/include" % env.system_install
-    if not exists(need_eigen):
+    if not env.safe_exists(need_eigen):
         env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
-    run("./configure --disable-werror --prefix=%s --with-eigen=%s"
-        % (env.system_install, orig_eigen))
+    env.safe_run("./configure --disable-werror --prefix=%s --with-eigen=%s"
+                 % (env.system_install, orig_eigen))
     #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
     #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
-    run("make")
+    env.safe_run("make")
     env.safe_sudo("make install")
 
 @_if_not_installed("tophat")
@@ -791,11 +791,11 @@ def install_abyss(env):
     version = env.get("tool_version", default_version)
     url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
     def _remove_werror_get_boost(env):
-        sed("configure", " -Werror", "")
+        env.safe_sed("configure", " -Werror", "")
         # http://osdir.com/ml/abyss-users-science/2011-10/msg00108.html
-        run("wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2")
-        run("tar jxf boost_1_47_0.tar.bz2")
-        run("ln -s boost_1_47_0/boost boost")
+        env.safe_run("wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2")
+        env.safe_run("tar jxf boost_1_47_0.tar.bz2")
+        env.safe_run("ln -s boost_1_47_0/boost boost")
     _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
@@ -820,7 +820,7 @@ def install_velvet(env):
         http://biostar.stackexchange.com/questions/13713/
         error-installing-velvet-assembler-1-1-06-on-ubuntu-server
         """
-        sed("Makefile", "Z_LIB_FILES=-lz", "Z_LIB_FILES=-lz -lm")
+        env.safe_sed("Makefile", "Z_LIB_FILES=-lz", "Z_LIB_FILES=-lz -lm")
     _get_install(url, env, _make_copy("find -perm -100 -name 'velvet*'"),
                  post_unpack_fn=_fix_library_order)
 
@@ -845,7 +845,7 @@ def install_trinity(env):
     url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
           "trinityrnaseq_%s.tgz" % version
     def _remove_werror(env):
-        sed("trinity-plugins/jellyfish/Makefile.in", " -Werror", "")
+        env.safe_sed("trinity-plugins/jellyfish/Makefile.in", " -Werror", "")
     _get_install_local(url, env, _make_copy(),
                        post_unpack_fn=_remove_werror)
 
@@ -857,29 +857,29 @@ def install_cortex_var(env):
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
-        sed("Makefile", "\-L/full/path/\S*",
-            "-L{0}/lib -L/usr/lib -L/usr/local/lib".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL =.*$",
-            "IDIR_GSL={0}/include -I/usr/include -I/usr/local/include".format(env.system_install))
-        sed("Makefile", "^IDIR_GSL_ALSO =.*$",
-            "IDIR_GSL_ALSO={0}/include/gsl -I/usr/include/gsl -I/usr/local/include/gsl".format(
-                env.system_install))
+        env.safe_sed("Makefile", "\-L/full/path/\S*",
+                     "-L{0}/lib -L/usr/lib -L/usr/local/lib".format(env.system_install))
+        env.safe_sed("Makefile", "^IDIR_GSL =.*$",
+                     "IDIR_GSL={0}/include -I/usr/include -I/usr/local/include".format(env.system_install))
+        env.safe_sed("Makefile", "^IDIR_GSL_ALSO =.*$",
+                     "IDIR_GSL_ALSO={0}/include/gsl -I/usr/include/gsl -I/usr/local/include/gsl".format(
+                         env.system_install))
         with cd("libs/gsl-1.15"):
-            run("make clean")
+            env.safe_run("make clean")
         with cd("libs/htslib"):
-            run("make clean")
-            run("make")
+            env.safe_run("make clean")
+            env.safe_run("make")
         for cols in ["1", "2", "3", "4", "5"]:
             for kmer in ["31", "63", "95"]:
-                run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
+                env.safe_run("make MAXK={0} NUM_COLS={1} cortex_var".format(kmer, cols))
         with cd("scripts/analyse_variants/needleman_wunsch"):
-            sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
+            env.safe_sed("Makefile", "string_buffer.c", "string_buffer.c -lz")
             # Fix incompatibilities with gzfile struct in zlib 1.2.6+
             for fix_gz in ["libs/string_buffer/string_buffer.c", "libs/bioinf/bioinf.c",
                            "libs/string_buffer/string_buffer.h", "libs/bioinf/bioinf.h"]:
-                sed(fix_gz, "gzFile \*", "gzFile ")
-                sed(fix_gz, "gzFile\*", "gzFile")
-            run("make")
+                env.safe_sed(fix_gz, "gzFile \*", "gzFile ")
+                env.safe_sed(fix_gz, "gzFile\*", "gzFile")
+            env.safe_run("make")
     _get_install_local(url, env, _cortex_build)
 
 def install_bcbio_variation(env):
@@ -893,7 +893,7 @@ def install_bcbio_variation(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % url)
+                env.safe_run("wget %s" % url)
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
 # --- ChIP-seq
@@ -918,7 +918,7 @@ def install_hydra(env):
     version = "0.5.3"
     url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
-        run("make clean")
+        env.safe_run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
 
@@ -940,7 +940,7 @@ def install_crisp(env):
     url = "https://sites.google.com/site/vibansal/software/crisp/" \
           "CRISP-linux-v{0}.tar.gz".format(version)
     def _make_executable():
-        run("chmod a+x *.py")
+        env.safe_run("chmod a+x *.py")
     _get_install(url, env, _make_copy("ls -1 CRISP.py crisp_to_vcf.py",
                                       premake_cmd=_make_executable,
                                       do_make=False))
@@ -957,12 +957,12 @@ def install_tassel(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget %s" % (url))
-                run("unzip %s" % os.path.basename(url))
+                env.safe_run("wget %s" % (url))
+                env.safe_run("unzip %s" % os.path.basename(url))
                 with cd("tassel{0}_standalone".format(version)):
                     for x in executables:
-                        sed(x, "^my \$top.*;",
-                            "use FindBin qw($RealBin); my $top = $RealBin;")
+                        env.safe_sed(x, "^my \$top.*;",
+                                     "use FindBin qw($RealBin); my $top = $RealBin;")
                         env.safe_sudo("chmod a+rwx %s" % x)
                     env.safe_sudo("mv * %s" % install_dir)
                 for x in executables:
@@ -990,6 +990,6 @@ def install_sambamba(env):
     if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                run("wget {0}".format(url))
+                env.safe_run("wget {0}".format(url))
                 env.safe_sudo("sudo dpkg -i {0}".format(
                         os.path.basename(url)))
