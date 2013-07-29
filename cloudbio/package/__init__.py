@@ -41,7 +41,7 @@ def _connect_native_packages(env, pkg_install, lib_install):
     that needs a local version in our non-root directory tree.
     """
     bin_dir = os.path.join(env.system_install, "bin")
-    path = env.safe_run("echo $PATH")
+    path = env.safe_run_output("echo $PATH")
     if bin_dir not in path and env.safe_exists(env.shell_config):
         comment_line = "# CloudBioLinux PATH updates"
         add_path = "export PATH=%s:$PATH" % bin_dir

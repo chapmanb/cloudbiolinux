@@ -30,8 +30,7 @@ def local_exists(path, use_sudo=False):
 def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
         if use_sudo:
-            print command, command.replace('"', '\\"')
-            command = "sudo sh -c " + '"%s"' % command.replace('"', '\\"')
+            command = "sudo bash -i -c " + '"%s"' % command.replace('"', '\\"')
         env.lcwd = env.cwd
         return local(command, capture=capture)
     return _run

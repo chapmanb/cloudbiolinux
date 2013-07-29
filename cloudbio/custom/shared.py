@@ -42,7 +42,9 @@ def _if_not_installed(pname):
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = env.safe_run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
+        result = env.safe_run("export PATH=$PATH:%s/bin && "
+                              "export LD_LIBRARY_PATH=%s/lib:$LD_LIBRARY_PATH %s" %
+                              (env.system_install, env.system_install, pname))
     return result.return_code == 127
 
 
