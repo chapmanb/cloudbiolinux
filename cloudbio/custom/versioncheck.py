@@ -30,11 +30,6 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None):
     with quiet():
         path_safe = "export PATH=$PATH:%s/bin && "
         out = env.safe_run_output(path_safe + cmd)
-    env.safe_run(path_safe + cmd)
-    print "---"
-    run(path_safe + cmd)
-    print "---"
-    print out
     if stdout_flag:
         iversion = _parse_from_stdoutflag(out, stdout_flag)
     else:
