@@ -26,8 +26,8 @@ def _install_tools(env, tools_conf=None):
 
     if _read_boolean(env, "galaxy_install_dependencies", False):
        # Need to ensure the install dir exists and is owned by env.galaxy_user
-        _setup_install_dir(env)
-        _install_applications(env, tools_conf)
+        _setup_install_dir(enconfigured_v)
+        _install_configured_applications(env, tools_conf)
         _chown_galaxy(env, env.galaxy_tools_dir)
         _chown_galaxy(env, env.galaxy_jars_dir)
 
@@ -62,43 +62,55 @@ def _setup_install_dir(env):
         _chown_galaxy(env, env.galaxy_jars_dir)
 
 
-def _install_applications(env, tools_conf):
-    """Install external tools (galaxy tool dependencies).
+def _install_configured_applications(env, tools_conf):
+    """
+    Install external tools defined by YAML or dictionary data structure.  Instead of
+    installing in system_install (e.g. /usr), these custom tools will be installed as
+    Galaxy dependency applications.
     """
     applications = tools_conf["applications"] or {}
-    for (name, versions) in applications.iteritems():
-        if type(versions) is str:
-            versions = [versions]
-        for version_info in versions:
-            if type(version_info) is str:
-                _install_tool(env, name, version=version_info, requirement_name=name)
-            else:
-                version = version_info["version"]
-                bin_dirs = version_info.get("bin_dirs", ["bin"])
-                env_vars = version_info.get("env_vars", {})
-                provides = version_info.get("provides", [])
-                if isinstance(provides, (str, unicode, basestring)):
-                    provides = [provides]
+    for (name, tool_conf) in applications.iteritems():
+        _install_application(name, tool_conf)
 
-                # Some requirements (e.g. blast+) maybe not have valid python
-                # identifiers as name. Use install_blast to setup but override
-                # requirement directory name with requirement_name field.
-                requirement_name = version_info.get("requirement_name", name)
-                tool_env = _install_tool(env, name, version, bin_dirs=bin_dirs, env_vars=env_vars, requirement_name=requirement_name)
-                symlink_versions = version_info.get("symlink_versions", [])
-                if type(symlink_versions) is str:
-                    symlink_versions = [symlink_versions]
-                for symlink_version in symlink_versions:
-                    _set_default_config(tool_env, tool_env["system_install"], symlink_version)
 
-                if provides:
-                    install_dir = tool_env["system_install"]
-                    ## Create additional symlinked packages from this one.
-                    tool_dir = "%s/.." % install_dir
-                    tools_dir = "%s/.." % tool_dir
-                    for package in provides:
-                        link_dir = "%s/%s" % (tools_dir, package)
-                        env.safe_sudo("ln -f -s '%s' '%s'" % (requirement_name, link_dir))
+def _install_application(name, versions):
+    """
+    Install single custom tool as Galaxy dependency application.
+
+    TODO: Rename versions and document options.
+    """
+    if type(versions) is str:
+        versions = [versions]
+    for version_info in versions:
+        if type(version_info) is str:
+            _install_tool(env, name, version=version_info, requirement_name=name)
+        else:
+            version = version_info["version"]
+            bin_dirs = version_info.get("bin_dirs", ["bin"])
+            env_vars = version_info.get("env_vars", {})
+            provides = version_info.get("provides", [])
+            if isinstance(provides, (str, unicode, basestring)):
+                provides = [provides]
+
+            # Some requirements (e.g. blast+) maybe not have valid python
+            # identifiers as name. Use install_blast to setup but override
+            # requirement directory name with requirement_name field.
+            requirement_name = version_info.get("requirement_name", name)
+            tool_env = _install_tool(env, name, version, bin_dirs=bin_dirs, env_vars=env_vars, requirement_name=requirement_name)
+            symlink_versions = version_info.get("symlink_versions", [])
+            if type(symlink_versions) is str:
+                symlink_versions = [symlink_versions]
+            for symlink_version in symlink_versions:
+                _set_default_config(tool_env, tool_env["system_install"], symlink_version)
+
+            if provides:
+                install_dir = tool_env["system_install"]
+                ## Create additional symlinked packages from this one.
+                tool_dir = "%s/.." % install_dir
+                tools_dir = "%s/.." % tool_dir
+                for package in provides:
+                    link_dir = "%s/%s" % (tools_dir, package)
+                    env.safe_sudo("ln -f -s '%s' '%s'" % (requirement_name, link_dir))
 
 
 def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}):
