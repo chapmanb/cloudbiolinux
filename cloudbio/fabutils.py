@@ -15,7 +15,7 @@ import hashlib
 import re
 import shutil
 
-from fabric.api import env, run, sudo, local, settings, hide
+from fabric.api import env, run, sudo, local, settings, hide, put
 from fabric.contrib.files import exists, sed, contains, append, comment
 
 # ## Local non-ssh access
