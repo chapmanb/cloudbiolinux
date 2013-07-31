@@ -29,7 +29,7 @@ applications:
       env_vars:
         LD_LIBRARY_PATH: "${system_install}/lib:$$LD_LIBRARY_PATH"
   omssa: "2.1.9"
-  tint_proteomics_scripts: "1.19.19"
+  tint_proteomics_scripts: "1.19.20"
   superhirn: "0.03"
   mzmine: "2.10"
   percolator: "2_04"
