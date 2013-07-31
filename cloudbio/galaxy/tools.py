@@ -14,6 +14,9 @@ from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
 from fabric.api import sudo
 from fabric.contrib.files import exists
 
+FAILED_INSTALL_MESSAGE = \
+    "Failed to install application %s as a Galaxy application. This may be a transient problem (e.g. mirror for download is currently unavailable) or misconfiguration. The contents of the CloudBioLinux temporary working directory may need to be deleted."
+
 
 def _install_tools(env, tools_conf=None):
     """
@@ -26,7 +29,7 @@ def _install_tools(env, tools_conf=None):
 
     if _read_boolean(env, "galaxy_install_dependencies", False):
        # Need to ensure the install dir exists and is owned by env.galaxy_user
-        _setup_install_dir(enconfigured_v)
+        _setup_install_dir(env)
         _install_configured_applications(env, tools_conf)
         _chown_galaxy(env, env.galaxy_tools_dir)
         _chown_galaxy(env, env.galaxy_jars_dir)
@@ -70,7 +73,11 @@ def _install_configured_applications(env, tools_conf):
     """
     applications = tools_conf["applications"] or {}
     for (name, tool_conf) in applications.iteritems():
-        _install_application(name, tool_conf)
+        try:
+            _install_application(name, tool_conf)
+        except:
+            env.logger.warn(FAILED_INSTALL_MESSAGE % name)
+            raise
 
 
 def _install_application(name, versions):
