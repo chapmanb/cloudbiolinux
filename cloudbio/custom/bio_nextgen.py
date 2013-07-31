@@ -11,7 +11,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_bin_dir, _get_lib_dir, _get_include_dir)
+                    _get_lib_dir, _get_include_dir)
 from cloudbio.custom import shared, versioncheck
 
 from cloudbio import libraries
@@ -49,13 +49,14 @@ def install_kent_tools(env):
 
 
 def _download_executables(env, base_url, tools):
-    install_dir = _get_bin_dir(env)
-    for tool in tools:
-        with cd(install_dir):
-            if not env.safe_exists(tool):
-                env.safe_sudo("wget %s%s" % (base_url, tool))
-                env.safe_sudo("chmod a+rwx %s" % tool)
-
+    install_dir = shared._get_bin_dir(env)
+    with _make_tmp_dir() as work_dir:
+        with cd(work_dir):
+            for tool in tools:
+                final_tool = os.path.join(install_dir, tool)
+                if not env.safe_exists(final_tool) and shared._executable_not_on_path(tool):
+                    env.safe_run("wget %s%s" % (base_url, tool))
+                    env.safe_sudo("cp -f %s %s" % (tool, install_dir))
 
 # --- Alignment tools
 
