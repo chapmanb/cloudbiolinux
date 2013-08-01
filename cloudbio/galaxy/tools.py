@@ -11,9 +11,6 @@ from cloudbio.galaxy.applications import *
 from cloudbio.galaxy.r import _install_r_packages
 from cloudbio.galaxy.utils import _chown_galaxy, _read_boolean
 
-from fabric.api import sudo
-from fabric.contrib.files import exists
-
 FAILED_INSTALL_MESSAGE = \
     "Failed to install application %s as a Galaxy application. This may be a transient problem (e.g. mirror for download is currently unavailable) or misconfiguration. The contents of the CloudBioLinux temporary working directory may need to be deleted."
 
@@ -58,19 +55,19 @@ def _load_tools_conf(env):
 
 def _setup_install_dir(env):
     """Sets up install dir and ensures its owned by Galaxy"""
-    if not exists(env.galaxy_tools_dir):
-        sudo("mkdir -p %s" % env.galaxy_tools_dir)
+    if not env.safe_exists(env.galaxy_tools_dir):
+        env.safe_sudo("mkdir -p %s" % env.galaxy_tools_dir)
         _chown_galaxy(env, env.galaxy_tools_dir)
     # Create a general-purpose ``bin`` directory under the galaxy_tools_dir
     # and put it on the PATH so users can more easily add custom tools
     bin_dir = os.path.join(env.galaxy_tools_dir, 'bin')
-    if not exists(bin_dir):
-        sudo("mkdir -p %s" % bin_dir)
+    if not env.safe_exists(bin_dir):
+        env.safe_sudo("mkdir -p %s" % bin_dir)
         _chown_galaxy(env, bin_dir)
         line = "export PATH={0}:$PATH".format(bin_dir)
         _add_to_profiles(line)
-    if not exists(env.galaxy_jars_dir):
-        sudo("mkdir -p %s" % env.galaxy_jars_dir)
+    if not env.safe_exists(env.galaxy_jars_dir):
+        env.safe_sudo("mkdir -p %s" % env.galaxy_jars_dir)
         _chown_galaxy(env, env.galaxy_jars_dir)
 
 
@@ -170,24 +167,24 @@ def _install_galaxy_config(tool_env, bin_dirs, env_vars):
     install_dir = tool_env["system_install"]
     env_path = os.path.join(install_dir, "env.sh")
     bin_paths = [os.path.join(install_dir, bin_dir) for bin_dir in bin_dirs]
-    path_pieces = [bin_path for bin_path in bin_paths if exists(bin_path)]
-    if len(path_pieces) > 0 and not exists(env_path):
+    path_pieces = [bin_path for bin_path in bin_paths if env.safe_exists(bin_path)]
+    if len(path_pieces) > 0 and not env.safe_exists(env_path):
         path_addtion = ":".join(path_pieces)
         # Standard bin install, just add it to path
-        sudo("echo 'PATH=%s:$PATH' > %s" % (path_addtion, env_path))
+        env.safe_sudo("echo 'PATH=%s:$PATH' > %s" % (path_addtion, env_path))
         venv_path = "%s/%s" % (install_dir, "venv")
-        if exists(venv_path):
+        if env.safe_exists(venv_path):
             #  Have env.sh activate virtualdirectory
-            sudo("echo '. %s/bin/activate' >> %s" % (venv_path, env_path))
-        sudo("chmod +x %s" % env_path)
+            env.safe_sudo("echo '. %s/bin/activate' >> %s" % (venv_path, env_path))
+        env.safe_sudo("chmod +x %s" % env_path)
         for env_var, env_var_value in env_vars.iteritems():
             env_var_template = Template(env_var_value)
             expanded_env_var_value = env_var_template.substitute(tool_env)
-            sudo("echo 'export %s=%s' >> %s" % (env_var, expanded_env_var_value, env_path))
+            env.safe_sudo("echo 'export %s=%s' >> %s" % (env_var, expanded_env_var_value, env_path))
         env.logger.debug("Added Galaxy env.sh file: %s" % env_path)
 
     _set_default_config(tool_env, install_dir)
-    if _read_boolean(tool_env, "autoload_galaxy_tools", False) and exists(env_path):
+    if _read_boolean(tool_env, "autoload_galaxy_tools", False) and env.safe_exists(env_path):
         # In this case, the web user (e.g. ubuntu) should auto-load all of
         # galaxy's default env.sh files so they are available for direct use
         # as well.

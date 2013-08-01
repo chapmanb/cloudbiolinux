@@ -3,14 +3,13 @@
 
 import os
 
-from fabric.api import cd, run, settings
-from fabric.contrib.files import append
+from fabric.api import cd
 
 from shared import (_if_not_installed, _make_tmp_dir,
-                    _get_install, _get_install_local, _make_copy, _configure_make,
+                    _get_install, _make_copy,
                     _java_install, _symlinked_java_version_dir,
                     _get_bin_dir, _get_install_subdir,
-                    _fetch_and_unpack, _python_make,
+                    _fetch_and_unpack,
                     _create_python_virtualenv)
 import re
 
@@ -44,15 +43,15 @@ def install_transproteomic_pipeline(env):
         def do_work(env):
             src_dir = "trans_proteomic_pipeline/src" if version == "4.6.1-occupy" else "src"
             with cd(src_dir):
-                append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
-                append("Makefile.config.incl", "TPP_WEB=/tpp/")
-                append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
-                append("Makefile.config.incl", "CGI_USERS_DIR=${TPP_ROOT}cgi-bin")
+                env.safe_append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
+                env.safe_append("Makefile.config.incl", "TPP_WEB=/tpp/")
+                env.safe_append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
+                env.safe_append("Makefile.config.incl", "CGI_USERS_DIR=${TPP_ROOT}cgi-bin")
                 work_cmd(env)
         return do_work
 
     def _make(env):
-        run("make")
+        env.safe_run("make")
         env.safe_sudo("make install")
     _get_install(url, env, _chdir_src(_make))
 
@@ -81,10 +80,10 @@ def install_openms(env):
 
     def _make(env):
         with cd("contrib"):
-            run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
-            run("make")
-        run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
-        run("make")
+            env.safe_run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+            env.safe_run("make")
+        env.safe_run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+        env.safe_run("make")
         env.safe_sudo("make install")
     _get_install(url, env, _make)
 
@@ -114,9 +113,9 @@ def install_ms2preproc(env):
     install_dir = _get_bin_dir(env)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run(get_cmd)
-            run("unzip ms2preproc.zip")
-            run("chmod +x ms2preproc-x86_64")
+            env.safe_run(get_cmd)
+            env.safe_run("unzip ms2preproc.zip")
+            env.safe_run("chmod +x ms2preproc-x86_64")
             env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
 
 
@@ -290,9 +289,9 @@ def install_percolator(env):
 
     def make(env):
         with cd(".."):
-            run("env")
-            run("cmake -DCMAKE_INSTALL_PREFIX='%s' . " % env.system_install)
-            run("make -j8")
+            env.safe_run("env")
+            env.safe_run("cmake -DCMAKE_INSTALL_PREFIX='%s' . " % env.system_install)
+            env.safe_run("make -j8")
             env.safe_sudo("make install")
 
     _get_install(url, env, make)
@@ -306,7 +305,7 @@ def install_pepnovo(env):
 
     def install_fn(env, install_dir):
         with cd("src"):
-            run("make")
+            env.safe_run("make")
             env.safe_sudo("mkdir -p '%s/bin'" % env.system_install)
             env.safe_sudo("mkdir -p '%s/share/pepnovo'" % env.system_install)
             env.safe_sudo("mv PepNovo_bin '%s/bin/PepNovo'" % env.system_install)
@@ -338,11 +337,11 @@ def install_fido(env):
     def _chdir_src(work_cmd):
         def do_work(env):
             with cd("src/cpp"):
-                append('tmpmake', 'SHELL=/bin/bash')
-                append('tmpmake', 'prefix=%s' % env.get("system_install"))
-                append('tmpmake', 'CPPFLAGS=-Wall -ffast-math -march=x86-64 -pipe -O4 -g')
-                run('cat makefile |grep BINPATH -A 9999 >> tmpmake')
-                run('cp tmpmake makefile')
+                env.safe_append('tmpmake', 'SHELL=/bin/bash')
+                env.safe_append('tmpmake', 'prefix=%s' % env.get("system_install"))
+                env.safe_append('tmpmake', 'CPPFLAGS=-Wall -ffast-math -march=x86-64 -pipe -O4 -g')
+                env.safe_run('cat makefile |grep BINPATH -A 9999 >> tmpmake')
+                env.safe_run('cp tmpmake makefile')
                 work_cmd(env)
         return do_work
 
@@ -357,7 +356,7 @@ def install_ipig(env):
     url = 'http://downloads.sourceforge.net/project/ipig/ipig_%s.zip' % version
     pkg_name = 'ipig'
     install_dir = os.path.join(env.galaxy_jars_dir, pkg_name)
-    install_cmd = env.safe_sudo if env.use_sudo else run
+    install_cmd = env.safe_sudo if env.use_sudo else env.safe_run
     install_cmd("mkdir -p %s" % install_dir)
     with cd(install_dir):
         install_cmd("wget %s -O %s" % (url, os.path.split(url)[-1]))
@@ -412,8 +411,8 @@ def install_idpqonvert(env):
     default_version = "3.0.475"
     version = env.get("tool_version", default_version)
     url = "%s/idpQonvert_%s" % (PROTEOMICS_APP_ARCHIVE_URL, version)
-    run("wget --no-check-certificate -O %s '%s'" % ("idpQonvert", url))
-    run("chmod 755 idpQonvert")
+    env.safe_run("wget --no-check-certificate -O %s '%s'" % ("idpQonvert", url))
+    env.safe_run("chmod 755 idpQonvert")
     env.safe_sudo("mkdir -p '%s/bin'" % env["system_install"])
     env.safe_sudo("mv %s '%s/bin'" % ("idpQonvert", env["system_install"]))
     env.safe_sudo("chmod +x '%s/bin/idpQonvert'" % env["system_install"])

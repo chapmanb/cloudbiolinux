@@ -26,17 +26,17 @@ CM_REPO_ROOT_URL = "https://bitbucket.org/galaxy/cloudman/raw/tip/"
 def _setup_users(env):
     def _add_user(username, uid=None):
         """ Add user with username to the system """
-        if not contains('/etc/passwd', "%s:" % username):
+        if not env.safe_contains('/etc/passwd', "%s:" % username):
             uid_str = "--uid %s" % uid if uid else ""
-            sudo('useradd -d /home/%s --create-home --shell /bin/bash '
-                 '-c"Galaxy-required user" %s --user-group %s' %
-                 (username, uid_str, username))
+            env.safe_sudo('useradd -d /home/%s --create-home --shell /bin/bash '
+                          '-c"Galaxy-required user" %s --user-group %s' %
+                          (username, uid_str, username))
     # Must specify uid for 'galaxy' user because of the
     # configuration for proFTPd
     _add_user('galaxy', '1001')
     _add_user('sgeadmin')
     _add_user('postgres')
-    env.logger.debug("Done setting up CloudMan users")
+    env.logger.debug("Done setting up Galaxy/CloudMan users")
 
 
 def _setup_galaxy_env_defaults(env):
