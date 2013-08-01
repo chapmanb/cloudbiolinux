@@ -6,9 +6,8 @@ lightweight way to avoid out of date dependencies.
 """
 from distutils.version import LooseVersion
 
-from fabric.api import quiet, run
-
 from cloudbio.custom import shared
+from cloudbio.fabutils import quiet
 
 def _parse_from_stdoutflag(out, flag):
     """Extract version information from a flag in verbose stdout.

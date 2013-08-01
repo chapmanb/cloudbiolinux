@@ -173,3 +173,10 @@ def configure_runsudo(env):
             env.safe_sudo = run_local()
         else:
             env.safe_sudo = run
+
+
+try:
+    from fabric.api import quiet
+except ImportError:
+    def quiet():
+        return settings(hide('warnings', 'runing', 'stdout', 'stderr'), warn_only=True)

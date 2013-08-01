@@ -10,11 +10,7 @@ from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
-try:
-    quiet
-except NameError:
-    def quiet():
-        return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
+from cloudbio.fabutils import quiet
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 

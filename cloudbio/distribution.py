@@ -6,8 +6,9 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env, quiet
+from fabric.api import env
 
+from cloudbio.fabutils import quiet
 from cloudbio.fabutils import configure_runsudo
 
 
