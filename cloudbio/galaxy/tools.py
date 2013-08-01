@@ -38,11 +38,20 @@ def _install_tools(env, tools_conf=None):
         _install_r_packages(tools_conf)
 
 
+def _tools_conf_path(env):
+    """
+    Load path to galaxy_tools_conf file from env, allowing expansion of $__contrib_dir__.
+    Default to $__contrib_dir__/flavor/cloudman/tools.yaml.
+    """
+    contrib_dir = os.path.join(env.config_dir, os.pardir, "contrib")
+    default_tools_conf_path = os.path.join(contrib_dir, "flavor", "cloudman", "tools.yaml")
+    tools_conf_path = env.get("galaxy_tools_conf", default_tools_conf_path)
+    ## Allow expansion of __config_dir__ in galaxy_tools_conf property.
+    return Template(tools_conf_path).safe_substitute({"__contrib_dir__": contrib_dir})
+
+
 def _load_tools_conf(env):
-    tools_conf_path = env.get("galaxy_tools_conf",
-                              os.path.join(env.config_dir, os.pardir,
-                                           "contrib", "flavor", "cloudman", "tools.yaml"))
-    with open(tools_conf_path) as in_handle:
+    with open(_tools_conf_path(env)) as in_handle:
         full_data = yaml.load(in_handle)
     return full_data
 

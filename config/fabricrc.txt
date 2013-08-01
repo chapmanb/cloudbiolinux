@@ -109,7 +109,7 @@ data_files = /mnt/biodata
 
 # Specify a custom location to a YAML file containing a list of tools to
 # install as Galaxy dependencies
-#galaxy_tools_conf = contrib/cloudman/tools.yaml
+#galaxy_tools_conf = $__contrib_dir__/cloudman/tools.yaml
 
 # Location where (some?!) Galaxy dependency tools should be installed
 #galaxy_tools_dir = /mnt/galaxyTools/tools
