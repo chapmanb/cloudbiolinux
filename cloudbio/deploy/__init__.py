@@ -78,7 +78,9 @@ class LocalVmLauncher:
         self.options = options
 
     def get_ip(self):
-        return self.options["hostname"]
+        specified_hostname = self.options.get("hostname", None)
+        hostname = specified_hostname or "localhost"
+        return hostname
 
     def get_key_file(self):
         return None
