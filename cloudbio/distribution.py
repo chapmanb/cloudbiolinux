@@ -32,6 +32,8 @@ def _setup_distribution_environment(ignore_distcheck=False):
     elif env.distribution == "scientificlinux":
         _setup_scientificlinux()
     elif env.distribution == "debian":
+        if env.dist_name == "__auto__":
+            env.dist_name = _debian_dist_name(env)
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
@@ -218,6 +220,13 @@ def _ubuntu_dist_name(env):
     Determine Ubuntu dist name (e.g. precise or quantal).
     """
     return env.safe_run_output("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+
+
+def _debian_dist_name(env):
+    """
+    Determine Debian dist name (e.g. squeeze).
+    """
+    return env.safe_run_output("lsb_release -a | grep Codename | cut -f 2")
 
 
 def _determine_distribution(env):
