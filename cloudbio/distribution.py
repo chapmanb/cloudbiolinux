@@ -10,8 +10,12 @@ from fabric.api import env, quiet
 
 from cloudbio.fabutils import configure_runsudo
 
+
 def _setup_distribution_environment(ignore_distcheck=False):
-    """Setup distribution environment
+    """Setup distribution environment.
+
+    In low-level terms, this method attempts to populate various values in the fabric
+    env data structure for use other places in CloudBioLinux.
     """
     env.logger.info("Distribution %s" % env.distribution)
 
@@ -46,6 +50,7 @@ def _setup_distribution_environment(ignore_distcheck=False):
     machine = env.safe_run_output("uname -m")
     env.is_64bit = machine.find("_64") > 0
 
+
 def _setup_fullpaths(env):
     home_dir = env.safe_run_output("echo $HOME")
     for attr in ["data_files", "galaxy_home", "local_install"]:
@@ -55,10 +60,12 @@ def _setup_fullpaths(env):
                 x = x.replace("~", home_dir)
                 setattr(env, attr, x)
 
+
 def _cloudman_compatibility(env):
     """Environmental variable naming for compatibility with CloudMan.
     """
     env.install_dir = env.system_install
+
 
 def _validate_target_distribution(dist, dist_name=None):
     """Check target matches environment setting (for sanity)
@@ -108,18 +115,20 @@ def _setup_ubuntu():
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
+
 def _setup_debian():
     env.logger.info("Debian setup")
     unstable_remap = {"sid": "squeeze"}
     shared_sources = _setup_deb_general()
     sources = [
-        "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen", # mongodb
-        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s-cran/", # lastest R versions
-        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib" # Hadoop
+        "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen",  # mongodb
+        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s-cran/",  # lastest R versions
+        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib"  # Hadoop
         ] + shared_sources
     # fill in %s
     dist_name = unstable_remap.get(env.dist_name, env.dist_name)
     env.std_sources = _add_source_versions(dist_name, sources)
+
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
@@ -136,10 +145,11 @@ def _setup_deb_general():
         # XXX look for a way to find JAVA_HOME automatically
         env.java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
     shared_sources = [
-        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux", # Bio-Linux
-        "deb http://download.virtualbox.org/virtualbox/debian %s contrib", # virtualbox
+        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux",  # Bio-Linux
+        "deb http://download.virtualbox.org/virtualbox/debian %s contrib",  # virtualbox
     ]
     return shared_sources
+
 
 def _setup_centos():
     env.logger.info("CentOS setup")
@@ -151,6 +161,7 @@ def _setup_centos():
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
+
 def _setup_scientificlinux():
     env.logger.info("ScientificLinux setup")
     if not hasattr(env, "python_version_ext"):
@@ -158,6 +169,7 @@ def _setup_scientificlinux():
     env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
+
 
 def _setup_nixpkgs():
     # for now, Nix packages are only supported in Debian - it can
@@ -177,6 +189,7 @@ def _setup_nixpkgs():
         env.logger.debug("NixPkgs: Ignored")
     env.nixpkgs = nixpkgs
 
+
 def _setup_local_environment():
     """Setup a localhost environment based on system variables.
     """
@@ -185,6 +198,7 @@ def _setup_local_environment():
         env.user = os.environ["USER"]
     if not env.has_key("java_home"):
         env.java_home = os.environ.get("JAVA_HOME", "/usr/lib/jvm/java-6-openjdk")
+
 
 def _setup_vagrant_environment():
     """Use vagrant commands to get connection information.
@@ -201,6 +215,7 @@ def _setup_vagrant_environment():
     env.host_string = "%s@%s:%s" % (env.user, env.hosts[0], env.port)
     env.key_filename = ssh_config["IdentityFile"].replace('"', '')
     env.logger.debug("ssh %s" % env.host_string)
+
 
 def _add_source_versions(version, sources):
     """Patch package source strings for version, e.g. Debian 'stable'
