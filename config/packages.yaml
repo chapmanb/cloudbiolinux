@@ -417,8 +417,10 @@ bio_proteomics:
   - libboost-serialization-dev
   - zlib1g-dev
   - libboost-dev
+
   # needed for 32bit execs distributed with searchgui.
-  - ia32-libs
+  # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.
+
   # needed for building OpenMS
   - libtool
   - qt4-dev-tools
@@ -588,7 +590,7 @@ galaxyp:
      - libboost-dev
 
      # needed for 32bit execs distributed with searchgui.
-     - ia32-libs
+     # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.     
 
      # needed for building OpenMS
      - libtool
