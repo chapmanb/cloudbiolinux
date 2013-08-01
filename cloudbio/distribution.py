@@ -19,7 +19,13 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _setup_vagrant_environment()
     elif env.hosts == ["localhost"]:
         _setup_local_environment()
+    configure_runsudo(env)
+    if env.distribution == "__auto__":
+        env.distribution = _determine_distribution(env)
     if env.distribution == "ubuntu":
+        ## TODO: Determine if dist_name check works with debian.
+        if env.dist_name == "__auto__":
+            env.dist_name = _ubuntu_dist_name(env)
         _setup_ubuntu()
     elif env.distribution == "centos":
         _setup_centos()
@@ -29,7 +35,6 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _setup_debian()
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
-    configure_runsudo(env)
     if not ignore_distcheck:
         _validate_target_distribution(env.distribution, env.get('dist_name', None))
     _cloudman_compatibility(env)
@@ -74,11 +79,12 @@ def _validate_target_distribution(dist, dist_name=None):
         if not dist_name:
             raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
         # Does this new method work with CentOS, do we need this.
-        actual_dist_name = env.safe_run_output("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
-        if actual_dist_name.lower().find(dist_name) == -1:
+        actual_dist_name = _ubuntu_dist_name(env)
+        if actual_dist_name != dist_name:
             raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
     else:
         env.logger.debug("Unknown target distro")
+
 
 def _setup_ubuntu():
     env.logger.info("Ubuntu setup")
@@ -205,3 +211,27 @@ def _add_source_versions(version, sources):
             s = s % name
         final.append(s)
     return final
+
+
+def _ubuntu_dist_name(env):
+    """
+    Determine Ubuntu dist name (e.g. precise or quantal).
+    """
+    return env.safe_run_output("cat /etc/*release | grep DISTRIB_CODENAME | cut -f 2 -d =")
+
+
+def _determine_distribution(env):
+    """
+    Attempt to automatically determine the distribution of the target machine.
+
+    Currently works for Ubuntu and CentOS.
+
+    TODO: Add ability to auto-determine scientificlinux and Debian as well.
+    """
+    output = env.safe_run_output("cat /etc/*release").lower()
+    if output.find("distrib_id=ubuntu") >= 0:
+        return "ubuntu"
+    elif output.find("centos release") >= 0:
+        return "centos"
+    else:
+        raise Exception("Attempt to automatically determine Linux distribution of target machine failed, please manually specify distribution in fabricrc.txt")
