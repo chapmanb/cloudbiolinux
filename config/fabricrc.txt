@@ -6,9 +6,16 @@
 #   fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data_s3:your_biodata.yaml
 
 # -- Details about the operating system
+
+## If target machine is Ubuntu or CentOS, the following defaults should allow CloudBioLinux to 
+## automatically determine the correct settings. For other operating systems (e.g. Debian or ScientificLinux)
+## please override distribution (and dist_name in case of Debian).
+distribution = __auto__
+dist_name = __auto__
+
 ## Ubuntu
-distribution = ubuntu
-dist_name = quantal
+#distribution = ubuntu
+#dist_name = quantal
 ## Centos
 #distribution = centos
 ## Debian
