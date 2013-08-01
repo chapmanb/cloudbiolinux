@@ -6,7 +6,7 @@ for standard server types.
 import os
 import subprocess
 
-from fabric.api import env
+from fabric.api import env, quiet
 
 from cloudbio.fabutils import configure_runsudo
 
@@ -224,14 +224,20 @@ def _determine_distribution(env):
     """
     Attempt to automatically determine the distribution of the target machine.
 
-    Currently works for Ubuntu and CentOS.
-
-    TODO: Add ability to auto-determine scientificlinux and Debian as well.
+    Currently works for Ubuntu, CentOS, Debian, Scientific Linux and Mac OS X.
     """
-    output = env.safe_run_output("cat /etc/*release").lower()
+    with quiet():
+        output = env.safe_run_output("cat /etc/*release").lower()
     if output.find("distrib_id=ubuntu") >= 0:
         return "ubuntu"
     elif output.find("centos release") >= 0:
         return "centos"
+    elif output.find("scientific linux release") >= 0:
+        return "scientificlinux"
+    elif env.safe_exists("/etc/debian_version"):
+        return "debian"
+    # check for file used by Python's platform.mac_ver
+    elif env.safe_exists("/System/Library/CoreServices/SystemVersion.plist"):
+        return "macosx"
     else:
         raise Exception("Attempt to automatically determine Linux distribution of target machine failed, please manually specify distribution in fabricrc.txt")
