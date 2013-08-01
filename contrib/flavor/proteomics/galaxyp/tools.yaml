@@ -1,20 +1,43 @@
 --- 
 
-# This file contains the install procedures for Galaxy tools used by #
-# the stock Galaxy-P configuration (hosted on usegalaxyp.org) directly
-# related to mass spec and/or proteomic data analysis..
+# This file contains the install procedures for Galaxy tools used by
+# the stock Galaxy-P configuration (hosted on usegalaxyp.org).
 
-# Install these tools using the proteoimcs_tools custom install function, 
-# either directly using:
+# Override the property `galaxy_tools_conf` in fabricrc to reference this 
+# file and set the property `install_galaxy_dependencies` to True and 
+# install with cbl_galaxy_tools custom install function directly using
+# 
+#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:galaxy_tools
 #
-#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:proteomics_tools
-#
-# Or as part of a full flavor install that include galaxyp, for instance using
+# Or as part of a full flavor install that include galaxy, for instance using
 # the cloudman/cloudman_and_galaxyp flavor.
 #
 #  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:flavor=cloudman/cloudman_and_galaxyp
 #
+
 applications:
+  ## Bioinformatics and NGS Applications
+  emboss: 
+    - version: "6.5.7"
+      symlink_versions: "5.0.0"
+  augustus: 
+    - version: "2.7"
+      bin_dirs: 
+        - bin
+        - scripts
+      env_vars:      
+        AUGUSTUS_CONFIG_PATH: $system_install/config
+  fastx_toolkit: "0.0.13.2"
+  ucsc_tools: "latest"
+  kent_tools: "latest"
+  blast: 
+    - version: "2.2.26+"
+      requirement_name: "blast+"
+    - version: "2.2.28+"
+      requirement_name: "blast+"  
+
+  ## Mass Spec Applications:
+
   peptide_to_gff: "master"
   transproteomic_pipeline: 
     - version: "4.6.1-occupy"

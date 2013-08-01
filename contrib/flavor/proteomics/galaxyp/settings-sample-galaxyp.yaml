@@ -9,6 +9,6 @@ fabricrc_overrides:
   # System user Galaxy will run as.
   galaxy_user: galaxy
 
-  galaxy_tools_conf: $__contrib_dir__/flavor/proteomics/galaxyp/galaxy_tools.yaml
+  galaxy_tools_conf: $__contrib_dir__/flavor/proteomics/galaxyp/tools.yaml
 
   galaxy_install_dependencies: True

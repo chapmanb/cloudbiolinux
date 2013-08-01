@@ -4,7 +4,6 @@
 from cloudbio.custom.galaxy import _prep_galaxy
 from cloudbio.custom.shared import _setup_conf_file, _setup_simple_service
 from cloudbio.galaxy.utils import _chown_galaxy
-from cloudbio.galaxy.tools import _install_tools
 
 from fabric.context_managers import prefix
 from fabric.contrib.files import *
@@ -12,15 +11,6 @@ from fabric.contrib.files import *
 from shared import _write_to_file
 
 import yaml
-
-
-def install_proteomics_tools(env):
-    _prep_galaxy(env)
-    tools_conf_path = env.get("galaxyp_tools_conf",
-                              os.path.join(env.config_dir, os.pardir,
-                                           "contrib", "flavor", "proteomics", "galaxyp", "galaxyp_tools.yaml"))
-    galaxyp_tools_conf = yaml.load(open(tools_conf_path, "r"))
-    _install_tools(env, galaxyp_tools_conf)
 
 
 def install_galaxy_protk(env):

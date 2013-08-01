@@ -97,7 +97,6 @@ galaxy_tools:
 galaxyp:
   - galaxy_protk
   - protvis
-  - proteomics_tools
 distributed:
   - gnu_parallel
   - pydoop
