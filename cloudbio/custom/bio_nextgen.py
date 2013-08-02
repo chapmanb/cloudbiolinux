@@ -186,7 +186,7 @@ def install_novoalign(env):
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
     base_url = "%s/novocraft%s.gcc.tar.gz" % (_url, base_version)
     cs_url = "%s/novoalignCS%s.gcc.tar.gz" % (_url, cs_version)
-    install_dir = os.path.join(env.system_install, "bin")
+    install_dir = shared._get_bin_dir(env)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, base_url)
@@ -214,7 +214,7 @@ def install_novosort(env):
     version = "V1.00.02"
     url = "http://www.novocraft.com/downloads/%s/novosort%s.gcc.tar.gz" % (base_version, version)
     ref_url = "http://www.novocraft.com/main/downloadpage.php"
-    install_dir = os.path.join(env.system_install, "bin")
+    install_dir = shared._get_bin_dir(env)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             _wget_with_cookies(ref_url, url)
@@ -303,7 +303,7 @@ def install_solexaqa(env):
         with cd(work_dir):
             env.safe_run("wget %s" % url)
             env.safe_run("unzip %s" % os.path.basename(url))
-            env.safe_sudo("mv SolexaQA.pl %s" % os.path.join(env.system_install, "bin"))
+            env.safe_sudo("mv SolexaQA.pl %s" % shared._get_bin_dir(env))
 
 @_if_not_installed("gemini")
 def install_gemini(env):

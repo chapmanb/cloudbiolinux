@@ -5,6 +5,7 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
+from cloudbio.custom import shared
 from shared import (_if_not_installed, _get_install, _configure_make, _java_install,
                     _make_tmp_dir)
 
@@ -52,7 +53,7 @@ def install_pgdspider(env):
         v=version)
     def _install_fn(env, install_dir):
         env.safe_sudo("mv *.jar %s" % install_dir)
-        bin_dir = os.path.join(env.system_install, "bin")
+        bin_dir = shared._get_bin_dir(env)
         exe_file = "PGDSpider2.sh"
         jar = "PGDSpider2.jar"
         env.safe_sed(exe_file, jar, "{dir}/{jar}".format(dir=install_dir, jar=jar))
