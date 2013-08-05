@@ -190,7 +190,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if find_cmd:
             install_dir = _get_bin_dir(env)
             for fname in env.safe_run_output(find_cmd).split("\n"):
-                env.safe_sudo("cp -f %s %s" % (fname.rstrip("\r"), install_dir))
+                env.safe_sudo("cp -rf %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
 
