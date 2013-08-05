@@ -506,12 +506,20 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
     # First make sure virtualenv-burrito is installed
     install_venvburrito()
     activate_vburrito = ". $HOME/.venvburrito/startup.sh"
-    with prefix(activate_vburrito):
-        print env
+
+    def create():
         if "venv_directory" not in env:
             _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url)
         else:
             _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+
+    # TODO: Terrible hack here, figure it out and fix it.
+    #   prefix or vburrito does not work with is_local or at least deployer+is_local
+    if env.is_local:
+        create()
+    else:
+        with prefix(activate_vburrito):
+            create()
 
 
 def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
@@ -522,7 +530,9 @@ def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     if not env.safe_exists(venv_directory):
         if reqs_url:
                 env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+        env.logger.debug("Creating virtualenv in directory %s" % venv_directory)
         env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
+        env.logger.debug("Activating")
         env.safe_sudo(". %s/bin/activate; pip install -r '%s'" % (venv_directory, reqs_file))
 
 
