@@ -76,7 +76,8 @@ def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
     http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
     """
-    version = "2.1.0"
+    default_version = "2.1.0"
+    version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
@@ -767,6 +768,8 @@ def install_tophat(env):
           "tophat-%s.Linux_x86_64.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -type f",
                                       do_make=False))
+
+install_tophat2 = install_tophat
 
 @_if_not_installed("cufflinks")
 def install_cufflinks(env):
