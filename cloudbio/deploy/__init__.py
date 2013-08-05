@@ -29,7 +29,7 @@ try:
     from vmlauncher.transfer import FileTransferManager
     from vmlauncher import build_vm_launcher
 except ImportError:
-    vmlauncher = None
+    build_vm_launcher = None
 
 
 DEFAULT_CLOUDBIOLINUX_TARGET = None
@@ -41,7 +41,7 @@ def deploy(options):
     if options["vm_provider"] == "novm":
         vm_launcher = LocalVmLauncher(options)
     else:
-        if not vmlauncher:
+        if not build_vm_launcher:
             raise ImportError("Require vmlauncher: https://github.com/jmchilton/vm-launcher")
         vm_launcher = build_vm_launcher(options)
 
