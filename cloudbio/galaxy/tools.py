@@ -78,12 +78,24 @@ def _install_configured_applications(env, tools_conf):
     Galaxy dependency applications.
     """
     applications = tools_conf["applications"] or {}
+    # Changing the default behavior here to install all tools and
+    # just record exceptions as they occur, but wait until the end
+    # raise an exception out of this block. Disable this behavior
+    # by setting galaxay_tool_defer_errors to False.
+    defer_errors = env.get("galaxy_tool_defer_errors", True)
+    exceptions = {}
     for (name, tool_conf) in applications.iteritems():
         try:
             _install_application(name, tool_conf)
-        except:
+        except BaseException, e:
+            exceptions[name] = e
+            if not defer_errors:
+                break
+    if exceptions:
+        for name, exception in exceptions.iteritems():
             env.logger.warn(FAILED_INSTALL_MESSAGE % name)
-            raise
+        first_exception = exceptions.values()[0]
+        raise first_exception
 
 
 def _install_application(name, versions):
