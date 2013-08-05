@@ -400,32 +400,63 @@ bio_visualization:
   - rasmol
   # - bio-linux-clcsequenceviewer # Awaiting fix
 bio_proteomics:
-  # Needed for TPP
-  - xsltproc
-  - libxml-sax-expat-perl
-  - libgd2-xpm-dev
-  - libbz2-dev
-  - gnuplot  
-  # Needed for percolator
-  - libxerces-c3.1
-  - libxerces-c-dev
-  - xsdcxx
-  - libboost-dev
-  - libboost-filesystem-dev
-  - libboost-system-dev
-  - libsqlite3-0
-  - libboost-serialization-dev
-  - zlib1g-dev
-  - libboost-dev
+  all:
+    # Required for protk
+    - libxml2-dev
+    - libreadline-dev
+    - libxslt-dev
+    
+    # Required for protvis
+    - python-virtualenv
+    - python-setuptools
+    - libpng12-dev
+    - python-dev
+    - libexpat1-dev
+    - libboost-dev
 
-  # needed for 32bit execs distributed with searchgui.
-  # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.
+    # Needed for TPP
+    - xsltproc
+    - libxml-sax-expat-perl
+    - libgd2-xpm-dev
+    - libbz2-dev
+    - gnuplot
 
-  # needed for building OpenMS
-  - libtool
-  - qt4-dev-tools
-  - libqtwebkit-dev
-  - libqtwebkit4
+    # Needed for percolator
+    - libxerces-c3.1
+    - libxerces-c-dev
+    - xsdcxx
+    - libboost-dev
+    - libboost-filesystem-dev
+    - libboost-system-dev
+    - libsqlite3-0
+    - libboost-serialization-dev
+    - zlib1g-dev
+    - libboost-dev
+
+    # needed for 32bit execs distributed with searchgui.
+    # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.     
+
+    # needed for building OpenMS
+    - libtool
+    - qt4-dev-tools
+    - libqtwebkit-dev
+    - libqtwebkit4
+
+     # Needed for psm-eval
+    - libyaml-dev
+
+    # Needed for RVM
+    - libbison-dev
+    - ncurses-dev 
+    - automake 
+    - libtool  
+    - bison
+    - subversion
+    - libgdbm-dev
+    - libffi-dev
+    - libsqlite3-dev
+    - sqlite3
+
 bio_proteomics_wine:
   - wine
 bio_utils:
@@ -521,8 +552,6 @@ galaxy:
     - default-jdk
     - python-rpy
     - xvfb
-    # Parallel file download (used by the Galaxy ObjectStore)
-    - axel
     # Required by Freebayes
     - cmake
     # Required by BWA
@@ -531,15 +560,8 @@ galaxy:
     - libncurses5-dev
     # Required by Compute q-values
     - liblzma-dev
-    # Latest python-rpy not currently compatible with R 3.0.1 at least on precise (presumably 
-    # quantal as well), hack below is to specify an older version of R compabile with python-rpy.    
-    #- r-base
-    #- r-base-core
-    #- r-base-dev
-    - r-cran-lattice
-    - r-cran-qvalue
-    # Required by HVIS
-    - r-bioc-hilbertvis
+    # Parallel file download (used by the Galaxy ObjectStore)
+    - axel
     # Required by various R modules
     - tcl-dev
     # Required by various R modules
@@ -549,6 +571,16 @@ galaxy:
     - pdfjam
     - python-scipy
     - libsparsehash-dev
+
+    # Latest python-rpy not currently compatible with R 3.0.1 at least on precise (presumably 
+    # quantal as well), hack below is to specify an older version of R compabile with python-rpy.    
+    #- r-base
+    #- r-base-core
+    #- r-base-dev
+    - r-cran-lattice
+    - r-cran-qvalue
+    # Required by HVIS
+    - r-bioc-hilbertvis
   ubuntu_quantal:
     - "r-base-core=3.0.0-2quantal"
     - "r-base-dev=3.0.0-2quantal"
