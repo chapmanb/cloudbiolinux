@@ -28,7 +28,7 @@ def _apt_packages(to_install=None, pkg_list=None):
             env.safe_sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
-        env.edition.apt_upgrade_system()
+        env.edition.apt_upgrade_system(env=env)
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
         # Allow editions and flavors to modify the package list
         packages = env.edition.rewrite_config_items("packages", packages)
