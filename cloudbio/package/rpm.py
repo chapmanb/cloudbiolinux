@@ -31,7 +31,7 @@ def _setup_yum_bashrc():
     if env.distribution in ["centos"]:
         to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
                       "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
-        fname = env.safe_run("ls %s" % env.shell_config)
+        fname = env.safe_run_output("ls %s" % env.shell_config)
         for line in to_include:
             if not env.safe_contains(fname, line.split("=")[0]):
                 env.safe_append(fname, line)
