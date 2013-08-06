@@ -18,7 +18,7 @@
 applications:
   ## Bioinformatics and NGS Applications
   emboss: 
-    - version: "6.5.7"
+    - version: "6.6.0"
       symlink_versions: "5.0.0"
   augustus: 
     - version: "2.7"
