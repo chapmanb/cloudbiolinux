@@ -82,8 +82,6 @@ programming:
     - tcl-devel
     - tk-devel
     - ImageMagick
-    - boost141
-    - boost141-devel
     - boost
     - boost-devel
     - openmpi
