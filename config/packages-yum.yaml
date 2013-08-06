@@ -204,7 +204,12 @@ galaxy:
     # Following requrie EPEL repository (setup by CloudBioLinux)    
     - pdfjam
     - sparsehash-devel
+
+    # cran packages for CentOS are not maintained, do what we can with EPEL.
+    - R
+    - R-devel
     # Missing relative to ubuntu install: axel, python-rpy, all R modules
+    #   Information on setting up rpy can be found at http://getgalaxyp.org/install.html
 bio_proteomics:
   # Needed for TPP
   - libxslt

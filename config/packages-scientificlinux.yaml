@@ -72,14 +72,22 @@ galaxy:
     - tcl-devel
     - tk-devel    
     - ImageMagick
-    #  - scipy  ## Available in CentOS but not SL, using numpy instead (likely many tools just require this.)
+    #  - scipy  ## Available in CentOS but not SL, install some prequirements instead including numpy (likely many tools just require this.)
     - numpy
+    - numpy-f2py
+    - blas-devel 
+    - atlas-devel
 
     # Following requrie EPEL repository (setup by CloudBioLinux)    
     - pdfjam
     - sparsehash-devel
-    # Missing relative to ubuntu install: All missing in CentOS (e.g. axel, python-rpy, all R modules)
+
+    # cran packages for CentOS are not maintained, do what we can with EPEL.
+    - R
+    - R-devel
+    # Missing relative to ubuntu install: All missing in CentOS (e.g. axel, python-rpy, many R modules)
     # Missing relative to CentOS install: scipy.
+    #   Information on setting up scipy and rpy can be found at http://getgalaxyp.org/install.html
 bio_proteomics:
   # Needed for TPP
   - libxslt
