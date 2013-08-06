@@ -8,6 +8,7 @@ dist/
 dpkg.lst
 *.log
 venv/
+venv_cbl/
 deploy/build
 deploy/keys
 deploy/settings.yaml
