@@ -68,8 +68,8 @@ programming:
     - xz-devel
     - gtk2
     - gtk2-devel
-    - globus-openss
-    - globus-openssl-devel
+    - globus-openssl-module
+    - globus-openssl-module-devel
     - pcre
     - pcre-devel
     - readline
@@ -78,6 +78,7 @@ programming:
     - librsync
     - librsync-devel
   libraries:
+    - libuuid-devel
     - tcl-devel
     - tk-devel
     - ImageMagick
@@ -137,7 +138,7 @@ java:
   - junit4
 erlang:
   - erlang
-  - erlang-devel
+  # - erlang-devel  ## Not available, erlang seems to install quite a bit.
 haskell:
   - ghc
 databases:
@@ -162,7 +163,7 @@ databases:
     - hdf5
     #- hdf5-devel
 math:
-  - prover9
+  # - prover9  # No longer available? Cannot find.
   - octave
   - octave-devel
 viz:
