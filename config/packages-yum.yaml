@@ -200,8 +200,9 @@ galaxy:
     - tcl-devel
     - tk-devel    
     - ImageMagick
-    - pdfjam
     - scipy
+    # Following requrie EPEL repository (setup by CloudBioLinux)    
+    - pdfjam
     - sparsehash-devel
     # Missing relative to ubuntu install: axel, python-rpy, all R modules
 bio_proteomics:
@@ -215,7 +216,7 @@ bio_proteomics:
   - xerces-c-devel
   - xerces-c
   - xsd
-  - sqlite3-devel
+  - sqlite-devel
   # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
   - zlib-devel
   - boost-devel
@@ -223,10 +224,6 @@ bio_proteomics:
   # needed for building OpenMS
   - qt-devel
   - qtwebkit-devel
-
-  # Needed for nbic galaxy database utilities
-  - perl-Log-Log4perl
-  # - libswiss-perl NOT AVAILABLE, ONE TOOL WON'T WORK.
 
   # Needed for PSM-eval
   - libyaml-devel
@@ -250,10 +247,14 @@ galaxyp:
   - xerces-c-devel
   - xerces-c
   - xsd
-  - sqlite3-devel
+  - sqlite-devel
   # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
   - zlib-devel
   - boost-devel
+
+  # Needed for nbic galaxy database utilities
+  - perl-Log-Log4perl
+  # - libswiss-perl NOT AVAILABLE, ONE TOOL WON'T WORK.
 
   # needed for building OpenMS
   - qt-devel
