@@ -257,6 +257,8 @@ def install_samtools(env):
     default_version = "0.1.19"
     version = env.get("tool_version", default_version)
     if versioncheck.up_to_date(env, "samtools", version, stdout_flag="Version:"):
+        env.logger.info("samtools version {0} is up to date; not installing"
+            .format(version))
         return
     url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
           "%s/samtools-%s.tar.bz2" % (version, version)
