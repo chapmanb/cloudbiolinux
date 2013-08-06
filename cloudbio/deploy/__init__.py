@@ -28,7 +28,7 @@ try:
     from vmlauncher import build_vm_launcher
 except ImportError:
     build_vm_launcher = None
-
+    FileTransferManager = None
 
 DEFAULT_CLOUDBIOLINUX_TARGET = None
 DEFAULT_CLOUDBIOLINUX_FLAVOR = None
@@ -164,7 +164,7 @@ def _possible_actions():
                          "detach_volumes",
                         ]
     for action_type in ["local_actions", "configure_actions", "ready_action"]:
-        for action in  __get_plugin_actions(env, "local_actions"):
+        for action in  __get_plugin_actions(env, action_type):
             possible_actions.append(action)
     return possible_actions
 
@@ -308,7 +308,7 @@ def _build_transfer_options(options, destination, user):
 
 
 def _do_transfer(transfer_options, files, compressed_files=[]):
-    if not vmlauncher:
+    if not FileTransferManager:
         raise ImportError("Require vmlauncher: https://github.com/jmchilton/vm-launcher")
     FileTransferManager(**transfer_options).transfer_files(files, compressed_files)
 

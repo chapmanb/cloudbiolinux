@@ -179,4 +179,4 @@ try:
     from fabric.api import quiet
 except ImportError:
     def quiet():
-        return settings(hide('warnings', 'runing', 'stdout', 'stderr'), warn_only=True)
+        return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
