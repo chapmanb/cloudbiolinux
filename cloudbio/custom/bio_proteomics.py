@@ -108,15 +108,17 @@ def install_tint_proteomics_scripts(env):
 def install_ms2preproc(env):
     default_version = "2009"
     version = env.get("tool_version", default_version)
-    get_cmd = 'wget --post-data "Anonym=1&GotoDownload=1&ref=http://hci.iwr.uni-heidelberg.de/MIP/Software/ms2preproc.php" http://hci.iwr.uni-heidelberg.de/php-tools/download.php -O ms2preproc.zip'
+    get_cmd = 'wget "http://software.steenlab.org/ms2preproc/ms2preproc.zip" -O ms2preproc.zip'
 
-    install_dir = _get_bin_dir(env)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             env.safe_run(get_cmd)
             env.safe_run("unzip ms2preproc.zip")
-            env.safe_run("chmod +x ms2preproc-x86_64")
-            env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
+            with cd("ms2preproc"):
+                env.safe_run("mv ms2preproc-r2821-x86_64 ms2preproc-x86_64")
+                env.safe_run("chmod +x ms2preproc-x86_64")
+                install_dir = _get_bin_dir(env)
+                env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
 
 
 @_if_not_installed("MZmine")
