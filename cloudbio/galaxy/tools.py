@@ -98,7 +98,7 @@ def _install_configured_applications(env, tools_conf):
         raise first_exception
 
 
-def _install_application(name, versions):
+def _install_application(name, versions, tool_install_dir=None):
     """
     Install single custom tool as Galaxy dependency application.
 
@@ -108,7 +108,7 @@ def _install_application(name, versions):
         versions = [versions]
     for version_info in versions:
         if type(version_info) is str:
-            _install_tool(env, name, version=version_info, requirement_name=name)
+            _install_tool(env, name, version=version_info, requirement_name=name, tool_install_dir=tool_install_dir)
         else:
             version = version_info["version"]
             bin_dirs = version_info.get("bin_dirs", ["bin"])
@@ -121,7 +121,7 @@ def _install_application(name, versions):
             # identifiers as name. Use install_blast to setup but override
             # requirement directory name with requirement_name field.
             requirement_name = version_info.get("requirement_name", name)
-            tool_env = _install_tool(env, name, version, bin_dirs=bin_dirs, env_vars=env_vars, requirement_name=requirement_name)
+            tool_env = _install_tool(env, name, version, bin_dirs=bin_dirs, env_vars=env_vars, requirement_name=requirement_name, tool_install_dir=tool_install_dir)
             symlink_versions = version_info.get("symlink_versions", [])
             if type(symlink_versions) is str:
                 symlink_versions = [symlink_versions]
@@ -138,22 +138,24 @@ def _install_application(name, versions):
                     env.safe_sudo("ln -f -s '%s' '%s'" % (requirement_name, link_dir))
 
 
-def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}):
-    tool_env = _build_tool_env(env, requirement_name, version)
+def _install_tool(env, name, version, requirement_name, bin_dirs=["bin"], env_vars={}, tool_install_dir=None):
+    tool_env = _build_tool_env(env, requirement_name, version, tool_install_dir)
     env.logger.debug("Installing a Galaxy tool via 'install_%s'" % name)
     eval("install_%s" % name)(tool_env)
     _install_galaxy_config(tool_env, bin_dirs, env_vars=env_vars)
     return tool_env
 
 
-def _build_tool_env(env, name, version):
+def _build_tool_env(env, name, version, tool_install_dir):
     """ Build new env to have tool installed for Galaxy instead of into /usr. """
     tool_env = {"tool_version": version,
                 "galaxy_tool_install": True}
     for key, value in env.iteritems():
         tool_env[key] = value
-    tool_env["system_install"] = os.path.join(env.galaxy_tools_dir, name, version)
-    tool_env["local_install"] = os.path.join(env.galaxy_tools_dir, name, version)
+    if not tool_install_dir:
+        tool_install_dir = os.path.join(env.galaxy_tools_dir, name, version)
+    tool_env["system_install"] = tool_install_dir
+    tool_env["local_install"] = tool_install_dir
     tool_env["venv_directory"] = "%s/%s" % (tool_env["system_install"], "venv")
     return AttributeDict(tool_env)
 
@@ -195,6 +197,8 @@ def _install_galaxy_config(tool_env, bin_dirs, env_vars):
             env.safe_sudo("echo 'export %s=%s' >> %s" % (env_var, expanded_env_var_value, env_path))
         env.logger.debug("Added Galaxy env.sh file: %s" % env_path)
 
+    # TODO: If a direct install (i.e. tool_install_dir specified instead of galaxy_tools_dir)
+    # default is still setup. This is not really desired.
     _set_default_config(tool_env, install_dir)
     if _read_boolean(tool_env, "autoload_galaxy_tools", False) and env.safe_exists(env_path):
         # In this case, the web user (e.g. ubuntu) should auto-load all of
