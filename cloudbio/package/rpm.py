@@ -29,8 +29,9 @@ def _setup_yum_bashrc():
     """Fix the user bashrc to update compilers.
     """
     if env.distribution in ["centos"]:
-        to_include = ["export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
-                      "export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
+        to_include = ["export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib/pkgconfig"]
+        # gcc fixes no longer necessary on recent CentOS versions
+        #"export CC=gcc44", "export CXX=g++44", "export FC=gfortran44",
         fname = env.safe_run_output("ls %s" % env.shell_config)
         for line in to_include:
             if not env.safe_contains(fname, line.split("=")[0]):

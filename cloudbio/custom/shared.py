@@ -306,7 +306,10 @@ def _pip_cmd(env):
 
 
 def _python_make(env):
-    env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
+    with quiet():
+        full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
+    run_cmd = env.safe_run if "/anaconda/" in full_pip else env.safe_sudo
+    run_cmd("%s install --upgrade ." % full_pip)
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 

@@ -26,9 +26,14 @@ def install_anaconda(env):
     if not env.safe_exists(outdir):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % url)
+                env.safe_run("wget -c %s" % url)
                 env.safe_sudo("echo -e '\nyes\n%s\nyes\n' | bash %s" % (outdir, os.path.basename(url)))
                 env.safe_sudo("chown -R %s %s" % (env.user, outdir))
+                comment_line = "# added by Ananconda"
+                if not env.safe_contains(env.shell_config, comment_line):
+                    env.safe_append(env.shell_config, comment_line)
+                    env.safe_append(env.shell_config, "export PATH=%s/bin:$PATH" % outdir)
+                    env.safe_run("source %s" % env.shell_config)
                 # remove curl library with broken certificates
                 env.safe_run("%s/bin/conda remove --yes curl" % outdir)
 
@@ -38,7 +43,7 @@ def install_emboss(env):
     http://emboss.sourceforge.net/
     Emboss target for platforms without packages (CentOS -- rpm systems).
     """
-    default_version = "6.4.0"
+    default_version = "6.6.0"
     version = env.get("tool_version", default_version)
     url = "ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-%s.tar.gz" % version
     _get_install(url, env, _configure_make)

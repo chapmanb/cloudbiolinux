@@ -155,10 +155,12 @@ def _setup_deb_general():
 def _setup_centos():
     env.logger.info("CentOS setup")
     if not hasattr(env, "python_version_ext"):
-        env.python_version_ext = "2.6"
+        # use installed anaconda version instead of package 2.6
+        #env.python_version_ext = "2.6"
+        env.python_version_ext = ""
+    #env.pip_cmd = "pip-python"
     if not hasattr(env, "ruby_version_ext"):
         env.ruby_version_ext = ""
-    env.pip_cmd = "pip-python"
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 

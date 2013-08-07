@@ -308,7 +308,7 @@ def install_solexaqa(env):
             env.safe_run("unzip %s" % os.path.basename(url))
             env.safe_sudo("mv SolexaQA.pl %s" % shared._get_bin_dir(env))
 
-@_if_not_installed("gemini")
+@_if_not_installed("gemini -v")
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
@@ -859,7 +859,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.18"
+    version = "1.0.5.20"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):
@@ -951,12 +951,12 @@ def install_crisp(env):
                                       premake_cmd=_make_executable,
                                       do_make=False))
 
-@_if_not_installed("start_tassel.pl")
+@_if_not_installed("run_pipeline.pl")
 def install_tassel(env):
     """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
     http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&/Itemid=119
     """
-    version = "3.0"
+    version = "4.0"
     url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
     executables = ["start_tassel.pl", "run_pipeline.pl"]
     install_dir = _symlinked_java_version_dir("tassel", version, env)
