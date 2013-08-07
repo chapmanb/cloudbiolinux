@@ -44,16 +44,16 @@ applications:
   bowtie2: "2.1.0"
   tophat2:
     - version: "2.0.9"
-    - bin_dirs:
-      - bin
-      - ../../bowtie2/2.1.0/bin
+      bin_dirs:
+        - bin
+        - ../../bowtie2/2.1.0/bin
   trinity:
     - version: "r2012-10-05"
       bin_dirs:
         - .
   cufflinks: "2.1.1"
   samtools: "0.1.16" 
-      
+
   ## Mass Spec Applications:
 
   peptide_to_gff: "master"
