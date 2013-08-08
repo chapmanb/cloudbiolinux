@@ -76,7 +76,7 @@ def _install_galaxy(env):
     """
     _clone_galaxy_repo(env)
     _chown_galaxy(env, env.galaxy_home)  # Make sure env.galaxy_user owns env.galaxy_home
-    sudo("chmod 755 %s" % os.path.split(env.galaxy_home)[0])
+    env.safe_sudo("chmod 755 %s" % os.path.split(env.galaxy_home)[0])
     setup_db = _read_boolean(env, "galaxy_setup_database", False)
     if setup_db:
         _setup_galaxy_db(env)
@@ -103,14 +103,14 @@ def _clone_galaxy_repo(env):
     """
     # Make sure ``env.galaxy_home`` dir exists but without Galaxy in it
     galaxy_exists = False
-    if exists(env.galaxy_home):
-        if exists(os.path.join(env.galaxy_home, '.hg')):
+    if env.safe_exists(env.galaxy_home):
+        if env.safe_exists(os.path.join(env.galaxy_home, '.hg')):
             env.logger.warning("Galaxy install dir {0} exists and seems to have "
                 "a Mercurial repository already there. Galaxy already installed?"
                 .format(env.galaxy_home))
             galaxy_exists = True
     else:
-        sudo("mkdir -p '%s'" % env.galaxy_home)
+        env.safe_sudo("mkdir -p '%s'" % env.galaxy_home)
     if not galaxy_exists:
         with cd(env.galaxy_home):
             # Needs to be done as non galaxy user, otherwise we have a
@@ -121,7 +121,7 @@ def _clone_galaxy_repo(env):
     _chown_galaxy(env, env.galaxy_home)
     # Make sure env.galaxy_home root dir is also owned by env.galaxy_user so Galaxy
     # process can create necessary dirs (e.g., shed_tools, tmp)
-    sudo("chown {0}:{0} {1}".format(env.galaxy_user, os.path.split(env.galaxy_home)[0]))
+    env.safe_sudo("chown {0}:{0} {1}".format(env.galaxy_user, os.path.split(env.galaxy_home)[0]))
     # If needed, custom-configure this freshly cloned Galaxy
     preconfigured = _read_boolean(env, "galaxy_preconfigured_repository", False)
     if not preconfigured:
@@ -173,14 +173,14 @@ def _galaxy_db_exists(env):
     db_exists = False
     started = False
     c = _get_galaxy_db_configs(env)
-    if exists(c['psql_data_dir']) and not _dir_is_empty(c['psql_data_dir']):
-        sudo("chown --recursive {0}:{0} {1}".format(c['psql_user'], c['psql_data_dir']))
+    if env.safe_exists(c['psql_data_dir']) and not _dir_is_empty(c['psql_data_dir']):
+        env.safe_sudo("chown --recursive {0}:{0} {1}".format(c['psql_user'], c['psql_data_dir']))
         env.logger.debug("Galaxy database directory {0} already exists.".format(c['psql_data_dir']))
         # Check if PostgreSQL is already running and try to start the DB if not
         if not _postgres_running(env):
             with settings(warn_only=True):
                 env.logger.debug("Trying to start DB server in {0}".format(c['psql_data_dir']))
-                sudo("{0}".format(c['pg_start_cmd']), user=c['psql_user'])
+                env.safe_sudo("{0}".format(c['pg_start_cmd']), user=c['psql_user'])
                 started = True
         # Check if galaxy DB already exists
         if 'galaxy' in sudo("{0} -P pager --list | grep {1} || true".format(c['psql_cmd'],
@@ -190,7 +190,7 @@ def _galaxy_db_exists(env):
             db_exists = True
         if started:
             with settings(warn_only=True):
-                sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
+                env.safe_sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
     return db_exists
 
 
@@ -199,37 +199,37 @@ def _create_galaxy_db(env):
     Create a new PostgreSQL database for use by Galaxy
     """
     c = _get_galaxy_db_configs(env)
-    if not exists(c['psql_data_dir']):
-        sudo("mkdir -p {0}".format(c['psql_data_dir']))
-    sudo("chown --recursive {0}:{0} {1}".format(c['psql_user'], c['psql_data_dir']))
+    if not env.safe_exists(c['psql_data_dir']):
+        env.safe_sudo("mkdir -p {0}".format(c['psql_data_dir']))
+    env.safe_sudo("chown --recursive {0}:{0} {1}".format(c['psql_user'], c['psql_data_dir']))
     # Initialize a new database for Galaxy in ``psql_data_dir``
     if _dir_is_empty(c['psql_data_dir']):
-        sudo("{0} -D {1}".format(os.path.join(c['psql_bin_dir'], 'initdb'), c['psql_data_dir']),
+        env.safe_sudo("{0} -D {1}".format(os.path.join(c['psql_bin_dir'], 'initdb'), c['psql_data_dir']),
             user=c['psql_user'])
     # Set port for the database server
-    sed(c['psql_conf_file'], '#port = 5432', 'port = {0}'.format(c['psql_port']), use_sudo=True)
-    sudo("chown {0}:{0} {1}".format(c['psql_user'], c['psql_conf_file']))
+    env.safe_sed(c['psql_conf_file'], '#port = 5432', 'port = {0}'.format(c['psql_port']), use_sudo=True)
+    env.safe_sudo("chown {0}:{0} {1}".format(c['psql_user'], c['psql_conf_file']))
     # Start PostgreSQL server so a role for Galaxy user can be created
     if not _postgres_running(env):
-        sudo(c['pg_start_cmd'], user=c['psql_user'])
+        env.safe_sudo(c['pg_start_cmd'], user=c['psql_user'])
         started = True
     else:
         # Restart is required so port setting takes effect
-        sudo("{0} -D {1} -w -l {2} restart".format(c['pg_ctl_cmd']), c['psql_data_dir'],
+        env.safe_sudo("{0} -D {1} -w -l {2} restart".format(c['pg_ctl_cmd']), c['psql_data_dir'],
             c['psql_log'], user=c['psql_user'])
         started = False
     # Create a role for env.galaxy_user
-    sudo('{0} -c"CREATE ROLE {1} LOGIN CREATEDB"'.format(c['psql_cmd'], env.galaxy_user),
+    env.safe_sudo('{0} -c"CREATE ROLE {1} LOGIN CREATEDB"'.format(c['psql_cmd'], env.galaxy_user),
         user=c['psql_user'])
     # Create a Galaxy database
-    sudo('{0} -p {1} {2}'.format(os.path.join(c['psql_bin_dir'], 'createdb'),
+    env.safe_sudo('{0} -p {1} {2}'.format(os.path.join(c['psql_bin_dir'], 'createdb'),
         c['psql_port'], c['galaxy_db_name']), user=env.galaxy_user)
     # Create a role for 'galaxyftp' user
-    sudo('{0} -c"CREATE ROLE galaxyftp LOGIN PASSWORD \'{1}\'"'.format(c['psql_cmd'],
+    env.safe_sudo('{0} -c"CREATE ROLE galaxyftp LOGIN PASSWORD \'{1}\'"'.format(c['psql_cmd'],
         c['galaxy_ftp_user_pwd']), user=c['psql_user'])
     if started:
         with settings(warn_only=True):
-            sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
+            env.safe_sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
     exp = "export PATH={0}:$PATH".format(c['psql_bin_dir'])
     _add_to_profiles(exp)
 
@@ -242,17 +242,17 @@ def _init_galaxy_db(env):
     with cd(env.galaxy_home):
         universe_wsgi_url = env.get('galaxy_universe_wsgi_url',
             os.path.join(CM_REPO_ROOT_URL, 'universe_wsgi.ini.cloud'))
-        sudo("wget --output-document=universe_wsgi.ini {0}".format(universe_wsgi_url))
+        env.safe_sudo("wget --output-document=universe_wsgi.ini {0}".format(universe_wsgi_url))
         started = False
         if not _postgres_running(env):
             c = _get_galaxy_db_configs(env)
-            sudo(c['pg_start_cmd'], user=c['psql_user'])
+            env.safe_sudo(c['pg_start_cmd'], user=c['psql_user'])
             started = True
         sudo("bash -c 'export PYTHON_EGG_CACHE=eggs; python -ES ./scripts/fetch_eggs.py; ./create_db.sh'",
             user=env.galaxy_user)
         if started:
             with settings(warn_only=True):
-                sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
+                env.safe_sudo("{0}".format(c['pg_stop_cmd']), user=c['psql_user'])
 
 
 def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
@@ -283,7 +283,7 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
 
 def _setup_shed_tools_dir(env):
     ts_dir = "%s/../shed_tools" % env.galaxy_home
-    if not exists(ts_dir):
+    if not env.safe_exists(ts_dir):
         _make_dir_for_galaxy(env, ts_dir)
         env.logger.info("Setup Tool Shed directory {0}".format(ts_dir))
 
@@ -293,15 +293,15 @@ def _setup_trackster(env):
     Download .len files required by Trackster:
     http://wiki.galaxyproject.org/Learn/Visualization#Setup_for_Local_Instances
     """
-    if not exists(env.galaxy_len_files):
-        sudo("mkdir -p {0}".format(env.galaxy_len_files))
+    if not env.safe_exists(env.galaxy_len_files):
+        env.safe_sudo("mkdir -p {0}".format(env.galaxy_len_files))
     with cd(env.galaxy_len_files):
-        if not exists(os.path.join(env.galaxy_len_files, "hg19.len")):
+        if not env.safe_exists(os.path.join(env.galaxy_len_files, "hg19.len")):
             local_fn = "len-files.tar.gz"
-            sudo('wget --output-document={0} '
+            env.safe_sudo('wget --output-document={0} '
                  'https://s3.amazonaws.com/usegalaxy/len-files.tar.gz'.format(local_fn))
-            sudo("tar xzf {0}".format(local_fn))
-            sudo("rm {0}".format(local_fn))
+            env.safe_sudo("tar xzf {0}".format(local_fn))
+            env.safe_sudo("rm {0}".format(local_fn))
     _chown_galaxy(env, env.galaxy_len_files)
 
 
@@ -320,30 +320,30 @@ def _configure_galaxy_repository(env):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
         # to all invocations of python within run.sh
-        sudo("sed -i 's/python .\//python -ES .\//g' run.sh", user=env.galaxy_user)
+        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' run.sh", user=env.galaxy_user)
         if _read_boolean(env, "galaxy_cloud", True):
             # Append DRMAA_LIBRARY_PATH in run.sh as well (this file will exist
             # once SGE is installed - which happens at instance contextualization)
-            sudo("grep -q 'export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; if [ $? -eq 1 ]; then sed -i '2 a export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; fi", user=env.galaxy_user)
+            env.safe_sudo("grep -q 'export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; if [ $? -eq 1 ]; then sed -i '2 a export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; fi", user=env.galaxy_user)
             # Upload the custom cloud welcome screen files
-            if not exists("%s/static/images/cloud.gif" % env.galaxy_home):
-                sudo("wget --output-document=%s/static/images/cloud.gif %s/cloud.gif" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
-            if not exists("%s/static/images/cloud_txt.png" % env.galaxy_home):
-                sudo("wget --output-document=%s/static/images/cloud_text.png %s/cloud_text.png" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
-            sudo("wget --output-document=%s/static/welcome.html %s/welcome.html" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
+            if not env.safe_exists("%s/static/images/cloud.gif" % env.galaxy_home):
+                env.safe_sudo("wget --output-document=%s/static/images/cloud.gif %s/cloud.gif" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
+            if not env.safe_exists("%s/static/images/cloud_txt.png" % env.galaxy_home):
+                env.safe_sudo("wget --output-document=%s/static/images/cloud_text.png %s/cloud_text.png" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
+            env.safe_sudo("wget --output-document=%s/static/welcome.html %s/welcome.html" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
         # Set up the symlink for SAMTOOLS (remove this code once SAMTOOLS is converted to data tables)
-        if exists("%s/tool-data/sam_fa_indices.loc" % env.galaxy_home):
-            sudo("rm %s/tool-data/sam_fa_indices.loc" % env.galaxy_home, user=env.galaxy_user)
+        if env.safe_exists("%s/tool-data/sam_fa_indices.loc" % env.galaxy_home):
+            env.safe_sudo("rm %s/tool-data/sam_fa_indices.loc" % env.galaxy_home, user=env.galaxy_user)
         # TODO: Is this really necessary here? Shouldn't the tools do this themselves?
         # set up the jars directory for Java tools
-        if not exists(env.galaxy_jars_dir):
-            sudo("mkdir -p %s" % env.galaxy_jars_dir, user=env.galaxy_user)
+        if not env.safe_exists(env.galaxy_jars_dir):
+            env.safe_sudo("mkdir -p %s" % env.galaxy_jars_dir, user=env.galaxy_user)
         srma_dir = os.path.join(env.galaxy_tools_dir, 'srma', 'default')
         haploview_dir = os.path.join(env.galaxy_tools_dir, 'haploview', 'default')
         picard_dir = os.path.join(env.galaxy_tools_dir, 'picard', 'default')
-        sudo('ln -s -f %s/srma.jar %s' % (srma_dir, env.galaxy_jars_dir), user=env.galaxy_user)
-        sudo('ln -s -f %s/haploview.jar %s' % (haploview_dir, env.galaxy_jars_dir), user=env.galaxy_user)
-        sudo('ln -s -f %s/*.jar %s' % (picard_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        env.safe_sudo('ln -s -f %s/srma.jar %s' % (srma_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        env.safe_sudo('ln -s -f %s/haploview.jar %s' % (haploview_dir, env.galaxy_jars_dir), user=env.galaxy_user)
+        env.safe_sudo('ln -s -f %s/*.jar %s' % (picard_dir, env.galaxy_jars_dir), user=env.galaxy_user)
     return True
 
 
@@ -385,7 +385,7 @@ def _install_nginx(env):
     remote_conf_dir = os.path.join(install_dir, "conf")
 
     # Skip install if already present
-    if exists(remote_conf_dir) and contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
+    if env.safe_exists(remote_conf_dir) and env.safe_contains(os.path.join(remote_conf_dir, "nginx.conf"), "/cloud"):
         env.logger.debug("Nginx already installed; not installing it again.")
         return
 
@@ -393,17 +393,17 @@ def _install_nginx(env):
         with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
             modules = _get_nginx_modules(env)
             module_flags = " ".join(["--add-module=../%s" % x for x in modules])
-            run("wget %s" % url)
-            run("tar xvzf %s" % os.path.split(url)[1])
+            env.safe_run("wget %s" % url)
+            env.safe_run("tar xvzf %s" % os.path.split(url)[1])
             with cd("nginx-%s" % version):
-                run("./configure --prefix=%s --with-ipv6 %s "
+                env.safe_run("./configure --prefix=%s --with-ipv6 %s "
                     "--user=galaxy --group=galaxy --with-debug "
                     "--with-http_ssl_module --with-http_gzip_static_module" %
                     (install_dir, module_flags))
-                sed("objs/Makefile", "-Werror", "")
-                run("make")
-                sudo("make install")
-                sudo("cd %s; stow nginx" % env.install_dir)
+                env.safe_sed("objs/Makefile", "-Werror", "")
+                env.safe_run("make")
+                env.safe_sudo("make install")
+                env.safe_sudo("cd %s; stow nginx" % env.install_dir)
 
     defaults = {"galaxy_home": "/mnt/galaxyTools/galaxy-central"}
     _setup_conf_file(env, os.path.join(remote_conf_dir, "nginx.conf"), "nginx.conf", defaults=defaults)
@@ -412,18 +412,18 @@ def _install_nginx(env):
     url = os.path.join(REPO_ROOT_URL, nginx_errdoc_file)
     remote_errdoc_dir = os.path.join(install_dir, "html")
     with cd(remote_errdoc_dir):
-        sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
-        sudo('tar xvzf %s' % nginx_errdoc_file)
+        env.safe_sudo("wget --output-document=%s/%s %s" % (remote_errdoc_dir, nginx_errdoc_file, url))
+        env.safe_sudo('tar xvzf %s' % nginx_errdoc_file)
 
-    sudo("mkdir -p %s" % env.install_dir)
-    if not exists("%s/nginx" % env.install_dir):
-        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
+    env.safe_sudo("mkdir -p %s" % env.install_dir)
+    if not env.safe_exists("%s/nginx" % env.install_dir):
+        env.safe_sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, env.install_dir))
     # If the guessed symlinking did not work, force it now
     cloudman_default_dir = "/opt/galaxy/sbin"
-    if not exists(cloudman_default_dir):
-        sudo("mkdir -p %s" % cloudman_default_dir)
-    if not exists(os.path.join(cloudman_default_dir, "nginx")):
-        sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
+    if not env.safe_exists(cloudman_default_dir):
+        env.safe_sudo("mkdir -p %s" % cloudman_default_dir)
+    if not env.safe_exists(os.path.join(cloudman_default_dir, "nginx")):
+        env.safe_sudo("ln -s %s/sbin/nginx %s/nginx" % (install_dir, cloudman_default_dir))
     env.logger.debug("Nginx {0} installed to {1}".format(version, install_dir))
 
 
@@ -450,9 +450,9 @@ def _get_nginx_module_upload(env):
     upload_module_version = "2.2.0"
     upload_url = "http://www.grid.net.ru/nginx/download/" \
                  "nginx_upload_module-%s.tar.gz" % upload_module_version
-    run("wget %s" % upload_url)
+    env.safe_run("wget %s" % upload_url)
     upload_fname = os.path.split(upload_url)[1]
-    run("tar -xvzpf %s" % upload_fname)
+    env.safe_run("tar -xvzpf %s" % upload_fname)
     return upload_fname.rsplit(".", 2)[0]
 
 
@@ -462,14 +462,14 @@ def _get_nginx_module_chunk(env):
 
     chunk_url = "https://github.com/agentzh/chunkin-nginx-module/tarball/v%s" % chunk_module_version
     chunk_fname = "agentzh-chunkin-nginx-module-%s.tar.gz" % (chunk_git_version)
-    run("wget -O %s %s" % (chunk_fname, chunk_url))
-    run("tar -xvzpf %s" % chunk_fname)
+    env.safe_run("wget -O %s %s" % (chunk_fname, chunk_url))
+    env.safe_run("tar -xvzpf %s" % chunk_fname)
     return chunk_fname.rsplit(".", 2)[0]
 
 
 def _get_nginx_module_ldap(env):
-    run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
-    run("git clone https://github.com/kvspb/nginx-auth-ldap")
+    env.safe_run("rm -rf nginx-auth-ldap")  # Delete it if its there or git won't clone
+    env.safe_run("git clone https://github.com/kvspb/nginx-auth-ldap")
     return "nginx-auth-ldap"
 
 
@@ -505,8 +505,8 @@ def _configure_postgresql(env, delete_main_dbcluster=False):
     # Not sure why I ever added this to gvl, doesn't seem needed. -John
     #_put_installed_file_as_user("postgresql-%s.conf" % env.postgres_version, "/etc/postgresql/%s/main/postgresql.conf" % env.postgres_version, user='root')
     exp = "export PATH=/usr/lib/postgresql/%s/bin:$PATH" % pg_ver
-    if not contains('/etc/bash.bashrc', exp):
-        append('/etc/bash.bashrc', exp, use_sudo=True)
+    if not env.safe_contains('/etc/bash.bashrc', exp):
+        env.safe_append('/etc/bash.bashrc', exp, use_sudo=True)
 
 
 def _init_postgresql_data(env):
@@ -526,5 +526,5 @@ def _postgres_running(env):
 
 
 def _make_dir_for_galaxy(env, path):
-    sudo("mkdir -p '%s'" % path)
+    env.safe_sudo("mkdir -p '%s'" % path)
     _chown_galaxy(env, path)

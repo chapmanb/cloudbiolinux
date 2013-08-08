@@ -225,6 +225,7 @@ def _get_install_local(url, env, make_command, dir_name=None,
             with cd(work_dir):
                 dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar,
                     tar_file_name=tar_file_name)
+                print env.local_install, dir_name
                 if not env.safe_exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
@@ -309,6 +310,8 @@ def _python_make(env):
     with quiet():
         full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
     run_cmd = env.safe_run if "/anaconda/" in full_pip else env.safe_sudo
+    # Clean up previously failed builds
+    env.safe_sudo("rm -rf /tmp/pip-build-%s" % env.user)
     run_cmd("%s install --upgrade ." % full_pip)
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
@@ -340,7 +343,10 @@ def _write_to_file(contents, path, mode):
     fd, local_path = tempfile.mkstemp()
     try:
         os.write(fd, contents)
-        put(local_path, path, use_sudo=True, mode=mode)
+        tmp_path = os.path.join("/tmp", os.path.basename(path))
+        env.safe_put(local_path, tmp_path)
+        env.safe_sudo("mv %s %s" % (tmp_path, path))
+        env.safe_sudo("chmod %s %s" % (mode, path))
         os.close(fd)
     finally:
         os.unlink(local_path)
@@ -465,7 +471,7 @@ def _extend_env(env, defaults={}, overrides={}):
 
 def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
     conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
-    _write_to_file(conf_file_contents, dest, mode=0755)
+    _write_to_file(conf_file_contents, dest, mode="0755")
 
 
 def _add_to_profiles(line, profiles=[], use_sudo=True):
@@ -491,7 +497,8 @@ def install_venvburrito():
     if not env.safe_exists("$HOME/.venvburrito/startup.sh"):
         env.safe_run("curl -s {0} | $SHELL".format(url))
         # Add the startup script into the ubuntu user's bashrc
-        _add_to_profiles(". $HOME/.venvburrito/startup.sh", ['/home/ubuntu/.bashrc'], use_sudo=False)
+        _add_to_profiles(". $HOME/.venvburrito/startup.sh", [env.shell_config], use_sudo=False)
+        env.safe_run("source %s" % env.shell_config)
 
 
 def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
@@ -544,7 +551,7 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     """
     Use mkvirtualenv to setup this virtualenv globally for user.
     """
-    if venv_name in env.safe_run("lsvirtualenv | grep {0} || true"
+    if venv_name in env.safe_run_output("bash -l -c lsvirtualenv | grep {0} || true"
         .format(venv_name)):
         env.logger.info("Virtualenv {0} already exists".format(venv_name))
     else:
@@ -553,9 +560,9 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
                 if not reqs_file:
                     # This mean the url only is provided so 'standardize ' the file name
                     reqs_file = 'requirements.txt'
-                cmd = "mkvirtualenv -r {0} {1}".format(reqs_file, venv_name)
+                cmd = "bash -l -c 'mkvirtualenv -r {0} {1}'".format(reqs_file, venv_name)
             else:
-                cmd = "mkvirtualenv {0}".format(venv_name)
+                cmd = "bash -l -c 'mkvirtualenv {0}'".format(venv_name)
             if reqs_url:
                 env.safe_run("wget --output-document=%s %s" % (reqs_file, reqs_url))
             env.safe_run(cmd)

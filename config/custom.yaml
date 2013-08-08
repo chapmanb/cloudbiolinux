@@ -38,7 +38,7 @@ bio_nextgen:
     - sambamba
     - shrec
     - tophat
-    - vep
+    # - vep # lots of timeout failures on download
   assembly:
     - abyss
     - cortex_var

@@ -124,8 +124,9 @@ def _setup_env(env):
     # Add a custom vimrc
     vimrc_url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', 'vimrc')
     remote_file = '/etc/vim/vimrc'
-    sudo("wget --output-document=%s %s" % (remote_file, vimrc_url))
-    env.logger.debug("Added a custom vimrc to {0}".format(remote_file))
+    if env.safe_exists("/etc/vim"):
+        env.safe_sudo("wget --output-document=%s %s" % (remote_file, vimrc_url))
+        env.logger.debug("Added a custom vimrc to {0}".format(remote_file))
     # Setup profile
     aliases = ['alias lt="ls -ltr"', 'alias ll="ls -l"']
     for alias in aliases:
@@ -140,7 +141,7 @@ def _configure_logrotate(env):
     conf_file = "cloudman.logrotate"
     remote = '/etc/logrotate.d/cloudman'
     url = os.path.join(MI_REPO_ROOT_URL, 'conf_files', conf_file)
-    sudo("wget --output-document=%s %s" % (remote, url))
+    env.safe_sudo("wget --output-document=%s %s" % (remote, url))
     env.logger.info("----- Added logrotate file to {0} -----".format(remote))
 
 
@@ -155,19 +156,22 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     """
     script = "ec2autorun.py"
     remote = os.path.join(env.install_dir, "bin", script)
-    if not exists(os.path.dirname(remote)):
-        sudo('mkdir -p {0}'.format(os.path.dirname(remote)))
+    if not env.safe_exists(os.path.dirname(remote)):
+        env.safe_sudo('mkdir -p {0}'.format(os.path.dirname(remote)))
     if use_repo_autorun:
         # Is this used, can we eliminate use_repo_autorun?
         url = os.path.join(MI_REPO_ROOT_URL, script)
-        sudo("wget --output-document=%s %s" % (remote, url))
+        env.safe_sudo("wget --output-document=%s %s" % (remote, url))
     else:
         install_file_dir = os.path.join(env.config_dir, os.pardir, "installed_files")
-        put(os.path.join(install_file_dir, script), remote, mode=0777, use_sudo=True)
+        tmp_remote = os.path.join("/tmp", os.path.basename(remote))
+        env.safe_put(os.path.join(install_file_dir, script), tmp_remote)
+        env.safe_sudo("mv %s %s" % (tmp_remote, remote))
+        env.safe_sudo("chmod 0777 %s" % remote)
     # Create upstart configuration file for boot-time script
     cloudman_boot_file = 'cloudman.conf'
     remote_file = '/etc/init/%s' % cloudman_boot_file
-    _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode=0644)
+    _write_to_file(cm_upstart % (remote, os.path.splitext(remote)[0]), remote_file, mode="0644")
     # Setup default image user data (if configured by image_user_data_path or
     # image_user_data_template_path). This specifies defaults for CloudMan when
     # used with resulting image, normal userdata supplied by user will override
@@ -176,7 +180,7 @@ def _configure_ec2_autorun(env, use_repo_autorun=False):
     if "image_user_data_dict" in env:
         # Explicit YAML contents defined in env, just dump them as is.
         import yaml
-        _write_to_file(yaml.dump(env.get("image_user_data_dict")), image_user_data_path, mode=0644)
+        _write_to_file(yaml.dump(env.get("image_user_data_dict")), image_user_data_path, mode="0644")
     else:
         # Else use file or template file.
         _setup_conf_file(env, image_user_data_path, "image_user_data", default_source="image_user_data")
@@ -192,16 +196,16 @@ def _configure_sge(env):
     TODO: Merge this with ``install_sge`` method in ``custom/cloudman.py``.
     """
     sge_root = '/opt/sge'
-    if not exists(sge_root):
-        sudo("mkdir -p %s" % sge_root)
-        sudo("chown sgeadmin:sgeadmin %s" % sge_root)
+    if not env.safe_exists(sge_root):
+        env.safe_sudo("mkdir -p %s" % sge_root)
+        env.safe_sudo("chown sgeadmin:sgeadmin %s" % sge_root)
     # Link our installed SGE to CloudMan's expected directory
     sge_package_dir = "/opt/galaxy/pkg"
     sge_dir = "ge6.2u5"
-    if not exists(os.path.join(sge_package_dir, sge_dir)):
-        sudo("mkdir -p %s" % sge_package_dir)
-    if not exists(os.path.join(sge_package_dir, sge_dir)):
-        sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
+    if not env.safe_exists(os.path.join(sge_package_dir, sge_dir)):
+        env.safe_sudo("mkdir -p %s" % sge_package_dir)
+    if not env.safe_exists(os.path.join(sge_package_dir, sge_dir)):
+        env.safe_sudo("ln --force -s %s/%s %s/%s" % (env.install_dir, sge_dir, sge_package_dir, sge_dir))
     env.logger.info("Done configuring SGE for CloudMan")
 
 
@@ -214,12 +218,12 @@ def _configure_hadoop(env):
     hcm_file = 'hadoop.1.0.4__1.0.tar.gz'
     si_file = 'sge_integration.1.0.tar.gz'
     # Make sure we're working with a clean hadoop_home dir to avoid any version conflicts
-    sudo("rm -rf {0}".format(hadoop_root))
-    sudo("mkdir -p %s" % hadoop_root)
+    env.safe_sudo("rm -rf {0}".format(hadoop_root))
+    env.safe_sudo("mkdir -p %s" % hadoop_root)
     with cd(hadoop_root):
-        sudo("wget --output-document={0} {1}/{0}".format(hcm_file, url_root))
-        sudo("wget --output-document={0} {1}/{0}".format(si_file, url_root))
-    sudo("chown -R ubuntu:ubuntu {0}".format(hadoop_root))
+        env.safe_sudo("wget --output-document={0} {1}/{0}".format(hcm_file, url_root))
+        env.safe_sudo("wget --output-document={0} {1}/{0}".format(si_file, url_root))
+    env.safe_sudo("chown -R {0} {1}".format(env.user, hadoop_root))
     env.logger.info("Done configuring Hadoop for CloudMan")
 
 
@@ -233,15 +237,15 @@ def _configure_nfs(env):
     """
     nfs_dir = "/export/data"
     cloudman_dir = "/mnt/galaxy/export"
-    if not exists(nfs_dir):
+    if not env.safe_exists(nfs_dir):
         # For the case of rerunning this script, ensure the nfs_dir does
         # not exist (exists() method does not recognize it as a file because
         # by default it points to a non-existing dir/file).
         with settings(warn_only=True):
-            sudo('rm -rf {0}'.format(nfs_dir))
-        sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
-        sudo("ln -s %s %s" % (cloudman_dir, nfs_dir))
-    sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
+            env.safe_sudo('rm -rf {0}'.format(nfs_dir))
+        env.safe_sudo("mkdir -p %s" % os.path.dirname(nfs_dir))
+        env.safe_sudo("ln -s %s %s" % (cloudman_dir, nfs_dir))
+    env.safe_sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
     # Setup /etc/exports paths, to be used as NFS mount points
     galaxy_data_mount = env.get("galaxy_data_mount", "/mnt/galaxyData")
     galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
@@ -256,15 +260,15 @@ def _configure_nfs(env):
     extra_nfs_exports = env.get("extra_nfs_exports", "")
     for extra_nfs_export in extra_nfs_exports.split(","):
         exports.append('%s   *(rw,sync,no_root_squash,no_subtree_check)' % extra_nfs_export)
-    append('/etc/exports', exports, use_sudo=True)
+    env.safe_append('/etc/exports', exports, use_sudo=True)
     # Create a symlink for backward compatibility where all of CloudMan's
     # stuff is expected to be in /opt/galaxy
     old_dir = '/opt/galaxy'
     # Because stow is used, the equivalent to CloudMan's expected path
     # is actually the parent of the install_dir so use it for the symlink
     new_dir = os.path.dirname(env.install_dir)
-    if not exists(old_dir) and exists(new_dir):
-        sudo('ln -s {0} {1}'.format(new_dir, old_dir))
+    if not env.safe_exists(old_dir) and exists(new_dir):
+        env.safe_sudo('ln -s {0} {1}'.format(new_dir, old_dir))
     env.logger.info("Done configuring NFS for CloudMan")
 
 

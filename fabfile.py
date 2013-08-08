@@ -329,7 +329,7 @@ def _python_library_installer(config):
     Handles using isolated anaconda environments.
     """
     with quiet():
-        is_anaconda = env.safe_run("conda -V").startswith("conda")
+        is_anaconda = env.safe_run_output("conda -h").startswith("usage: conda")
     if is_anaconda:
         for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
             env.safe_run("conda install --yes {0}".format(pname))
@@ -348,7 +348,7 @@ def _ruby_library_installer(config):
     def _cur_gems():
         with settings(
                 hide('warnings', 'running', 'stdout', 'stderr')):
-            gem_info = run("gem%s list --no-versions" % gem_ext)
+            gem_info = env.safe_run_output("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
     for gem in env.flavor.rewrite_config_items("ruby", config['gems']):
@@ -365,16 +365,16 @@ def _perl_library_installer(config):
     """
     with _make_tmp_dir() as tmp_dir:
         with cd(tmp_dir):
-            run("wget --no-check-certificate -O cpanm "
-                "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
-            run("chmod a+rwx cpanm")
+            env.safe_run("wget --no-check-certificate -O cpanm "
+                         "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
+            env.safe_run("chmod a+rwx cpanm")
             env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""
     for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
-        run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
+        env.safe_run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
 
 def _haskell_library_installer(config):
     """Install haskell libraries using cabal.
@@ -382,7 +382,7 @@ def _haskell_library_installer(config):
     run("cabal update")
     for lib in config["cabal"]:
         sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
-        run("cabal install %s --global %s" % (sudo_str, lib))
+        env.safe_run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
     "r-libs" : libraries.r_library_installer,

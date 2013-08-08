@@ -647,7 +647,7 @@ def install_freebayes(env):
                  post_unpack_fn=_fix_tabixpp_library_order,
                  revision=version)
 
-@_if_not_installed("vcffilter")
+@_if_not_installed("vcfallelicprimitives -h")
 def install_vcflib(env):
     """Utilities for parsing and manipulating VCF files.
     https://github.com/ekg/vcflib

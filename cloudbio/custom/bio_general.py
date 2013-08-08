@@ -48,11 +48,12 @@ def install_emboss(env):
     url = "ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
-@_if_not_installed("PGDSpider2.sh")
 def install_pgdspider(env):
     """PGDSpider format conversion for population genetics programs.
     http://www.cmpg.unibe.ch/software/PGDSpider/
     """
+    if os.path.exists(os.path.join(shared._get_bin_dir(env), "PGDSpider2.sh")):
+        return
     version = "2.0.2.0"
     url = "http://www.cmpg.unibe.ch/software/PGDSpider/PGDSpider_{v}.zip".format(
         v=version)

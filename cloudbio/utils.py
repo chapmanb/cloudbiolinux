@@ -155,8 +155,8 @@ def _create_local_paths(env):
         if "local_install" in env:
             if not env.safe_exists(env.local_install):
                 env.safe_sudo("mkdir -p %s" % env.local_install)
-                user = env.safe_run("echo $USER")
+                user = env.safe_run_output("echo $USER")
                 env.safe_sudo("chown -R %s %s" % (user, env.local_install))
             with cd(env.local_install):
-                result = env.safe_run("pwd")
+                result = env.safe_run_output("pwd")
                 env.local_install = result
