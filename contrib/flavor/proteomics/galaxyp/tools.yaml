@@ -54,6 +54,12 @@ applications:
   cufflinks: "2.1.1"
   samtools: "0.1.16" 
 
+  bwa: "0.5.9"
+  gatk: "1.4-9-g1f1233b"
+  fastqc: "0.10.0"
+  picard: "1.56"
+
+
   ## Mass Spec Applications:
 
   peptide_to_gff: "master"
@@ -65,12 +71,15 @@ applications:
       provides:
         - "proteowizard"
         - "xtandem"
+        - "trans_proteomic_pipeline"
   openms: 
     - version: "1.10.0"
       env_vars:
         LD_LIBRARY_PATH: "${system_install}/lib:$$LD_LIBRARY_PATH"
   omssa: "2.1.9"
-  tint_proteomics_scripts: "1.19.20"
+  tint_proteomics_scripts:
+    - version: "1.19.20"
+      symlink_versions: "1.19.19"
   superhirn: "0.03"
   mzmine: "2.10"
   percolator: "2_04"
@@ -87,7 +96,7 @@ applications:
   mayu: "1.06"
   pepnovo: "20120423"
   ipig: "r5"
-  searchgui: "1.13.1"
+  searchgui: "1.14.1"
   peptide_shaker: 
     - version: "0.20.1"
       env_vars:
