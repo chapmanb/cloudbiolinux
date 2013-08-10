@@ -33,7 +33,7 @@ from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
+from cloudbio.custom import shared
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
@@ -328,9 +328,7 @@ def _python_library_installer(config):
     """Install python specific libraries using easy_install.
     Handles using isolated anaconda environments.
     """
-    with quiet():
-        is_anaconda = env.safe_run_output("conda -h").startswith("usage: conda")
-    if is_anaconda:
+    if shared._is_anaconda(env):
         for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
             env.safe_run("conda install --yes {0}".format(pname))
         cmd = env.safe_run
@@ -339,7 +337,7 @@ def _python_library_installer(config):
         env.safe_sudo("easy_install%s -U pip" % version_ext)
         cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        cmd("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
+        cmd("{0} install --upgrade {1}".format(shared._pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
@@ -363,7 +361,7 @@ def _ruby_library_installer(config):
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
-    with _make_tmp_dir() as tmp_dir:
+    with shared._make_tmp_dir() as tmp_dir:
         with cd(tmp_dir):
             env.safe_run("wget --no-check-certificate -O cpanm "
                          "https://raw.github.com/miyagawa/cpanminus/master/cpanm")

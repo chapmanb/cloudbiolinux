@@ -287,7 +287,6 @@ def _python_cmd(env):
     else:
         return "python"
 
-
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
@@ -305,14 +304,21 @@ def _pip_cmd(env):
             return cmd
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
-
-def _python_make(env):
+def _is_anaconda(env):
+    """Check if we have a conda command or are in an anaconda subdirectory.
+    """
+    with quiet():
+        has_conda = env.safe_run_output("conda -h").startswith("usage: conda")
     with quiet():
         full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
-    run_cmd = env.safe_run if "/anaconda/" in full_pip else env.safe_sudo
+    in_anaconda_dir = "/anaconda/" in full_pip
+    return has_conda or in_anaconda_dir
+
+def _python_make(env):
+    run_cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
     # Clean up previously failed builds
     env.safe_sudo("rm -rf /tmp/pip-build-%s" % env.user)
-    run_cmd("%s install --upgrade ." % full_pip)
+    run_cmd("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 

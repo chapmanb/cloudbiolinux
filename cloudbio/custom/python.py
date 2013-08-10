@@ -5,7 +5,8 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_python_lib, _get_install, _python_make, _pip_cmd
+from shared import (_if_not_python_lib, _get_install, _python_make, _pip_cmd,
+                    _is_anaconda)
 
 @_if_not_python_lib("bx")
 def install_bx_python(env):
@@ -14,8 +15,9 @@ def install_bx_python(env):
     """
     version = "bitbucket"
     url = "https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2"
-    env.safe_sudo("%s install --upgrade distribute" % _pip_cmd(env))
-    env.safe_sudo("%s install --upgrade %s" % (_pip_cmd(env), url))
+    cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
+    cmd("%s install --upgrade distribute" % _pip_cmd(env))
+    cmd("%s install --upgrade %s" % (_pip_cmd(env), url))
 
 @_if_not_python_lib("rpy")
 def install_rpy(env):
@@ -42,4 +44,5 @@ def install_netsa_python(env):
     """
     version = "1.3"
     url = "http://tools.netsa.cert.org/releases/netsa-python-%s.tar.gz" % version
-    env.safe_sudo("%s install %s" % (_pip_cmd(env), url))
+    cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
+    cmd("%s install %s" % (_pip_cmd(env), url))
