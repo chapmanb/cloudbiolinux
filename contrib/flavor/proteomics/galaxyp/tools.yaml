@@ -69,9 +69,10 @@ applications:
         - bin
         - cgi-bin
       provides:
-        - "proteowizard"
         - "xtandem"
         - "trans_proteomic_pipeline"
+        - name: "proteowizard"        
+          unless: "using_wine"
   openms: 
     - version: "1.10.0"
       env_vars:

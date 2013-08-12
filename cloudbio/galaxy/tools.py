@@ -85,12 +85,16 @@ def _install_configured_applications(env, tools_conf):
     defer_errors = env.get("galaxy_tool_defer_errors", True)
     exceptions = {}
     for (name, tool_conf) in applications.iteritems():
+        if not __check_conditional(tool_conf):
+            continue
+
         try:
             _install_application(name, tool_conf)
         except BaseException, e:
             exceptions[name] = e
             if not defer_errors:
                 break
+
     if exceptions:
         for name, exception in exceptions.iteritems():
             env.logger.warn(FAILED_INSTALL_MESSAGE % name)
@@ -116,6 +120,11 @@ def _install_application(name, versions, tool_install_dir=None):
             provides = version_info.get("provides", [])
             if isinstance(provides, (str, unicode, basestring)):
                 provides = [provides]
+            for provide_conf in provides[:]:
+                if isinstance(provide_conf, dict):
+                    provides.remove(provide_conf)
+                    if __check_conditional(provide_conf):
+                        provies.append(provide_conf["name"])
 
             # Some requirements (e.g. blast+) maybe not have valid python
             # identifiers as name. Use install_blast to setup but override
@@ -158,6 +167,21 @@ def _build_tool_env(env, name, version, tool_install_dir):
     tool_env["local_install"] = tool_install_dir
     tool_env["venv_directory"] = "%s/%s" % (tool_env["system_install"], "venv")
     return AttributeDict(tool_env)
+
+
+def __check_conditional(conf_dict):
+    passes = True
+    try:
+        if "if" in conf_dict:
+            value = conf_dict["if"]
+            passes = _read_boolean(env, value, False)
+        elif "unless" in conf_dict:
+            value = conf_dict["unless"]
+            passes = not _read_boolean(env, value, False)
+    except TypeError:
+        # configuration is not a dictionary, default to True
+        pass
+    return passes
 
 
 class AttributeDict(dict):
