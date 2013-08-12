@@ -81,7 +81,7 @@ def _perform_install(target=None, flavor=None):
     See `install_biolinux` for full details on arguments
     `target` and `flavor`.
     """
-    pkg_install, lib_install, custom_ignore = _read_main_config()
+    pkg_install, lib_install, custom_ignore, custom_add = _read_main_config()
     if target is None or target == "packages":
         # can only install native packages if we have sudo access.
         if env.use_sudo:
@@ -92,7 +92,7 @@ def _perform_install(target=None, flavor=None):
             _setup_nix_sources()
             _nix_packages(pkg_install)
     if target is None or target == "custom":
-        _custom_installs(pkg_install, custom_ignore)
+        _custom_installs(pkg_install, custom_ignore, custom_add)
     if target is None or target == "chef_recipes":
         _provision_chef_recipes(pkg_install, custom_ignore)
     if target is None or target == "puppet_classes":
@@ -146,12 +146,14 @@ def _check_fabric_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or higher")
 
-def _custom_installs(to_install, ignore=None):
+def _custom_installs(to_install, ignore=None, add=None):
+    if add is None:
+        add = []
     if not env.safe_exists(env.local_install) and env.local_install:
         env.safe_run("mkdir -p %s" % env.local_install)
     pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
-    packages = [p for p in packages if ignore is None or p not in ignore]
+    packages = [p for p in packages if ignore is None or p not in ignore] + add
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
@@ -315,12 +317,13 @@ def _read_main_config():
     packages = full_data.get('packages', [])
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
+    custom_add = full_data.get("custom_additional", [])
     if packages is None: packages = []
     if libraries is None: libraries = []
     if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
-    return packages, sorted(libraries), custom_ignore
+    return packages, sorted(libraries), custom_ignore, custom_add
 
 # ### Library specific installation code
 

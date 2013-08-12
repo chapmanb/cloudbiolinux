@@ -248,12 +248,23 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     else:
         base_dir = os.path.join(env.system_install, "share", pname)
     install_dir = "%s-%s" % (base_dir, version)
+    # Does not exist, change symlink to new directory
     if not env.safe_exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
         if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
         env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
+    items = env.safe_run_output("ls %s" % install_dir)
+    # empty directory, change symlink and re-download
+    if items.strip() == "":
+        if env.safe_exists(base_dir):
+            env.safe_sudo("rm -f %s" % base_dir)
+        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        return install_dir
+    # Create symlink if previously deleted
+    if not env.safe_exists(base_dir):
+        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
     return None
 
 
@@ -261,11 +272,19 @@ def _symlinked_java_version_dir(pname, version, env):
     return _symlinked_shared_dir(pname, version, env, extra_dir="java")
 
 
-def _java_install(pname, version, url, env, install_fn=None):
+def _java_install(pname, version, url, env, install_fn=None,
+                  pre_fetch_fn=None):
+    """Download java jars into versioned input directories.
+
+    pre_fetch_fn runs before URL retrieval, allowing insertion of
+    manual steps like restricted downloads.
+    """
     install_dir = _symlinked_java_version_dir(pname, version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
+                if pre_fetch_fn:
+                    pre_fetch_fn(env)
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     if install_fn is not None:
