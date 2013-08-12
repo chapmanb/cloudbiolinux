@@ -320,7 +320,7 @@ def _read_main_config():
     packages = full_data.get('packages', [])
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
-    custom_add = full_data.get("custom_additional", [])
+    custom_add = full_data.get("custom_additional")
     if packages is None: packages = []
     if libraries is None: libraries = []
     if custom_ignore is None: custom_ignore = []
