@@ -13,7 +13,7 @@ packages:
   - distributed
 libraries:
 custom_additional:
-  - gatk_protected
+  bio_nextgen: [gatk_protected]
 custom_ignore:
   - anaconda
   - bfast
