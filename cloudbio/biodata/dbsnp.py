@@ -22,10 +22,10 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
     """Download and install dbSNP variation data for supplied genomes.
     """
     folder_name = "variation"
-    to_download = [("dbsnp_{ver}".format(ver=dbsnp_version), ""),
-                   ("hapmap_3.3", ""),
-                   ("1000G_omni2.5", ""),
-                   ("Mills_and_1000G_gold_standard.indels", "")]
+    to_download = ["dbsnp_{ver}".format(ver=dbsnp_version),
+                   "hapmap_3.3",
+                   "1000G_omni2.5",
+                   "Mills_and_1000G_gold_standard.indels"]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
@@ -33,14 +33,15 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
         if not env.safe_exists(vrn_dir):
             env.safe_run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
-            for dl_name, dl_ext in to_download:
-                _download_broad_bundle(manager.dl_name, bundle_version, dl_name, dl_ext)
+            for dl_name in to_download:
+                for ext in ["", ".idx"]:
+                    _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
             _download_cosmic(gid)
             # XXX Wait to get this by default until it is used more widely
             #_download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
-    broad_fname = "{name}.{gid}{ext}.vcf".format(gid=gid, name=name, ext=ext)
+    broad_fname = "{name}.{gid}.vcf{ext}".format(gid=gid, name=name, ext=ext)
     fname = broad_fname.replace(".{0}".format(gid), "").replace(".sites", "")
     base_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
                "{bundle}/{gid}/{fname}.gz".format(
