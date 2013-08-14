@@ -16,7 +16,8 @@ def install_bx_python(env):
     version = "bitbucket"
     url = "https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2"
     cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
-    cmd("%s install --upgrade distribute" % _pip_cmd(env))
+    if not _is_anaconda(env):
+        cmd("%s install --upgrade distribute" % _pip_cmd(env))
     cmd("%s install --upgrade %s" % (_pip_cmd(env), url))
 
 @_if_not_python_lib("rpy")

@@ -13,7 +13,7 @@ def install_anaconda(env):
     """Pre-packaged Anaconda Python installed from Continuum.
     http://docs.continuum.io/anaconda/index.html
     """
-    version = "1.6.0"
+    version = "1.6.1"
     outdir = os.path.join(env.system_install, "anaconda")
     if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian"]:
         platform = "Linux"
@@ -33,9 +33,9 @@ def install_anaconda(env):
                 if not env.safe_contains(env.shell_config, comment_line):
                     env.safe_append(env.shell_config, comment_line)
                     env.safe_append(env.shell_config, "export PATH=%s/bin:$PATH" % outdir)
-                    env.safe_run("source %s" % env.shell_config)
                 # remove curl library with broken certificates
                 env.safe_run("%s/bin/conda remove --yes curl" % outdir)
+                env.safe_run("%s/bin/conda install --yes pip" % outdir)
 
 @_if_not_installed("embossversion")
 def install_emboss(env):
