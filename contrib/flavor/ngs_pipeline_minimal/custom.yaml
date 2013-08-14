@@ -3,7 +3,7 @@ bio_nextgen:
   alignment:
     - bwa
     - bowtie2
-  utilitites:
+  utilities:
     - bamtools
     - bedtools
     - fastqc
