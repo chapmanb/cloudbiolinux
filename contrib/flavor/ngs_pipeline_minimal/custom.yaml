@@ -3,11 +3,13 @@ bio_nextgen:
   alignment:
     - bwa
     - bowtie2
+    - star
   utilities:
     - bamtools
     - bedtools
     - fastqc
     - ogap
+    - rnaseqc
   analysis:
     - cufflinks
     - picard

@@ -17,8 +17,9 @@ bio_nextgen:
     - mosaik
     # - perm # difficult build process with directory names
     - snap
+    - star
     #- stampy # no version names on tarballs
-  utilitites:
+  utilities:
     - bamtools
     - bedtools
     - cram
@@ -27,6 +28,7 @@ bio_nextgen:
     - fastq_screen
     - fastx_toolkit
     - ogap
+    - rnaseqc
     # - solexaqa
     - varianttools
     - vcftools
