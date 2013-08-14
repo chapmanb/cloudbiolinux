@@ -415,6 +415,7 @@ def install_fastqc(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
+
 @_if_not_installed("fastq_screen")
 def install_fastq_screen(env):
     """A screening application for high througput sequence data.
@@ -500,6 +501,20 @@ def install_picard(env):
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
+
+def install_rnaseqc(env):
+    """Quality control metrics for RNA-seq data
+    https://www.broadinstitute.org/cancer/cga/rna-seqc
+    """
+    version = "1.1.7"
+    url = ("http://www.broadinstitute.org/cancer/cga/sites/default/files/"
+           "data/tools/rnaseqc/RNA-SeQC_v%s.jar" % version)
+    install_dir = _symlinked_java_version_dir("RNA-SeQC", version, env)
+    if install_dir:
+        with _make_tmp_dir() as work_dir:
+            with cd(work_dir):
+                env.safe_run("wget --no-check-certificate %s" % url)
+                env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_gatk(env):
     """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
