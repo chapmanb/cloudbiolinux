@@ -19,6 +19,15 @@ def _parse_from_stdoutflag(out, flag):
     raise IOError("Did not find version information with flag %s from: \n %s"
                   % (flag, out))
 
+def _clean_version(x):
+    if x.startswith("("):
+        x = x[1:]
+    if x.endswith(")"):
+        x = x[:-1]
+    if x.startswith("v"):
+        x = x[1:]
+    return x
+
 def up_to_date(env, cmd, version, args=None, stdout_flag=None):
     """Check if the given command is up to date with the provided version.
     """
@@ -33,4 +42,5 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None):
         iversion = _parse_from_stdoutflag(out, stdout_flag)
     else:
         iversion = out.strip()
+    iversion = _clean_version(iversion)
     return LooseVersion(iversion) >= LooseVersion(version)
