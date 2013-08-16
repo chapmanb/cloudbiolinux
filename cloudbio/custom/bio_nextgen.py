@@ -30,7 +30,7 @@ def install_ucsc_tools(env):
              "bedGraphToBigWig", "bigWigInfo", "bigWigSummary",
              "bigWigToBedGraph", "bigWigToWig",
              "fetchChromSizes", "wigToBigWig", "faSize", "twoBitInfo",
-             "twoBitToFa", "faCount"]
+             "twoBitToFa", "faCount", "gtfToGenePred"]
     url = "http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/"
     _download_executables(env, url, tools)
 
