@@ -29,7 +29,7 @@ def _download_annotation_bundle(env, url, gid):
     if not env.safe_exists(tarball):
         with warn_only():
             env.safe_run("wget %s" % url)
-    if exists(tarball):
+    if env.safe_exists(tarball):
         env.safe_run("xz -dc %s | tar -xvpf -" % tarball)
         env.safe_run("rm -f %s" % tarball)
     else:
