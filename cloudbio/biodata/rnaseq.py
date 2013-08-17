@@ -18,19 +18,19 @@ def download_transcripts(genomes, env):
                                     if m.config.get("rnaseq", False)):
         org_dir = os.path.join(genome_dir, orgname)
         tx_dir = os.path.join(org_dir, gid, folder_name)
-        if not exists(tx_dir):
+        if not env.safe_exists(tx_dir):
             with cd(org_dir):
-                _download_annotation_bundle(base_url.format(gid=gid), gid)
+                _download_annotation_bundle(env, base_url.format(gid=gid), gid)
 
-def _download_annotation_bundle(url, gid):
+def _download_annotation_bundle(env, url, gid):
     """Download bundle of RNA-seq data from S3 biodata/annotation
     """
     tarball = os.path.basename(url)
-    if not exists(tarball):
+    if not env.safe_exists(tarball):
         with warn_only():
-            run("wget %s" % url)
+            env.safe_run("wget %s" % url)
     if exists(tarball):
-        run("xz -dc %s | tar -xvpf -" % tarball)
-        run("rm -f %s" % tarball)
+        env.safe_run("xz -dc %s | tar -xvpf -" % tarball)
+        env.safe_run("rm -f %s" % tarball)
     else:
         env.logger.warn("RNA-seq transcripts not available for %s" % gid)
