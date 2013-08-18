@@ -143,8 +143,14 @@ def _setup_deb_general():
     if not hasattr(env, "ruby_version_ext"):
         env.ruby_version_ext = "1.9.1"
     if not env.has_key("java_home"):
-        # XXX look for a way to find JAVA_HOME automatically
-        env.java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
+        # Try to determine java location from update-alternatives
+        java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
+        java_info = env.safe_run_output("update-alternatives --display java")
+        for line in java_info.split("\n"):
+            if line.strip().startswith("link currently points to"):
+                java_home = line.split()[-1].strip()
+                java_home = java_home.replace("/jre/bin/java", "")
+        env.java_home = java_home
     shared_sources = [
         "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux",  # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib",  # virtualbox
@@ -199,8 +205,6 @@ def _setup_local_environment():
     env.logger.info("Get local environment")
     if not env.has_key("user"):
         env.user = os.environ["USER"]
-    if not env.has_key("java_home"):
-        env.java_home = os.environ.get("JAVA_HOME", "/usr/lib/jvm/java-6-openjdk")
 
 
 def _setup_vagrant_environment():
