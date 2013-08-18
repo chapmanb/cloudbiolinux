@@ -24,9 +24,9 @@ dist_name = __auto__
 
 # -- Installation details
 
-# Unset to avoid CloudBioLinux customizations like setup scripts;
+# Set to get CloudBioLinux customizations like setup scripts;
 # or set to different edition to get specific customizations
-edition = cloudbiolinux
+#edition = cloudbiolinux
 
 # Whether to clean the system for EC2 AMI preparation;
 # do not set on vagrant or local machines
