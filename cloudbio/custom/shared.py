@@ -523,7 +523,7 @@ def install_venvburrito():
         env.safe_run("curl -s {0} | $SHELL".format(url))
         # Add the startup script into the ubuntu user's bashrc
         _add_to_profiles(". $HOME/.venvburrito/startup.sh", [env.shell_config], use_sudo=False)
-        env.safe_run("source %s" % env.shell_config)
+        env.safe_run(". %s" % env.shell_config)
 
 
 def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
