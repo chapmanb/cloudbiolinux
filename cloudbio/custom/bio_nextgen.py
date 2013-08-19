@@ -501,7 +501,7 @@ def install_picard(env):
     """Command-line utilities that manipulate BAM files with a Java API.
     http://picard.sourceforge.net/
     """
-    version = "1.93"
+    version = "1.96"
     url = "http://downloads.sourceforge.net/project/picard/" \
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
