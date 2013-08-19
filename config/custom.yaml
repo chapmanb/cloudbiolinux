@@ -52,6 +52,7 @@ bio_nextgen:
     - delly
     - hydra
     - lumpy
+    - freec
   variant:
     - bcbio_variation
     - crisp
