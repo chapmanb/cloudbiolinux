@@ -688,18 +688,26 @@ def install_vep(env):
         env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
 
-@_if_not_installed("freebayes")
 def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "296a0fa"
+    version = "0.9.9.2-8"
+    revision = "c3e485daa6"
+    if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
+        return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
     def _fix_tabixpp_library_order(env):
         env.safe_sed("vcflib/tabixpp/Makefile", "-ltabix", "-ltabix -lz")
+    def _fix_autoversion(env):
+        env.safe_sed("src/Makefile", "all: autoversion ../bin/freebayes ../bin/bamleftalign",
+                     "all: ../bin/freebayes ../bin/bamleftalign")
+    def _freebayes_fixes(env):
+        _fix_tabixpp_library_order(env)
+        _fix_autoversion(env)
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
-                 post_unpack_fn=_fix_tabixpp_library_order,
-                 revision=version)
+                 post_unpack_fn=_freebayes_fixes,
+                 revision=revision)
 
 @_if_not_installed("vcfallelicprimitives -h")
 def install_vcflib(env):
