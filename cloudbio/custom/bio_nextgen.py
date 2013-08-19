@@ -982,14 +982,35 @@ def install_hydra(env):
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
 
-@_if_not_installed("lumpy")
 def install_lumpy(env):
     """a general probabilistic framework for structural variant discovery
     https://github.com/arq5x/lumpy-sv
     """
-    version = "fca4706573"
+    version = "0.1.2"
+    revision = "a8b9e14cc5"
+    if versioncheck.up_to_date(env, "lumpy", version, stdout_flag="Program:"):
+        return
     repository = "git clone https://github.com/arq5x/lumpy-sv.git"
-    _get_install(repository, env, _make_copy("ls -1 bin/*"), revision=version)
+    def _add_gsl_includes():
+        """Add multi-environment include and library links for finding GNU Scientific Libraries.
+        """
+        env.safe_sed("defs.local", "^\([^#]\)", "#\1")
+        env.safe_append("defs.local", ("GSL_INCLUDE=-I/usr/local/include -I/usr/local/include/gsl "
+                                       "-I/usr/include/gsl -I%s/include/gsl" % env.system_install))
+        env.safe_append("defs.local", ("GSL_LINK=-L/usr/local/lib -L/usr/lib -L%s/lib" % env.system_install))
+    _get_install(repository, env, _make_copy("ls -1 bin/*", _add_gsl_includes),
+                 revision=revision)
+
+def install_delly(env):
+    """DELLY: Structural variant discovery by integrated paired-end and split-read analysis
+    http://www.embl.de/~rausch/delly.html
+    """
+    version = "0.0.11"
+    if versioncheck.up_to_date(env, "delly", version, stdout_flag="Deletion finder"):
+        return
+    url = "http://www.embl.de/~rausch/delly_v%s.tar.gz" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f",
+                                      do_make=False))
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):

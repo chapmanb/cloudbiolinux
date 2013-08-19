@@ -49,7 +49,9 @@ bio_nextgen:
     - trinity
     - velvet
   sv:
+    - delly
     - hydra
+    - lumpy
   variant:
     - bcbio_variation
     - crisp

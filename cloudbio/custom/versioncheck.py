@@ -15,17 +15,17 @@ def _parse_from_stdoutflag(out, flag):
     for line in out.split("\n") + out.stderr.split("\n"):
         if line.find(flag) >= 0:
             parts = [x for x in line.split() if not x.startswith(flag)]
-            return parts[0]
+            return parts[-1].strip()
     raise IOError("Did not find version information with flag %s from: \n %s"
                   % (flag, out))
 
 def _clean_version(x):
     if x.startswith("("):
-        x = x[1:]
+        x = x[1:].strip()
     if x.endswith(")"):
-        x = x[:-1]
+        x = x[:-1].strip()
     if x.startswith("v"):
-        x = x[1:]
+        x = x[1:].strip()
     return x
 
 def up_to_date(env, cmd, version, args=None, stdout_flag=None):
