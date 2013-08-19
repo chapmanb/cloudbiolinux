@@ -1012,6 +1012,18 @@ def install_delly(env):
     _get_install(url, env, _make_copy("find -perm -100 -type f",
                                       do_make=False))
 
+@_if_not_installed("freec")
+def install_freec(env):
+    """Control-FREEC: a tool for detection of copy number changes and allelic imbalances.
+    http://bioinfo-out.curie.fr/projects/freec/
+    """
+    if env.distribution in ["ubuntu", "debian"]:
+        if env.is_64bit:
+            url = "http://bioinfo-out.curie.fr/projects/freec/src/FREEC_Linux64.tar.gz"
+        else:
+            url = "http://bioinfo-out.curie.fr/projects/freec/src/FREEC_LINUX32.tar.gz"
+    _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
+
 @_if_not_installed("CRISP.py")
 def install_crisp(env):
     """Detect SNPs and short indels from pooled sequencing data.
