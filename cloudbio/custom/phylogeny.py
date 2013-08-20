@@ -7,7 +7,6 @@ from fabric.contrib.files import *
 
 from cloudbio.custom.shared import _if_not_installed, _make_tmp_dir
 
-@_if_not_installed("tracer")
 def install_tracer(env):
     """A program for analysing results from Bayesian MCMC programs such as BEAST & MrBayes.
     http://tree.bio.ed.ac.uk/software/tracer/
@@ -15,6 +14,8 @@ def install_tracer(env):
     version = "1.5"
     install_dir = os.path.join(env.system_install, "bioinf")
     final_exe = os.path.join(env.system_install, "bin", "tracer")
+    if env.safe_exists(final_exe):
+        return
     if not exists(final_exe):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
@@ -27,7 +28,7 @@ def install_tracer(env):
                 env.safe_sudo("mv -f Tracer_v%s %s/tracer" % (version, install_dir))
                 env.safe_sudo("ln -sf %s/tracer/bin/tracer %s" % (install_dir, final_exe))
 
-@_if_not_installed("beast")
+@_if_not_installed("beast -help")
 def install_beast(env):
     """BEAST: Bayesian MCMC analysis of molecular sequences.
     http://beast.bio.ed.ac.uk
