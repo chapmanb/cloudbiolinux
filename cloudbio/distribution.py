@@ -145,7 +145,8 @@ def _setup_deb_general():
     if not env.has_key("java_home"):
         # Try to determine java location from update-alternatives
         java_home = "/usr/lib/jvm/java-7-openjdk-amd64"
-        java_info = env.safe_run_output("update-alternatives --display java")
+        with quiet():
+            java_info = env.safe_run_output("update-alternatives --display java")
         for line in java_info.split("\n"):
             if line.strip().startswith("link currently points to"):
                 java_home = line.split()[-1].strip()

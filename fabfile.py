@@ -336,7 +336,7 @@ def _python_library_installer(config):
     """
     if shared._is_anaconda(env):
         for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
-            env.safe_run("conda install --yes {0}".format(pname))
+            env.safe_run("{0} install --yes {1}".format(shared._conda_cmd(env), pname))
         cmd = env.safe_run
     else:
         version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""

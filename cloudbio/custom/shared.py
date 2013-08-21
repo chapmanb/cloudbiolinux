@@ -296,6 +296,9 @@ def _java_install(pname, version, url, env, install_fn=None,
 def _python_cmd(env):
     """Retrieve python command, handling tricky situations on CentOS.
     """
+    anaconda_py = os.path.join(env.system_install, "anaconda", "bin", "python")
+    if env.safe_exists(anaconda_py):
+        return anaconda_py
     if "python_version_ext" in env and env.python_version_ext:
         major, minor = env.safe_run("python --version").split()[-1].split(".")[:2]
         check_major, check_minor = env.python_version_ext.split(".")[:2]
@@ -309,7 +312,11 @@ def _python_cmd(env):
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
-    to_check = ["pip"]
+    anaconda_pip = os.path.join(env.system_install, "anaconda", "bin", "pip")
+    if env.safe_exists(anaconda_pip):
+        to_check = [anaconda_pip]
+    else:
+        to_check = ["pip"]
     if "pip_cmd" in env and env.pip_cmd:
         to_check.append(env.pip_cmd)
     if not env.use_sudo:
@@ -323,11 +330,21 @@ def _pip_cmd(env):
             return cmd
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
+def _conda_cmd(env):
+    to_check = [os.path.join(env.system_install, "anaconda", "bin", "conda"), "conda"]
+    for cmd in to_check:
+        with quiet():
+            test = env.safe_run("%s --version" % cmd)
+        if test.succeeded:
+            return cmd
+    return None
+
 def _is_anaconda(env):
     """Check if we have a conda command or are in an anaconda subdirectory.
     """
     with quiet():
-        has_conda = env.safe_run_output("conda -h").startswith("usage: conda")
+        conda = _conda_cmd(env)
+        has_conda = conda and env.safe_run_output("%s -h" % conda).startswith("usage: conda")
     with quiet():
         full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
     in_anaconda_dir = "/anaconda/" in full_pip

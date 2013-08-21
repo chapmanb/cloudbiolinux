@@ -30,7 +30,7 @@ def install_anaconda(env):
                 env.safe_sed(os.path.basename(url), "more <<EOF", "cat  <<EOF")
                 env.safe_sudo("echo -e '\nyes\n%s\nyes\n' | bash %s" % (outdir, os.path.basename(url)))
                 env.safe_sudo("chown -R %s %s" % (env.user, outdir))
-                comment_line = "# added by Ananconda"
+                comment_line = "# added by Ananconda %s installer" % version
                 if not env.safe_contains(env.shell_config, comment_line):
                     env.safe_append(env.shell_config, comment_line)
                     env.safe_append(env.shell_config, "export PATH=%s/bin:$PATH" % outdir)
