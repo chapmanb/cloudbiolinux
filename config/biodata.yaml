@@ -24,6 +24,7 @@ genomes:
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
+    rnaseq: true
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: mm9
