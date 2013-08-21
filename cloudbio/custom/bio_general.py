@@ -27,6 +27,7 @@ def install_anaconda(env):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 env.safe_run("wget -c %s" % url)
+                env.safe_sed(os.path.basename(url), "more <<EOF", "cat  <<EOF")
                 env.safe_sudo("echo -e '\nyes\n%s\nyes\n' | bash %s" % (outdir, os.path.basename(url)))
                 env.safe_sudo("chown -R %s %s" % (env.user, outdir))
                 comment_line = "# added by Ananconda"
