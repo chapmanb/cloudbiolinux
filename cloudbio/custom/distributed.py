@@ -38,4 +38,4 @@ def install_seal(env):
     java_home = env.java_home if env.has_key("java_home") else os.environ["JAVA_HOME"]
     export_str = "export JAVA_HOME=%s" % (java_home)
     cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
-    cmd("%s && %s install seal" % (export_str, _pip_cmd(env)))
+    cmd("%s && %s install --pre seal" % (export_str, _pip_cmd(env)))
