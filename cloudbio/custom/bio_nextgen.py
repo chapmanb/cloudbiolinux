@@ -318,9 +318,12 @@ def install_gemini(env):
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
             env.safe_run("wget --no-check-certificate %s" % installer)
-            env.safe_run("%s gemini_install.py %s %s %s" %
-                         (_python_cmd(env), "" if env.use_sudo else "--nosudo",
+            env.safe_run("%s %s/gemini_install.py %s %s %s" %
+                         (_python_cmd(env), work_dir, "" if env.use_sudo else "--nosudo",
                           env.system_install, data_dir))
+## manually specifying the work dir for the gemini_install.py script, since
+## the env.safe_run doesn't always appear to stay in the directory we just
+## cd'd to.
             env.safe_run("rm -f gemini_install.py")
 
 @_if_not_installed("vcftools")
