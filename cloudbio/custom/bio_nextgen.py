@@ -334,6 +334,8 @@ def install_gemini(env):
                             "share", "gemini")
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
+            if env.safe_exists(installer):
+                env.safe_run("rm -f %s" % installer)
             env.safe_run("wget --no-check-certificate %s" % installer)
             env.safe_run("%s gemini_install.py %s %s %s" %
                          (_python_cmd(env), "" if env.use_sudo else "--nosudo",
