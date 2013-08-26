@@ -24,8 +24,8 @@ from fabric.api import put, run, env, settings, sudo
 
 
 try:
-    from vmlauncher.transfer import FileTransferManager
-    from vmlauncher import build_vm_launcher
+    from .vmlauncher.transfer import FileTransferManager
+    from .vmlauncher import build_vm_launcher
 except ImportError:
     build_vm_launcher = None
     FileTransferManager = None
