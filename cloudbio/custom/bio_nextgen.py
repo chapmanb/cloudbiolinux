@@ -956,9 +956,9 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.0.9"
-    url = "https://s3.amazonaws.com/bcbio.variation/" \
-          "bcbio.variation-%s-standalone.jar" % version
+    version = "0.1.0"
+    url = "https://github.com/chapmanb/bcbio.variation/releases/download/" \
+          "v%s/bcbio.variation-%s-standalone.jar" % (version, version)
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
