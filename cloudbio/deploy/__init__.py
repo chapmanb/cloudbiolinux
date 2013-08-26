@@ -35,6 +35,8 @@ DEFAULT_CLOUDBIOLINUX_FLAVOR = None
 
 
 def deploy(options):
+    _setup_logging(env)
+
     actions = _expand_actions(options.get("actions"))
     if options["vm_provider"] == "novm":
         vm_launcher = LocalVmLauncher(options)
@@ -188,7 +190,6 @@ def _setup_cloudbiolinux(options):
         _setup_cloudbiolinux_fabric_properties(env, options)
 
     flavor = get_main_options_string(options, "flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
-    _setup_logging(env)
     _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
     _setup_image_user_data(env, options)
 
