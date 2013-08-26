@@ -7,7 +7,9 @@ http://cufflinks.cbcb.umd.edu/igenomes.html
 """
 import os
 
-from fabric.api import (cd, warn_only)
+from fabric.api import cd
+from cloudbio.fabutils import warn_only
+
 
 VERSIONS = {"GRCh37": "-2013-08-21"}
 

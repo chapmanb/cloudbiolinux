@@ -180,3 +180,9 @@ try:
 except ImportError:
     def quiet():
         return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
+
+try:
+    from fabric.api import warn_only
+except ImportError:
+    def warn_only():
+        return settings(warn_only=True)
