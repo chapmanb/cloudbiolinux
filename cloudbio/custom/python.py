@@ -30,10 +30,10 @@ def install_rpy(env):
     url = "http://downloads.sourceforge.net/project/rpy/rpy/" \
           "%s/rpy-%s%s.zip" % (version, version, ext)
     def _fix_libraries(env):
-        run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
+        env.safe_run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = run("R --version")
+        result = env.safe_run("R --version")
         if result.failed:
             return
     _get_install(url, env, _python_make, post_unpack_fn=_fix_libraries)

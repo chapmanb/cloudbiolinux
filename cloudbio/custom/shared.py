@@ -354,6 +354,7 @@ def _python_make(env):
     run_cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
     # Clean up previously failed builds
     env.safe_sudo("rm -rf /tmp/pip-build-%s" % env.user)
+    env.safe_sudo("rm -rf /tmp/pip-*-build")
     run_cmd("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
