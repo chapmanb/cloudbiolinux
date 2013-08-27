@@ -18,8 +18,11 @@ import shutil
 from fabric.api import env, run, sudo, local, settings, hide, put
 from fabric.contrib.files import exists, sed, contains, append, comment
 
-# ## Local non-ssh access
+SUDO_ENV_KEEPS = []  # Environment variables passed through to sudo environment when using local sudo.
+SUDO_ENV_KEEPS += ["http_proxy", "https_proxy"]  # Required for local sudo to work behind a proxy.
 
+
+# ## Local non-ssh access
 def local_exists(path, use_sudo=False):
     func = env.safe_sudo if use_sudo else env.safe_run
     cmd = 'test -e "$(echo %s)"' % path
@@ -30,7 +33,9 @@ def local_exists(path, use_sudo=False):
 def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
         if use_sudo:
-            command = "sudo bash -c " + '"%s"' % command.replace('"', '\\"')
+            sudo_env = " ".join(["%s=$%s" % (keep, keep) for keep in SUDO_ENV_KEEPS])
+            sudo_prefix = "sudo %s bash -c " % sudo_env
+            command = sudo_prefix + '"%s"' % command.replace('"', '\\"')
         env.lcwd = env.cwd
         return local(command, capture=capture)
     return _run
