@@ -963,8 +963,9 @@ def install_bcbio_variation(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % url)
-                env.safe_sudo("mv *.jar %s" % install_dir)
+                jar_file = os.path.basename(url)
+                env.safe_run("wget -O %s %s" % (jar_file, url))
+                env.safe_sudo("mv %s %s" % (jar_file, install_dir))
 
 # --- ChIP-seq
 
