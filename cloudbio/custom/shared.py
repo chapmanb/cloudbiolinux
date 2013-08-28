@@ -610,6 +610,14 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
 
 
+def _get_bitbucket_download_url(revision, default_repo):
+    if revision.startswith("http"):
+        url = revision
+    else:
+        url = "%s/get/%s.tar.gz" % (default_repo, revision)
+    return url
+
+
 def _read_boolean(env, name, default):
     property_str = env.get(name, str(default))
     return property_str.upper() in ["TRUE", "YES"]

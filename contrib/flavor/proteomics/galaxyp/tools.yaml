@@ -16,6 +16,7 @@
 #
 
 applications:
+  galaxy_protk: "1.2.2"
   ## Bioinformatics and NGS Applications
   emboss: 
     - version: "6.6.0"

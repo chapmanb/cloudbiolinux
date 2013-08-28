@@ -34,7 +34,11 @@ def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
         if use_sudo:
             sudo_env = " ".join(["%s=$%s" % (keep, keep) for keep in SUDO_ENV_KEEPS])
-            sudo_prefix = "sudo %s bash -c " % sudo_env
+            sudo_to = ""
+            if "user" in kwags:
+                sudo_to = "su - %s" % kwags["user"]
+            sudo_prefix = "sudo %s %s bash -c " % (sudo_env, sudo_to)
+
             command = sudo_prefix + '"%s"' % command.replace('"', '\\"')
         env.lcwd = env.cwd
         return local(command, capture=capture)
