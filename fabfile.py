@@ -105,16 +105,7 @@ def _perform_install(target=None, flavor=None):
     if target is None or target == "cleanup":
         _cleanup_space(env)
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
-            if env.distribution in ["ubuntu"]:
-                # For the time being (Dec 2012), must install development version
-                # of cloud-init because of a boto & cloud-init bug:
-                # https://bugs.launchpad.net/cloud-init/+bug/1068801
-                sudo('wget --output-document=cloud-init_0.7.1-0ubuntu4_all.deb ' +
-                    'https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
-                sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
-                sudo("rm -f cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
-
 
 def _print_time_stats(action, event, prev_time=None):
     """ A convenience method for displaying time event during configuration.
