@@ -320,7 +320,7 @@ def _configure_galaxy_repository(env):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
         # to all invocations of python within run.sh
-        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' run.sh", user=env.galaxy_user)
+        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' %s/run.sh", user=env.galaxy_user % env.galaxy_home)
         if _read_boolean(env, "galaxy_cloud", True):
             # Append DRMAA_LIBRARY_PATH in run.sh as well (this file will exist
             # once SGE is installed - which happens at instance contextualization)
