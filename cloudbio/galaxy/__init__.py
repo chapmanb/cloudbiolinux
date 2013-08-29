@@ -320,11 +320,11 @@ def _configure_galaxy_repository(env):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
         # to all invocations of python within run.sh
-        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' %s/run.sh", user=env.galaxy_user % env.galaxy_home)
+        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' %s/run.sh" %(env.galaxy_home, user=env.galaxy_user)
         if _read_boolean(env, "galaxy_cloud", True):
             # Append DRMAA_LIBRARY_PATH in run.sh as well (this file will exist
             # once SGE is installed - which happens at instance contextualization)
-            env.safe_sudo("grep -q 'export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; if [ $? -eq 1 ]; then sed -i '2 a export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; fi", user=env.galaxy_user)
+            env.safe_sudo("grep -q 'export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' %s/run.sh; if [ $? -eq 1 ]; then sed -i '2 a export DRMAA_LIBRARY_PATH=/opt/sge/lib/lx24-amd64/libdrmaa.so.1.0' run.sh; fi" %(env.galaxy_home, user=env.galaxy_user)
             # Upload the custom cloud welcome screen files
             if not env.safe_exists("%s/static/images/cloud.gif" % env.galaxy_home):
                 env.safe_sudo("wget --output-document=%s/static/images/cloud.gif %s/cloud.gif" % (env.galaxy_home, CDN_ROOT_URL), user=env.galaxy_user)
