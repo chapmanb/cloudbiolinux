@@ -336,12 +336,12 @@ def _if_installed(pname):
 
 def _make_genome_dir():
     genome_dir = os.path.join(env.data_files, "genomes")
-    with settings(warn_only=True):
-        if not env.safe_exists(genome_dir):
+    if not env.safe_exists(genome_dir):
+        with settings(warn_only=True):
             result = env.safe_run_output("mkdir -p %s" % genome_dir)
-        else:
-            result = None
-    if result and result.failed:
+    else:
+        result = None
+    if result is not None and result.failed:
         env.safe_sudo("mkdir -p %s" % genome_dir)
         env.safe_sudo("chown -R %s %s" % (env.user, genome_dir))
     return genome_dir
