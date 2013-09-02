@@ -591,9 +591,9 @@ def install_varscan(env):
                 env.safe_sudo("mv *.jar %s" % install_dir)
 
 def install_mutect(env):
-    version = "1.1.4"
-    url = "http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/" \
-          "muTect-%s-bin.zip" % version
+    version = "1.1.5"
+    url = "https://github.com/broadinstitute/mutect/releases/download/" \
+          "%s/muTect-%s-bin.zip" % (version, version)
     install_dir = _symlinked_java_version_dir("mutect", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
