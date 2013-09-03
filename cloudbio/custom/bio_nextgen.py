@@ -1108,3 +1108,7 @@ def install_weblogo(env):
     version = "2.8.2"
     url = "http://weblogo.berkeley.edu/release/weblogo.%s.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
+    def _cp_pm(env):
+        for perl_module in ["template.pm", "logo.pm", "template.eps"]:
+            env.safe_sudo("cp %s %s/lib/perl5" % (perl_module, env.system_install))
+    _get_install(url, env, _cp_pm(env))
