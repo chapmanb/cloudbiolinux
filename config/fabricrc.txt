@@ -33,11 +33,11 @@ dist_name = __auto__
 is_ec2_image = false
 
 # Global installation directory for packages and standard programs
-system_install = /usr
+system_install = /usr/local
 
 # Local install directory for versioned software that will not
 # be included in the path by default
-local_install = ~/install
+local_install = /usr/local/share
 
 # Shell to be used by CBL scripts during runtime
 shell_config = ~/.bashrc
