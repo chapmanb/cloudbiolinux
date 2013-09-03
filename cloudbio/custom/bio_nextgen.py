@@ -1099,3 +1099,12 @@ def install_sambamba(env):
                 env.safe_run("wget {0}".format(url))
                 env.safe_sudo("sudo dpkg -i {0}".format(
                         os.path.basename(url)))
+
+@_if_not_installed("weblogo")
+def install_weblogo(env):
+    """Weblogo
+    http://weblogo.berkeley.edu/
+    """
+    version = "2.8.2"
+    url = "http://weblogo.berkeley.edu/release/weblogo.%s.tar.gz" % version
+    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
