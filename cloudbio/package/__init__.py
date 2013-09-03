@@ -5,6 +5,7 @@ import os
 from fabric.api import env, cd
 
 from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.package import brew
 from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
                                   _setup_apt_automation, _setup_apt_sources)
 from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
@@ -31,6 +32,8 @@ def _configure_and_install_native_packages(env, pkg_install):
         _yum_packages(pkg_install)
         if env.edition.short_name not in ["minimal"]:
             _setup_yum_bashrc()
+    elif env.distribution == "macosx":
+        brew.install_packages(env, pkg_install)
     else:
         raise NotImplementedError("Unknown target distribution")
 

@@ -107,6 +107,7 @@ distributed:
   - pydoop
   - seal
 system:
+  - homebrew
   - s3fs
 python:
   - bx-python

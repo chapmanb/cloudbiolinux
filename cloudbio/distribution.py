@@ -10,7 +10,7 @@ from fabric.api import env
 
 from cloudbio.fabutils import quiet
 from cloudbio.fabutils import configure_runsudo
-
+from cloudbio.custom import system
 
 def _setup_distribution_environment(ignore_distcheck=False):
     """Setup distribution environment.
@@ -40,6 +40,9 @@ def _setup_distribution_environment(ignore_distcheck=False):
         if env.dist_name == "__auto__":
             env.dist_name = _debian_dist_name(env)
         _setup_debian()
+    elif env.distribution == "macosx":
+        _setup_macosx(env)
+        ignore_distcheck=True
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
     if not ignore_distcheck:
@@ -180,6 +183,13 @@ def _setup_scientificlinux():
     if not env.has_key("java_home"):
         env.java_home = "/etc/alternatives/java_sdk"
 
+def _setup_macosx(env):
+    # XXX Only framework in place; needs testing
+    env.logger.info("MacOSX setup")
+    # XXX Ensure XCode is installed and provide useful directions if not
+    system.install_homebrew(env)
+    # XXX find java correctly
+    env.java_home = ""
 
 def _setup_nixpkgs():
     # for now, Nix packages are only supported in Debian - it can
