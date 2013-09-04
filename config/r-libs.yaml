@@ -1,7 +1,7 @@
 ---
 # Configuration file defining R specific libraries that are installed 
 # via CRAN and Bioconductor.
-cranrepo: http://watson.nci.nih.gov/cran_mirror/
+cranrepo: http://cran.fhcrc.org/
 cran:
  - abind
  - ape
@@ -81,6 +81,7 @@ cran:
  - spatial
  - sqldf
  - statmod
+ - stringr
  - strucchange
  - survival
  - testthat

@@ -110,7 +110,7 @@ def _setup_ubuntu():
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://archive.canonical.com/ubuntu %s partner",  # partner repositories
       "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen",  # mongodb
-      "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/ubuntu %s/",  # lastest R versions
+      "deb http://cran.fhcrc.org/bin/linux/ubuntu %s/",  # lastest R versions
       "deb http://archive.cloudera.com/debian maverick-cdh3 contrib",  # Hadoop
       "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
       "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main",  # Free-NX
@@ -126,7 +126,7 @@ def _setup_debian():
     shared_sources = _setup_deb_general()
     sources = [
         "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen",  # mongodb
-        "deb http://watson.nci.nih.gov/cran_mirror/bin/linux/debian %s-cran/",  # lastest R versions
+        "deb http://cran.fhcrc.org/bin/linux/debian %s-cran/",  # lastest R versions
         "deb http://archive.cloudera.com/debian lenny-cdh3 contrib"  # Hadoop
         ] + shared_sources
     # fill in %s
