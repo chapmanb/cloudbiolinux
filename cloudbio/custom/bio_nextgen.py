@@ -557,8 +557,8 @@ def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
     http://www.broadinstitute.org/gatk/
     """
-    min_version = "2.6-5"
-    version = "%s-gba531bd" % min_version
+    min_version = "2.7-2"
+    version = "%s-g6bda569" % min_version
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
     with _make_tmp_dir() as work_dir:
         work_fname = os.path.join(work_dir, dl_fname)
@@ -568,13 +568,16 @@ def install_gatk_protected(env):
             print "Please retrieve the latest versions from:"
             print "http://www.broadinstitute.org/gatk/download"
             print "and place %s in your home directory" % dl_fname
-            raw_input("**** Press <enter> when complete ")
-            try:
-                fname = env.safe_run_output("ls $HOME/%s" % dl_fname)
-            except:
-                raise IOError("Could not find %s in your home directory. Please download and retry" % dl_fname)
-            env.safe_put(fname, work_fname)
-            return work_fname
+            userin = raw_input("**** Press <enter> when complete or type 'skip' to avoid the installation: ")
+            if userin.find("skip") >= 0:
+                return None
+            else:
+                try:
+                    fname = env.safe_run_output("ls $HOME/%s" % dl_fname)
+                except:
+                    raise IOError("Could not find %s in your home directory. Please download and retry" % dl_fname)
+                env.safe_put(fname, work_fname)
+                return work_fname
         _java_install("gatk", version, work_fname, env, pre_fetch_fn=manual_gatk_download)
 
 def install_varscan(env):

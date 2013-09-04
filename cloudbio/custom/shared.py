@@ -284,7 +284,9 @@ def _java_install(pname, version, url, env, install_fn=None,
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 if pre_fetch_fn:
-                    pre_fetch_fn(env)
+                    out = pre_fetch_fn(env)
+                    if out is None:
+                        return
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     if install_fn is not None:

@@ -58,6 +58,7 @@ bio_nextgen:
     - crisp
     - freebayes
     - gatk
+    #- gatk_protected
     - gemini
     - grabix
     - mutect
