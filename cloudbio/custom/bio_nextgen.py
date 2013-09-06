@@ -584,7 +584,7 @@ def install_varscan(env):
     """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/
     """
-    version = "2.3.5"
+    version = "2.3.6"
     url = "http://downloads.sourceforge.net/project/varscan/VarScan.v%s.jar" % version
     install_dir = _symlinked_java_version_dir("varscan", version, env)
     if install_dir:
