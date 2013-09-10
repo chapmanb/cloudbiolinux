@@ -686,9 +686,13 @@ def install_vep(env):
     url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
           "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
           "&pathrev={0}".format(version)
-    cache_dbs = "24"
+    # 26 : homo_sapiens, 35 : mus_musculus 
+    fasta_files = "26 35"
+    # 25 : homo_sapiens_refseq_vep_73.tar.gz, 26 : homo_sapiens_vep_73.tar.gz, 35: mus_musculus_vep_73.tar.gz
+    cache_dbs = "25 26 35"
     def _vep_install(env):
         env.safe_sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
+        env.safe_sed("INSTALL.pl", 'my \$input = <>', 'my $input = "{0}"'.format(fasta_files))
         env.safe_sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
         env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl")
     _get_install_local(url, env, _vep_install)
