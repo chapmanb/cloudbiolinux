@@ -682,7 +682,7 @@ def install_vep(env):
     """Variant Effects Predictor (VEP) from Ensembl.
     http://ensembl.org/info/docs/variation/vep/index.html
     """
-    version = "branch-ensembl-69"
+    version = "branch-ensembl-73"
     url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
           "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
           "&pathrev={0}".format(version)
