@@ -19,7 +19,7 @@ bio_nextgen:
     - bcbio_variation
     - freebayes
     - gatk
-    #- gatk_protected
+    - gatk_protected
     - grabix
     - mutect
     - tabix
