@@ -601,7 +601,7 @@ def install_mutect(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget --no-check-certificate %s" % url)
+                env.safe_run("wget --no-check-certificate -O %s %s" % (os.path.basename(url), url))
                 env.safe_run("unzip %s" % os.path.basename(url))
                 env.safe_sudo("mv *.jar version.txt LICENSE* %s" % install_dir)
 
