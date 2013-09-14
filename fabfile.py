@@ -33,8 +33,9 @@ from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom import shared
+from cloudbio.custom import shared, system
 from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.package import brew
 from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
@@ -270,6 +271,18 @@ def _install_custom(p, pkg_to_group=None):
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
 
+def install_brew(p=None, flavor=None):
+    """Top level access to homebrew/linuxbrew packages.
+    p is a package name to install, or all configured packages if not specified.
+    """
+    _setup_logging(env)
+    _configure_fabric_environment(env, flavor, ignore_distcheck=True)
+    system.install_homebrew(env)
+    if p is not None:
+        brew.install_packages(env, packages=[p])
+    else:
+        pkg_install = _read_main_config()[0]
+        brew.install_packages(env, to_install=pkg_install)
 
 def _custom_install_function(env, p, pkg_to_group):
     """
