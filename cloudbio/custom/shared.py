@@ -34,13 +34,18 @@ def _if_not_installed(pname):
         return decorator
     return argcatcher
 
-
+def _all_cbl_paths(env, ext):
+    """Add paths to other non-system directories installed by CloudBioLinux.
+    """
+    return ":".join("%s/%s" % (p, ext) for p in [env.system_install,
+                                                 os.path.join(env.local_install, "homebrew"),
+                                                 os.path.join(env.system_install, "anaconda")])
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = env.safe_run("export PATH=$PATH:%s/bin && "
-                              "export LD_LIBRARY_PATH=%s/lib:$LD_LIBRARY_PATH && %s" %
-                              (env.system_install, env.system_install, pname))
+        result = env.safe_run("export PATH=%s:$PATH && "
+                              "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH && %s" %
+                              (_all_cbl_paths(env, "bin"), _all_cbl_paths(env, "lib"), pname))
     return result.return_code == 127
 
 

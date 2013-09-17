@@ -15,17 +15,13 @@ For MuTect and cancer calling:
 """
 import os
 
-from fabric.api import *
-from fabric.contrib.files import *
+from fabric.api import env, warn_only
+from fabric.contrib.files import cd
 
 def download_dbsnp(genomes, bundle_version, dbsnp_version):
     """Download and install dbSNP variation data for supplied genomes.
     """
     folder_name = "variation"
-    to_download = ["dbsnp_{ver}".format(ver=dbsnp_version),
-                   "hapmap_3.3",
-                   "1000G_omni2.5",
-                   "Mills_and_1000G_gold_standard.indels"]
     genome_dir = os.path.join(env.data_files, "genomes")
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("dbsnp", False)):
@@ -33,12 +29,37 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
         if not env.safe_exists(vrn_dir):
             env.safe_run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
-            for dl_name in to_download:
-                for ext in ["", ".idx"]:
-                    _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
-            _download_cosmic(gid)
-            # XXX Wait to get this by default until it is used more widely
-            #_download_background_vcf(gid)
+            if gid in ["GRCh37", "hg19"]:
+                _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
+            elif gid in ["mm10"]:
+                _dbsnp_mouse(env, gid)
+
+def _dbsnp_mouse(env, gid):
+    """Retrieve resources for mouse variant analysis from custom S3 biodata bucket.
+    """
+    remote_dir = "https://s3.amazonaws.com/biodata/variants/"
+    files = {"mm10": ["mm10-dbSNP-2013-09-12.vcf"]}
+    for f in files[gid]:
+        for ext in ["", ".idx"]:
+            fname = f + ext
+            if not env.safe_exists(fname):
+                url = "%s%s.gz" % (remote_dir, fname)
+                env.safe_run("wget -O %s -c %s" % (os.path.basename(url), url))
+                env.safe_run("gunzip %s" % os.path.basename(url))
+
+def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
+    """Retrieve resources for human variant analysis from Broad resource bundles.
+    """
+    to_download = ["dbsnp_{ver}".format(ver=dbsnp_version),
+                   "hapmap_3.3",
+                   "1000G_omni2.5",
+                   "Mills_and_1000G_gold_standard.indels"]
+    for dl_name in to_download:
+        for ext in ["", ".idx"]:
+            _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
+    _download_cosmic(gid)
+    # XXX Wait to get this by default until it is used more widely
+    #_download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}.vcf{ext}".format(gid=gid, name=name, ext=ext)

@@ -60,6 +60,30 @@ class UCSCGenome(_DownloadHelper):
     def ucsc_name(self):
         return self._name
 
+    def _karyotype_sort(self, xs):
+        """Sort reads in karyotypic order to work with GATK's defaults.
+        """
+        def karyotype_keyfn(x):
+            base = os.path.splitext(os.path.basename(x))[0]
+            if base.startswith("chr"):
+                base = base[3:]
+            parts = base.split("_")
+            try:
+                parts[0] =  int(parts[0])
+            except ValueError:
+                pass
+            # unplaced at the very end
+            if parts[0] == "Un":
+                parts.insert(0, "z")
+            # mitochondrial special case -- after X/Y
+            elif parts[0] in ["M", "MT"]:
+                parts.insert(0, "x")
+            # sort random and extra chromosomes after M
+            elif len(parts) > 1:
+                parts.insert(0, "y")
+            return parts
+        return sorted(xs, key=karyotype_keyfn)
+
     def download(self, seq_dir):
         zipped_file = None
         genome_file = "%s.fa" % self._name
@@ -74,19 +98,8 @@ class UCSCGenome(_DownloadHelper):
             else:
                 raise ValueError("Do not know how to handle: %s" % zipped_file)
             tmp_file = genome_file.replace(".fa", ".txt")
-            with settings(warn_only=True):
-                result = env.safe_run("ls *.fa")
-            # some UCSC downloads have the files in multiple directories
-            # mv them to the parent directory and delete the child directories
-            #ignore_random = " -a \! -name '*_random.fa' -a \! -name 'chrUn*'" \
-            #        "-a \! -name '*hap*.fa'"
-            ignore_random = ""
-            if result.failed:
-                env.safe_run("find . -name '*.fa'%s -exec mv {} . \;" % ignore_random)
-                env.safe_run("find . -type d -a \! -name '\.' | xargs rm -rf")
-            result = env.safe_run("find . -name '*.fa'%s" % ignore_random)
-            result = [x.strip() for x in result.split("\n")]
-            result.sort()
+            result = env.safe_run_output("find . -name '*.fa'")
+            result = self._karyotype_sort([x.strip() for x in result.split("\n")])
             env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
             env.safe_run("rm -f *.fa")
             env.safe_run("mv %s %s" % (tmp_file, genome_file))
