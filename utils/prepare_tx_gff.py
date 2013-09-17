@@ -15,11 +15,17 @@ import shutil
 import platform
 import collections
 import subprocess
+import tempfile
+import glob
 
 import MySQLdb
-import rpy2.robjects as robjects
+import rnaseqlib.utils as utils
+import rnaseqlib.events.defineEvents as def_events
+import gffutils
+import time
 
-from bcbio.utils import chdir, safe_makedir
+
+from bcbio.utils import chdir, safe_makedir, file_exists
 
 def build_ucsc_map(ensembl_chrs, mt_chr):
     """Build mapping of Ensembl to UCSC names for standard chromosomes.
@@ -31,7 +37,7 @@ def build_ucsc_map(ensembl_chrs, mt_chr):
     return out
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "66"
+ensembl_release = "73"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name",
@@ -39,9 +45,12 @@ Build = collections.namedtuple("Build", ["taxname", "fname", "biomart_name",
 build_info = {
     "hg19": Build("homo_sapiens", "Homo_sapiens.GRCh37.{release}.gtf.gz",
                   "hsapiens_gene_ensembl", None),
-    "mm9": Build("mus_musculus", "Mus_musculus.NCBIM37.{release}.gtf.gz",
-                 "mmusculus_gene_ensembl",
-                 build_ucsc_map(range(1, 20) + ["X", "Y"], "MT"))}
+    "mm9": Build("mus_musculus", "Mus_musculus.NCBIM37.67.gtf.gz",
+                 "mmusculus_gene_ensembl", None),
+    "mm10": Build("mus_musculus", "Mus_musculus.GRCm38.{release}.gtf.gz",
+                 "mmusculus_gene_ensembl", None)}
+
+#                 build_ucsc_map(range(1, 20) + ["X", "Y"], "MT"))}
 
 ucsc_db= "genome-mysql.cse.ucsc.edu"
 ucsc_user="genome"
@@ -50,42 +59,224 @@ ucsc_user="genome"
 
 def main(org_build):
     work_dir = os.path.join(os.getcwd(), "tmpcbl")
+    out_dir = os.path.join(os.getcwd(), "rnaseq")
     safe_makedir(work_dir)
     with chdir(work_dir):
         build = build_info[org_build]
         tx_gff = prepare_tx_gff(build, org_build)
-        mask_gff = prepare_mask_gff(tx_gff, build)
-        upload_to_s3([tx_gff, mask_gff], org_build)
+        mask_gff = prepare_mask_gtf(tx_gff)
+        rrna_gtf = prepare_rrna_gtf(tx_gff)
+        gtf_to_interval(rrna_gtf, org_build)
+        make_miso_events(tx_gff, org_build)
+        prepare_tophat_index(tx_gff, org_build)
+    shutil.move(work_dir, "rnaseq")
+    #upload_to_s3([tx_gff, mask_gff], org_build)
+    upload_to_s3(out_dir, org_build)
 
-def upload_to_s3(fnames, org_build):
-    final_dir = os.path.join(org_build, "rnaseq")
-    final_tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
-    if not os.path.exists(final_tarball):
-        safe_makedir(final_dir)
-        for fname in fnames:
-            shutil.move(fname, final_dir)
-        subprocess.check_call("tar -cvpf - {dir} | xz -zc - > {tarball}".format(
-            dir=final_dir, tarball=final_tarball), shell=True)
+
+def upload_to_s3(out_dir, org_build):
+    tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
+    if not os.path.exists(tarball):
+        subprocess.check_call("tar -cvpf - {out_dir} | xz -zc - > {tarball}".format(
+            out_dir=out_dir, tarball=tarball), shell=True)
     python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
-    subprocess.check_call([python_exe, upload_script, final_tarball, "biodata",
-                           os.path.join("annotation", os.path.basename(final_tarball)),
+    subprocess.check_call([python_exe, upload_script, tarball, "biodata",
+                           os.path.join("annotation", os.path.basename(tarball)),
                            "--public"])
 
-# ## Get transcripts to filter from Ensembl BioMart query
 
-def prepare_mask_gff(base_gff, build):
-    """Prepare GFF file with high abundance transcripts to mask.
+# def upload_to_s3(fnames, org_build):
+#     final_dir = os.path.join(org_build, "rnaseq")
+#     final_tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
+#     if not os.path.exists(final_tarball):
+#         safe_makedir(final_dir)
+#         for fname in fnames:
+#             shutil.move(fname, final_dir)
+#         subprocess.check_call("tar -cvpf - {dir} | xz -zc - > {tarball}".format(
+#             dir=final_dir, tarball=final_tarball), shell=True)
+#     python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
+#     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
+#     subprocess.check_call([python_exe, upload_script, final_tarball, "biodata",
+#                            os.path.join("annotation", os.path.basename(final_tarball)),
+#                            "--public"])
+
+
+def make_miso_annotation(tables_dir, output_dir, org_build):
     """
-    out_file = "{0}-mask{1}".format(*os.path.splitext(base_gff))
-    if not os.path.exists(out_file):
-        tx_ids = high_abudance_transcripts(build)
-        with open(base_gff) as in_handle, \
-             open(out_file, "w") as out_handle:
-            for line in in_handle:
-                tx = line.split('transcript_id "')[1].split('"')[0]
-                if tx in tx_ids:
-                    out_handle.write(line)
+    Make GFF annotation. Takes GFF tables directory
+    and an output directory.
+
+    Adapted from
+    https://github.com/yarden/rnaseqlib/
+    """
+    tables_dir = utils.pathify(tables_dir)
+    output_dir = utils.pathify(output_dir)
+    print "Making GFF alternative events annotation..."
+    print " - UCSC tables read from: %s" % (tables_dir)
+    print " - Output dir: %s" % (output_dir)
+    t1 = time.time()
+    table_fnames = def_events.load_ucsc_tables(tables_dir)
+    num_tables = len(table_fnames)
+    if num_tables == 0:
+        raise Exception("No UCSC tables found in %s." % (tables_dir))
+    print "Loaded %d UCSC tables." % (num_tables)
+    def_events.defineAllSplicing(tables_dir, output_dir,
+                                 flanking="commonshortest",
+                                 multi_iso=False,
+                                 sanitize=False,
+                                 genome_label=org_build)
+    t2 = time.time()
+    print "Took %.2f minutes to make the annotation." \
+        % ((t2 - t1)/60.)
+
+
+def genepred_to_UCSC_table(genepred):
+    header = ["#bin", "name", "chrom", "strand",
+              "txStart", "txEnd", "cdsStart", "cdsEnd",
+              "exonCount", "exonStarts", "exonEnds", "score",
+              "name2",	"cdsStartStat",	"cdsEndStat",
+              "exonFrames"]
+    out_file = os.path.splitext(genepred)[0] + ".UCSCTable"
+    if file_exists(out_file):
+        return out_file
+    with open(genepred) as in_handle, open(out_file, "w") as out_handle:
+        counter = -1
+        current_item = None
+        out_handle.write("\t".join(header) + "\n")
+        for l in in_handle:
+            item = l.split("\t")[0]
+            if current_item != item:
+                current_item = item
+                counter = counter + 1
+            out_handle.write("\t".join([str(counter), l]))
+    return out_file
+
+def gtf_to_genepred(gtf):
+    out_file = os.path.splitext(gtf)[0] + ".genePred"
+    if file_exists(out_file):
+        return out_file
+
+    cmd = "gtfToGenePred -allErrors -genePredExt {gtf} {out_file}"
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return out_file
+
+def make_miso_events(gtf, org_build):
+
+    genepred = gtf_to_genepred(gtf)
+    genepred = genepred_to_UCSC_table(genepred)
+    pred_dir = tempfile.mkdtemp()
+    miso_dir = os.path.join(os.path.dirname(gtf), "miso")
+    tmp_pred = os.path.join(pred_dir, "ensGene.txt")
+    os.symlink(os.path.abspath(genepred), tmp_pred)
+    make_miso_annotation(pred_dir, miso_dir, org_build)
+
+    gff_files = glob.glob(os.path.join(miso_dir, "commonshortest", "*.gff3"))
+
+    cmd = "index_gff --index {f} {prefix}"
+
+    for f in gff_files:
+        prefix = f.split(".")[0] + "_indexed"
+        print prefix
+        print f
+        print cmd.format(**locals())
+        subprocess.check_call(cmd.format(**locals()), shell=True)
+
+def prepare_tophat_index(gtf, org_build):
+    tophat_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir,
+                                              "tophat", org_build))
+    bowtie_dir = os.path.abspath(os.path.join(os.getcwd(),
+                                              os.pardir, "bowtie2", org_build))
+    out_dir = tempfile.mkdtemp()
+    fastq = _create_dummy_fastq()
+    cmd = ("tophat --transcriptome-index {tophat_dir} -G {gtf} "
+           "-o {out_dir} {bowtie_dir} {fastq}")
+    print cmd.format(**locals())
+    print os.getcwd()
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    shutil.rmtree(out_dir)
+#    os.remove(fastq)
+
+def _create_dummy_fastq():
+    read = ("@HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
+            "GGNCTTTCCTGCTTCTATGTCTTGATCGCCTGTAGGCAGG\n"
+            "+HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
+            "[[BS\\a`ceeagfhhhhhaefhcdfhcf`efeg[cg_b__\n")
+    fn = "dummy.fq"
+    with open(fn, "w") as out_handle:
+        out_handle.write(read)
+    return fn
+
+def gtf_to_interval(gtf, build):
+    fa_dict = os.path.join(os.getcwd(), os.pardir, "seq", build + ".dict")
+    if not file_exists(fa_dict):
+        raise IOError("%s is not found, please make with "
+                      "CreateSequenceDictionary.")
+    db = _get_gtf_db(gtf)
+    out_file = os.path.splitext(gtf)[0] + ".interval_list"
+    if file_exists(out_file):
+        return out_file
+
+    with open(out_file, "w") as out_handle:
+        with open(fa_dict) as in_handle:
+            for l in in_handle:
+                out_handle.write(l)
+
+        for l in db.all_features():
+            out_handle.write("\t".join([str(l.seqid), str(l.start),
+                                        str(l.end), str(l.strand),
+                                        str(l.attributes.get("transcript_id",
+                                                             ["."])[0])]) + "\n")
+    return out_file
+
+def prepare_mask_gtf(gtf):
+    """
+    make a mask file of usually-masked RNA biotypes
+    """
+
+    mask_biotype = ["rRNA", "Mt_rRNA", "misc_RNA", "snRNA", "snoRNA",
+                    "tRNA","Mt_tRNA"]
+    mask_chrom = ["MT"]
+    out_file = os.path.join(os.path.dirname(gtf), "ref-transcripts-mask.gtf")
+    if file_exists(out_file):
+        return out_file
+
+    db = _get_gtf_db(gtf)
+    with open(out_file, "w") as out_handle:
+        for g in db.all_features():
+            biotype = g.attributes.get("gene_biotype", None)
+            if ((biotype and biotype[0] in mask_biotype) or
+               g.chrom in mask_chrom):
+                out_handle.write(str(g) + "\n")
+    return out_file
+
+def prepare_rrna_gtf(gtf):
+    """
+    extract out just the rRNA biotypes, for assessing rRNA contamination
+    """
+    mask_biotype = ["rRNA", "Mt_rRNA", "tRNA", "MT_tRNA"]
+
+    out_file = os.path.join(os.path.dirname(gtf), "rRNA.gtf")
+    if os.path.exists(out_file):
+        return out_file
+
+    db = _get_gtf_db(gtf)
+
+    with open(out_file, "w") as out_handle:
+        for g in db.all_features():
+            biotype = g.attributes.get("gene_biotype", None)
+            if biotype and biotype[0] in mask_biotype:
+                out_handle.write(str(g) + "\n")
+
+    return out_file
+
+def gtf_to_genepred(gtf):
+    out_file = os.path.splitext(gtf)[0] + ".genePred"
+    if file_exists(out_file):
+        return out_file
+
+    cmd = "gtfToGenePred -allErrors -genePredExt {gtf} {out_file}"
+    subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
 
 def high_abudance_transcripts(build):
@@ -137,10 +328,7 @@ def _query_for_ucsc_ensembl_map(org_name):
     cursor.execute("select * from ucscToEnsembl")
     ucsc_map = {}
     for ucsc, ensembl in cursor.fetchall():
-        # only include standard chromosomes -- not haplotype and random
-        # gtf_to_fasta in TopHat doesn't seem to like these
-        if len(ucsc) < 6:
-            ucsc_map[ensembl] = ucsc
+        ucsc_map[ensembl] = ucsc
     return ucsc_map
 
 def _download_ensembl_gff(build):
@@ -152,6 +340,13 @@ def _download_ensembl_gff(build):
         subprocess.check_call(["wget", dl_url])
         subprocess.check_call(["gunzip", os.path.basename(dl_url)])
     return out_file
+
+def _get_gtf_db(gtf):
+    db_file = gtf + ".db"
+    if not file_exists(db_file):
+        gffutils.create_db(gtf, dbfn=db_file)
+
+    return gffutils.FeatureDB(db_file)
 
 if __name__ == "__main__":
     main(*sys.argv[1:])
