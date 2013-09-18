@@ -244,15 +244,27 @@ def _get_install_local(url, env, make_command, dir_name=None,
 
 # --- Language specific utilities
 
-
-def _symlinked_shared_dir(pname, version, env, extra_dir=None):
-    """Create a symlinked directory of files inside the shared environment.
-    """
+def _symlinked_install_dir(pname, version, env, extra_dir=None):
     if extra_dir:
         base_dir = os.path.join(env.system_install, "share", extra_dir, pname)
     else:
         base_dir = os.path.join(env.system_install, "share", pname)
-    install_dir = "%s-%s" % (base_dir, version)
+    return base_dir, "%s-%s" % (base_dir, version)
+
+def _symlinked_dir_exists(pname, version, env, extra_dir=None):
+    """Check if a symlinked directory exists and is non-empty.
+    """
+    _, install_dir = _symlinked_install_dir(pname, version, env, extra_dir)
+    if env.safe_exists(install_dir):
+        items = env.safe_run_output("ls %s" % install_dir)
+        if items.strip() != "":
+            return True
+    return False
+
+def _symlinked_shared_dir(pname, version, env, extra_dir=None):
+    """Create a symlinked directory of files inside the shared environment.
+    """
+    base_dir, install_dir = _symlinked_install_dir(pname, version, env, extra_dir)
     # Does not exist, change symlink to new directory
     if not env.safe_exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
@@ -271,7 +283,6 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     if not env.safe_exists(base_dir):
         env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
     return None
-
 
 def _symlinked_java_version_dir(pname, version, env):
     return _symlinked_shared_dir(pname, version, env, extra_dir="java")

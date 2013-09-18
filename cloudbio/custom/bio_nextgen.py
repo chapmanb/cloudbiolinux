@@ -563,25 +563,26 @@ def install_gatk_protected(env):
     """
     min_version = "2.7-2"
     version = "%s-g6bda569" % min_version
+    if shared._symlinked_dir_exists("gatk", version, env, "java"):
+        return
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
+    print "**** Manual intervention needed"
+    print "Recent GATK versions require manual download from the GATK website"
+    print "Please retrieve the latest versions from:"
+    print "http://www.broadinstitute.org/gatk/download"
+    print "and place %s in your home directory" % dl_fname
+    userin = raw_input("**** Press <enter> when complete or type 'skip' to avoid the installation: ")
+    if userin.find("skip") >= 0:
+        return
     with _make_tmp_dir() as work_dir:
         work_fname = os.path.join(work_dir, dl_fname)
         def manual_gatk_download(env):
-            print "**** Manual intervention needed"
-            print "Recent GATK versions require manual download from the GATK website"
-            print "Please retrieve the latest versions from:"
-            print "http://www.broadinstitute.org/gatk/download"
-            print "and place %s in your home directory" % dl_fname
-            userin = raw_input("**** Press <enter> when complete or type 'skip' to avoid the installation: ")
-            if userin.find("skip") >= 0:
-                return None
-            else:
-                try:
-                    fname = env.safe_run_output("ls $HOME/%s" % dl_fname)
-                except:
-                    raise IOError("Could not find %s in your home directory. Please download and retry" % dl_fname)
-                env.safe_put(fname, work_fname)
-                return work_fname
+            try:
+                fname = env.safe_run_output("ls $HOME/%s" % dl_fname)
+            except:
+                raise IOError("Could not find %s in your home directory. Please download and retry" % dl_fname)
+            env.safe_put(fname, work_fname)
+            return work_fname
         _java_install("gatk", version, work_fname, env, pre_fetch_fn=manual_gatk_download)
 
 def install_varscan(env):
