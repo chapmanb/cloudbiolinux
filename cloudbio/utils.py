@@ -127,6 +127,9 @@ def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
     """
     env.config_dir = os.path.join(os.path.dirname(__file__), "..", "config")
+    env.tool_data_table_conf_file = os.path.join(env.config_dir, "..",
+                                                 "installed_files",
+                                                 "tool_data_table_conf.xml")
     if not env.has_key("distribution") and not env.has_key("system_install"):
         env.logger.info("Reading default fabricrc.txt")
         env.update(load_settings(get_config_file(env, "fabricrc.txt").base))
@@ -152,8 +155,8 @@ def _create_local_paths(env):
         if "local_install" in env:
             if not env.safe_exists(env.local_install):
                 env.safe_sudo("mkdir -p %s" % env.local_install)
-                user = env.safe_run("echo $USER")
+                user = env.safe_run_output("echo $USER")
                 env.safe_sudo("chown -R %s %s" % (user, env.local_install))
             with cd(env.local_install):
-                result = env.safe_run("pwd")
+                result = env.safe_run_output("pwd")
                 env.local_install = result

@@ -1,5 +1,4 @@
-from fabric.api import put, cd
-from fabric.contrib.files import exists
+from fabric.api import cd
 
 from shared import (_make_tmp_dir, _fetch_and_unpack, _write_to_file, _get_bin_dir)
 
@@ -9,8 +8,8 @@ import os
 def install_proteomics_wine_env(env):
     script_src = env.get("setup_proteomics_wine_env_script")
     script_dest = "%s/bin/setup_proteomics_wine_env.sh" % env.get("system_install")
-    if not exists(script_dest):
-        put(script_src, script_dest, mode=0755, use_sudo=True)
+    if not env.safe_exists(script_dest):
+        env.safe_put(script_src, script_dest, mode=0755, use_sudo=True)
 
 
 def install_multiplierz(env):

@@ -1,14 +1,24 @@
-import yaml
+from datetime import datetime
 from os.path import exists, join
-from fabric.api import local, lcd, env
-from .util import eval_template
+from os import listdir
 from tempfile import mkdtemp
+
+from cloudbio.deploy.util import eval_template
+
+from boto.exception import S3ResponseError
+from boto.s3.key import Key
+
+import yaml
+
+from fabric.api import local, lcd, env
+
+DEFAULT_BUCKET_NAME = 'cloudman'
 
 DEFAULT_CLOUDMAN_PASSWORD = 'adminpass'
 DEFAULT_CLOUDMAN_CLUSTER_NAME = 'cloudman'
 
 
-def bundle_cloudman(options):
+def bundle_cloudman(vm_launcher, options):
     cloudman_options = options.get('cloudman')
     cloudman_repository_path = cloudman_options['cloudman_repository']
     delete_repository = False
@@ -70,6 +80,56 @@ def cloudman_launch(vm_launcher, options):
                             ex_userdata=user_data)
 
 
+def sync_cloudman_bucket(vm_launcher, options):
+    bucket = options.get("target_bucket", None)
+    if not bucket:
+        bucket = __get_bucket_default(options)
+    bucket_source = options.get("cloudman", {}).get("bucket_source", None)
+    if not bucket or not bucket_source:
+        print "Warning: Failed to sync cloud bucket, bucket or bucket_source is undefined."
+        return
+    conn = vm_launcher.boto_s3_connection()
+    for file_name in listdir(bucket_source):
+        _save_file_to_bucket(conn, bucket, file_name, join(bucket_source, file_name))
+
+
+def _save_file_to_bucket(conn, bucket_name, remote_filename, local_file, **kwargs):
+    """ Save the local_file to bucket_name as remote_filename. Also, any additional
+    arguments passed as key-value pairs, are stored as file's metadata on S3."""
+    # print "Establishing handle with bucket '%s'..." % bucket_name
+    b = _get_bucket(conn, bucket_name)
+    if b is not None:
+        # print "Establishing handle with key object '%s'..." % remote_filename
+        k = Key( b, remote_filename )
+        print "Attempting to save file '%s' to bucket '%s'..." % (remote_filename, bucket_name)
+        try:
+            # Store some metadata (key-value pairs) about the contents of the file being uploaded
+            # Note that the metadata must be set *before* writing the file
+            k.set_metadata('date_uploaded', str(datetime.utcnow()))
+            for args_key in kwargs:
+                print "Adding metadata to file '%s': %s=%s" % (remote_filename, args_key, kwargs[args_key])
+                k.set_metadata(args_key, kwargs[args_key])
+            print "Saving file '%s'" % local_file
+            k.set_contents_from_filename(local_file)
+            print "Successfully added file '%s' to bucket '%s'." % (remote_filename, bucket_name)
+            make_public = True
+            if make_public:
+                k.make_public()
+        except S3ResponseError, e:
+            print "Failed to save file local file '%s' to bucket '%s' as file '%s': %s" % ( local_file, bucket_name, remote_filename, e )
+            return False
+        return True
+    else:
+        return False
+
+
+def __get_bucket_default(options):
+    cloudman_options = options.get("cloudman", {})
+    user_data = cloudman_options = cloudman_options.get('user_data', None) or {}
+    bucket = user_data.get("bucket_default", None)
+    return bucket
+
+
 def _prepare_user_data(vm_launcher, cloudman_options):
     cloudman_user_data = cloudman_options.get('user_data', None) or {}
     cluster_name = \
@@ -90,3 +150,22 @@ def _prepare_user_data(vm_launcher, cloudman_options):
 def _set_property_if_needed(user_data, property, value):
     if property not in user_data:
         user_data[property] = value
+
+
+def _get_bucket(s3_conn, bucket_name):
+    b = None
+    for i in range(0, 5):
+        try:
+            b = s3_conn.get_bucket(bucket_name)
+            break
+        except S3ResponseError:
+            print "Bucket '%s' not found, attempt %s/5" % (bucket_name, i)
+            return None
+    return b
+
+
+local_actions = {
+    "cloudman_launch": cloudman_launch,
+    "sync_cloudman_bucket": sync_cloudman_bucket,
+    "bundle_cloudman": bundle_cloudman,
+}

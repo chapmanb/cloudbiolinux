@@ -2,17 +2,20 @@
 """
 
 import os
+import re
 
-from fabric.api import cd, run, settings
-from fabric.contrib.files import append
+from fabric.api import cd
+from fabric.context_managers import prefix
 
 from shared import (_if_not_installed, _make_tmp_dir,
-                    _get_install, _get_install_local, _make_copy, _configure_make,
+                    _get_install, _make_copy,
                     _java_install, _symlinked_java_version_dir,
                     _get_bin_dir, _get_install_subdir,
-                    _fetch_and_unpack, _python_make,
-                    _create_python_virtualenv)
-import re
+                    _fetch_and_unpack,
+                    _create_python_virtualenv,
+                    _get_bitbucket_download_url,
+                    _write_to_file)
+from cloudbio.galaxy.utils import _chown_galaxy
 
 # Tools from Tabb lab are only available via TeamCity builds that
 # and the artifacts eventually are deleted (I think), storing versions
@@ -44,15 +47,15 @@ def install_transproteomic_pipeline(env):
         def do_work(env):
             src_dir = "trans_proteomic_pipeline/src" if version == "4.6.1-occupy" else "src"
             with cd(src_dir):
-                append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
-                append("Makefile.config.incl", "TPP_WEB=/tpp/")
-                append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
-                append("Makefile.config.incl", "CGI_USERS_DIR=${TPP_ROOT}cgi-bin")
+                env.safe_append("Makefile.config.incl", "TPP_ROOT=%s/" % env["system_install"])
+                env.safe_append("Makefile.config.incl", "TPP_WEB=/tpp/")
+                env.safe_append("Makefile.config.incl", "XSLT_PROC=/usr/bin/xsltproc")
+                env.safe_append("Makefile.config.incl", "CGI_USERS_DIR=${TPP_ROOT}cgi-bin")
                 work_cmd(env)
         return do_work
 
     def _make(env):
-        run("make")
+        env.safe_run("make")
         env.safe_sudo("make install")
     _get_install(url, env, _chdir_src(_make))
 
@@ -81,10 +84,10 @@ def install_openms(env):
 
     def _make(env):
         with cd("contrib"):
-            run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
-            run("make")
-        run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
-        run("make")
+            env.safe_run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+            env.safe_run("make")
+        env.safe_run("cmake -DINSTALL_PREFIX=%s ." % env.get('system_install'))
+        env.safe_run("make")
         env.safe_sudo("make install")
     _get_install(url, env, _make)
 
@@ -109,15 +112,17 @@ def install_tint_proteomics_scripts(env):
 def install_ms2preproc(env):
     default_version = "2009"
     version = env.get("tool_version", default_version)
-    get_cmd = 'wget --post-data "Anonym=1&GotoDownload=1&ref=http://hci.iwr.uni-heidelberg.de/MIP/Software/ms2preproc.php" http://hci.iwr.uni-heidelberg.de/php-tools/download.php -O ms2preproc.zip'
+    get_cmd = 'wget "http://software.steenlab.org/ms2preproc/ms2preproc.zip" -O ms2preproc.zip'
 
-    install_dir = _get_bin_dir(env)
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run(get_cmd)
-            run("unzip ms2preproc.zip")
-            run("chmod +x ms2preproc-x86_64")
-            env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
+            env.safe_run(get_cmd)
+            env.safe_run("unzip ms2preproc.zip")
+            with cd("ms2preproc"):
+                env.safe_run("mv ms2preproc-r2821-x86_64 ms2preproc-x86_64")
+                env.safe_run("chmod +x ms2preproc-x86_64")
+                install_dir = _get_bin_dir(env)
+                env.safe_sudo("mv ms2preproc-x86_64 '%s'/ms2preproc" % install_dir)
 
 
 @_if_not_installed("MZmine")
@@ -290,9 +295,9 @@ def install_percolator(env):
 
     def make(env):
         with cd(".."):
-            run("env")
-            run("cmake -DCMAKE_INSTALL_PREFIX='%s' . " % env.system_install)
-            run("make -j8")
+            env.safe_run("env")
+            env.safe_run("cmake -DCMAKE_INSTALL_PREFIX='%s' . " % env.system_install)
+            env.safe_run("make -j8")
             env.safe_sudo("make install")
 
     _get_install(url, env, make)
@@ -306,7 +311,7 @@ def install_pepnovo(env):
 
     def install_fn(env, install_dir):
         with cd("src"):
-            run("make")
+            env.safe_run("make")
             env.safe_sudo("mkdir -p '%s/bin'" % env.system_install)
             env.safe_sudo("mkdir -p '%s/share/pepnovo'" % env.system_install)
             env.safe_sudo("mv PepNovo_bin '%s/bin/PepNovo'" % env.system_install)
@@ -338,11 +343,11 @@ def install_fido(env):
     def _chdir_src(work_cmd):
         def do_work(env):
             with cd("src/cpp"):
-                append('tmpmake', 'SHELL=/bin/bash')
-                append('tmpmake', 'prefix=%s' % env.get("system_install"))
-                append('tmpmake', 'CPPFLAGS=-Wall -ffast-math -march=x86-64 -pipe -O4 -g')
-                run('cat makefile |grep BINPATH -A 9999 >> tmpmake')
-                run('cp tmpmake makefile')
+                env.safe_append('tmpmake', 'SHELL=/bin/bash')
+                env.safe_append('tmpmake', 'prefix=%s' % env.get("system_install"))
+                env.safe_append('tmpmake', 'CPPFLAGS=-Wall -ffast-math -march=x86-64 -pipe -O4 -g')
+                env.safe_run('cat makefile |grep BINPATH -A 9999 >> tmpmake')
+                env.safe_run('cp tmpmake makefile')
                 work_cmd(env)
         return do_work
 
@@ -357,7 +362,7 @@ def install_ipig(env):
     url = 'http://downloads.sourceforge.net/project/ipig/ipig_%s.zip' % version
     pkg_name = 'ipig'
     install_dir = os.path.join(env.galaxy_jars_dir, pkg_name)
-    install_cmd = env.safe_sudo if env.use_sudo else run
+    install_cmd = env.safe_sudo if env.use_sudo else env.safe_run
     install_cmd("mkdir -p %s" % install_dir)
     with cd(install_dir):
         install_cmd("wget %s -O %s" % (url, os.path.split(url)[-1]))
@@ -380,6 +385,73 @@ def install_peptide_to_gff(env):
 
     _unzip_install("peptide_to_gff", version, repository, env, install_fn)
 
+
+def install_galaxy_protk(env):
+    """This method installs Ira Cooke's ProtK framework. Very galaxy specific,
+    can only be installed in context of custom Galaxy tool.
+
+
+    By default this will install ProtK from rubygems server, but if
+    env.protk_version is set to <version>@<url> (e.g.
+    1.1.5@https://bitbucket.org/iracooke/protk-working) the
+    gem will be cloned with hg and installed from source.
+    """
+    if not env.get('galaxy_tool_install', False):
+        from cloudbio.custom.galaxy import _prep_galaxy
+        _prep_galaxy(env)
+    default_version = "1.2.2"
+    version = env.get("tool_version", default_version)
+    version_and_revision = version
+    install_from_source = version_and_revision.find("@") > 0
+    # e.g. protk_version = 1.1.5@https://bitbucket.org/iracooke/protk-working
+    if install_from_source:
+        (version, revision) = version_and_revision.split("@")
+        url = _get_bitbucket_download_url(revision, "https://bitbucket.org/iracooke/protk")
+    else:
+        version = version_and_revision
+
+    ruby_version = "1.9.3"
+    force_rvm_install = False
+    with prefix("HOME=~%s" % env.galaxy_user):
+        def rvm_exec(env, cmd="", rvm_cmd="use", with_gemset=False):
+            target = ruby_version if not with_gemset else "%s@%s" % (ruby_version, "protk-%s" % version)
+            prefix = ". $HOME/.rvm/scripts/rvm; rvm %s %s; " % (rvm_cmd, target)
+            env.safe_sudo("%s %s" % (prefix, cmd), user=env.galaxy_user)
+        if not env.safe_exists("$HOME/.rvm") or force_rvm_install:
+            env.safe_sudo("curl -L get.rvm.io | bash -s stable; source ~%s/.rvm/scripts/rvm" % (env.galaxy_user), user=env.galaxy_user)
+            rvm_exec(env, rvm_cmd="install")
+            rvm_exec(env, cmd="rvm gemset create protk-%s" % version)
+        if not install_from_source:
+            # Typical rubygem install
+            rvm_exec(env, "gem install  --no-ri --no-rdoc protk -v %s" % version, with_gemset=True)
+        else:
+            with cd("~%s" % env.galaxy_user):
+                env.safe_sudo("rm -rf protk_source; hg clone '%s' protk_source" % url, user=env.galaxy_user)
+                rvm_exec(env, "cd protk_source; gem build protk.gemspec; gem install protk", with_gemset=True)
+
+        protk_properties = {}
+        ## ProtK can set these up itself, should make that an option.
+        protk_properties["tpp_root"] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default")
+        protk_properties['openms_root'] = "/usr"  # os.path.join(env.galaxy_tools_dir, "openms", "default", "bin")
+        ### Assumes omssa, blast, and transproteomic_pipeline CBL galaxy installs.
+        protk_properties['omssa_root'] = os.path.join(env.galaxy_tools_dir, "omssa", "default", "bin")
+        protk_properties['blast_root'] = os.path.join(env.galaxy_tools_dir, "blast+", "default")
+        protk_properties['pwiz_root'] = os.path.join(env.galaxy_tools_dir, "transproteomic_pipeline", "default", "bin")
+        # Other properties: log_file, blast_root
+        env.safe_sudo("mkdir -p \"$HOME/.protk\"", user=env.galaxy_user)
+        env.safe_sudo("mkdir -p \"$HOME/.protk/Databases\"", user=env.galaxy_user)
+        import  yaml
+        _write_to_file(yaml.dump(protk_properties), "/home/%s/.protk/config.yml" % env.galaxy_user, "0755")
+
+        rvm_exec(env, "protk_setup.rb galaxyenv", with_gemset=True)
+
+        install_dir = os.path.join(env.galaxy_tools_dir, "galaxy_protk", version)
+        env.safe_sudo("mkdir -p '%s'" % install_dir)
+        _chown_galaxy(env, install_dir)
+        env.safe_sudo('ln -s -f "$HOME/.protk/galaxy/env.sh" "%s/env.sh"' % install_dir, user=env.galaxy_user)
+        with cd(install_dir):
+            with cd(".."):
+                env.safe_sudo("ln -s -f '%s' default" % version)
 
 
 @_if_not_installed("myrimatch")
@@ -412,8 +484,8 @@ def install_idpqonvert(env):
     default_version = "3.0.475"
     version = env.get("tool_version", default_version)
     url = "%s/idpQonvert_%s" % (PROTEOMICS_APP_ARCHIVE_URL, version)
-    run("wget --no-check-certificate -O %s '%s'" % ("idpQonvert", url))
-    run("chmod 755 idpQonvert")
+    env.safe_run("wget --no-check-certificate -O %s '%s'" % ("idpQonvert", url))
+    env.safe_run("chmod 755 idpQonvert")
     env.safe_sudo("mkdir -p '%s/bin'" % env["system_install"])
     env.safe_sudo("mv %s '%s/bin'" % ("idpQonvert", env["system_install"]))
     env.safe_sudo("chmod +x '%s/bin/idpQonvert'" % env["system_install"])

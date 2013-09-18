@@ -1,7 +1,7 @@
 ---
 # Top level configuration file that specifies which groups of programs
 # should be installed. New sections that are added to individual config
-# files should go here. Comment out any groups you don't want to have 
+# files should go here. Comment out any groups you don't want to have
 # installed.
 packages:
   - minimal
@@ -34,6 +34,7 @@ packages:
   - bio_utils
   - phylogeny
   - galaxy
+  - galaxy_tools
   - cloudman
 libraries:
   #- haskell-libs

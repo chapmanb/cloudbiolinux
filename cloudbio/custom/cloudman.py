@@ -51,41 +51,41 @@ def install_proftpd(env):
     install_dir = os.path.join(env.install_dir, 'proftpd')
     remote_conf_dir = os.path.join(install_dir, "etc")
     # skip install if already present
-    if exists(remote_conf_dir):
+    if env.safe_exists(remote_conf_dir):
         env.logger.debug("ProFTPd seems to already be installed in {0}".format(install_dir))
         return
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            run("wget %s" % url)
+            env.safe_run("wget %s" % url)
             with settings(hide('stdout')):
-                run("tar xvzf %s" % os.path.split(url)[1])
+                env.safe_run("tar xvzf %s" % os.path.split(url)[1])
             with cd("proftpd-%s" % version):
-                run("CFLAGS='-I/usr/include/postgresql' ./configure --prefix=%s " \
+                env.safe_run("CFLAGS='-I/usr/include/postgresql' ./configure --prefix=%s " \
                     "--disable-auth-file --disable-ncurses --disable-ident --disable-shadow " \
                     "--enable-openssl --with-modules=%s " \
                     "--with-libraries=/usr/lib/postgresql/%s/lib" % (install_dir, modules, postgres_ver))
-                sudo("make")
-                sudo("make install")
-                sudo("make clean")
+                env.safe_sudo("make")
+                env.safe_sudo("make install")
+                env.safe_sudo("make clean")
     # Get the init.d startup script
     initd_script = 'proftpd.initd'
     initd_url = os.path.join(REPO_ROOT_URL, 'conf_files', initd_script)
     remote_file = "/etc/init.d/proftpd"
-    sudo("wget --output-document=%s %s" % (remote_file, initd_url))
-    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
-    sudo("chmod 755 %s" % remote_file)
+    env.safe_sudo("wget --output-document=%s %s" % (remote_file, initd_url))
+    env.safe_sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    env.safe_sudo("chmod 755 %s" % remote_file)
     # Set the configuration file
     conf_file = 'proftpd.conf'
     conf_url = os.path.join(REPO_ROOT_URL, 'conf_files', conf_file)
     remote_file = os.path.join(remote_conf_dir, conf_file)
-    sudo("wget --output-document=%s %s" % (remote_file, conf_url))
-    sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
+    env.safe_sudo("wget --output-document=%s %s" % (remote_file, conf_url))
+    env.safe_sed(remote_file, 'REPLACE_THIS_WITH_CUSTOM_INSTALL_DIR', install_dir, use_sudo=True)
     # Get the custom welcome msg file
     welcome_msg_file = 'welcome_msg.txt'
     welcome_url = os.path.join(REPO_ROOT_URL, 'conf_files', welcome_msg_file)
-    sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
+    env.safe_sudo("wget --output-document=%s %s" % (os.path.join(remote_conf_dir, welcome_msg_file), welcome_url))
     # Stow
-    sudo("cd %s; stow proftpd" % env.install_dir)
+    env.safe_sudo("cd %s; stow proftpd" % env.install_dir)
     env.logger.debug("----- ProFTPd %s installed to %s -----" % (version, install_dir))
 
 def install_sge(env):
@@ -98,7 +98,7 @@ def install_sge(env):
         return
     with _make_tmp_dir() as work_dir:
         with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
-            run("wget %s" % url)
-            sudo("chown %s %s" % (env.user, install_dir))
-            run("tar -C %s -xvzf %s" % (install_dir, os.path.split(url)[1]))
+            env.safe_run("wget %s" % url)
+            env.safe_sudo("chown %s %s" % (env.user, install_dir))
+            env.safe_run("tar -C %s -xvzf %s" % (install_dir, os.path.split(url)[1]))
     env.logger.debug("SGE setup")

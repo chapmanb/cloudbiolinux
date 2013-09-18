@@ -9,7 +9,6 @@ cpan:
   - 'Algorithm::C3'
   - 'Algorithm::Diff'
   - 'Algorithm::Munkres'
-  - 'AnyData'
   - 'Array::Compare'
   - 'Bit::Vector'
   - 'Bundle::LWP'
@@ -207,6 +206,7 @@ cpan:
   - 'Bio::Das'
   - 'Bio::GFF3::LowLevel'
 # Currently have problems building on CentOS
+#  - 'AnyData'
 #  - 'Convert::BinHex'
 #  - 'XML'
 #  - 'XML::LibXSLT'

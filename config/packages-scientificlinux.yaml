@@ -59,3 +59,98 @@ distributed:
   - hadoop-0.20-libhdfs
   - mpich2
   - mpich2-devel
+galaxy:
+  all:
+    - postgresql
+    - gcc-gfortran
+    - java-1.7.0-openjdk
+    - xorg-x11-server-Xvfb
+    - cmake
+    - zlib-devel
+    - ncurses-devel
+    - xz-devel
+    - tcl-devel
+    - tk-devel    
+    - ImageMagick
+    #  - scipy  ## Available in CentOS but not SL, install some prequirements instead including numpy (likely many tools just require this.)
+    - numpy
+    - numpy-f2py
+    - blas-devel 
+    - atlas-devel
+
+    # Following requrie EPEL repository (setup by CloudBioLinux)    
+    - pdfjam
+    - sparsehash-devel
+
+    # cran packages for CentOS are not maintained, do what we can with EPEL.
+    - R
+    - R-devel
+    # Missing relative to ubuntu install: All missing in CentOS (e.g. axel, python-rpy, many R modules)
+    # Missing relative to CentOS install: scipy.
+    #   Information on setting up scipy and rpy can be found at http://getgalaxyp.org/install.html
+bio_proteomics:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel
+galaxyp:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # Needed for nbic galaxy database utilities
+  - perl-Log-Log4perl
+  # - libswiss-perl NOT AVAILABLE, ONE TOOL WON'T WORK.
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel

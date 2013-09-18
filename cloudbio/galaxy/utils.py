@@ -14,8 +14,8 @@ def _chown_galaxy(env, path):
     """
     chown_command = "chown --recursive %s:%s %s"
     galaxy_user = env.get("galaxy_user", "galaxy")
-    if exists(path):
-        sudo(chown_command % (galaxy_user, galaxy_user, path))
+    if env.safe_exists(path):
+        env.safe_sudo(chown_command % (galaxy_user, galaxy_user, path))
 
 
 def _dir_is_empty(path):

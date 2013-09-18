@@ -48,10 +48,11 @@ class Edition:
         """Allows editions to modify key list"""
         return standalone, keyserver
 
-    def apt_upgrade_system(self):
+    def apt_upgrade_system(self, env=None):
         """Upgrade system through apt - so this behaviour can be overridden
         """
-        sudo("apt-get -y --force-yes upgrade")
+        sudo_cmd = env.safe_sudo if env else sudo
+        sudo_cmd("apt-get -y --force-yes upgrade")
 
     def post_install(self, pkg_install=None):
         """Post installation hook"""
@@ -179,7 +180,7 @@ class Minimal(Edition):
     def rewrite_apt_keys(self, standalone, keyserver):
         return [], []
 
-    def apt_upgrade_system(self):
+    def apt_upgrade_system(self, env=None):
         """Do nothing"""
         env.logger.debug("Skipping forced system upgrade")
 

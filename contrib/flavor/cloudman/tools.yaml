@@ -33,7 +33,6 @@ applications:
     - "1.3.3"
     - "2.0.6"
 
-
   picard: "1.56"
   fastqc: "0.10.0"
   gatk: "2.3-9-gdcdccbb"

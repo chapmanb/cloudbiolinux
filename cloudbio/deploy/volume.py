@@ -1,13 +1,7 @@
-from os import listdir
-from os.path import join
 from fabric.api import run, env
 from time import sleep
-from datetime import datetime
-from boto.exception import EC2ResponseError, S3ResponseError
-from boto.s3.key import Key
+from boto.exception import EC2ResponseError
 from .util import eval_template
-
-DEFAULT_BUCKET_NAME = 'cloudman'
 
 
 def attach_volumes(vm_launcher, options, format=False):
@@ -90,26 +84,6 @@ def make_snapshots(vm_launcher, options):
             _make_snapshot(vm_launcher, path, desc)
 
 
-def sync_cloudman_bucket(vm_launcher, options):
-    bucket = options.get("target_bucket", None)
-    if not bucket:
-        bucket = __get_bucket_default(options)
-    bucket_source = options.get("cloudman", {}).get("bucket_source", None)
-    if not bucket or not bucket_source:
-        print "Warning: Failed to sync cloud bucket, bucket or bucket_source is undefined."
-        return
-    conn = vm_launcher.boto_s3_connection()
-    for file_name in listdir(bucket_source):
-        _save_file_to_bucket(conn, bucket, file_name, join(bucket_source, file_name))
-
-
-def __get_bucket_default(options):
-    cloudman_options = options.get("cloudman", {})
-    user_data = cloudman_options = cloudman_options.get('user_data', None) or {}
-    bucket = user_data.get("bucket_default", None)
-    return bucket
-
-
 def _get_attached(conn, instance_id, device_id, valid_states=['attached']):
     vol_list = conn.get_all_volumes()
     fs_vol = None
@@ -169,36 +143,6 @@ def _find_mounted_device_id(path):
     # Adding dollar sign to grep to distinguish between /mnt/galaxy and /mnt/galaxyIndices
     device_id = env.safe_sudo("df | grep '%s$' | awk '{print $1}'" % path)
     return device_id
-
-
-def _save_file_to_bucket(conn, bucket_name, remote_filename, local_file, **kwargs):
-    """ Save the local_file to bucket_name as remote_filename. Also, any additional
-    arguments passed as key-value pairs, are stored as file's metadata on S3."""
-    # print "Establishing handle with bucket '%s'..." % bucket_name
-    b = _get_bucket(conn, bucket_name)
-    if b is not None:
-        # print "Establishing handle with key object '%s'..." % remote_filename
-        k = Key( b, remote_filename )
-        print "Attempting to save file '%s' to bucket '%s'..." % (remote_filename, bucket_name)
-        try:
-            # Store some metadata (key-value pairs) about the contents of the file being uploaded
-            # Note that the metadata must be set *before* writing the file
-            k.set_metadata('date_uploaded', str(datetime.utcnow()))
-            for args_key in kwargs:
-                print "Adding metadata to file '%s': %s=%s" % (remote_filename, args_key, kwargs[args_key])
-                k.set_metadata(args_key, kwargs[args_key])
-            print "Saving file '%s'" % local_file
-            k.set_contents_from_filename(local_file)
-            print "Successfully added file '%s' to bucket '%s'." % (remote_filename, bucket_name)
-            make_public = True
-            if make_public:
-                k.make_public()
-        except S3ResponseError, e:
-            print "Failed to save file local file '%s' to bucket '%s' as file '%s': %s" % ( local_file, bucket_name, remote_filename, e )
-            return False
-        return True
-    else:
-        return False
 
 
 def _attach(ec2_conn, instance_id, volume_id, device):
@@ -273,15 +217,3 @@ def _create_snapshot(ec2_conn, volume_id, description=None):
     else:
         print "Could not create snapshot from volume with ID '%s'" % volume_id
         return False
-
-
-def _get_bucket(s3_conn, bucket_name):
-    b = None
-    for i in range(0, 5):
-        try:
-            b = s3_conn.get_bucket(bucket_name)
-            break
-        except S3ResponseError:
-            print "Bucket '%s' not found, attempt %s/5" % (bucket_name, i)
-            return None
-    return b

@@ -17,8 +17,9 @@ bio_nextgen:
     - mosaik
     # - perm # difficult build process with directory names
     - snap
+    - star
     #- stampy # no version names on tarballs
-  utilitites:
+  utilities:
     - bamtools
     - bedtools
     - cram
@@ -27,6 +28,7 @@ bio_nextgen:
     - fastq_screen
     - fastx_toolkit
     - ogap
+    - rnaseqc
     # - solexaqa
     - varianttools
     - vcftools
@@ -38,7 +40,7 @@ bio_nextgen:
     - sambamba
     - shrec
     - tophat
-    - vep
+    # - vep # lots of timeout failures on download
   assembly:
     - abyss
     - cortex_var
@@ -47,12 +49,16 @@ bio_nextgen:
     - trinity
     - velvet
   sv:
+    - delly
     - hydra
+    - lumpy
+    - freec
   variant:
     - bcbio_variation
     - crisp
     - freebayes
     - gatk
+    #- gatk_protected
     - gemini
     - grabix
     - mutect
@@ -92,16 +98,17 @@ cloudman:
   - novnc
 galaxy:
   - galaxy_webapp
-  - galaxy_tools
+galaxy_tools:
+  - cbl_galaxy_tools
 galaxyp:
-  - protkgem
+  - galaxy_protk
   - protvis
-  - proteomics_tools
 distributed:
   - gnu_parallel
   - pydoop
   - seal
 system:
+  - homebrew
   - s3fs
 python:
   - bx-python

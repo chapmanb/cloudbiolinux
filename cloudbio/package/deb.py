@@ -25,10 +25,10 @@ def _apt_packages(to_install=None, pkg_list=None):
     if env.edition.short_name not in ["minimal"]:
         env.logger.info("Update the system")
         with settings(warn_only=True):
-            sudo("apt-get update")
+            env.safe_sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
-        env.edition.apt_upgrade_system()
+        env.edition.apt_upgrade_system(env=env)
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
         # Allow editions and flavors to modify the package list
         packages = env.edition.rewrite_config_items("packages", packages)
@@ -45,10 +45,9 @@ def _apt_packages(to_install=None, pkg_list=None):
     env.logger.info("Installing %i packages" % len(packages))
     while i < len(packages):
         env.logger.info("Package install progress: {0}/{1}".format(i, len(packages)))
-        sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i + group_size]))
+        env.safe_sudo("apt-get -y --force-yes install %s" % " ".join(packages[i:i + group_size]))
         i += group_size
-    sudo("apt-get clean")
-
+    env.safe_sudo("apt-get clean")
 
 def _add_apt_gpg_keys():
     """Adds GPG keys from all repositories
@@ -66,13 +65,12 @@ def _add_apt_gpg_keys():
         ]
     standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
     for key in standalone:
-        sudo("wget -q -O- %s | apt-key add -" % key)
+        env.safe_sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
-        sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
+        env.safe_sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     with settings(warn_only=True):
-        sudo("apt-get update")
-        sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
-
+        env.safe_sudo("apt-get update")
+        env.safe_sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
 
 def _setup_apt_automation():
     """Setup the environment to be fully automated for tricky installs.
@@ -87,11 +85,11 @@ def _setup_apt_automation():
     http://www.uluga.ubuntuforums.org/showthread.php?p=9120196
     """
     interactive_cmd = "export DEBIAN_FRONTEND=noninteractive"
-    if not contains(env.shell_config, interactive_cmd):
-        append(env.shell_config, interactive_cmd)
+    if not env.safe_contains(env.shell_config, interactive_cmd):
+        env.safe_append(env.shell_config, interactive_cmd)
     # Remove interactive checks in .bashrc which prevent
     # bash customizations
-    comment(env.shell_config, "^[ ]+\*\) return;;$")
+    env.safe_comment(env.shell_config, "^[ ]+\*\) return;;$")
     package_info = [
             "postfix postfix/not_configured boolean true",
             "postfix postfix/main_mailer_type select 'No configuration'",
@@ -118,7 +116,7 @@ def _setup_apt_automation():
     cmd = ""
     for l in package_info:
         cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
-    sudo(cmd)
+    env.safe_sudo(cmd)
 
 def _setup_apt_sources():
     """Add sources for retrieving library packages.
@@ -132,9 +130,9 @@ def _setup_apt_sources():
     # It may be sudo is not installed - which has fab fail - therefor
     # we'll try to install it by default, assuming we have root access
     # already (e.g. on EC2). Fab will fail anyway, otherwise.
-    if not exists('/usr/bin/sudo') or not exists('/usr/bin/curl'):
-        sudo('apt-get update')
-        sudo('apt-get -y --force-yes install sudo curl')
+    if not env.safe_exists('/usr/bin/sudo') or not env.safe_exists('/usr/bin/curl'):
+        env.safe_sudo('apt-get update')
+        env.safe_sudo('apt-get -y --force-yes install sudo curl')
 
     env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
     env.edition.check_packages_source()
@@ -144,27 +142,27 @@ def _setup_apt_sources():
     preferences = env.edition.rewrite_apt_preferences([])
     if len(preferences):
         # make sure it exists, and is empty
-        sudo("rm -f %s" % env.apt_preferences_file)
-        sudo("touch %s" % env.apt_preferences_file)
-        append(env.apt_preferences_file, comment, use_sudo=True)
+        env.safe_sudo("rm -f %s" % env.apt_preferences_file)
+        env.safe_sudo("touch %s" % env.apt_preferences_file)
+        env.safe_append(env.apt_preferences_file, comment, use_sudo=True)
         lines = "\n".join(preferences)
         env.logger.debug("Policy %s" % lines)
         # append won't duplicate, so we use echo
-        sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file))
+        env.safe_sudo("/bin/echo -e \"%s\" >> %s" % (lines, env.apt_preferences_file))
         # check there is no error parsing the file
-        env.logger.debug(sudo("apt-cache policy"))
+        env.logger.debug(env.safe_sudo("apt-cache policy"))
 
     # Make sure a source file exists
-    if not exists(env.sources_file):
-        sudo("touch %s" % env.sources_file)
+    if not env.safe_exists(env.sources_file):
+        env.safe_sudo("touch %s" % env.sources_file)
     # Add a comment
-    if not contains(env.sources_file, comment):
-        append(env.sources_file, comment, use_sudo=True)
+    if not env.safe_contains(env.sources_file, comment):
+        env.safe_append(env.sources_file, comment, use_sudo=True)
     for source in env.edition.rewrite_apt_sources_list(env.std_sources):
         env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
-            sudo("apt-get install -y --force-yes python-software-properties")
-            sudo("add-apt-repository '%s'" % source)
-        elif (not contains(env.sources_file, source) and
-              not contains(env.global_sources_file, source)):
-            append(env.sources_file, source, use_sudo=True)
+            env.safe_sudo("apt-get install -y --force-yes python-software-properties")
+            env.safe_sudo("add-apt-repository '%s'" % source)
+        elif (not env.safe_contains(env.sources_file, source) and
+              not env.safe_contains(env.global_sources_file, source)):
+            env.safe_append(env.sources_file, source, use_sudo=True)

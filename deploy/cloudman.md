@@ -56,7 +56,7 @@ Immediately this template can be updated to reflect the bucket created above
 and the availibity zone you are targetting. We can update teh snap_id's and
 the default_mi after creating them.
 
-Copy and modify `settings.yaml`:
+Copy and modify `settings-sample-cm.yaml` to `settings.yaml`:
 
     % git clone git://github.com/chapmanb/cloudbiolinux.git
     % cd cloudbiolinux/deploy

@@ -23,6 +23,11 @@ ARG_PROPERTIES = [
 
   # CloudMan options
   "target_bucket",
+
+  # Galaxy options
+  "galaxy_tool_version",
+  "galaxy_tool_name",
+  "galaxy_tool_dir",
 ]
 
 
@@ -32,6 +37,11 @@ def main():
 
     for property in ARG_PROPERTIES:
         _copy_arg_to_options(options, args, property)
+
+    for fabric_property, fabric_value in zip(args.fabric_properties, args.fabric_values):
+        if "fabricrc_overrides" not in options:
+            options["fabricrc_overrides"] = {}
+        options["fabricrc_overrides"][fabric_property] = fabric_value
 
     deploy(options)
 
@@ -60,6 +70,14 @@ def parse_args():
     # CloudMan related options
     parser.add_argument("--target_bucket", dest="target_bucket", default=None, help="Specify a target bucket for CloudMan bucket related actions.")
 
+    # Galaxy options
+    parser.add_argument("--galaxy_tool_version", dest="galaxy_tool_version")
+    parser.add_argument("--galaxy_tool_name", dest="galaxy_tool_name")
+    parser.add_argument("--galaxy_tool_dir", dest="galaxy_tool_dir")
+
+    parser.add_argument('--fabric_property', dest="fabric_properties", action="append", default=[])
+    parser.add_argument('--fabric_value', dest="fabric_values", action="append", default=[])
+
     args = parser.parse_args()
     if len(args.actions) == 0:
         args.actions = ["transfer"]
@@ -67,7 +85,13 @@ def parse_args():
 
 
 def parse_settings(name):
-    return _read_yaml(name)
+    if not name == "__none__":
+        # Rather just die if settings.yaml does not exist or is not set, but would also
+        # like to support pure command-line driven mode so make settings.yaml if
+        # --settings=__none__ is passed to application.
+        return _read_yaml(name)
+    else:
+        return {}
 
 
 def _read_yaml(yaml_file):

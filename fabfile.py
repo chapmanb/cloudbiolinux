@@ -33,8 +33,9 @@ from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom.shared import _make_tmp_dir, _pip_cmd
+from cloudbio.custom import shared, system
 from cloudbio.package.shared import _yaml_to_packages
+from cloudbio.package import brew
 from cloudbio.package import (_configure_and_install_native_packages,
                               _connect_native_packages)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
@@ -81,18 +82,18 @@ def _perform_install(target=None, flavor=None):
     See `install_biolinux` for full details on arguments
     `target` and `flavor`.
     """
-    pkg_install, lib_install, custom_ignore = _read_main_config()
+    pkg_install, lib_install, custom_ignore, custom_add = _read_main_config()
     if target is None or target == "packages":
         # can only install native packages if we have sudo access.
         if env.use_sudo:
             _configure_and_install_native_packages(env, pkg_install)
         else:
-            _connect_native_packages(env, pkg_install)
+            _connect_native_packages(env, pkg_install, lib_install)
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
     if target is None or target == "custom":
-        _custom_installs(pkg_install, custom_ignore)
+        _custom_installs(pkg_install, custom_ignore, custom_add)
     if target is None or target == "chef_recipes":
         _provision_chef_recipes(pkg_install, custom_ignore)
     if target is None or target == "puppet_classes":
@@ -105,16 +106,7 @@ def _perform_install(target=None, flavor=None):
     if target is None or target == "cleanup":
         _cleanup_space(env)
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
-            if env.distribution in ["ubuntu"]:
-                # For the time being (Dec 2012), must install development version
-                # of cloud-init because of a boto & cloud-init bug:
-                # https://bugs.launchpad.net/cloud-init/+bug/1068801
-                sudo('wget --output-document=cloud-init_0.7.1-0ubuntu4_all.deb ' +
-                    'https://launchpad.net/ubuntu/+archive/primary/+files/cloud-init_0.7.1-0ubuntu4_all.deb')
-                sudo("dpkg -i cloud-init_0.7.1-0ubuntu4_all.deb")
-                sudo("rm -f cloud-init_0.7.1-0ubuntu4_all.deb")
             _cleanup_ec2(env)
-
 
 def _print_time_stats(action, event, prev_time=None):
     """ A convenience method for displaying time event during configuration.
@@ -146,12 +138,17 @@ def _check_fabric_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or higher")
 
-def _custom_installs(to_install, ignore=None):
+def _custom_installs(to_install, ignore=None, add=None):
     if not env.safe_exists(env.local_install) and env.local_install:
         env.safe_run("mkdir -p %s" % env.local_install)
     pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
     packages = [p for p in packages if ignore is None or p not in ignore]
+    if add is not None:
+        for key, vals in add.iteritems():
+            for v in vals:
+                pkg_to_group[v] = key
+                packages.append(v)
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
@@ -274,24 +271,41 @@ def _install_custom(p, pkg_to_group=None):
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
 
-def _custom_install_function(env, p, pkg_to_group):
-    """ Find custom install function to execute based on package name to pkg_to_group dict. """
+def install_brew(p=None, flavor=None):
+    """Top level access to homebrew/linuxbrew packages.
+    p is a package name to install, or all configured packages if not specified.
+    """
+    _setup_logging(env)
+    _configure_fabric_environment(env, flavor, ignore_distcheck=True)
+    system.install_homebrew(env)
+    if p is not None:
+        brew.install_packages(env, packages=[p])
+    else:
+        pkg_install = _read_main_config()[0]
+        brew.install_packages(env, to_install=pkg_install)
 
+def _custom_install_function(env, p, pkg_to_group):
+    """
+    Find custom install function to execute based on package name to
+    pkg_to_group dict.
+    """
     try:
-        env.logger.debug("Import %s" % p)
         # Allow direct calling of a program install method, even if the program
         # is not listed in the custom list (ie, not contained as a key value in
         # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
         mod_name = pkg_to_group[p] if p in pkg_to_group else p
+        env.logger.debug("Importing module cloudbio.custom.%s" % mod_name)
         mod = __import__("cloudbio.custom.%s" % mod_name,
                          fromlist=["cloudbio", "custom"])
     except ImportError:
-        raise ImportError("Need to write a %s module in custom." %
+        raise ImportError("Need to write module cloudbio.custom.%s" %
                 pkg_to_group[p])
     replace_chars = ["-"]
     try:
         for to_replace in replace_chars:
             p = p.replace(to_replace, "_")
+        env.logger.debug("Looking for custom install function %s.install_%s"
+            % (mod.__name__, p))
         fn = getattr(mod, "install_%s" % p)
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"
@@ -310,12 +324,13 @@ def _read_main_config():
     packages = full_data.get('packages', [])
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
+    custom_add = full_data.get("custom_additional")
     if packages is None: packages = []
     if libraries is None: libraries = []
     if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
-    return packages, sorted(libraries), custom_ignore
+    return packages, sorted(libraries), custom_ignore, custom_add
 
 # ### Library specific installation code
 
@@ -323,18 +338,16 @@ def _python_library_installer(config):
     """Install python specific libraries using easy_install.
     Handles using isolated anaconda environments.
     """
-    with quiet():
-        is_anaconda = env.safe_run("conda -V").startswith("conda")
-    if is_anaconda:
+    if shared._is_anaconda(env):
         for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
-            env.safe_run("conda install --yes {0}".format(pname))
+            env.safe_run("{0} install --yes {1}".format(shared._conda_cmd(env), pname))
         cmd = env.safe_run
     else:
         version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
         env.safe_sudo("easy_install%s -U pip" % version_ext)
         cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        cmd("{0} install --upgrade {1}".format(_pip_cmd(env), pname))
+        cmd("{0} install --upgrade {1}".format(shared._pip_cmd(env), pname))
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
@@ -343,7 +356,7 @@ def _ruby_library_installer(config):
     def _cur_gems():
         with settings(
                 hide('warnings', 'running', 'stdout', 'stderr')):
-            gem_info = run("gem%s list --no-versions" % gem_ext)
+            gem_info = env.safe_run_output("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
     for gem in env.flavor.rewrite_config_items("ruby", config['gems']):
@@ -358,18 +371,18 @@ def _ruby_library_installer(config):
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
-    with _make_tmp_dir() as tmp_dir:
+    with shared._make_tmp_dir() as tmp_dir:
         with cd(tmp_dir):
-            run("wget --no-check-certificate -O cpanm "
-                "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
-            run("chmod a+rwx cpanm")
+            env.safe_run("wget --no-check-certificate -O cpanm "
+                         "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
+            env.safe_run("chmod a+rwx cpanm")
             env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""
     for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
-        run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
+        env.safe_run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
 
 def _haskell_library_installer(config):
     """Install haskell libraries using cabal.
@@ -377,7 +390,7 @@ def _haskell_library_installer(config):
     run("cabal update")
     for lib in config["cabal"]:
         sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
-        run("cabal install %s --global %s" % (sudo_str, lib))
+        env.safe_run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
     "r-libs" : libraries.r_library_installer,

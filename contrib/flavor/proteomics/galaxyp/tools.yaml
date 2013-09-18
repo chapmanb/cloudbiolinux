@@ -1,0 +1,107 @@
+--- 
+
+# This file contains the install procedures for Galaxy tools used by
+# the stock Galaxy-P configuration (hosted on usegalaxyp.org).
+
+# Override the property `galaxy_tools_conf` in fabricrc to reference this 
+# file and set the property `install_galaxy_dependencies` to True and 
+# install with cbl_galaxy_tools custom install function directly using
+# 
+#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:galaxy_tools
+#
+# Or as part of a full flavor install that include galaxy, for instance using
+# the cloudman/cloudman_and_galaxyp flavor.
+#
+#  % fab -f fabfile.py -i <key> -H ubuntu@<IP> install_biolinux:flavor=cloudman/cloudman_and_galaxyp
+#
+
+applications:
+  galaxy_protk: "1.2.2"
+  ## Bioinformatics and NGS Applications
+  emboss: 
+    - version: "6.6.0"
+      symlink_versions: "5.0.0"
+  augustus: 
+    - version: "2.7"
+      bin_dirs: 
+        - bin
+        - scripts
+      env_vars:      
+        AUGUSTUS_CONFIG_PATH: $system_install/config
+  fastx_toolkit: "0.0.13.2"
+  ucsc_tools: "latest"
+  kent_tools: "latest"
+  blast: 
+    - version: "2.2.26+"
+      requirement_name: "blast+"
+    - version: "2.2.28+"
+      requirement_name: "blast+"  
+  bowtie: "0.12.9"
+  tophat:
+    - version: "1.3.3"
+      bin_dirs: # tophat requires bowtie so make sure to include it in it's env.sh
+        - bin
+        - ../../bowtie/0.12.9/bin
+  bowtie2: "2.1.0"
+  tophat2:
+    - version: "2.0.9"
+      bin_dirs:
+        - bin
+        - ../../bowtie2/2.1.0/bin
+  trinity:
+    - version: "r2012-10-05"
+      bin_dirs:
+        - .
+  cufflinks: "2.1.1"
+  samtools: "0.1.16" 
+
+  bwa: "0.5.9"
+  gatk: "1.4-9-g1f1233b"
+  fastqc: "0.10.0"
+  picard: "1.56"
+
+
+  ## Mass Spec Applications:
+
+  peptide_to_gff: "master"
+  transproteomic_pipeline: 
+    - version: "4.6.1-occupy"
+      bin_dirs:
+        - bin
+        - cgi-bin
+      provides:
+        - "xtandem"
+        - "trans_proteomic_pipeline"
+        - name: "proteowizard"        
+          unless: "using_wine"
+  openms: 
+    - version: "1.10.0"
+      env_vars:
+        LD_LIBRARY_PATH: "${system_install}/lib:$$LD_LIBRARY_PATH"
+  omssa: "2.1.9"
+  tint_proteomics_scripts:
+    - version: "1.19.20"
+      symlink_versions: "1.19.19"
+  superhirn: "0.03"
+  mzmine: "2.10"
+  percolator: "2_04"
+  myrimatch: "2.1.131"
+  directag: "1.3.62"
+  idpqonvert: "3.0.475"
+  pepitome: "1.0.45"
+  tagrecon: "1.4.63"
+  crux: "1.39"
+  fido: "2011"
+  pride_inspector: "1.3.0"
+  pride_converter2: "2.0.17"
+  ms2preproc: "2009"
+  mayu: "1.06"
+  pepnovo: "20120423"
+  ipig: "r5"
+  searchgui: "1.14.1"
+  peptide_shaker: 
+    - version: "0.20.1"
+      env_vars:
+        # If DISPLAY set keep it the same, otherwise use XVFB
+        DISPLAY: "$${DISPLAY:-:42}"
+  psm_eval: "0.1.0"

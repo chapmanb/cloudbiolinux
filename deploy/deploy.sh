@@ -26,6 +26,4 @@ fi
 # Use cbl_deploy virtualenv
 workon $VIRTUALENV_NAME
 
-# Add cloudbiolinux to python path and run deployment.
-export PYTHONPATH=..:$PYTHONPATH
-python $PROJECT_DIRECTORY/../cloudbio/deploy/main.py "$@"
+sh $PROJECT_DIRECTORY/deploy_no_deps.sh "$@"

@@ -14,7 +14,7 @@ server = "rsync://datacache.g2.bx.psu.edu"
 index_map = {"bowtie": "bowtie_index",
              "bowtie2": "bowtie2_index",
              "bwa": "bwa_index",
-             "novoalign": None,
+             "novoalign": "novoalign_index",
              "ucsc": "seq",
              "seq": "sam_index"}
 
@@ -82,30 +82,32 @@ def update_loc_file(ref_file, line_parts):
     """
     if getattr(env, "galaxy_home", None) is not None:
         tools_dir = os.path.join(env.galaxy_home, "tool-data")
-        if not exists(tools_dir):
-            run("mkdir -p %s" % tools_dir)
-            put(env.tool_data_table_conf_file,
-                os.path.join(env.galaxy_home, "tool_data_table_conf.xml"))
+        if not env.safe_exists(tools_dir):
+            env.safe_run("mkdir -p %s" % tools_dir)
+        dt_file = os.path.join(env.galaxy_home, "tool_data_table_conf.xml")
+        if not env.safe_exists(dt_file):
+            env.safe_put(env.tool_data_table_conf_file, dt_file)
         add_str = "\t".join(line_parts)
         with cd(tools_dir):
-            if not exists(ref_file):
-                run("touch %s" % ref_file)
-            if not contains(ref_file, add_str):
-                append(ref_file, add_str)
+            if not env.safe_exists(ref_file):
+                env.safe_run("touch %s" % ref_file)
+            if not env.safe_contains(ref_file, add_str):
+                env.safe_append(ref_file, add_str)
 
 def prep_locs(gid, indexes, config):
     """Prepare Galaxy location files for all available indexes.
     """
     for ref_index_file, cur_index, prefix, tool_name in [
-          ("sam_fa_indices.loc", indexes.get("seq", None), "", 'sam_fa_indexes'),
-          ("picard_index.loc", indexes.get("seq", None), "", "picard_indexes"),
-          ("gatk_sorted_picard_index.loc", indexes.get("seq", None), "", "gatk_picard_indexes"),
-          ("alignseq.loc", indexes.get("ucsc", None), "seq", None),
-          ("twobit.loc", indexes.get("ucsc", None), "", None),
-          ("bowtie_indices.loc", indexes.get("bowtie", None), "", 'bowtie_indexes'),
-          ("bowtie2_indices.loc", indexes.get("bowtie2", None), "", 'bowtie2_indexes'),
-          ("mosaik_index.loc", indexes.get("mosaik", None), "", "mosaik_indexes"),
-          ("bwa_index.loc", indexes.get("bwa", None), "", 'bwa_indexes')]:
+            ("sam_fa_indices.loc", indexes.get("seq", None), "", 'sam_fa_indexes'),
+            ("picard_index.loc", indexes.get("seq", None), "", "picard_indexes"),
+            ("gatk_sorted_picard_index.loc", indexes.get("seq", None), "", "gatk_picard_indexes"),
+            ("alignseq.loc", indexes.get("ucsc", None), "seq", None),
+            ("twobit.loc", indexes.get("ucsc", None), "", None),
+            ("bowtie_indices.loc", indexes.get("bowtie", None), "", 'bowtie_indexes'),
+            ("bowtie2_indices.loc", indexes.get("bowtie2", None), "", 'bowtie2_indexes'),
+            ("mosaik_index.loc", indexes.get("mosaik", None), "", "mosaik_indexes"),
+            ("bwa_index.loc", indexes.get("bwa", None), "", 'bwa_indexes'),
+            ("novoalign_indices.loc", indexes.get("novoalign", None), "", "novoalign_indexes")]:
         if cur_index:
             str_parts = _build_galaxy_loc_line(gid, cur_index, config, prefix, tool_name)
             update_loc_file(ref_index_file, str_parts)
@@ -122,11 +124,11 @@ def index_picard(ref_file):
     for dname in dirs_to_try:
         if dname:
             test_jar = os.path.join(dname, "CreateSequenceDictionary.jar")
-            if exists(test_jar):
+            if env.safe_exists(test_jar):
                 picard_jar = test_jar
                 break
-    if picard_jar and not exists(index_file):
-        run("java -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
+    if picard_jar and not env.safe_exists(index_file):
+        env.safe_run("java -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
             jar=picard_jar, ref=ref_file, out=index_file))
     return index_file
 
@@ -134,8 +136,8 @@ def _finalize_index_seq(fname):
     """Convert UCSC 2bit file into fasta file.
     """
     out_fasta = fname + ".fa"
-    if not exists(out_fasta):
-        run("twoBitToFa {base}.2bit {out}".format(
+    if not env.safe_exists(out_fasta):
+        env.safe_run("twoBitToFa {base}.2bit {out}".format(
             base=fname, out=out_fasta))
 
 finalize_fns = {"ucsc": _finalize_index_seq,
@@ -166,8 +168,8 @@ def _get_galaxy_genomes(gid, genome_dir, genomes, genome_indexes):
     """
     out = {}
     org_dir = os.path.join(genome_dir, gid)
-    if not exists(org_dir):
-        run('mkdir -p %s' % org_dir)
+    if not env.safe_exists(org_dir):
+        env.safe_run('mkdir -p %s' % org_dir)
     for idx in genome_indexes:
         galaxy_index_name = index_map.get(idx)
         index_file = None
@@ -183,29 +185,29 @@ def _rsync_genome_index(gid, idx, org_dir):
     """Retrieve index for a genome from rsync server, returning path to files.
     """
     idx_dir = os.path.join(org_dir, idx)
-    if not exists(idx_dir):
+    if not env.safe_exists(idx_dir):
         org_rsync = None
         for subdir in galaxy_subdirs:
             test_rsync = "{server}/indexes{subdir}/{gid}/{idx}/".format(
                 server=server, subdir=subdir, gid=gid, idx=idx)
             with quiet():
-                check_dir = run("rsync --list-only {server}".format(server=test_rsync))
+                check_dir = env.safe_run("rsync --list-only {server}".format(server=test_rsync))
             if check_dir.succeeded:
                 org_rsync = test_rsync
                 break
         if org_rsync is None:
             raise ValueError("Could not find genome %s on Galaxy rsync" % gid)
         with quiet():
-            check_dir = run("rsync --list-only {server}".format(server=org_rsync))
+            check_dir = env.safe_run("rsync --list-only {server}".format(server=org_rsync))
         if check_dir.succeeded:
-            if not exists(idx_dir):
-                run('mkdir -p %s' % idx_dir)
+            if not env.safe_exists(idx_dir):
+                env.safe_run('mkdir -p %s' % idx_dir)
             with cd(idx_dir):
-                run("rsync -avzP {server} {idx_dir}".format(server=org_rsync,
+                env.safe_run("rsync -avzP {server} {idx_dir}".format(server=org_rsync,
                                                             idx_dir=idx_dir))
-    if exists(idx_dir):
+    if env.safe_exists(idx_dir):
         with quiet():
-            has_fa_ext = run("ls {idx_dir}/{gid}.fa*".format(idx_dir=idx_dir,
-                                                             gid=gid))
+            has_fa_ext = env.safe_run("ls {idx_dir}/{gid}.fa*".format(idx_dir=idx_dir,
+                                                                      gid=gid))
         ext = ".fa" if (has_fa_ext.succeeded and idx not in ["seq"]) else ""
         return os.path.join(idx_dir, gid + ext)

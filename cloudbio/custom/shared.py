@@ -10,11 +10,7 @@ from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
-try:
-    quiet
-except NameError:
-    def quiet():
-        return settings(hide('warnings', 'running', 'stdout', 'stderr'), warn_only=True)
+from cloudbio.fabutils import quiet
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
@@ -38,11 +34,18 @@ def _if_not_installed(pname):
         return decorator
     return argcatcher
 
-
+def _all_cbl_paths(env, ext):
+    """Add paths to other non-system directories installed by CloudBioLinux.
+    """
+    return ":".join("%s/%s" % (p, ext) for p in [env.system_install,
+                                                 os.path.join(env.local_install, "homebrew"),
+                                                 os.path.join(env.system_install, "anaconda")])
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                   warn_only=True):
-        result = env.safe_run("export PATH=$PATH:%s/bin && %s" % (env.system_install, pname))
+        result = env.safe_run("export PATH=%s:$PATH && "
+                              "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH && %s" %
+                              (_all_cbl_paths(env, "bin"), _all_cbl_paths(env, "lib"), pname))
     return result.return_code == 127
 
 
@@ -54,7 +57,7 @@ def _galaxy_tool_install(args):
 
 
 def _galaxy_tool_present(args):
-    return exists(os.path.join(args[0]["system_install"], "env.sh"))
+    return env.safe_exists(os.path.join(args[0]["system_install"], "env.sh"))
 
 
 def _if_not_python_lib(library):
@@ -192,7 +195,7 @@ def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
         if find_cmd:
             install_dir = _get_bin_dir(env)
             for fname in env.safe_run_output(find_cmd).split("\n"):
-                env.safe_sudo("mv -f %s %s" % (fname.rstrip("\r"), install_dir))
+                env.safe_sudo("cp -rf %s %s" % (fname.rstrip("\r"), install_dir))
     return _do_work
 
 
@@ -222,17 +225,22 @@ def _get_install_local(url, env, make_command, dir_name=None,
         test2, _ = test1.rsplit("-", 1)
     else:
         test2 = os.path.join(env.local_install, test_name.split("_")[0])
-    if not exists(test1) and not exists(test2):
+    if not env.safe_exists(test1) and not env.safe_exists(test2):
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar,
                     tar_file_name=tar_file_name)
-                if not exists(os.path.join(env.local_install, dir_name)):
+                print env.local_install, dir_name
+                if not env.safe_exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
                             post_unpack_fn(env)
                         make_command(env)
-                    env.safe_sudo("mv -p %s %s" % (dir_name, env.local_install))
+                    # Copy instead of move because GNU mv does not have --parents flag.
+                    # The source dir will get cleaned up anyhow so just leave it.
+                    destination_dir = env.local_install
+                    env.safe_sudo("mkdir -p '%s'" % destination_dir)
+                    env.safe_sudo("cp --recursive %s %s" % (dir_name, destination_dir))
 
 # --- Language specific utilities
 
@@ -245,12 +253,23 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     else:
         base_dir = os.path.join(env.system_install, "share", pname)
     install_dir = "%s-%s" % (base_dir, version)
-    if not exists(install_dir):
+    # Does not exist, change symlink to new directory
+    if not env.safe_exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
-        if exists(base_dir):
+        if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
         env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
         return install_dir
+    items = env.safe_run_output("ls %s" % install_dir)
+    # empty directory, change symlink and re-download
+    if items.strip() == "":
+        if env.safe_exists(base_dir):
+            env.safe_sudo("rm -f %s" % base_dir)
+        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        return install_dir
+    # Create symlink if previously deleted
+    if not env.safe_exists(base_dir):
+        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
     return None
 
 
@@ -258,11 +277,21 @@ def _symlinked_java_version_dir(pname, version, env):
     return _symlinked_shared_dir(pname, version, env, extra_dir="java")
 
 
-def _java_install(pname, version, url, env, install_fn=None):
+def _java_install(pname, version, url, env, install_fn=None,
+                  pre_fetch_fn=None):
+    """Download java jars into versioned input directories.
+
+    pre_fetch_fn runs before URL retrieval, allowing insertion of
+    manual steps like restricted downloads.
+    """
     install_dir = _symlinked_java_version_dir(pname, version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
+                if pre_fetch_fn:
+                    out = pre_fetch_fn(env)
+                    if out is None:
+                        return
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     if install_fn is not None:
@@ -274,8 +303,11 @@ def _java_install(pname, version, url, env, install_fn=None):
 def _python_cmd(env):
     """Retrieve python command, handling tricky situations on CentOS.
     """
+    anaconda_py = os.path.join(env.system_install, "anaconda", "bin", "python")
+    if env.safe_exists(anaconda_py):
+        return anaconda_py
     if "python_version_ext" in env and env.python_version_ext:
-        major, minor = run("python --version").split()[-1].split(".")[:2]
+        major, minor = env.safe_run("python --version").split()[-1].split(".")[:2]
         check_major, check_minor = env.python_version_ext.split(".")[:2]
         if major != check_major or int(check_minor) > int(minor):
             return "python%s" % env.python_version_ext
@@ -284,11 +316,14 @@ def _python_cmd(env):
     else:
         return "python"
 
-
 def _pip_cmd(env):
     """Retrieve pip command for installing python packages, allowing configuration.
     """
-    to_check = ["pip"]
+    anaconda_pip = os.path.join(env.system_install, "anaconda", "bin", "pip")
+    if env.safe_exists(anaconda_pip):
+        to_check = [anaconda_pip]
+    else:
+        to_check = ["pip"]
     if "pip_cmd" in env and env.pip_cmd:
         to_check.append(env.pip_cmd)
     if not env.use_sudo:
@@ -302,9 +337,32 @@ def _pip_cmd(env):
             return cmd
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
+def _conda_cmd(env):
+    to_check = [os.path.join(env.system_install, "anaconda", "bin", "conda"), "conda"]
+    for cmd in to_check:
+        with quiet():
+            test = env.safe_run("%s --version" % cmd)
+        if test.succeeded:
+            return cmd
+    return None
+
+def _is_anaconda(env):
+    """Check if we have a conda command or are in an anaconda subdirectory.
+    """
+    with quiet():
+        conda = _conda_cmd(env)
+        has_conda = conda and env.safe_run_output("%s -h" % conda).startswith("usage: conda")
+    with quiet():
+        full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
+    in_anaconda_dir = "/anaconda/" in full_pip
+    return has_conda or in_anaconda_dir
 
 def _python_make(env):
-    env.safe_sudo("%s install --upgrade ." % _pip_cmd(env))
+    run_cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
+    # Clean up previously failed builds
+    env.safe_sudo("rm -rf /tmp/pip-build-%s" % env.user)
+    env.safe_sudo("rm -rf /tmp/pip-*-build")
+    run_cmd("%s install --upgrade ." % _pip_cmd(env))
     for clean in ["dist", "build", "lib/*.egg-info"]:
         env.safe_sudo("rm -rf %s" % clean)
 
@@ -335,7 +393,10 @@ def _write_to_file(contents, path, mode):
     fd, local_path = tempfile.mkstemp()
     try:
         os.write(fd, contents)
-        put(local_path, path, use_sudo=True, mode=mode)
+        tmp_path = os.path.join("/tmp", os.path.basename(path))
+        env.safe_put(local_path, tmp_path)
+        env.safe_sudo("mv %s %s" % (tmp_path, path))
+        env.safe_sudo("chmod %s %s" % (mode, path))
         os.close(fd)
     finally:
         os.unlink(local_path)
@@ -370,11 +431,11 @@ def _set_default_config(env, install_dir, sym_dir_name="default"):
     when it doesn't exists or when installing a new version of software.
     """
     version = env["tool_version"]
-    if exists(install_dir):
+    if env.safe_exists(install_dir):
         install_dir_root = "%s/.." % install_dir
         sym_dir = "%s/%s" % (install_dir_root, sym_dir_name)
         replace_default = False
-        if not exists(sym_dir):
+        if not env.safe_exists(sym_dir):
             replace_default = True
         if not replace_default:
             default_version = env.safe_sudo("basename `readlink -f %s`" % sym_dir)
@@ -460,7 +521,7 @@ def _extend_env(env, defaults={}, overrides={}):
 
 def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
     conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
-    _write_to_file(conf_file_contents, dest, mode=0755)
+    _write_to_file(conf_file_contents, dest, mode="0755")
 
 
 def _add_to_profiles(line, profiles=[], use_sudo=True):
@@ -472,8 +533,8 @@ def _add_to_profiles(line, profiles=[], use_sudo=True):
     if not profiles:
         profiles = ['/etc/bash.bashrc', '/etc/profile']
     for profile in profiles:
-        if not contains(profile, line):
-            append(profile, line, use_sudo=use_sudo)
+        if not env.safe_contains(profile, line):
+            env.safe_append(profile, line, use_sudo=use_sudo)
 
 
 def install_venvburrito():
@@ -483,11 +544,10 @@ def install_venvburrito():
     method for installing and managing Python virtualenvs.
     """
     url = "https://raw.github.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh"
-    if not exists("$HOME/.venvburrito/startup.sh"):
-        run("curl -s {0} | $SHELL".format(url))
+    if not env.safe_exists("$HOME/.venvburrito/startup.sh"):
+        env.safe_run("curl -s {0} | $SHELL".format(url))
         # Add the startup script into the ubuntu user's bashrc
-        _add_to_profiles(". $HOME/.venvburrito/startup.sh", ['/home/ubuntu/.bashrc'], use_sudo=False)
-
+        _add_to_profiles(". $HOME/.venvburrito/startup.sh", [env.shell_config], use_sudo=False)
 
 def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
     """
@@ -505,12 +565,20 @@ def _create_python_virtualenv(env, venv_name, reqs_file=None, reqs_url=None):
     # First make sure virtualenv-burrito is installed
     install_venvburrito()
     activate_vburrito = ". $HOME/.venvburrito/startup.sh"
-    with prefix(activate_vburrito):
-        print env
+
+    def create():
         if "venv_directory" not in env:
             _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url)
         else:
             _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url)
+
+    # TODO: Terrible hack here, figure it out and fix it.
+    #   prefix or vburrito does not work with is_local or at least deployer+is_local
+    if env.is_local:
+        create()
+    else:
+        with prefix(activate_vburrito):
+            create()
 
 
 def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
@@ -518,10 +586,12 @@ def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     Use virtualenv directly to setup virtualenv in specified directory.
     """
     venv_directory = env.get("venv_directory")
-    if not exists(venv_directory):
+    if not env.safe_exists(venv_directory):
         if reqs_url:
                 env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+        env.logger.debug("Creating virtualenv in directory %s" % venv_directory)
         env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
+        env.logger.debug("Activating")
         env.safe_sudo(". %s/bin/activate; pip install -r '%s'" % (venv_directory, reqs_file))
 
 
@@ -529,7 +599,7 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     """
     Use mkvirtualenv to setup this virtualenv globally for user.
     """
-    if venv_name in run("lsvirtualenv | grep {0} || true"
+    if venv_name in env.safe_run_output("bash -l -c lsvirtualenv | grep {0} || true"
         .format(venv_name)):
         env.logger.info("Virtualenv {0} already exists".format(venv_name))
     else:
@@ -538,13 +608,21 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
                 if not reqs_file:
                     # This mean the url only is provided so 'standardize ' the file name
                     reqs_file = 'requirements.txt'
-                cmd = "mkvirtualenv -r {0} {1}".format(reqs_file, venv_name)
+                cmd = "bash -l -c 'mkvirtualenv -r {0} {1}'".format(reqs_file, venv_name)
             else:
-                cmd = "mkvirtualenv {0}".format(venv_name)
+                cmd = "bash -l -c 'mkvirtualenv {0}'".format(venv_name)
             if reqs_url:
-                run("wget --output-document=%s %s" % (reqs_file, reqs_url))
-            run(cmd)
+                env.safe_run("wget --output-document=%s %s" % (reqs_file, reqs_url))
+            env.safe_run(cmd)
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
+
+
+def _get_bitbucket_download_url(revision, default_repo):
+    if revision.startswith("http"):
+        url = revision
+    else:
+        url = "%s/get/%s.tar.gz" % (default_repo, revision)
+    return url
 
 
 def _read_boolean(env, name, default):

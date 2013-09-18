@@ -1,6 +1,7 @@
 ---
-# Flavor containing more minimal instructions to install tools for
-# running next-generation sequencing pipelines.
+# Flavor containing packages for running next-generation sequencing pipelines.
+# Full featured download with lots of associated packages covering multiple
+# pipeline approaches.
 packages:
   - minimal
   - libraries
@@ -11,20 +12,28 @@ packages:
   - bio_nextgen
   - distributed
 libraries:
+custom_additional:
+  bio_nextgen: [gatk_protected]
 custom_ignore:
   - anaconda
   - bfast
+  - crisp
+  - fastx_toolkit
   - gmap
   - lastz
+  - leiningen
   - macs
   - mosaik
   - perm
+  - plink_seq
   - snap
   - stacks
-  - fastx_toolkit
+  - tassel
   - varianttools
+  - vcflib
   - vep
   - abyss
+  - cortex_var
   - ray
   - transabyss
   - trinity

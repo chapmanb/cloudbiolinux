@@ -65,4 +65,9 @@
         <columns>value, dbkey, name, path</columns>
         <file path="tool-data/mosaik_index.loc" />
     </table>
+    <!-- Novoalign indexes, not part of default Galaxy configurations -->
+    <table name="novoalign_indexes" comment_char="#">
+        <columns>value, dbkey, name, path</columns>
+        <file path="tool-data/novoalign_indices.loc" />
+    </table>
 </tables>

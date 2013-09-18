@@ -36,7 +36,6 @@ pypi:
   - pygr
   - PyVCF
   - rpy2
-  - rpy2-bioconductor-extensions
   - ramp
   # databases
   - CouchDB
@@ -47,7 +46,6 @@ pypi:
   # visualization
   - gnuplot-py
   - PIL
-  - pygooglechart
   - pypdf
   - reportlab
   # cloudman
@@ -81,3 +79,5 @@ conda:
   #- pysparse
   #- sympy
   #- pydot # references python 3-only pyparsing
+  #- pygooglechart
+  #- rpy2-bioconductor-extensions
