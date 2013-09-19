@@ -276,7 +276,7 @@ def install_custom(options):
 def install_biolinux(options):
     flavor = options.get("flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
     target = options.get("target", DEFAULT_CLOUDBIOLINUX_TARGET)
-    _perform_install(target=target, flavor=flavor)
+    _perform_install(target=target, flavor=flavor, more_custom_add=options.get("custom_add", None))
 
 
 def _interactive_ssh(vm_launcher):

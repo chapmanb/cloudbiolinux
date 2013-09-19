@@ -12,8 +12,6 @@ packages:
   - bio_nextgen
   - distributed
 libraries:
-custom_additional:
-  bio_nextgen: [gatk_protected]
 custom_ignore:
   - anaconda
   - bfast
