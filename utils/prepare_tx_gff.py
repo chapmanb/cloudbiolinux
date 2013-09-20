@@ -67,9 +67,9 @@ ucsc_user="genome"
 # ## Main driver functions
 
 def main(org_build):
-    work_dir = os.path.join(os.getcwd(), "tmpcbl")
-    out_dir = os.path.join(os.getcwd(), "rnaseq")
-    tophat_dir = os.path.join(os.getcwd(), "tophat")
+    work_dir = os.path.join(os.getcwd(), org_build, "tmpcbl")
+    out_dir = os.path.join(os.getcwd(), org_build, "rnaseq")
+    tophat_dir = os.path.join(out_dir, "tophat")
     safe_makedir(work_dir)
     with chdir(work_dir):
         build = build_info[org_build]
@@ -80,10 +80,14 @@ def main(org_build):
         gtf_to_interval(rrna_gtf, org_build)
         make_miso_events(tx_gff, org_build)
         prepare_tophat_index(tx_gff, org_build)
-    shutil.move(work_dir, "rnaseq")
-    tar_dirs = [out_dir, tophat_dir]
+        cleanup(work_dir, out_dir)
+    tar_dirs = [out_dir]
     upload_to_s3(tar_dirs, org_build)
 
+def cleanup(work_dir, out_dir):
+    db_files = glob.glob(os.path.join(work_dir, "*.db"))
+    map(os.remove, db_files)
+    shutil.move(work_dir, out_dir)
 
 def upload_to_s3(tar_dirs, org_build):
     tar_dirs = " ".join(tar_dirs)
@@ -192,11 +196,11 @@ def make_miso_events(gtf, org_build):
         subprocess.check_call(cmd.format(**locals()), shell=True)
 
 def prepare_tophat_index(gtf, org_build):
-    tophat_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir,
-                                              "tophat",
+    tophat_dir = os.path.abspath(os.path.join(os.path.dirname(gtf), "tophat",
                                               org_build + "_transcriptome"))
-    bowtie_dir = os.path.abspath(os.path.join(os.getcwd(),
-                                              os.pardir, "bowtie2", org_build))
+    bowtie_dir = os.path.abspath(os.path.join(os.path.dirname(gtf),
+                                              os.path.pardir, "bowtie2",
+                                              org_build))
     out_dir = tempfile.mkdtemp()
     fastq = _create_dummy_fastq()
     cmd = ("tophat --transcriptome-index {tophat_dir} -G {gtf} "
@@ -312,7 +316,9 @@ def prepare_tx_gff(build, org_name):
     ensembl_gff = _download_ensembl_gff(build)
     ucsc_name_map = (_query_for_ucsc_ensembl_map(org_name)
                      if build.ucsc_map is None else build.ucsc_map)
-    return _remap_gff(ensembl_gff, ucsc_name_map)
+    tx_gff = _remap_gff(ensembl_gff, ucsc_name_map)
+    os.remove(ensembl_gff)
+    return tx_gff
 
 def _remap_gff(base_gff, name_map):
     """Remap chromosome names to UCSC instead of Ensembl
