@@ -17,6 +17,7 @@ packages:
   - ruby
   - perl
   - java
+  - java_extras
   - erlang
   - haskell
   - databases
