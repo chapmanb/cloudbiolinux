@@ -1,13 +1,24 @@
 #!/usr/bin/env python
-"""Prepare GFF transcript files for use as input to Cufflinks.
+"""Prepare GFF transcript files for use as input to RNA-seq pipelines
 
-This supports running RNA-seq pipelines by providing reference annotation and
-mask files needed by Cufflinks, ready for use with UCSC named genomes:
-
-http://cufflinks.cbcb.umd.edu/manual.html
-
-Usage:
+Usage, from within the main genome directory of your organism:
   prepare_tx_gff.py <org_build>
+
+requires these python packages which may not be installed
+---------------------------------------------------------
+rnaseqlib
+git@github.com:yarden/rnaseqlib.git
+
+
+gffutils (the refactor branch):
+https://github.com/daler/gffutils/tree/refactor
+
+MISO:
+git@github.com:yarden/MISO.git
+
+mysql-python (via pip)
+
+
 """
 import os
 import sys
@@ -50,8 +61,6 @@ build_info = {
     "mm10": Build("mus_musculus", "Mus_musculus.GRCm38.{release}.gtf.gz",
                  "mmusculus_gene_ensembl", None)}
 
-#                 build_ucsc_map(range(1, 20) + ["X", "Y"], "MT"))}
-
 ucsc_db= "genome-mysql.cse.ucsc.edu"
 ucsc_user="genome"
 
@@ -60,46 +69,33 @@ ucsc_user="genome"
 def main(org_build):
     work_dir = os.path.join(os.getcwd(), "tmpcbl")
     out_dir = os.path.join(os.getcwd(), "rnaseq")
+    tophat_dir = os.path.join(os.getcwd(), "tophat")
     safe_makedir(work_dir)
     with chdir(work_dir):
         build = build_info[org_build]
         tx_gff = prepare_tx_gff(build, org_build)
+        gtf_to_refflat(tx_gff)
         mask_gff = prepare_mask_gtf(tx_gff)
         rrna_gtf = prepare_rrna_gtf(tx_gff)
         gtf_to_interval(rrna_gtf, org_build)
         make_miso_events(tx_gff, org_build)
         prepare_tophat_index(tx_gff, org_build)
     shutil.move(work_dir, "rnaseq")
-    #upload_to_s3([tx_gff, mask_gff], org_build)
-    upload_to_s3(out_dir, org_build)
+    tar_dirs = [out_dir, tophat_dir]
+    upload_to_s3(tar_dirs, org_build)
 
 
-def upload_to_s3(out_dir, org_build):
+def upload_to_s3(tar_dirs, org_build):
+    tar_dirs = " ".join(tar_dirs)
     tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
     if not os.path.exists(tarball):
         subprocess.check_call("tar -cvpf - {out_dir} | xz -zc - > {tarball}".format(
-            out_dir=out_dir, tarball=tarball), shell=True)
+            out_dir=tar_dirs, tarball=tarball), shell=True)
     python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
     subprocess.check_call([python_exe, upload_script, tarball, "biodata",
                            os.path.join("annotation", os.path.basename(tarball)),
                            "--public"])
-
-
-# def upload_to_s3(fnames, org_build):
-#     final_dir = os.path.join(org_build, "rnaseq")
-#     final_tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
-#     if not os.path.exists(final_tarball):
-#         safe_makedir(final_dir)
-#         for fname in fnames:
-#             shutil.move(fname, final_dir)
-#         subprocess.check_call("tar -cvpf - {dir} | xz -zc - > {tarball}".format(
-#             dir=final_dir, tarball=final_tarball), shell=True)
-#     python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
-#     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
-#     subprocess.check_call([python_exe, upload_script, final_tarball, "biodata",
-#                            os.path.join("annotation", os.path.basename(final_tarball)),
-#                            "--public"])
 
 
 def make_miso_annotation(tables_dir, output_dir, org_build):
@@ -161,6 +157,19 @@ def gtf_to_genepred(gtf):
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
 
+def gtf_to_refflat(gtf):
+    out_file = os.path.splitext(gtf)[0] + ".refFlat"
+    if file_exists(out_file):
+        return out_file
+
+    genepred = gtf_to_genepred(gtf)
+    with open(genepred) as in_handle, open(out_file, "w") as out_handle:
+        for l in in_handle:
+            first = l.split("\t")[0]
+            out_handle.write("\t".join([first, l]))
+
+    return out_file
+
 def make_miso_events(gtf, org_build):
 
     genepred = gtf_to_genepred(gtf)
@@ -191,11 +200,9 @@ def prepare_tophat_index(gtf, org_build):
     fastq = _create_dummy_fastq()
     cmd = ("tophat --transcriptome-index {tophat_dir} -G {gtf} "
            "-o {out_dir} {bowtie_dir} {fastq}")
-    print cmd.format(**locals())
-    print os.getcwd()
     subprocess.check_call(cmd.format(**locals()), shell=True)
     shutil.rmtree(out_dir)
-#    os.remove(fastq)
+    os.remove(fastq)
 
 def _create_dummy_fastq():
     read = ("@HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
