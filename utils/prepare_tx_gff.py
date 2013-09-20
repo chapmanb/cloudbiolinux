@@ -193,7 +193,8 @@ def make_miso_events(gtf, org_build):
 
 def prepare_tophat_index(gtf, org_build):
     tophat_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir,
-                                              "tophat", org_build))
+                                              "tophat",
+                                              org_build + "_transcriptome"))
     bowtie_dir = os.path.abspath(os.path.join(os.getcwd(),
                                               os.pardir, "bowtie2", org_build))
     out_dir = tempfile.mkdtemp()
