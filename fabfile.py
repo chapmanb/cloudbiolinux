@@ -74,7 +74,7 @@ def install_biolinux(target=None, flavor=None):
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
 
-def _perform_install(target=None, flavor=None):
+def _perform_install(target=None, flavor=None, more_custom_add=None):
     """
     Once CBL/fabric environment is setup, this method actually
     runs the required installation procedures.
@@ -83,6 +83,14 @@ def _perform_install(target=None, flavor=None):
     `target` and `flavor`.
     """
     pkg_install, lib_install, custom_ignore, custom_add = _read_main_config()
+    if more_custom_add:
+        if custom_add is None:
+            custom_add = {}
+        for k, vs in more_custom_add.iteritems():
+            if k in custom_add:
+                custom_add[k].extend(vs)
+            else:
+                custom_add[k] = vs
     if target is None or target == "packages":
         # can only install native packages if we have sudo access.
         if env.use_sudo:
