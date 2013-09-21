@@ -49,7 +49,8 @@ def _symlink_version(env, tx_dir, version_dir):
     """
     if env.safe_exists(tx_dir):
         env.safe_run("rm -rf %s" % tx_dir)
-    env.safe_run("ln -s %s %s" % (version_dir, tx_dir))
+    with cd(os.path.dirname(version_dir)):
+        env.safe_run("ln -s %s %s" % (os.path.basename(version_dir), os.path.basename(tx_dir)))
 
 def _download_annotation_bundle(env, url, gid):
     """Download bundle of RNA-seq data from S3 biodata/annotation
@@ -59,7 +60,8 @@ def _download_annotation_bundle(env, url, gid):
         with warn_only():
             env.safe_run("wget %s" % url)
     if env.safe_exists(tarball):
-        env.safe_run("xz -dc %s | tar -xvpf -" % tarball)
+        env.logger.info("Extracting RNA-seq references: %s" % tarball)
+        env.safe_run("xz -dc %s | tar -xpf -" % tarball)
         env.safe_run("rm -f %s" % tarball)
         return True
     else:
