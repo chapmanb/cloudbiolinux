@@ -11,7 +11,8 @@ from fabric.api import cd
 from cloudbio.fabutils import warn_only
 
 
-VERSIONS = {"GRCh37": "-2013-08-21"}
+VERSIONS = {"GRCh37": "-2013-08-21",
+            "mm10": "-2013-09-20"}
 
 def download_transcripts(genomes, env):
     folder_name = "rnaseq"
@@ -25,9 +26,23 @@ def download_transcripts(genomes, env):
         version_dir = tx_dir + version
         if not env.safe_exists(version_dir):
             with cd(org_dir):
-                _download_annotation_bundle(env, base_url.format(gid=gid, version=version), gid)
-                if version:
+                has_rnaseq = _download_annotation_bundle(env, base_url.format(gid=gid, version=version), gid)
+                if version and has_rnaseq:
                     _symlink_version(env, tx_dir, version_dir)
+        if version:
+            _symlink_refgenome(env, gid, org_dir)
+
+def _symlink_refgenome(env, gid, org_dir):
+    """Provide symlinks back to reference genomes so tophat avoids generating FASTA genomes.
+    """
+    for aligner in ["bowtie", "bowtie2"]:
+        aligner_dir = os.path.join(org_dir, gid, aligner)
+        if env.safe_exists(aligner_dir):
+            with cd(aligner_dir):
+                for ext in ["", ".fai"]:
+                    orig_seq = os.path.join(os.pardir, "seq", "%s.fa%s" % (gid, ext))
+                    if env.safe_exists(orig_seq) and not env.safe_exists(os.path.basename(orig_seq)):
+                        env.safe_run("ln -s %s" % orig_seq)
 
 def _symlink_version(env, tx_dir, version_dir):
     """Symlink the expected base output directory to our current version.
@@ -46,5 +61,7 @@ def _download_annotation_bundle(env, url, gid):
     if env.safe_exists(tarball):
         env.safe_run("xz -dc %s | tar -xvpf -" % tarball)
         env.safe_run("rm -f %s" % tarball)
+        return True
     else:
         env.logger.warn("RNA-seq transcripts not available for %s" % gid)
+        return False

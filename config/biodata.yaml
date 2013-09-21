@@ -20,7 +20,6 @@ genomes:
   - dbkey: hg19
     name: Human (hg19)
     dbsnp: true
-    rnaseq: true
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
@@ -28,6 +27,7 @@ genomes:
   - dbkey: mm10
     name: Mouse (mm10)
     dbsnp: true
+    rnaseq: true
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: araTha_tair9
