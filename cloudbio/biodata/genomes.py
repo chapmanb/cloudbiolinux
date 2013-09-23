@@ -240,7 +240,7 @@ GENOMES_SUPPORTED = [
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
                             "ucsc", "mosaik"]
-DEFAULT_GENOME_INDEXES = ["ucsc", "seq"]
+DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
 
@@ -281,6 +281,9 @@ def install_data_rsync(config_source):
     _check_version()
     genomes, genome_indexes, config = _get_genomes(config_source)
     genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
+    # Galaxy stores FASTAs in ucsc format and generates on the fly
+    if "ucsc" not in genome_indexes:
+        genome_indexes.append("ucsc")
     genome_dir = _make_genome_dir()
     galaxy.rsync_genomes(genome_dir, genomes, genome_indexes)
 

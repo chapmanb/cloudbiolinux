@@ -4,7 +4,6 @@
 packages:
   - minimal
   - libraries
-  - documentation
   - python
   - java
   - bio_nextgen
