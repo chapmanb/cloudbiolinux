@@ -446,12 +446,13 @@ def install_fastq_screen(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
-@_if_not_installed("bedtools")
 def install_bedtools(env):
     """A flexible suite of utilities for comparing genomic features.
     https://code.google.com/p/bedtools/
     """
     version = "2.17.0"
+    if versioncheck.up_to_date(env, "bedtools --version", version, stdout_flag="bedtools"):
+        return
     url = "https://bedtools.googlecode.com/files/" \
           "BEDTools.v%s.tar.gz" % version
     _get_install(url, env, _make_copy("ls -1 bin/*"))
@@ -643,15 +644,22 @@ def install_tabix(env):
     url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
     _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
 
-@_if_not_installed("grabix")
 def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "fda4d2609"
+    version = "0.1"
+    try:
+        uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
+    # Old versions will not have any version information
+    except IOError:
+        uptodate = False
+    if uptodate:
+        return
+    revision = "abc76b7313"
     repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
-                 revision=version)
+                 revision=revision)
 
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.
