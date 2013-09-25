@@ -17,14 +17,14 @@ MISO:
 git@github.com:yarden/MISO.git
 
 mysql-python (via pip)
-
+pandas (via conda)
 
 """
 import os
 import sys
 import shutil
-import platform
 import collections
+import datetime
 import subprocess
 import tempfile
 import glob
@@ -68,7 +68,7 @@ ucsc_user="genome"
 
 def main(org_build):
     work_dir = os.path.join(os.getcwd(), org_build, "tmpcbl")
-    out_dir = os.path.join(os.getcwd(), org_build, "rnaseq")
+    out_dir = os.path.join(os.getcwd(), org_build, "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
     safe_makedir(work_dir)
     with chdir(work_dir):
@@ -90,17 +90,15 @@ def cleanup(work_dir, out_dir):
     shutil.move(work_dir, out_dir)
 
 def upload_to_s3(tar_dirs, org_build):
-    tar_dirs = " ".join(tar_dirs)
-    tarball = "{org}-rnaseq.tar.xz".format(org=org_build)
+    str_tar_dirs = " ".join(os.path.relpath(d) for d in tar_dirs)
+    tarball = "{org}-{dir}.tar.xz".format(org=org_build, dir=os.path.basename(tar_dirs[0]))
     if not os.path.exists(tarball):
         subprocess.check_call("tar -cvpf - {out_dir} | xz -zc - > {tarball}".format(
-            out_dir=tar_dirs, tarball=tarball), shell=True)
-    python_exe = "python{0}.{1}".format(*platform.python_version_tuple()[:2])
+            out_dir=str_tar_dirs, tarball=tarball), shell=True)
     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
-    subprocess.check_call([python_exe, upload_script, tarball, "biodata",
+    subprocess.check_call([sys.executable, upload_script, tarball, "biodata",
                            os.path.join("annotation", os.path.basename(tarball)),
                            "--public"])
-
 
 def make_miso_annotation(tables_dir, output_dir, org_build):
     """
@@ -190,10 +188,11 @@ def make_miso_events(gtf, org_build):
 
     for f in gff_files:
         prefix = f.split(".")[0] + "_indexed"
-        print prefix
-        print f
-        print cmd.format(**locals())
-        subprocess.check_call(cmd.format(**locals()), shell=True)
+        if not file_exists(prefix):
+            print prefix
+            print f
+            print cmd.format(**locals())
+            subprocess.check_call(cmd.format(**locals()), shell=True)
 
 def prepare_tophat_index(gtf, org_build):
     tophat_dir = os.path.abspath(os.path.join(os.path.dirname(gtf), "tophat",
@@ -223,7 +222,7 @@ def gtf_to_interval(gtf, build):
     fa_dict = os.path.join(os.getcwd(), os.pardir, "seq", build + ".dict")
     if not file_exists(fa_dict):
         raise IOError("%s is not found, please make with "
-                      "CreateSequenceDictionary.")
+                      "CreateSequenceDictionary." % fa_dict)
     db = _get_gtf_db(gtf)
     out_file = os.path.splitext(gtf)[0] + ".interval_list"
     if file_exists(out_file):
@@ -342,7 +341,12 @@ def _query_for_ucsc_ensembl_map(org_name):
     cursor.execute("select * from ucscToEnsembl")
     ucsc_map = {}
     for ucsc, ensembl in cursor.fetchall():
-        ucsc_map[ensembl] = ucsc
+        # workaround for GRCh37/hg19 additional haplotype contigs.
+        # Coordinates differ between builds so do not include these regions.
+        if org_name == "hg19" and "hap" in ucsc:
+            continue
+        else:
+            ucsc_map[ensembl] = ucsc
     return ucsc_map
 
 def _download_ensembl_gff(build):

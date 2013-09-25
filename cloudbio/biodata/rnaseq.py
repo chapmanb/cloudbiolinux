@@ -12,6 +12,7 @@ from cloudbio.fabutils import warn_only
 
 
 VERSIONS = {"GRCh37": "-2013-08-21",
+            "hg19": "-2013-09-25",
             "mm10": "-2013-09-20"}
 
 def download_transcripts(genomes, env):

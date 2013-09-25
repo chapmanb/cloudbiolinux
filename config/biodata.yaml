@@ -20,6 +20,7 @@ genomes:
   - dbkey: hg19
     name: Human (hg19)
     dbsnp: true
+    rnaseq: true
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
