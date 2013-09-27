@@ -1050,8 +1050,8 @@ def install_freec(env):
         else:
             url = "http://bioinfo-out.curie.fr/projects/freec/src/FREEC_LINUX32.tar.gz"
 
-    if not versioncheck.up_to_date(env, "freec", version, stdout_index=1):
-        _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
+        if not versioncheck.up_to_date(env, "freec", version, stdout_index=1):
+            _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):
