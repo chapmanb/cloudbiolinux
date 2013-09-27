@@ -76,14 +76,18 @@ def _if_not_python_lib(library):
 
 
 @contextmanager
-def _make_tmp_dir():
+def _make_tmp_dir(ext=None):
     """
     Setup a temporary working directory for building custom software. First checks
     fabric environment for a `work_dir` path, if that is not set it will use the
     remote path $TMPDIR/cloudbiolinux if $TMPDIR is defined remotely, finally falling
     back on remote $HOME/cloudbiolinux otherwise.
+    `ext` allows creation of tool specific temporary directories to avoid conflicts
+    using CloudBioLinux inside of CloudBioLinux.
     """
     work_dir = __work_dir()
+    if ext:
+        work_dir += ext
     use_sudo = False
     if not env.safe_exists(work_dir):
         with settings(warn_only=True):

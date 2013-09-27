@@ -336,7 +336,7 @@ def install_gemini(env):
         data_dir = os.path.join(env.system_install,
                                 "local" if env.system_install.find("/local") == -1 else "",
                                 "share", "gemini")
-        with _make_tmp_dir() as work_dir:
+        with _make_tmp_dir(ext="-gemini") as work_dir:
             with cd(work_dir):
                 if env.safe_exists(installer):
                     env.safe_run("rm -f %s" % installer)
