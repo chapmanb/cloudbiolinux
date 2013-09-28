@@ -648,7 +648,7 @@ def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "0.1"
+    version = "0.1.1"
     try:
         uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
     # Old versions will not have any version information
@@ -656,10 +656,24 @@ def install_grabix(env):
         uptodate = False
     if uptodate:
         return
-    revision = "abc76b7313"
+    revision = "80150d00e5"
     repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=revision)
+
+@_if_not_installed("pbgzip")
+def install_pbgzip(env):
+    """Parallel blocked bgzip -- compatible with bgzip but with thread support.
+    https://github.com/nh13/samtools/tree/master/pbgzip
+    """
+    repository = "git clone https://github.com/chapmanb/samtools.git"
+    revision = "2cce3ffa97"
+    def _build(env):
+        with cd("pbgzip"):
+            env.safe_run("make")
+            install_dir = shared._get_bin_dir(env)
+            env.safe_sudo("cp -f pbgzip %s" % (install_dir))
+    _get_install(repository, env, _build, revision=revision)
 
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.

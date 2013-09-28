@@ -21,6 +21,7 @@ bio_nextgen:
     - gatk
     - grabix
     - mutect
+    - pbgzip
     - tabix
     - snpeff
     - varscan
