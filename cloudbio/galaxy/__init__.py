@@ -31,9 +31,7 @@ def _setup_users(env):
             env.safe_sudo('useradd -d /home/%s --create-home --shell /bin/bash '
                           '-c"Galaxy-required user" %s --user-group %s' %
                           (username, uid_str, username))
-    # Must specify uid for 'galaxy' user because of the
-    # configuration for proFTPd
-    _add_user('galaxy', '1001')
+    _add_user('galaxy')
     _add_user('sgeadmin')
     _add_user('postgres')
     env.logger.debug("Done setting up Galaxy/CloudMan users")
@@ -43,10 +41,10 @@ def _setup_galaxy_env_defaults(env):
     if "galaxy_user" not in env:
         env.galaxy_user = "galaxy"
     if "galaxy_home" not in env:
-        env.galaxy_home = "/mnt/galaxyTools/galaxy-central"
+        env.galaxy_home = "/mnt/galaxy/galaxy-app"
     if "galaxy_tools_dir" not in env:
         # Was called install_dir in tools_fabfile.py
-        env.galaxy_tools_dir = "/mnt/galaxyTools/tools"
+        env.galaxy_tools_dir = "/mnt/galaxy/tools"
     if "galaxy_loc_files" not in env:
         indicies_dir = env.get("data_files", "/mnt/galaxyIndices")
         env.galaxy_loc_files = os.path.join(indicies_dir, "galaxy", "galaxy-data")
@@ -405,7 +403,7 @@ def _install_nginx(env):
                 env.safe_sudo("make install")
                 env.safe_sudo("cd %s; stow nginx" % env.install_dir)
 
-    defaults = {"galaxy_home": "/mnt/galaxyTools/galaxy-central"}
+    defaults = {"galaxy_home": "/mnt/galaxy/galaxy-app"}
     _setup_conf_file(env, os.path.join(remote_conf_dir, "nginx.conf"), "nginx.conf", defaults=defaults)
 
     nginx_errdoc_file = 'nginx_errdoc.tar.gz'
