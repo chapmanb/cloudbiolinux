@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 """
+This is a contextualization script required by CloudMan; it is automatically run
+at instance startup (via an upstart job).
+
 Requires:
     PyYAML http://pyyaml.org/wiki/PyYAMLDocumentation (easy_install pyyaml)
     boto http://code.google.com/p/boto/ (easy_install boto)
