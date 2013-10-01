@@ -49,4 +49,7 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None,
     else:
         iversion = out.strip()
     iversion = _clean_version(iversion)
-    return LooseVersion(iversion) >= LooseVersion(version)
+    if not iversion:
+        return False
+    else:
+        return LooseVersion(iversion) >= LooseVersion(version)
