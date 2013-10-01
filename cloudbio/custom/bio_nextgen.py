@@ -336,7 +336,7 @@ def install_gemini(env):
         data_dir = os.path.join(env.system_install,
                                 "local" if env.system_install.find("/local") == -1 else "",
                                 "share", "gemini")
-        with _make_tmp_dir() as work_dir:
+        with _make_tmp_dir(ext="-gemini") as work_dir:
             with cd(work_dir):
                 if env.safe_exists(installer):
                     env.safe_run("rm -f %s" % installer)
@@ -446,12 +446,13 @@ def install_fastq_screen(env):
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
                                                          env.system_install, executable))
 
-@_if_not_installed("bedtools")
 def install_bedtools(env):
     """A flexible suite of utilities for comparing genomic features.
     https://code.google.com/p/bedtools/
     """
     version = "2.17.0"
+    if versioncheck.up_to_date(env, "bedtools --version", version, stdout_flag="bedtools"):
+        return
     url = "https://bedtools.googlecode.com/files/" \
           "BEDTools.v%s.tar.gz" % version
     _get_install(url, env, _make_copy("ls -1 bin/*"))
@@ -643,15 +644,36 @@ def install_tabix(env):
     url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
     _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
 
-@_if_not_installed("grabix")
 def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "fda4d2609"
+    version = "0.1.1"
+    try:
+        uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
+    # Old versions will not have any version information
+    except IOError:
+        uptodate = False
+    if uptodate:
+        return
+    revision = "80150d00e5"
     repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
-                 revision=version)
+                 revision=revision)
+
+@_if_not_installed("pbgzip")
+def install_pbgzip(env):
+    """Parallel blocked bgzip -- compatible with bgzip but with thread support.
+    https://github.com/nh13/samtools/tree/master/pbgzip
+    """
+    repository = "git clone https://github.com/chapmanb/samtools.git"
+    revision = "2cce3ffa97"
+    def _build(env):
+        with cd("pbgzip"):
+            env.safe_run("make")
+            install_dir = shared._get_bin_dir(env)
+            env.safe_sudo("cp -f pbgzip %s" % (install_dir))
+    _get_install(repository, env, _build, revision=revision)
 
 def install_snpeff(env):
     """Variant annotation and effect prediction tool.
@@ -706,8 +728,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-10"
-    revision = "3e07445a9"
+    version = "0.9.9.2-14"
+    revision = "10ac8d449"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
@@ -1046,8 +1068,8 @@ def install_freec(env):
         else:
             url = "http://bioinfo-out.curie.fr/projects/freec/src/FREEC_LINUX32.tar.gz"
 
-    if not versioncheck.up_to_date(env, "freec", version, stdout_index=1):
-        _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
+        if not versioncheck.up_to_date(env, "freec", version, stdout_index=1):
+            _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):

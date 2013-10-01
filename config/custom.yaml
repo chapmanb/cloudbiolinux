@@ -62,6 +62,7 @@ bio_nextgen:
     - gemini
     - grabix
     - mutect
+    - pbgzip
     - tabix
     - tassel
     - snpeff
