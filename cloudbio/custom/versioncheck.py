@@ -41,7 +41,8 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None,
     if args:
         cmd = cmd + " " + " ".join(args)
     with quiet():
-        path_safe = "export PATH=$PATH:%s/bin && " % env.system_install
+        path_safe = ("export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:%s/lib/pkgconfig && "
+                     "export PATH=$PATH:%s/bin && " % (env.system_install, env.system_install))
         out = env.safe_run_output(path_safe + cmd)
     if stdout_flag:
         iversion = _parse_from_stdoutflag(out, stdout_flag, stdout_index)
