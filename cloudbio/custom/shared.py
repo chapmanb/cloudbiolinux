@@ -189,6 +189,9 @@ def _configure_make(env):
     env.safe_run("make")
     env.safe_sudo("make install")
 
+def _ac_configure_make(env):
+    env.safe_run("autoreconf -i -f")
+    _configure_make(env)
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
     def _do_work(env):
