@@ -458,16 +458,18 @@ def install_bedtools(env):
     _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 def install_biobambam(env):
-    version = "0.0.92"
-    revision = "e325743"
-    libmaus_version = "0.0.72"
-    libmaus_revision = "8f6b9b4"
-    repo = "git clone https://github.com/gt1/biobambam.git"
-    libmaus_repo = "git clone https://github.com/gt1/libmaus.git"
+    version = "0.0.93"
+    revision = "20131002162026"
+    libmaus_version = "0.0.74"
+    libmaus_revision = "20131002161300"
+    url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
+          % (version, revision)
+    libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
+                  % (libmaus_version, libmaus_revision)
     if not versioncheck.up_to_date(env, "bamtofastq --version", version, stdout_flag="This is biobambam version"):
         if not versioncheck.up_to_date(env, "pkg-config --modversion libmaus", libmaus_version):
-            _get_install(libmaus_repo, env, shared._ac_configure_make, revision=libmaus_revision)
-        _get_install(repo, env, shared._ac_configure_make, revision=revision)
+            _get_install(libmaus_url, env, shared._configure_make)
+        _get_install(url, env, shared._configure_make)
 
 _shrec_run = """
 #!/usr/bin/perl
