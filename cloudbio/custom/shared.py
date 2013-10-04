@@ -1,12 +1,15 @@
 """Reusable decorators and functions for custom installations.
 """
-import tempfile
-import os
-import functools
-import urllib
-from tempfile import NamedTemporaryFile
-from string import Template
 from contextlib import contextmanager
+import datetime
+import functools
+import os
+import socket
+from string import Template
+import tempfile
+from tempfile import NamedTemporaryFile
+import urllib
+import uuid
 
 from fabric.api import *
 from fabric.contrib.files import *
@@ -159,6 +162,24 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
+def _remote_fetch(env, url, out_file=None):
+    """Retrieve url using wget, performing download in a temporary directory.
+
+    Provides a central location to handle retrieval issues and avoid
+    using interrupted downloads.
+    """
+    if out_file is None:
+        out_file = os.path.basename(url)
+    if not env.safe_exists(out_file):
+        orig_dir = env.safe_run_output("pwd").strip()
+        temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL, "file://%s/%s/%s/%s" %
+                                      (env.host, socket.gethostname(),
+                                       datetime.datetime.now().isoformat(), out_file))
+        with _make_tmp_dir(ext=temp_ext) as tmp_dir:
+            with cd(tmp_dir):
+                env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
+                env.safe_run("mv %s %s" % (out_file, orig_dir))
+    return out_file
 
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
                       safe_tar=False, tar_file_name=None):
@@ -176,8 +197,7 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
     else:
         # If tar_file_name is provided, use it instead of the inferred one
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar, tar_file_name=tar_file_name)
-        if not env.safe_exists(tar_file):
-            env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
+        tar_file = _remote_fetch(env, url, tar_file)
         env.safe_run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
