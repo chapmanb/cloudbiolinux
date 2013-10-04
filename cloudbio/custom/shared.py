@@ -13,7 +13,7 @@ import uuid
 
 from fabric.api import *
 from fabric.contrib.files import *
-from cloudbio.fabutils import quiet
+from cloudbio.fabutils import quiet, warn_only
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
@@ -162,7 +162,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _remote_fetch(env, url, out_file=None):
+def _remote_fetch(env, url, out_file=None, allow_fail=False):
     """Retrieve url using wget, performing download in a temporary directory.
 
     Provides a central location to handle retrieval issues and avoid
@@ -177,8 +177,14 @@ def _remote_fetch(env, url, out_file=None):
                                        datetime.datetime.now().isoformat(), out_file))
         with _make_tmp_dir(ext=temp_ext) as tmp_dir:
             with cd(tmp_dir):
-                env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
-                env.safe_run("mv %s %s" % (out_file, orig_dir))
+                with warn_only():
+                    result = env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
+                if result.succeeded:
+                    env.safe_run("mv %s %s" % (out_file, orig_dir))
+                elif allow_fail:
+                    out_file = None
+                else:
+                    raise IOError("Failure to retrieve remote file")
     return out_file
 
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
@@ -626,7 +632,7 @@ def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     venv_directory = env.get("venv_directory")
     if not env.safe_exists(venv_directory):
         if reqs_url:
-                env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+            _remote_fetch(env, reqs_url, reqs_file)
         env.logger.debug("Creating virtualenv in directory %s" % venv_directory)
         env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
         env.logger.debug("Activating")
@@ -650,7 +656,7 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
             else:
                 cmd = "bash -l -c 'mkvirtualenv {0}'".format(venv_name)
             if reqs_url:
-                env.safe_run("wget --output-document=%s %s" % (reqs_file, reqs_url))
+                _remote_fetch(env, reqs_url, reqs_file)
             env.safe_run(cmd)
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
 

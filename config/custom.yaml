@@ -30,7 +30,6 @@ bio_nextgen:
     - fastx_toolkit
     - ogap
     - rnaseqc
-    # - solexaqa
     - varianttools
     - vcftools
   analysis:
