@@ -71,6 +71,7 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
         env.safe_run("{brew_cmd} unlink {pkg}".format(**locals()))
     env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
     env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
+    env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
     # reset Git back to latest
     with cd(brew_prefix):
         cmd_parts = git_cmd.split()
