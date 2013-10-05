@@ -43,7 +43,7 @@ def install_packages(env, to_install=None, packages=None):
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.
     """
-    local_brew = os.path.join(env.local_install, "homebrew", "bin", "brew")
+    local_brew = os.path.join(env.local_install, "bin", "brew")
     for cmd in [local_brew, "brew"]:
         with quiet():
             test_version = env.safe_run("%s --version" % cmd)
