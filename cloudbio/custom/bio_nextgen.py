@@ -648,7 +648,8 @@ def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "0.1.1"
+    version = "0.1.2"
+    revision = "a78cbaf488"
     try:
         uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
     # Old versions will not have any version information
@@ -656,7 +657,6 @@ def install_grabix(env):
         uptodate = False
     if uptodate:
         return
-    revision = "80150d00e5"
     repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=revision)
