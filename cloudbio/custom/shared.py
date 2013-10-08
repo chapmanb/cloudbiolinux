@@ -1,16 +1,19 @@
 """Reusable decorators and functions for custom installations.
 """
-import tempfile
-import os
-import functools
-import urllib
-from tempfile import NamedTemporaryFile
-from string import Template
 from contextlib import contextmanager
+import datetime
+import functools
+import os
+import socket
+from string import Template
+import tempfile
+from tempfile import NamedTemporaryFile
+import urllib
+import uuid
 
 from fabric.api import *
 from fabric.contrib.files import *
-from cloudbio.fabutils import quiet
+from cloudbio.fabutils import quiet, warn_only
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
@@ -38,7 +41,6 @@ def _all_cbl_paths(env, ext):
     """Add paths to other non-system directories installed by CloudBioLinux.
     """
     return ":".join("%s/%s" % (p, ext) for p in [env.system_install,
-                                                 os.path.join(env.local_install, "homebrew"),
                                                  os.path.join(env.system_install, "anaconda")])
 def _executable_not_on_path(pname):
     with settings(hide('warnings', 'running', 'stdout', 'stderr'),
@@ -159,6 +161,30 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
+def _remote_fetch(env, url, out_file=None, allow_fail=False):
+    """Retrieve url using wget, performing download in a temporary directory.
+
+    Provides a central location to handle retrieval issues and avoid
+    using interrupted downloads.
+    """
+    if out_file is None:
+        out_file = os.path.basename(url)
+    if not env.safe_exists(out_file):
+        orig_dir = env.safe_run_output("pwd").strip()
+        temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL, "file://%s/%s/%s/%s" %
+                                      (env.host, socket.gethostname(),
+                                       datetime.datetime.now().isoformat(), out_file))
+        with _make_tmp_dir(ext=temp_ext) as tmp_dir:
+            with cd(tmp_dir):
+                with warn_only():
+                    result = env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
+                if result.succeeded:
+                    env.safe_run("mv %s %s" % (out_file, orig_dir))
+                elif allow_fail:
+                    out_file = None
+                else:
+                    raise IOError("Failure to retrieve remote file")
+    return out_file
 
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
                       safe_tar=False, tar_file_name=None):
@@ -176,8 +202,7 @@ def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
     else:
         # If tar_file_name is provided, use it instead of the inferred one
         tar_file, dir_name, tar_cmd = _get_expected_file(url, dir_name, safe_tar, tar_file_name=tar_file_name)
-        if not env.safe_exists(tar_file):
-            env.safe_run("wget --no-check-certificate -O %s '%s'" % (tar_file, url))
+        tar_file = _remote_fetch(env, url, tar_file)
         env.safe_run("%s %s" % (tar_cmd, tar_file))
         return _safe_dir_name(dir_name, need_dir)
 
@@ -189,6 +214,9 @@ def _configure_make(env):
     env.safe_run("make")
     env.safe_sudo("make install")
 
+def _ac_configure_make(env):
+    env.safe_run("autoreconf -i -f")
+    _configure_make(env)
 
 def _make_copy(find_cmd=None, premake_cmd=None, do_make=True):
     def _do_work(env):
@@ -603,7 +631,7 @@ def _create_local_python_virtualenv(env, venv_name, reqs_file, reqs_url):
     venv_directory = env.get("venv_directory")
     if not env.safe_exists(venv_directory):
         if reqs_url:
-                env.safe_sudo("wget --output-document=%s %s" % (reqs_file, reqs_url))
+            _remote_fetch(env, reqs_url, reqs_file)
         env.logger.debug("Creating virtualenv in directory %s" % venv_directory)
         env.safe_sudo("virtualenv --no-site-packages '%s'" % venv_directory)
         env.logger.debug("Activating")
@@ -627,7 +655,7 @@ def _create_global_python_virtualenv(env, venv_name, reqs_file, reqs_url):
             else:
                 cmd = "bash -l -c 'mkvirtualenv {0}'".format(venv_name)
             if reqs_url:
-                env.safe_run("wget --output-document=%s %s" % (reqs_file, reqs_url))
+                _remote_fetch(env, reqs_url, reqs_file)
             env.safe_run(cmd)
             env.logger.info("Finished installing virtualenv {0}".format(venv_name))
 

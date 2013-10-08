@@ -109,9 +109,8 @@ class UCSCGenome(_DownloadHelper):
         for zipped_file in ["chromFa.tar.gz", "%s.fa.gz" % self._name,
                             "chromFa.zip"]:
             if not self._exists(zipped_file, seq_dir):
-                with settings(warn_only=True):
-                    result = env.safe_run("wget -c %s/%s" % (self._url, zipped_file))
-                if not result.failed:
+                result = shared._remote_fetch(env, "%s/%s" % (self._url, zipped_file), allow_fail=True)
+                if result:
                     break
             else:
                 break
@@ -132,7 +131,7 @@ class NCBIRest(_DownloadHelper):
         genome_file = "%s.fa" % self._name
         if not self._exists(genome_file, seq_dir):
             for ref in self._refs:
-                env.safe_run("wget -c %s" % (self._base_url % ref))
+                shared._remote_fetch(env, self._base_url % ref)
                 env.safe_run("ls -l")
                 env.safe_sed('%s.fasta' % ref, '^>.*$', '>%s' % ref, '1')
             tmp_file = genome_file.replace(".fa", ".txt")
@@ -170,7 +169,7 @@ class EnsemblGenome(_DownloadHelper):
     def download(self, seq_dir):
         genome_file = "%s.fa" % self._name
         if not self._exists(self._get_file, seq_dir):
-            env.safe_run("wget -c %s%s" % (self._url, self._get_file))
+            shared._remote_fetch(env, "%s%s" % (self._url, self._get_file))
         if not self._exists(genome_file, seq_dir):
             env.safe_run("gunzip -c %s > %s" % (self._get_file, genome_file))
         if self._convert_to_ucsc:
@@ -195,7 +194,7 @@ class BroadGenome(_DownloadHelper):
     def download(self, seq_dir):
         org_file = "%s.fa" % self._name
         if not self._exists(org_file, seq_dir):
-            env.safe_run("wget -c %s%s.gz" % (self._ftp_url, self._target))
+            shared._remote_fetch(env, "%s%s.gz" % (self._ftp_url, self._target))
             env.safe_run("gunzip %s.gz" % self._target)
             env.safe_run("mv %s %s" % (self._target, org_file))
         return org_file, []
@@ -457,7 +456,7 @@ class CustomMaskManager:
         out_fasta = "{0}.fa".format(self._custom["dbkey"])
         if not env.safe_exists(os.path.join(seq_dir, out_fasta)):
             if not env.safe_exists(mask_file):
-                env.safe_run("wget -c {0}".format(self._custom["mask"]))
+                shared._remote_fetch(env, self._custom["mask"])
             if not env.safe_exists(ready_mask):
                 env.safe_run("bedtools complement -i {i} -g {g}.fai > {o}".format(
                     i=mask_file, g=base_seq, o=ready_mask))
@@ -602,9 +601,9 @@ def _index_mosaik(ref_file):
 def _download_s3_index(env, manager, gid, idx):
     env.logger.info("Downloading genome from s3: {0} {1}".format(gid, idx))
     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
-    env.safe_run("wget -c --no-check-certificate %s" % url)
-    env.safe_run("xz -dc %s | tar -xvpf -" % os.path.basename(url))
-    env.safe_run("rm -f %s" % os.path.basename(url))
+    out_file = shared._remote_fetch(env, url)
+    env.safe_run("xz -dc %s | tar -xvpf -" % out_file)
+    env.safe_run("rm -f %s" % out_file)
 
 def _download_genomes(genomes, genome_indexes):
     """Download a group of genomes from Amazon s3 bucket.
@@ -700,13 +699,12 @@ def _data_liftover(lift_over_genomes):
             worked = False
             with cd(lo_dir):
                 if not env.safe_exists(non_zip):
-                    with settings(warn_only=True):
-                        result = env.safe_run("wget %s" % (lo_base_url % (g1, cur_file)))
+                    result = shared._remote_fetch(env, "%s" % (lo_base_url % (g1, cur_file)), allow_fail=True)
                     # Lift over back and forths don't always exist
                     # Only move forward if we found the file
-                    if not result.failed:
+                    if result:
                         worked = True
-                        env.safe_run("gunzip %s" % cur_file)
+                        env.safe_run("gunzip %s" % result)
             if worked:
                 ref_parts = [g1, g2, os.path.join(lo_dir, non_zip)]
                 galaxy.update_loc_file("liftOver.loc", ref_parts)
@@ -734,9 +732,9 @@ def _data_uniref():
         base_file = os.path.splitext(os.path.basename(fasta_url))[0]
         with cd(work_dir):
             if not env.safe_exists(base_file):
-                env.safe_run("wget -c %s" % fasta_url)
-                env.safe_run("gunzip %s" % os.path.basename(fasta_url))
-                env.safe_run("wget %s" % (base_work_url + ".release_note"))
+                out_file = shared._remote_fetch(env, fasta_url)
+                env.safe_run("gunzip %s" % out_file)
+                shared._remote_fetch(env, base_work_url + ".release_note")
         _index_blast_db(work_dir, base_file, "prot")
 
 def _index_blast_db(work_dir, base_file, db_type):

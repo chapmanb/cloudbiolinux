@@ -55,7 +55,7 @@ def _download_executables(env, base_url, tools):
             for tool in tools:
                 final_tool = os.path.join(install_dir, tool)
                 if not env.safe_exists(final_tool) and shared._executable_not_on_path(tool):
-                    env.safe_run("wget %s%s" % (base_url, tool))
+                    shared._remote_fetch(env, "%s%s" % (base_url, tool))
                     env.safe_sudo("cp -f %s %s" % (tool, install_dir))
 
 # --- Alignment tools
@@ -308,20 +308,6 @@ def install_fastx_toolkit(env):
     _get_install(gtext_url, env, _configure_make, post_unpack_fn=_remove_werror)
     _get_install(fastx_url, env, _configure_make, post_unpack_fn=_remove_werror)
 
-@_if_not_installed("SolexaQA.pl")
-def install_solexaqa(env):
-    """SolexaQA creates visual representations of data quality from FASTQ files.
-    http://solexaqa.sourceforge.net/
-    """
-    version = "1.4"
-    url = "http://downloads.sourceforge.net/project/solexaqa/src/" \
-            "SolexaQA_v.%s.pl.zip" % version
-    with _make_tmp_dir() as work_dir:
-        with cd(work_dir):
-            env.safe_run("wget %s" % url)
-            env.safe_run("unzip %s" % os.path.basename(url))
-            env.safe_sudo("mv SolexaQA.pl %s" % shared._get_bin_dir(env))
-
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
@@ -332,17 +318,17 @@ def install_gemini(env):
     elif not shared._executable_not_on_path("gemini -v"):
         env.safe_run("gemini update")
     else:
-        installer = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
+        iurl = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
         data_dir = os.path.join(env.system_install,
                                 "local" if env.system_install.find("/local") == -1 else "",
                                 "share", "gemini")
         with _make_tmp_dir(ext="-gemini") as work_dir:
             with cd(work_dir):
-                if env.safe_exists(installer):
-                    env.safe_run("rm -f %s" % installer)
-                env.safe_run("wget --no-check-certificate %s" % installer)
-                env.safe_run("%s gemini_install.py %s %s %s" %
-                             (_python_cmd(env), "" if env.use_sudo else "--nosudo",
+                if env.safe_exists(os.path.basename(iurl)):
+                    env.safe_run("rm -f %s" % os.path.basename(iurl))
+                installer = shared._remote_fetch(env, iurl)
+                env.safe_run("%s %s %s %s %s" %
+                             (_python_cmd(env), installer, "" if env.use_sudo else "--nosudo",
                               env.system_install, data_dir))
                 env.safe_run("rm -f gemini_install.py")
 
@@ -398,7 +384,7 @@ def install_dwgsim(env):
     samtools_url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
                    "{ver}/samtools-{ver}.tar.bz2".format(ver=samtools_version)
     def _get_samtools(env):
-        env.safe_run("wget {0}".format(samtools_url))
+        shared._remote_fetch(env, samtools_url)
         env.safe_run("tar jxf samtools-{0}.tar.bz2".format(samtools_version))
         env.safe_run("ln -s samtools-{0} samtools".format(samtools_version))
     _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
@@ -417,8 +403,8 @@ def install_fastqc(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % (url))
-                env.safe_run("unzip %s" % os.path.basename(url))
+                out_file = shared._remote_fetch(env, url)
+                env.safe_run("unzip %s" % out_file)
                 with cd("FastQC"):
                     env.safe_sudo("chmod a+rwx %s" % executable)
                     env.safe_sudo("mv * %s" % install_dir)
@@ -439,8 +425,8 @@ def install_fastq_screen(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % (url))
-                env.safe_run("tar -xzvpf %s" % os.path.basename(url))
+                out_file = shared._remote_fetch(env, url)
+                env.safe_run("tar -xzvpf %s" % out_file)
                 with cd("fastq_screen_v%s" % version):
                     env.safe_sudo("mv * %s" % install_dir)
                 env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
@@ -456,6 +442,20 @@ def install_bedtools(env):
     url = "https://bedtools.googlecode.com/files/" \
           "BEDTools.v%s.tar.gz" % version
     _get_install(url, env, _make_copy("ls -1 bin/*"))
+
+def install_biobambam(env):
+    version = "0.0.93"
+    revision = "20131002162026"
+    libmaus_version = "0.0.74"
+    libmaus_revision = "20131002161300"
+    url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
+          % (version, revision)
+    libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
+                  % (libmaus_version, libmaus_revision)
+    if not versioncheck.up_to_date(env, "bamtofastq --version", version, stdout_flag="This is biobambam version"):
+        if not versioncheck.up_to_date(env, "pkg-config --modversion libmaus", libmaus_version):
+            _get_install(libmaus_url, env, shared._configure_make)
+        _get_install(url, env, shared._configure_make)
 
 _shrec_run = """
 #!/usr/bin/perl
@@ -484,8 +484,8 @@ def install_shrec(env):
         shrec_script = "%s/shrec" % install_dir
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % (url))
-                env.safe_run("unzip %s" % os.path.basename(url))
+                out_file = shared._remote_fetch(env, url)
+                env.safe_run("unzip %s" % out_file)
                 env.safe_sudo("mv *.class %s" % install_dir)
                 for line in _shrec_run.split("\n"):
                     if line.strip():
@@ -524,8 +524,8 @@ def install_rnaseqc(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget --no-check-certificate %s" % url)
-                env.safe_sudo("mv *.jar %s" % install_dir)
+                out_file = shared._remote_fetch(env, url)
+                env.safe_sudo("mv %s %s" % (out_file, install_dir))
 
 def install_gatk(env):
     """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
@@ -596,8 +596,8 @@ def install_varscan(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget --no-check-certificate %s" % url)
-                env.safe_sudo("mv *.jar %s" % install_dir)
+                out_file = shared._remote_fetch(env, url)
+                env.safe_sudo("mv %s %s" % (out_file, install_dir))
 
 def install_mutect(env):
     version = "1.1.5"
@@ -607,8 +607,8 @@ def install_mutect(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget --no-check-certificate -O %s %s" % (os.path.basename(url), url))
-                env.safe_run("unzip %s" % os.path.basename(url))
+                out_file = shared._remote_fetch(env, url)
+                env.safe_run("unzip %s" % out_file)
                 env.safe_sudo("mv *.jar version.txt LICENSE* %s" % install_dir)
 
 def install_cram(env):
@@ -622,8 +622,8 @@ def install_cram(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget --no-check-certificate %s" % url)
-                env.safe_sudo("mv *.jar %s" % install_dir)
+                out_file = shared._remote_fetch(env, url)
+                env.safe_sudo("mv %s %s" % (out_file, install_dir))
 
 @_if_not_installed("bam")
 def install_bamutil(env):
@@ -648,7 +648,8 @@ def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "0.1.1"
+    version = "0.1.2"
+    revision = "a78cbaf488"
     try:
         uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
     # Old versions will not have any version information
@@ -656,7 +657,6 @@ def install_grabix(env):
         uptodate = False
     if uptodate:
         return
-    revision = "80150d00e5"
     repository = "git clone https://github.com/arq5x/grabix.git"
     _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=revision)
@@ -897,8 +897,9 @@ def install_abyss(env):
     def _remove_werror_get_boost(env):
         env.safe_sed("configure", " -Werror", "")
         # http://osdir.com/ml/abyss-users-science/2011-10/msg00108.html
-        env.safe_run("wget http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2")
-        env.safe_run("tar jxf boost_1_47_0.tar.bz2")
+        url = "http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2"
+        dl_file = shared._remote_fetch(env, url)
+        env.safe_run("tar jxf %s" % dl_file)
         env.safe_run("ln -s boost_1_47_0/boost boost")
     _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
@@ -997,8 +998,7 @@ def install_bcbio_variation(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                jar_file = os.path.basename(url)
-                env.safe_run("wget -O %s %s" % (jar_file, url))
+                jar_file = shared._remote_fetch(env, url)
                 env.safe_sudo("mv %s %s" % (jar_file, install_dir))
 
 # --- ChIP-seq
@@ -1097,8 +1097,8 @@ def install_tassel(env):
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget %s" % (url))
-                env.safe_run("unzip %s" % os.path.basename(url))
+                dl_file = shared._remote_fetch(env, url)
+                env.safe_run("unzip %s" % dl_file)
                 with cd("tassel{0}_standalone".format(version)):
                     for x in executables:
                         env.safe_sed(x, "^my \$top.*;",
@@ -1130,9 +1130,8 @@ def install_sambamba(env):
     if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
-                env.safe_run("wget {0}".format(url))
-                env.safe_sudo("sudo dpkg -i {0}".format(
-                        os.path.basename(url)))
+                dl_file = shared._remote_fetch(env, url)
+                env.safe_sudo("sudo dpkg -i {0}".format(dl_file))
 
 @_if_not_installed("seqlogo")
 def install_weblogo(env):

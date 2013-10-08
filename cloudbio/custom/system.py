@@ -3,7 +3,10 @@ Install system programs not available from packages.
 """
 import os
 
-from shared import _if_not_installed, _get_install, _configure_make
+from fabric.api import cd
+
+from cloudbio.custom import shared
+from cloudbio.custom.shared import _if_not_installed, _get_install, _configure_make
 
 @_if_not_installed("brew")
 def install_homebrew(env):
@@ -16,16 +19,25 @@ def install_homebrew(env):
         # XXX Test homebrew install on mac
         env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"')
     else:
-        outdir = os.path.join(env.local_install, "homebrew")
-        if env.safe_exists(os.path.join(outdir, "bin", "brew")):
-            return
-        env.safe_sudo("chown %s %s" % (env.user, env.local_install))
-        env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git %s" % outdir)
-        comment_line = "# Linuxbrew -- added by CloudBioLinux"
-        if not env.safe_contains(env.shell_config, comment_line):
-            env.safe_append(env.shell_config, comment_line)
-            env.safe_append(env.shell_config, "export PATH=%s/bin:$PATH" % outdir)
-            env.safe_append(env.shell_config, "export LD_LIBRARY_PATH=%s/lib:$LD_LIBRARY_PATH" % outdir)
+        brew_cmd = os.path.join(env.system_install, "bin", "brew")
+        if not env.safe_exists(brew_cmd):
+            with shared._make_tmp_dir() as tmp_dir:
+                with cd(tmp_dir):
+                    env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git" )
+                    with cd("linuxbrew"):
+                        env.safe_sudo("chown %s %s" % (env.user, env.system_install))
+                        paths = ["bin", "etc", "include", "lib", "lib/pkgconfig", "Library",
+                                 "sbin", "share", "var", "var/log", "share/locale",
+                                 "share/man", "share/man/man1", "share/man/man2",
+                                 "share/man/man3", "share/man/man4", "share/man/man5",
+                                 "share/man/man6", "share/man/man7", "share/man/man8",
+                                 "share/info", "share/doc", "share/aclocal"]
+                        for path in paths:
+                            if env.safe_exists("%s/%s" % (env.system_install, path)):
+                                env.safe_sudo("chown %s %s/%s" % (env.user, env.system_install, path))
+                        env.safe_run("mv bin/brew %s/bin" % env.system_install)
+                        env.safe_run("mv Library %s" % env.system_install)
+                        env.safe_run("mv .git %s" % env.system_install)
 
 @_if_not_installed("s3fs")
 def install_s3fs(env):

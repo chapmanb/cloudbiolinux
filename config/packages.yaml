@@ -34,13 +34,14 @@ minimal:
     - bzr
     #- darcs # pulls in postfix mail configuration.
   build:
-    - make
+    - cmake
     - gcc
     - g++
     - gfortran
+    - libtool
+    - make
     - patch
-    - cmake
-    - swig
+    - pkg-config
   util:
     - axel
     - gawk
@@ -121,16 +122,13 @@ programming:
     - exuberant-ctags
     - gedit
   build:
-    - xfsprogs
-    - stow
-    - rsync
-    - python-software-properties
-    - protobuf-compiler
     - libgtk2.0-dev
-    - stow
-    - rsync
-    - python-software-properties
     - protobuf-compiler
+    - python-software-properties
+    - stow
+    - swig
+    - rsync
+    - xfsprogs
   filesystem:
     - libfuse-dev
     - fuse-utils

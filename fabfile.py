@@ -92,10 +92,11 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
             else:
                 custom_add[k] = vs
     if target is None or target == "packages":
+        env.keep_isolated = getattr(env, "keep_isolated", "false").lower() in ["true", "yes"]
         # can only install native packages if we have sudo access.
         if env.use_sudo:
             _configure_and_install_native_packages(env, pkg_install)
-        else:
+        elif not env.keep_isolated:
             _connect_native_packages(env, pkg_install, lib_install)
         if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
@@ -279,7 +280,7 @@ def _install_custom(p, pkg_to_group=None):
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
 
-def install_brew(p=None, flavor=None):
+def install_brew(p=None, version=None, flavor=None):
     """Top level access to homebrew/linuxbrew packages.
     p is a package name to install, or all configured packages if not specified.
     """
@@ -287,6 +288,8 @@ def install_brew(p=None, flavor=None):
     _configure_fabric_environment(env, flavor, ignore_distcheck=True)
     system.install_homebrew(env)
     if p is not None:
+        if version:
+            p = "%s==%s" % (p, version)
         brew.install_packages(env, packages=[p])
     else:
         pkg_install = _read_main_config()[0]

@@ -6,17 +6,7 @@ from fabric.api import *
 from fabric.contrib.files import *
 
 from shared import (_if_not_installed, _make_tmp_dir)
-
-@_if_not_installed("cljr")
-def install_cljr(env):
-    """Clojure package manager, cljr.
-
-    http://github.com/liebke/cljr
-    """
-    env.safe_run("wget http://incanter.org/downloads/cljr-installer.jar")
-    env.safe_run("java -jar cljr-installer.jar")
-    env.safe_sudo("ln -s .cljr/bin/cljr /usr/bin")
-    env.safe_run("rm cljr-installer.jar")
+from cloudbio.custom import shared
 
 @_if_not_installed("lein")
 def install_leiningen(env):
@@ -26,7 +16,7 @@ def install_leiningen(env):
     bin_dir = os.path.join(env.system_install, "bin")
     with _make_tmp_dir() as work_dir:
         with cd(work_dir):
-            env.safe_run("wget --no-check-certificate https://raw.github.com/technomancy/leiningen/stable/bin/lein")
+            shared._remote_fetch(env,"https://raw.github.com/technomancy/leiningen/stable/bin/lein") 
             env.safe_run("chmod a+rwx lein")
             env.safe_sudo("mv lein %s" % bin_dir)
             env.safe_run("%s/lein" % bin_dir)

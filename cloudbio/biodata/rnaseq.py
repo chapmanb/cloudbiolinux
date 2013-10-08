@@ -8,8 +8,9 @@ http://cufflinks.cbcb.umd.edu/igenomes.html
 import os
 
 from fabric.api import cd
-from cloudbio.fabutils import warn_only
 
+from cloudbio.custom import shared
+from cloudbio.fabutils import warn_only
 
 VERSIONS = {"GRCh37": "-2013-08-21",
             "hg19": "-2013-09-25",
@@ -56,11 +57,8 @@ def _symlink_version(env, tx_dir, version_dir):
 def _download_annotation_bundle(env, url, gid):
     """Download bundle of RNA-seq data from S3 biodata/annotation
     """
-    tarball = os.path.basename(url)
-    if not env.safe_exists(tarball):
-        with warn_only():
-            env.safe_run("wget %s" % url)
-    if env.safe_exists(tarball):
+    tarball = shared._remote_fetch(env, url, allow_fail=True)
+    if tarball and env.safe_exists(tarball):
         env.logger.info("Extracting RNA-seq references: %s" % tarball)
         env.safe_run("xz -dc %s | tar -xpf -" % tarball)
         env.safe_run("rm -f %s" % tarball)
