@@ -444,10 +444,10 @@ def install_bedtools(env):
     _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 def install_biobambam(env):
-    version = "0.0.93"
-    revision = "20131002162026"
-    libmaus_version = "0.0.74"
-    libmaus_revision = "20131002161300"
+    version = "0.0.94"
+    revision = "20131003223915"
+    libmaus_version = "0.0.75"
+    libmaus_revision = "20131003223752"
     url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
           % (version, revision)
     libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
@@ -728,8 +728,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-14"
-    revision = "10ac8d449"
+    version = "0.9.9.2-18"
+    revision = "c283d6d3b"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
