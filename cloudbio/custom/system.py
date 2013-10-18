@@ -31,13 +31,16 @@ def install_homebrew(env):
                                  "share/man", "share/man/man1", "share/man/man2",
                                  "share/man/man3", "share/man/man4", "share/man/man5",
                                  "share/man/man6", "share/man/man7", "share/man/man8",
-                                 "share/info", "share/doc", "share/aclocal"]
+                                 "share/info", "share/doc", "share/aclocal",
+                                 "lib/python2.7/site-packages", "lib/python2.6/site-packages",
+                                 "lib/python3.2/site-packages", "lib/python3.3/site-packages"]
                         for path in paths:
                             if env.safe_exists("%s/%s" % (env.system_install, path)):
                                 env.safe_sudo("chown %s %s/%s" % (env.user, env.system_install, path))
                         env.safe_run("mv bin/brew %s/bin" % env.system_install)
                         env.safe_run("mv Library %s" % env.system_install)
                         env.safe_run("mv .git %s" % env.system_install)
+                        env.safe_run("mv share/man/man1/brew.1 %s/share/man/man1" % env.system_install)
 
 @_if_not_installed("s3fs")
 def install_s3fs(env):

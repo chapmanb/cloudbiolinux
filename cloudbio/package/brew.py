@@ -35,7 +35,9 @@ def install_packages(env, to_install=None, packages=None):
 
 def _get_current_pkgs(env, brew_cmd):
     out = {}
-    for line in env.safe_run_output("{brew_cmd} which".format(**locals())).split("\n"):
+    with quiet():
+        which_out = env.safe_run_output("{brew_cmd} which".format(**locals()))
+    for line in which_out.split("\n"):
         if line:
             pkg, version = line.rstrip().split()
             if pkg.endswith(":"):
