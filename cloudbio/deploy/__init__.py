@@ -86,7 +86,7 @@ class LocalVmLauncher:
         pass
 
     def get_user(self):
-        pass
+        return env.user
 
     def list(self):
         return []
