@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free under a Creative Commons Attribution 2.5 License
+Name       : ProfessionalDescription: A two-column, fixed-width design with dark color scheme background.Version    : 1.0Released   : 20081230
+--><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+    <title>Professional by FreeCSSTemplates.org</title>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <div id="logo">
+          <h1>Welcome to CloudBioLinux</h1>
+        </div>
+      </div>
+      <!-- end #header -->
+      <div id="header-pic">
+        
+      </div>
+      <div id="page">
+        <div id="content">
+          <div class="post">
+            <h1 class="title">What is CloudBiolinux?</h1>
+            <div class="entry">
+              <p><strong>CloudBioLinux is a communtiy project that offers genome
+                  analysis resources for cloud computing platforms such as
+                  Amazon EC2. We develop freely available, community maintained
+                  software images and data repositories for biological analysis.</strong></p>
+            </div>
+          </div>
+          <div class="post">
+            <h1 class="title">Motivation</h1>
+            <div class="entry">
+              <p>Many Bioinformatics workflows involve large datasets requiring
+                high performance computing. Cloud computing provides researchers
+                with the ability to perform computations using a practically
+                unlimited pool of virtual machines, using platforms such as <a
+
+                  href="http://aws.amazon.com/ec2/" target="_blank">Amazon EC2</a>,
+                <a href="http://www.eucalyptus.com/" target="_blank">Eucalyptus</a>
+                or <a href="http://www.virtualbox.org/">VirtualBox</a>.
+                CloudBioLinux utilizes these resources to enable instant access
+                to biological software, programming libraries and data.</p>
+              <p>CloudBioLinux is a community project and we welcome
+                contributors and feedback. A fully automated infrsatructure
+                installs software and data, with packages specified in simple <a
+
+                  href="http://github.com/chapmanb/cloudbiolinux/tree/master/config/#readme">configuration
+                  files</a>. Please fork <a href="http://github.com/chapmanb/cloudbiolinux">our
+                  code on GitHub</a> and suggest improvements and additions. </p>
+              <p>These resources are designed for biologists as well as
+                programmers. With the help of the <a href="http://nebc.nerc.ac.uk/tools/bio-linux">NEBC
+                  Bio-Linux</a> development team, images include biological
+                software and libraries available in local installations along
+                with a <a href="https://help.ubuntu.com/community/FreeNX">FreeNX</a>
+                desktop environment designed to ease the transition to remote
+                computational analysis.</p>
+            </div>
+          </div>
+          <div class="post">
+            <h1 class="title">CloudBioLinux Services</h1>
+            <div class="entry">
+              <p>The CloudBioLinux project provides several services not
+                available with the standard tool set of Galaxy. Such services
+                include:</p>
+              <ul style="text-align: left;">
+                <li><span style="font-weight: bold;">Viral Assembly and
+                    Annotation</span></li>
+                <ul>
+                  <li>This set of tools allows a user to assemble and/or
+                    annotate 454 sequence data (along with optional Sanger and
+                    Solexa) from any one of several viral organisms. The
+                    annotation is displayed in an extensive, graphical interface
+                    through which the user can easily acquire more information.
+                  </li>
+                  <li>Detailed documentation can be found here.<span style="  font-weight: bold;"><br />
+                    </span></li>
+                </ul>
+                <li><span style="font-weight: bold;">Prokaryote Assembly</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id="sidebar">
+          <div id="sidebar-content">
+            <div id="sidebar-bgbtm">
+              <ul>
+                <li>
+                  <h2>Related Topics</h2>
+                  <ul>
+                    <li><a href="#">Discussion List<br />
+                      </a></li>
+                    <li><span style="color: black;">Included Software</span></li>
+                    <li><a href="#">Machine Images<br />
+                      </a></li>
+                    <li><a href="#">Code Framework<br />
+                      </a></li>
+                    <li><a href="#">Contributors</a></li>
+                  </ul>
+                </li>
+                <li>
+                  <h2>Organizations</h2>
+                  <ul>
+                    <li><a href="#">Nec metus sed donec</a></li>
+                    <li><a href="#">Magna lacus bibendum mauris</a></li>
+                    <li><a href="#">Velit semper nisi molestie</a></li>
+                    <li><a href="#">Eget tempor eget nonummy</a></li>
+                    <li><a href="#">Nec metus sed donec</a></li>
+                    <li><a href="#">Magna lacus bibendum mauris</a></li>
+                    <li><a href="#">Velit semper nisi molestie</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- end #sidebar --> </div>
+      <!-- end #page --> </div>
+    <!-- end #footer -->
+    
+  </body>
+</html>
