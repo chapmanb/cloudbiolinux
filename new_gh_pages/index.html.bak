@@ -1,8 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free under a Creative Commons Attribution 2.5 License
-Name       : ProfessionalDescription: A two-column, fixed-width design with dark color scheme background.Version    : 1.0Released   : 20081230
---><html xmlns="http://www.w3.org/1999/xhtml">
+Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free under a Creative Commons Attribution 2.5 LicenseName       : ProfessionalDescription: A two-column, fixed-width design with dark color scheme background.Version    : 1.0Released   : 20081230-->
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
     <title>Professional by FreeCSSTemplates.org</title>
@@ -16,9 +15,7 @@ Name       : ProfessionalDescription: A two-column, fixed-width design with dark
         </div>
       </div>
       <!-- end #header -->
-      <div id="header-pic">
-        
-      </div>
+      <div id="header-pic"> </div>
       <div id="page">
         <div id="content">
           <div class="post">
@@ -36,8 +33,7 @@ Name       : ProfessionalDescription: A two-column, fixed-width design with dark
               <p>Many Bioinformatics workflows involve large datasets requiring
                 high performance computing. Cloud computing provides researchers
                 with the ability to perform computations using a practically
-                unlimited pool of virtual machines, using platforms such as <a
-
+                unlimited pool of virtual machines, using platforms such as <a
                   href="http://aws.amazon.com/ec2/" target="_blank">Amazon EC2</a>,
                 <a href="http://www.eucalyptus.com/" target="_blank">Eucalyptus</a>
                 or <a href="http://www.virtualbox.org/">VirtualBox</a>.
@@ -45,8 +41,7 @@ Name       : ProfessionalDescription: A two-column, fixed-width design with dark
                 to biological software, programming libraries and data.</p>
               <p>CloudBioLinux is a community project and we welcome
                 contributors and feedback. A fully automated infrsatructure
-                installs software and data, with packages specified in simple <a
-
+                installs software and data, with packages specified in simple <a
                   href="http://github.com/chapmanb/cloudbiolinux/tree/master/config/#readme">configuration
                   files</a>. Please fork <a href="http://github.com/chapmanb/cloudbiolinux">our
                   code on GitHub</a> and suggest improvements and additions. </p>
@@ -102,23 +97,33 @@ Name       : ProfessionalDescription: A two-column, fixed-width design with dark
                 </li>
                 <li>
                   <h2>Organizations</h2>
-                  <ul>
-                    <li><a href="#">Nec metus sed donec</a></li>
-                    <li><a href="#">Magna lacus bibendum mauris</a></li>
-                    <li><a href="#">Velit semper nisi molestie</a></li>
-                    <li><a href="#">Eget tempor eget nonummy</a></li>
-                    <li><a href="#">Nec metus sed donec</a></li>
-                    <li><a href="#">Magna lacus bibendum mauris</a></li>
-                    <li><a href="#">Velit semper nisi molestie</a></li>
-                  </ul>
+                  <div style="text-align: center;"> <a href="http://www.jcvi.org/cms/research/projects/jcvi-cloud-biolinux/overview/"
+                      target="_blank"><img src="images/jcvi-logo.png" alt="JCVI logo"
+                        title="JCVI logo" /></a> </div>
                 </li>
+                <li><br />
+                </li>
+              </ul>
+              <div style="text-align: center;"><a href="http://nebc.nerc.ac.uk/nebc/tools/bio-linux"><img
+                    src="images/nebc-logo.gif" alt="NEBC logo" /></a><br />
+                <br />
+                <a href="http://www.debian.org/devel/debian-med/"><img src="images/debian-logo.png"
+                    alt="Debian logo" style="width: 83px; height: 103px;" /></a><br />
+                <br />
+                <a href="http://wiki.g2.bx.psu.edu/Admin/Cloud"><img src="images/galaxy-logo.png"
+                    alt="Galaxy logo" title="Galaxy logo" style="width: 210px; height: 58px;" /></a><br />
+                <br />
+                <a href="http://www.hsph.harvard.edu/research/bioinfocore/"><img
+                    src="images/hsph-logo.jpg" alt="hsph logo" title="hsph logo"
+                    style="width: 272px; height: 67px;" /></a><br />
+              </div>
+              <ul>
               </ul>
             </div>
           </div>
         </div>
-        <!-- end #sidebar --> </div>
+      </div>
       <!-- end #page --> </div>
     <!-- end #footer -->
-    
   </body>
 </html>
