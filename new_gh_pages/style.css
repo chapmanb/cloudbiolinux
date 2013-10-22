@@ -121,7 +121,7 @@ a img {
 
 #page {
 	width: 900px;
-	height: 900px;
+	height: 2500px;
 	margin: 0px auto;
 	padding: 10px 0px 0px 0px;
 	background: #FFFFFF;
@@ -136,7 +136,7 @@ a img {
 /* Content */
 
 #content {
-	float: right;
+	float: left;
 	width: 570px;
 }
 
@@ -171,7 +171,7 @@ a img {
 /* Sidebar */
 
 #sidebar {
-	float: left;
+	float: right;
 	width: 300px;
 }
 

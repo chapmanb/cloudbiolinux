@@ -5,7 +5,7 @@ Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free und
   <head>
     <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
     <title>Professional by FreeCSSTemplates.org</title>
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <link media="screen" href="style.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
     <div id="wrapper">
@@ -34,8 +34,8 @@ Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free und
                 high performance computing. Cloud computing provides researchers
                 with the ability to perform computations using a practically
                 unlimited pool of virtual machines, using platforms such as <a
-                  href="http://aws.amazon.com/ec2/" target="_blank">Amazon EC2</a>,
-                <a href="http://www.eucalyptus.com/" target="_blank">Eucalyptus</a>
+                  target="_blank" href="http://aws.amazon.com/ec2/">Amazon EC2</a>,
+                <a target="_blank" href="http://www.eucalyptus.com/">Eucalyptus</a>
                 or <a href="http://www.virtualbox.org/">VirtualBox</a>.
                 CloudBioLinux utilizes these resources to enable instant access
                 to biological software, programming libraries and data.</p>
@@ -77,6 +77,81 @@ Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free und
               </ul>
             </div>
           </div>
+          <div class="post">
+            <h1 class="title">Resources</h1>
+            <div class="entry">
+              <ul>
+                <li>Amazon EC2 (us-east-1): <i>ami-46d4792f</i> -- <a href="http://alestic.com">Ubuntu
+                    12.04 64bit</a> (27 June 2012) </li>
+                <ul>
+                  <li class="inner">These images work with micro instances, a
+                    cost effective way to explore Amazon resources.</li>
+                </ul>
+                <li> Cloud BioLinux can be executed on a desktop computer
+                  without the need for a cloud: </li>
+                <ul>
+                  <li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/Cloud+BioLinux+32bit.ova">Cloud
+                      BioLinux 32-bit VirtualBox appliance</a> <br />
+                    Information for end-users <a href="http://www.virtualbox.org/wiki/Downloads">for
+                      installing Virtualbox</a> and <a href="http://www.virtualbox.org/manual/ch01.html#ovf">importing
+                      Cloud BioLinux images </a> for execution within
+                    Virtualbox. </li>
+                </ul>
+                <li> Cloud BioLinux images are available for execution on a
+                  private <a href="http://open.eucalyptus.com">Eucalyptus</a>
+                  cloud: </li>
+                <ul>
+                  <li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/CloudBioLinux-32bit.Eucalyptus.img">Cloud
+                      BioLinux 32-bit Eucalyptus .img</a> <br />
+                    The .img file can be uploaded to your Eucalyptus cloud by
+                    simply running "uec-publish-image file.img" from the <a href="http://packages.ubuntu.com/lucid/cloud-utils">Ubuntu
+                      cloud-utils</a> </li>
+                </ul>
+                <li>Indexed genome builds for aligners such as <a href="http://bowtie-bio.sourceforge.net/">Bowtie</a>,
+                  <a href="http://bio-bwa.sourceforge.net/">BWA</a> and <a href="http://www.novocraft.com/">Novoalign</a>
+                  in the <a href="http://s3.amazonaws.com/biodata">biodata S3
+                    bucket</a>. An <a href="https://github.com/chapmanb/cloudbiolinux/blob/master/data_fabfile.py">automated
+                    script</a> pulls the requested genomes and aligner indexes
+                  to an Amazon machine or your local computer; integration with
+                  Galaxy is also provided.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="post">
+            <h1 class="title">Documentation</h1>
+            <div class="entry">
+              <ul>
+                <li><a href="http://biocloudcentral.org">BioCloudCentral</a>:
+                  Easily launch CloudBioLinux and CloudMan clusters </li>
+                <li><a href="http://cda.currentprotocols.com/WileyCDA/CPUnit/refId-bi1109.html">
+                    Using Cloud Computing Infrastructure with CloudBioLinux,
+                    CloudMan, and Galaxy</a>: Detailed how-tos </li>
+                <li><a href="https://github.com/chapmanb/cloudbiolinux/blob/master/doc/intro/gettingStarted_CloudBioLinux.pdf?raw=true">Getting
+                    Started with CloudBioLinux</a>: a gentle guide for new
+                  users.</li>
+                <li>Accessing 1000 Human Genomes data using CloudBioLinux: <a href="http://youtu.be/A8JLh44L1Cw">Part
+                    1: Starting</a>, <a href="http://youtu.be/BiPn3ezINYw">Part
+                    2: Accessing data</a>. </li>
+                <li>Deploying production Galaxy instances using CloudBioLinux
+                  and CloudMan: <a href="http://bitly.com/prodcloudman">documentation</a>,
+                  <a href="http://bitly.com/prodcloudman-slides">slides</a> </li>
+                <li><a href="http://bcbio.wordpress.com/2011/11/29/making-next-generation-sequencing-analysis-pipelines-easier-with-biocloudcentral-and-galaxy-integration/">Building
+                    analysis pipelines with CloudBioLinux and CloudMan</a> </li>
+                <li><a href="http://bcbio.wordpress.com/2010/05/08/automated-build-environment-for-bioinformatics-cloud-images/">Build
+                    framework</a>: a high level overview of the automated build
+                  environment. </li>
+                <li><a href="https://github.com/chapmanb/cloudbiolinux#readme">Developer
+                    build documentation</a>: details on using and contributing
+                  to the framework.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="post">
+            <h1 class="title">And The People We Have To Thank For...</h1>
+            <div class="entry"><br />
+              <br />
+            </div>
+          </div>
         </div>
         <div id="sidebar">
           <div id="sidebar-content">
@@ -97,28 +172,43 @@ Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free und
                 </li>
                 <li>
                   <h2>Organizations</h2>
-                  <div style="text-align: center;"> <a href="http://www.jcvi.org/cms/research/projects/jcvi-cloud-biolinux/overview/"
-                      target="_blank"><img src="images/jcvi-logo.png" alt="JCVI logo"
-                        title="JCVI logo" /></a> </div>
+                  <div style="text-align: center;"> <a target="_blank" href="http://www.jcvi.org/cms/research/projects/jcvi-cloud-biolinux/overview/"><img
+                        title="JCVI logo" alt="JCVI logo" src="images/jcvi-logo.png" /></a>
+                  </div>
                 </li>
                 <li><br />
                 </li>
               </ul>
-              <div style="text-align: center;"><a href="http://nebc.nerc.ac.uk/nebc/tools/bio-linux"
-                  target="_blank"><img src="images/nebc-logo.gif" alt="NEBC logo" /></a><br />
+              <div style="text-align: center;"><a target="_blank" href="http://nebc.nerc.ac.uk/nebc/tools/bio-linux"><img
+                    alt="NEBC logo" src="images/nebc-logo.gif" /></a><br />
                 <br />
-                <a href="http://www.debian.org/devel/debian-med/" target="_blank"><img
-                    src="images/debian-logo.png" alt="Debian logo" style="width: 83px; height: 103px;" /></a><br />
+                <a target="_blank" href="http://www.debian.org/devel/debian-med/"><img
+                    style="width: 83px; height: 103px;" alt="Debian logo" src="images/debian-logo.png" /></a><br />
                 <br />
-                <a href="http://wiki.g2.bx.psu.edu/Admin/Cloud"><img src="images/galaxy-logo.png"
-                    alt="Galaxy logo" title="Galaxy logo" style="width: 210px; height: 58px;" /></a><br />
+                <a href="http://wiki.g2.bx.psu.edu/Admin/Cloud"><img style="width: 210px; height: 58px;"
+                    title="Galaxy logo" alt="Galaxy logo" src="images/galaxy-logo.png" /></a><br />
                 <br />
-                <a href="http://www.hsph.harvard.edu/research/bioinfocore/" target="_blank"><img
-                    src="images/hsph-logo.jpg" alt="hsph logo" title="hsph logo"
-                    style="width: 272px; height: 67px;" /></a><br />
+                <a target="_blank" href="http://www.hsph.harvard.edu/research/bioinfocore/"><img
+                    style="width: 272px; height: 67px;" title="hsph logo" alt="hsph logo"
+                    src="images/hsph-logo.jpg" /></a><br />
+                <br />
               </div>
-              <ul>
-              </ul>
+              <li>
+                <h2>People</h2>
+                <ul>
+                  <li>Brad Chapman</li>
+                  <li>Enis Afgan</li>
+                  <li>Corban Rivera</li>
+                  <li>Daniel Brami</li>
+                  <li>Jianwu Wang</li>
+                  <li>Don Preuss</li>
+                  <li>Raja Mazmuder</li>
+                  <li>Brian Muchmore</li>
+                  <li>Jeff Kitrell</li>
+                  <li>Dullep Samuel</li>
+                  <li>Tony Travis</li>
+                </ul>
+              </li>
             </div>
           </div>
         </div>
