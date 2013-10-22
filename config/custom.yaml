@@ -9,9 +9,7 @@ bio_general:
  - pgdspider
 bio_nextgen:
   alignment:
-    - bwa
     - bowtie
-    - bowtie2
     - gmap
     - lastz
     - mosaik
@@ -20,23 +18,18 @@ bio_nextgen:
     - star
     #- stampy # no version names on tarballs
   utilities:
-    - bamtools
-    - bedtools
     - biobambam
     - cram
     - dwgsim
-    - fastqc
     - fastq_screen
     - fastx_toolkit
     - ogap
     - rnaseqc
     - varianttools
-    - vcftools
   analysis:
     - cufflinks
     # - echo # build problems on ubuntu 12.10
     - picard
-    - samtools
     - sambamba
     - shrec
     - tophat
@@ -49,9 +42,7 @@ bio_nextgen:
     - trinity
     - velvet
   sv:
-    - delly
     - hydra
-    - lumpy
     - freec
   variant:
     - bcbio_variation
@@ -63,7 +54,6 @@ bio_nextgen:
     - grabix
     - mutect
     - pbgzip
-    - tabix
     - tassel
     - snpeff
     - stacks

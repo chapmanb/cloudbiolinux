@@ -1,20 +1,13 @@
 ---
 bio_nextgen:
   alignment:
-    - bwa
-    - bowtie2
     - star
   utilities:
-    - bamtools
-    - bedtools
     - biobambam
-    - fastqc
-    - ogap
     - rnaseqc
   analysis:
     - cufflinks
     - picard
-    - samtools
     - tophat
   variant:
     - bcbio_variation
@@ -23,10 +16,8 @@ bio_nextgen:
     - grabix
     - mutect
     - pbgzip
-    - tabix
     - snpeff
     - varscan
   needs_64bit:
     - ucsc_tools
-    - novoalign
     - novosort

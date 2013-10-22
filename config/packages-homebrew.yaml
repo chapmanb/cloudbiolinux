@@ -9,9 +9,14 @@ bio_nextgen:
     - bamtools
     - bedtools
     - fastqc
+    - qualimap
   analysis:
     #- cufflinks
     - samtools
     #- tophat
   variant:
+    - delly
+    - lumpy-sv
     - tabix
+    - vcftools
+    - yaha
