@@ -30,6 +30,7 @@ def install_packages(env, to_install=None, packages=None):
             env.safe_run("%s tap %s" % (brew_cmd, repo))
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
              "current" : _get_current_pkgs(env, brew_cmd)}
+    _install_brew_baseline(env, brew_cmd, ipkgs)
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
 
@@ -124,6 +125,16 @@ def _get_pkg_and_version(pkg_str):
     else:
         assert len(parts) == 2
         return parts
+
+def _install_brew_baseline(env, brew_cmd, ipkgs):
+    """Install baseline brew components not handled by dependency system.
+
+    Handles installation of required Perl libraries.
+    """
+    _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
+    cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
+    for perl_lib in ["Statistics::Descriptive"]:
+        env.safe_run("%s -i '%s'" % (cpanm_cmd, perl_lib))
 
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.
