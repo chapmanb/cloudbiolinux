@@ -20,4 +20,3 @@ bio_nextgen:
     - varscan
   needs_64bit:
     - ucsc_tools
-    - novosort

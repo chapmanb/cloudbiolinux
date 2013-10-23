@@ -444,10 +444,10 @@ def install_bedtools(env):
     _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 def install_biobambam(env):
-    version = "0.0.94"
-    revision = "20131003223915"
-    libmaus_version = "0.0.75"
-    libmaus_revision = "20131003223752"
+    version = "0.0.96"
+    revision = "20131022183655"
+    libmaus_version = "0.0.77"
+    libmaus_revision = "20131022183354"
     url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
           % (version, revision)
     libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
