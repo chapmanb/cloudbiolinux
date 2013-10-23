@@ -135,7 +135,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs):
     _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
-        env.safe_run("%s -i --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+        env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
 
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.

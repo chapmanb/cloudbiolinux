@@ -2,11 +2,11 @@
 ---
 bio_nextgen:
   alignment:
-    - bwa
+    #- bwa
     - bowtie2
     - novoalign
   utilities:
-    - bamtools
+    #- bamtools
     - bedtools
     - fastqc
     - qualimap
@@ -15,8 +15,8 @@ bio_nextgen:
     - samtools
     #- tophat
   variant:
-    - delly
-    - lumpy-sv
+    #- delly
+    #- lumpy-sv
     - tabix
     - vcftools
     - yaha

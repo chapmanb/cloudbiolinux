@@ -1,8 +1,10 @@
 ---
 bio_nextgen:
   alignment:
+    - bwa
     - star
   utilities:
+    - bamtools
     - biobambam
     - rnaseqc
   analysis:
