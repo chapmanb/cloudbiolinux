@@ -3,7 +3,7 @@ Install system programs not available from packages.
 """
 import os
 
-from fabric.api import cd
+from fabric.api import cd, quiet
 
 from cloudbio.custom import shared
 from cloudbio.custom.shared import _if_not_installed, _get_install, _configure_make
@@ -18,8 +18,10 @@ def install_homebrew(env):
         # XXX Test homebrew install on mac
         env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"')
     else:
-        brew_cmd = os.path.join(env.system_install, "bin", "brew")
-        if not env.safe_exists(brew_cmd):
+        brewcmd = os.path.join(env.system_install, "bin", "brew")
+        with quiet():
+            test_brewcmd = env.safe_run("%s --version" % brewcmd)
+        if not test_brewcmd.succeeded:
             with shared._make_tmp_dir() as tmp_dir:
                 with cd(tmp_dir):
                     if env.safe_exists("linuxbrew"):

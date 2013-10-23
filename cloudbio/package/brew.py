@@ -146,4 +146,4 @@ def _brew_cmd(env):
             test_version = env.safe_run("%s --version" % cmd)
         if test_version.succeeded:
             return cmd
-    raise ValueError("Did not find installation of Homebrew")
+    raise ValueError("Did not find working installation of Linuxbrew/Homebrew")
