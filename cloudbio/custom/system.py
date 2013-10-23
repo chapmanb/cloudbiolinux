@@ -35,7 +35,7 @@ def install_homebrew(env):
                                  "share/info", "share/doc", "share/aclocal",
                                  "lib/python2.7/site-packages", "lib/python2.6/site-packages",
                                  "lib/python3.2/site-packages", "lib/python3.3/site-packages",
-                                 "lib/perl5/site_perl"]
+                                 "lib/perl5", "lib/perl5/site_perl"]
                         for path in paths:
                             if env.safe_exists("%s/%s" % (env.system_install, path)):
                                 env.safe_sudo("chown %s %s/%s" % (env.user, env.system_install, path))

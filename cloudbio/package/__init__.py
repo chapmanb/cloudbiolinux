@@ -55,6 +55,10 @@ def _connect_native_packages(env, pkg_install, lib_install):
         add_ldlibrary = "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path
         if not env.safe_contains(env.shell_config, add_ldlibrary):
             env.safe_append(env.shell_config, add_ldlibrary)
+        perl_export = ("export PERL5LIB=%s/lib/perl5:%s/lib/perl5/site_perl:${PERL5LIB}"
+                       % (env.system_install, env.system_install))
+        if not env.safe_contains(env.shell_config, perl_export):
+            env.safe_append(env.shell_config, perl_export)
     if "python" in pkg_install and "python" in lib_install:
         _create_local_virtualenv(env.system_install)
 

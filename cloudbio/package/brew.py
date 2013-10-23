@@ -113,7 +113,8 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     else:
         brew_subcmd = "install"
     if brew_subcmd:
-        env.safe_run("%s %s %s" % (brew_cmd, brew_subcmd, pkg))
+        perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
+        env.safe_run("%s && %s %s %s" % (perl_setup, brew_cmd, brew_subcmd, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_and_version(pkg_str):
@@ -134,7 +135,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs):
     _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
-        env.safe_run("%s -i '%s'" % (cpanm_cmd, perl_lib))
+        env.safe_run("%s -i --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
 
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.
