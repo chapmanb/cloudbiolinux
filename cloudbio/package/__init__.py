@@ -45,20 +45,21 @@ def _connect_native_packages(env, pkg_install, lib_install):
     """
     bin_dir = os.path.join(env.system_install, "bin")
     path = env.safe_run_output("echo $PATH")
+    comment_line = "# CloudBioLinux PATH updates"
+    if not env.safe_contains(env.shell_config, comment_line):
+        env.safe_append(env.shell_config, comment_line)
     if bin_dir not in path and env.safe_exists(env.shell_config):
-        comment_line = "# CloudBioLinux PATH updates"
         add_path = "export PATH=%s:$PATH" % bin_dir
         if not env.safe_contains(env.shell_config, add_path):
-            env.safe_append(env.shell_config, comment_line)
             env.safe_append(env.shell_config, add_path)
-        ldlib_path = os.path.join(env.system_install, "lib")
-        add_ldlibrary = "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path
-        if not env.safe_contains(env.shell_config, add_ldlibrary):
-            env.safe_append(env.shell_config, add_ldlibrary)
-        perl_export = ("export PERL5LIB=%s/lib/perl5:%s/lib/perl5/site_perl:${PERL5LIB}"
-                       % (env.system_install, env.system_install))
-        if not env.safe_contains(env.shell_config, perl_export):
-            env.safe_append(env.shell_config, perl_export)
+    ldlib_path = os.path.join(env.system_install, "lib")
+    add_ldlibrary = "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path
+    if not env.safe_contains(env.shell_config, add_ldlibrary):
+        env.safe_append(env.shell_config, add_ldlibrary)
+    perl_export = ("export PERL5LIB=%s/lib/perl5:%s/lib/perl5/site_perl:${PERL5LIB}"
+                   % (env.system_install, env.system_install))
+    if not env.safe_contains(env.shell_config, perl_export):
+        env.safe_append(env.shell_config, perl_export)
     if "python" in pkg_install and "python" in lib_install:
         _create_local_virtualenv(env.system_install)
 
