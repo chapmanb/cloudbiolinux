@@ -220,8 +220,6 @@ python:
 ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
-  - ruby1.8
-  - ruby1.8-dev
 r:
   - r-base
   - r-base-core

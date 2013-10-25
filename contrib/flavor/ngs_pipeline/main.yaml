@@ -8,6 +8,7 @@ packages:
   - documentation
   - python
   - java
+  - ruby
   - r
   - bio_nextgen
   - distributed
