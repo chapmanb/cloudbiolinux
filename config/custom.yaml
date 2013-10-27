@@ -32,7 +32,6 @@ bio_nextgen:
     - cufflinks
     # - echo # build problems on ubuntu 12.10
     - picard
-    - sambamba
     - shrec
     - tophat
     # - vep # lots of timeout failures on download

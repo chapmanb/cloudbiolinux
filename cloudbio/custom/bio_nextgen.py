@@ -1115,20 +1115,6 @@ def install_stacks(env):
           "stacks-{0}.tar.gz".format(version)
     _get_install(url, env, _configure_make)
 
-@_if_not_installed("sambamba")
-def install_sambamba(env):
-    """Library for working with SAM/BAM formats written in D programming language
-    https://github.com/lomereiter/sambamba/wiki
-    """
-    version = "0.2.9"
-    url = "https://github.com/downloads/lomereiter/sambamba/" \
-          "sambamba-{0}_amd64.deb".format(version)
-    if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                dl_file = shared._remote_fetch(env, url)
-                env.safe_sudo("sudo dpkg -i {0}".format(dl_file))
-
 @_if_not_installed("seqlogo")
 def install_weblogo(env):
     """Weblogo

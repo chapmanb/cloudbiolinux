@@ -22,7 +22,7 @@ def install_packages(env, to_install=None, packages=None):
     if to_install:
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
     brew_cmd = _brew_cmd(env)
-    formula_repos = ["homebrew/science"]
+    formula_repos = ["homebrew/science", "chapmanb/cbl"]
     env.safe_run("%s update" % brew_cmd)
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
     for repo in formula_repos:
