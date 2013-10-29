@@ -11,7 +11,6 @@ bio_nextgen:
   alignment:
     - bwa
     - bowtie
-    - bowtie2
     - gmap
     - lastz
     - mosaik
@@ -21,23 +20,18 @@ bio_nextgen:
     #- stampy # no version names on tarballs
   utilities:
     - bamtools
-    - bedtools
     - biobambam
     - cram
     - dwgsim
-    - fastqc
     - fastq_screen
     - fastx_toolkit
     - ogap
     - rnaseqc
     - varianttools
-    - vcftools
   analysis:
     - cufflinks
     # - echo # build problems on ubuntu 12.10
     - picard
-    - samtools
-    - sambamba
     - shrec
     - tophat
     # - vep # lots of timeout failures on download
@@ -49,9 +43,7 @@ bio_nextgen:
     - trinity
     - velvet
   sv:
-    - delly
     - hydra
-    - lumpy
     - freec
   variant:
     - bcbio_variation
@@ -63,7 +55,6 @@ bio_nextgen:
     - grabix
     - mutect
     - pbgzip
-    - tabix
     - tassel
     - snpeff
     - stacks
@@ -74,8 +65,6 @@ bio_nextgen:
   needs_64bit:
     - ucsc_tools
     - bfast
-    - novoalign
-    - novosort
     - plink_seq
 bio_proteomics:
   - transproteomic_pipeline

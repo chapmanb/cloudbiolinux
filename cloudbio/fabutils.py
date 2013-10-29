@@ -170,18 +170,19 @@ def configure_runsudo(env):
         env.safe_exists = exists
         env.safe_run = run
         env.safe_run_output = run
-    if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
-        env.use_sudo = True
-        if env.is_local:
-            env.safe_sudo = run_local(True)
+    if isinstance(getattr(env, "use_sudo", "true"), basestring):
+        if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
+            env.use_sudo = True
+            if env.is_local:
+                env.safe_sudo = run_local(True)
+            else:
+                env.safe_sudo = sudo
         else:
-            env.safe_sudo = sudo
-    else:
-        env.use_sudo = False
-        if env.is_local:
-            env.safe_sudo = run_local()
-        else:
-            env.safe_sudo = run
+            env.use_sudo = False
+            if env.is_local:
+                env.safe_sudo = run_local()
+            else:
+                env.safe_sudo = run
 
 
 try:

@@ -22,7 +22,7 @@ def install_packages(env, to_install=None, packages=None):
     if to_install:
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
     brew_cmd = _brew_cmd(env)
-    formula_repos = ["homebrew/science"]
+    formula_repos = ["homebrew/science", "chapmanb/cbl"]
     env.safe_run("%s update" % brew_cmd)
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
     for repo in formula_repos:
@@ -30,12 +30,15 @@ def install_packages(env, to_install=None, packages=None):
             env.safe_run("%s tap %s" % (brew_cmd, repo))
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
              "current" : _get_current_pkgs(env, brew_cmd)}
+    _install_brew_baseline(env, brew_cmd, ipkgs)
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
 
 def _get_current_pkgs(env, brew_cmd):
     out = {}
-    for line in env.safe_run_output("{brew_cmd} which".format(**locals())).split("\n"):
+    with quiet():
+        which_out = env.safe_run_output("{brew_cmd} which".format(**locals()))
+    for line in which_out.split("\n"):
         if line:
             pkg, version = line.rstrip().split()
             if pkg.endswith(":"):
@@ -110,7 +113,9 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     else:
         brew_subcmd = "install"
     if brew_subcmd:
-        env.safe_run("%s %s %s" % (brew_cmd, brew_subcmd, pkg))
+        perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
+        compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
+        env.safe_run("%s && %s && %s %s --env=std %s" % (compiler_setup, perl_setup, brew_cmd, brew_subcmd, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_and_version(pkg_str):
@@ -123,13 +128,23 @@ def _get_pkg_and_version(pkg_str):
         assert len(parts) == 2
         return parts
 
+def _install_brew_baseline(env, brew_cmd, ipkgs):
+    """Install baseline brew components not handled by dependency system.
+
+    Handles installation of required Perl libraries.
+    """
+    _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
+    cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
+    for perl_lib in ["Statistics::Descriptive"]:
+        env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.
     """
-    local_brew = os.path.join(env.local_install, "bin", "brew")
+    local_brew = os.path.join(env.system_install, "bin", "brew")
     for cmd in [local_brew, "brew"]:
         with quiet():
             test_version = env.safe_run("%s --version" % cmd)
         if test_version.succeeded:
             return cmd
-    raise ValueError("Did not find installation of Homebrew")
+    raise ValueError("Did not find working installation of Linuxbrew/Homebrew")

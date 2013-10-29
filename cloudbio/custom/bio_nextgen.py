@@ -444,10 +444,10 @@ def install_bedtools(env):
     _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 def install_biobambam(env):
-    version = "0.0.94"
-    revision = "20131003223915"
-    libmaus_version = "0.0.75"
-    libmaus_revision = "20131003223752"
+    version = "0.0.96"
+    revision = "20131022183655"
+    libmaus_version = "0.0.77"
+    libmaus_revision = "20131022183354"
     url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
           % (version, revision)
     libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
@@ -991,7 +991,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.1.0"
+    version = "0.1.1"
     url = "https://github.com/chapmanb/bcbio.variation/releases/download/" \
           "v%s/bcbio.variation-%s-standalone.jar" % (version, version)
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
@@ -1118,20 +1118,6 @@ def install_stacks(env):
     url = "http://creskolab.uoregon.edu/stacks/source/" \
           "stacks-{0}.tar.gz".format(version)
     _get_install(url, env, _configure_make)
-
-@_if_not_installed("sambamba")
-def install_sambamba(env):
-    """Library for working with SAM/BAM formats written in D programming language
-    https://github.com/lomereiter/sambamba/wiki
-    """
-    version = "0.2.9"
-    url = "https://github.com/downloads/lomereiter/sambamba/" \
-          "sambamba-{0}_amd64.deb".format(version)
-    if env.distribution in ["ubuntu", "debian"] and env.is_64bit:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                dl_file = shared._remote_fetch(env, url)
-                env.safe_sudo("sudo dpkg -i {0}".format(dl_file))
 
 @_if_not_installed("seqlogo")
 def install_weblogo(env):

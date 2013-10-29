@@ -220,8 +220,6 @@ python:
 ruby:
   - ruby1.9.1 # default Ruby install
   - ruby1.9.1-dev
-  - ruby1.8
-  - ruby1.8-dev
 r:
   - r-base
   - r-base-core
@@ -404,7 +402,7 @@ bio_proteomics:
     - libxml2-dev
     - libreadline-dev
     - libxslt-dev
-    
+
     # Required for protvis
     - python-virtualenv
     - python-setuptools
@@ -433,7 +431,7 @@ bio_proteomics:
     - libboost-dev
 
     # needed for 32bit execs distributed with searchgui.
-    # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.     
+    # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.
 
     # needed for building OpenMS
     - libtool
@@ -446,9 +444,9 @@ bio_proteomics:
 
     # Needed for RVM
     - libbison-dev
-    - ncurses-dev 
-    - automake 
-    - libtool  
+    - ncurses-dev
+    - automake
+    - libtool
     - bison
     - subversion
     - libgdbm-dev
@@ -541,6 +539,7 @@ cloudman:
     - mime-support
     # Required for novnc
     - vnc4server
+    - glusterfs-client
   ubuntu_quantal:
     # Required to get HTCondor, not available on 12.04 (latest LTS release).
     - condor
@@ -571,8 +570,8 @@ galaxy:
     - python-scipy
     - libsparsehash-dev
 
-    # Latest python-rpy not currently compatible with R 3.0.1 at least on precise (presumably 
-    # quantal as well), hack below is to specify an older version of R compabile with python-rpy.    
+    # Latest python-rpy not currently compatible with R 3.0.1 at least on precise (presumably
+    # quantal as well), hack below is to specify an older version of R compabile with python-rpy.
     #- r-base
     #- r-base-core
     #- r-base-dev
@@ -585,14 +584,14 @@ galaxy:
     - "r-base-dev=3.0.0-2quantal"
   ubuntu_precise:
     - "r-base-core=3.0.0-2precise"
-    - "r-base-dev=3.0.0-2precise"        
+    - "r-base-dev=3.0.0-2precise"
 galaxyp:
   all:
      # Required for protk
      - libxml2-dev
      - libreadline-dev
      - libxslt-dev
-     
+
      # Required for protvis
      - python-virtualenv
      - python-setuptools
@@ -621,7 +620,7 @@ galaxyp:
      - libboost-dev
 
      # needed for 32bit execs distributed with searchgui.
-     # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.     
+     # - ia32-libs ## Doesn't play well with dependencies of gnuplot, TODO: Find more specific lib.
 
      # needed for building OpenMS
      - libtool
@@ -638,9 +637,9 @@ galaxyp:
 
      # Needed for RVM
      - libbison-dev
-     - ncurses-dev 
-     - automake 
-     - libtool  
+     - ncurses-dev
+     - automake
+     - libtool
      - bison
      - subversion
      - libgdbm-dev

@@ -114,8 +114,6 @@ ruby:
   - ruby
   - ruby-devel
   - rubygems
-  - ruby-irb
-  - rubygem-rake
 r:
   - R
   - R-core
