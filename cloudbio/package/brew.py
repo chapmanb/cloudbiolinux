@@ -115,7 +115,7 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     if brew_subcmd:
         perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
         compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
-        env.safe_run("%s && %s && %s %s --env=std %s" % (compiler_setup, perl_setup, brew_cmd, brew_subcmd, pkg))
+        env.safe_run("%s && %s && %s %s --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, brew_subcmd, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_and_version(pkg_str):
