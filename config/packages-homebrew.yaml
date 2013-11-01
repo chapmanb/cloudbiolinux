@@ -21,3 +21,5 @@ bio_nextgen:
     - tabix
     - vcftools
     - yaha
+distributed:
+  - parallel

@@ -92,7 +92,6 @@ galaxyp:
   - galaxy_protk
   - protvis
 distributed:
-  - gnu_parallel
   - pydoop
   - seal
 system:
