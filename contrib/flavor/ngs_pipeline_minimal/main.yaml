@@ -6,6 +6,8 @@ packages:
   - libraries
   - python
   - java
+  - r
   - ruby
   - bio_nextgen
 libraries:
+  - r-libs
