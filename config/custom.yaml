@@ -9,7 +9,6 @@ bio_general:
  - pgdspider
 bio_nextgen:
   alignment:
-    - bwa
     - bowtie
     - gmap
     - lastz
@@ -19,7 +18,6 @@ bio_nextgen:
     - star
     #- stampy # no version names on tarballs
   utilities:
-    - bamtools
     - biobambam
     - cram
     - dwgsim
@@ -94,7 +92,6 @@ galaxyp:
   - galaxy_protk
   - protvis
 distributed:
-  - gnu_parallel
   - pydoop
   - seal
 system:

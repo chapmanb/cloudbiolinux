@@ -1,0 +1,7 @@
+---
+cranrepo: http://cran.fhcrc.org/
+cran:
+  - ggplot2
+biocrepo: http://bioconductor.org/biocLite.R
+bioc:
+ - cn.mops

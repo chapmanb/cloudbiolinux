@@ -16,10 +16,6 @@ bio_nextgen:
     - samtools
     #- tophat
   variant:
-    - delly
     - lumpy-sv
     - tabix
     - vcftools
-    - yaha
-distributed:
-  - parallel

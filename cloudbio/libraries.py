@@ -1,5 +1,6 @@
 """Installers for programming language specific libraries.
 """
+import os
 
 from fabric.api import env
 
@@ -12,24 +13,32 @@ def r_library_installer(config):
     if env.safe_exists(out_file):
         env.safe_run("rm -f %s" % out_file)
     env.safe_run("touch %s" % out_file)
+    lib_loc = os.path.join(env.system_install, "lib", "R", "site-library")
+    env.safe_sudo("mkdir -p %s" % lib_loc)
     repo_info = """
+    .libPaths(c("%s"))
     cran.repos <- getOption("repos")
     cran.repos["CRAN" ] <- "%s"
     options(repos=cran.repos)
     source("%s")
-    """ % (config["cranrepo"], config["biocrepo"])
+    """ % (lib_loc, config["cranrepo"], config["biocrepo"])
     env.safe_append(out_file, repo_info)
     install_fn = """
     repo.installer <- function(repos, install.fn) {
-      update.or.install <- function(pname) {
-        if (pname %in% installed.packages())
-          update.packages(lib.loc=c(pname), repos=repos, ask=FALSE)
-        else
+      %s
+      maybe.install <- function(pname) {
+        if (!(pname %%in%% installed.packages()))
           install.fn(pname)
       }
     }
     """
-    env.safe_append(out_file, install_fn)
+    if config.get("update_packages", True):
+        update_str = """
+        update.packages(lib.loc="%s", repos=repos, ask=FALSE)
+        """ % lib_loc
+    else:
+        update_str = "\n"
+    env.safe_append(out_file, install_fn % update_str)
     std_install = """
     std.pkgs <- c(%s)
     std.installer = repo.installer(cran.repos, install.packages)
@@ -43,12 +52,6 @@ def r_library_installer(config):
         lapply(bioc.pkgs, bioc.installer)
         """ % (", ".join('"%s"' % p for p in config['bioc']))
         env.safe_append(out_file, bioc_install)
-    if config.get("update_packages", True):
-        final_update = """
-        update.packages(repos=biocinstallRepos(), ask=FALSE)
-        update.packages(ask=FALSE)
-        """
-        env.safe_append(out_file, final_update)
     # run the script and then get rid of it
     env.safe_sudo("Rscript %s" % out_file)
     env.safe_run("rm -f %s" % out_file)

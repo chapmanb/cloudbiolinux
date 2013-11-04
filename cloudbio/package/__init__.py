@@ -47,7 +47,7 @@ def _connect_native_packages(env, pkg_install, lib_install):
     path = env.safe_run_output("echo $PATH")
     comment_line = "# CloudBioLinux PATH updates"
     if not env.safe_contains(env.shell_config, comment_line):
-        env.safe_append(env.shell_config, comment_line)
+        env.safe_append(env.shell_config, "\n" + comment_line)
     if bin_dir not in path and env.safe_exists(env.shell_config):
         add_path = "export PATH=%s:$PATH" % bin_dir
         if not env.safe_contains(env.shell_config, add_path):
