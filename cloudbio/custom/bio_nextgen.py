@@ -537,26 +537,6 @@ def install_gatk(env):
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
-    # Install R gsalib for report and pdf generation
-    # XXX Currently have issues with gsalib R installation.
-    # Need to make this into a proper R package and re-enable
-    if False:
-        with quiet():
-            have_gsalib = env.safe_run("Rscript -e '\"gsalib\" %in% installed.packages()'")
-        if have_gsalib and "FALSE" in have_gsalib:
-            # install dependencies for gsalib
-            rlib_config = get_config_file(env, "r-libs.yaml").base
-            with open(rlib_config) as in_handle:
-                config = yaml.load(in_handle)
-            config["bioc"] = []
-            config["update_packages"] = False
-            config["cran"] = ["ggplot2", "gplots"]
-            libraries.r_library_installer(config)
-            # install gsalib
-            git_repo = "git clone --depth 1 https://github.com/broadgsa/gatk.git"
-            def install_gsalib(env):
-                env.safe_sudo("ant gsalib")
-            _get_install(git_repo, env, install_gsalib)
 
 def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
@@ -724,8 +704,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-18"
-    revision = "c283d6d3b"
+    version = "0.9.9.2-21"
+    revision = "4f2fe5eee"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"

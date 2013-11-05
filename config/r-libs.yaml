@@ -32,6 +32,7 @@ cran:
  - graph
  - ggplot2
  - gplots
+ - gsalib
  - gtools
  - hdf5
  - hexbin
