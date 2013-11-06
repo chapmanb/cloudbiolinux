@@ -17,5 +17,5 @@ setup(name = "cloudbiolinux",
       scripts = [],
       install_requires = [
           "PyYAML >= 3.09",
-          "fabric >= 1.1.1"]
+          "fabric >= 1.8.0"]
       )
