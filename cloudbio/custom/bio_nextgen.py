@@ -721,12 +721,12 @@ def install_freebayes(env):
                  post_unpack_fn=_freebayes_fixes,
                  revision=revision)
 
-@_if_not_installed("vcfallelicprimitives -h")
+@_if_not_installed("vcfcreatemulti -h")
 def install_vcflib(env):
     """Utilities for parsing and manipulating VCF files.
     https://github.com/ekg/vcflib
     """
-    version = "06e664c"
+    version = "2ca6ec2d05"
     repository = "git clone --recursive https://github.com/ekg/vcflib.git"
     def _fix_tabixpp_library_order(env):
         env.safe_sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
