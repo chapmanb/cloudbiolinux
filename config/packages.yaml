@@ -131,7 +131,6 @@ programming:
     - xfsprogs
   filesystem:
     - libfuse-dev
-    - fuse-utils
   libraries:
     - tcl-dev
     - tk-dev
@@ -142,7 +141,6 @@ programming:
     - libboost-dev
     - libboost-python-dev
     - libboost-thread-dev
-    - libgd2-xpm
     - libgd2-xpm-dev
     - libgnomecanvas2-0
     - libgnomecanvas2-dev
@@ -262,7 +260,7 @@ erlang:
   - erlang-manpages
   - erlang-mode
 haskell:
-  - ghc6
+  - ghc
   - cabal-install
   - c2hs
 databases:
@@ -317,10 +315,10 @@ bio_general:
   - bio-linux-catchall
   # - bio-linux-emboss
   - bio-linux-readseq
-  - emboss
-  - emboss-data
-  - emboss-lib
-  - jemboss
+  # - emboss # Broken on 13.10
+  # - emboss-data # Broken on 13.10
+  # - emboss-lib # broken on 13.10
+  # - jemboss # Broken on 13.10
   - ugene
 bio_search:
   - blast2
@@ -374,9 +372,8 @@ bio_annotation:
   - bio-linux-big-blast
   - bio-linux-cd-hit
   - bio-linux-estscan
-  - bio-linux-glimmer3
   - bio-linux-jprofilegrid
-  - bio-linux-msatfinder
+  # - bio-linux-msatfinder # broken on 13.10
 #   - bio-linux-prot4est - broken, fix in progress
   - bio-linux-rbs-finder
   - bio-linux-transterm-hp
@@ -462,7 +459,7 @@ bio_utils:
   - bio-linux-bldp-files
   - bio-linux-sampledata
   - bio-linux-taxinspector
-  - bio-linux-xcut
+  # - bio-linux-xcut # hash mismatch
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
@@ -532,7 +529,6 @@ cloudman:
     # Required for s3fs
     - libfuse-dev
     - libfuse2
-    - fuse-utils
     - pkg-config
     - libcurl4-openssl-dev
     - libxml2-dev

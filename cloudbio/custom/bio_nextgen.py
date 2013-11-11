@@ -444,10 +444,10 @@ def install_bedtools(env):
     _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 def install_biobambam(env):
-    version = "0.0.96"
-    revision = "20131022183655"
-    libmaus_version = "0.0.77"
-    libmaus_revision = "20131022183354"
+    version = "0.0.107"
+    revision = "20131106163731"
+    libmaus_version = "0.0.88"
+    libmaus_revision = "20131106163655"
     url = "https://github.com/gt1/biobambam/archive/%s-release-%s.tar.gz" \
           % (version, revision)
     libmaus_url = "https://github.com/gt1/libmaus/archive/%s-release-%s.tar.gz" \
@@ -537,26 +537,6 @@ def install_gatk(env):
     url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
-    # Install R gsalib for report and pdf generation
-    # XXX Currently have issues with gsalib R installation.
-    # Need to make this into a proper R package and re-enable
-    if False:
-        with quiet():
-            have_gsalib = env.safe_run("Rscript -e '\"gsalib\" %in% installed.packages()'")
-        if have_gsalib and "FALSE" in have_gsalib:
-            # install dependencies for gsalib
-            rlib_config = get_config_file(env, "r-libs.yaml").base
-            with open(rlib_config) as in_handle:
-                config = yaml.load(in_handle)
-            config["bioc"] = []
-            config["update_packages"] = False
-            config["cran"] = ["ggplot2", "gplots"]
-            libraries.r_library_installer(config)
-            # install gsalib
-            git_repo = "git clone --depth 1 https://github.com/broadgsa/gatk.git"
-            def install_gsalib(env):
-                env.safe_sudo("ant gsalib")
-            _get_install(git_repo, env, install_gsalib)
 
 def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
@@ -728,8 +708,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-18"
-    revision = "c283d6d3b"
+    version = "0.9.9.2-21"
+    revision = "4f2fe5eee"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
@@ -745,12 +725,12 @@ def install_freebayes(env):
                  post_unpack_fn=_freebayes_fixes,
                  revision=revision)
 
-@_if_not_installed("vcfallelicprimitives -h")
+@_if_not_installed("vcfcreatemulti -h")
 def install_vcflib(env):
     """Utilities for parsing and manipulating VCF files.
     https://github.com/ekg/vcflib
     """
-    version = "06e664c"
+    version = "2ca6ec2d05"
     repository = "git clone --recursive https://github.com/ekg/vcflib.git"
     def _fix_tabixpp_library_order(env):
         env.safe_sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
