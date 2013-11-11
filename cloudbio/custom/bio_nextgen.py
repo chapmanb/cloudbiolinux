@@ -542,8 +542,8 @@ def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
     http://www.broadinstitute.org/gatk/
     """
-    min_version = "2.7-2"
-    version = "%s-g6bda569" % min_version
+    min_version = "2.7-4"
+    version = "%s-g6f46d11" % min_version
     if shared._symlinked_dir_exists("gatk", version, env, "java"):
         return
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
