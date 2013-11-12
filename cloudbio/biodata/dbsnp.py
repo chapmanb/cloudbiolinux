@@ -78,10 +78,23 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
     return fname
 
 def _download_cosmic(gid):
-    base_url = "http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/"
-    base_name = "b37_cosmic_v54_120711.vcf"
-    if gid in ["GRCh37"] and not env.safe_exists(base_name):
-        shared._remote_fetch(env, "{0}/{1}".format(base_url, base_name))
+    """Prepared versions of COSMIC, pre-sorted and indexed.
+    utils/prepare_cosmic.py handles the work of creating the VCFs from standard
+    COSMIC resources.
+    """
+    base_url = "https://s3.amazonaws.com/biodata/variants"
+    version = "v67_20131024"
+    supported = ["hg19", "GRCh37"]
+    if gid in supported:
+        url = "%s/cosmic-%s-%s.vcf.gz" % (base_url, version, gid)
+        gzip_fname = os.path.basename(url)
+        fname = os.path.splitext(gzip_fname)[0]
+        if not env.safe_exists(fname):
+            if not env.safe_exists(gzip_fname):
+                shared._remote_fetch(env, url)
+            env.safe_run("gunzip %s" % fname)
+        if not env.safe_exists(fname + ".idx"):
+            shared._remote_fetch(env, url.replace(".gz", ".idx"))
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.
