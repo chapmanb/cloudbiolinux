@@ -184,7 +184,9 @@ machine, i.e.  your local desktop, using ssh and cloudbiolinux.
 See the Installation section for installing CloudBioLinux with fabric.
 
 Any cloudbiolinux distribution can be used, including Ubuntu, Debian Linux
-and CentOS.
+and CentOS. We recommend using m1.medium or better instance for building a
+CloudBioLinux image from scratch, due to resource usage while compiling
+software.
 
 1. Go to the cloudbiolinux source and edit the `config/fabricrc.txt`,
    to match the system you plan to install on. Specifically,
