@@ -4,7 +4,6 @@ bio_nextgen:
     - bwa
     - star
   utilities:
-    - bamtools
     - biobambam
     - rnaseqc
   analysis:
