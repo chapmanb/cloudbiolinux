@@ -41,6 +41,8 @@ genomes:
     name: C elegans (WS210)
   - dbkey: rn5
     name: Rat (rn5)
+  - dbkey: canFam3
+    name: Dog (canFam3)
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
