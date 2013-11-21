@@ -121,14 +121,14 @@ a img {
 
 #page {
 	width: 900px;
-	height: 2700px;
+	height: 950px;
 	margin: 0px auto;
 	padding: 10px 0px 0px 0px;
 	background: #FFFFFF;
 }
 
 #header-pic {
-	background: url(images/logo.png) no-repeat left top;
+	background: #FFFFFF url(images/logo.png) no-repeat center top;
 	width: 900px;
 	height: 280px;
 }
@@ -138,10 +138,15 @@ a img {
 #content {
 	float: left;
 	width: 570px;
+	height: 950px;
+	background: #FFFFFF;
 }
 
 .post {
 	margin: 0px 0px 30px 0px;
+	height: 960px;
+	background: #FFFFFF;
+	overflow: visible;
 }
 
 .post .title {
