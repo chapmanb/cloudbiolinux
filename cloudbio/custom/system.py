@@ -3,10 +3,11 @@ Install system programs not available from packages.
 """
 import os
 
-from fabric.api import cd, quiet
+from fabric.api import cd
 
 from cloudbio.custom import shared
 from cloudbio.custom.shared import _if_not_installed, _get_install, _configure_make
+from cloudbio.fabutils import quiet
 
 def install_homebrew(env):
     """Homebrew package manager for OSX and Linuxbrew for linux systems.
@@ -26,7 +27,7 @@ def install_homebrew(env):
                 with cd(tmp_dir):
                     if env.safe_exists("linuxbrew"):
                         env.safe_run("rm -rf linuxbrew")
-                    env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git" )
+                    env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git")
                     with cd("linuxbrew"):
                         env.safe_sudo("chown %s %s" % (env.user, env.system_install))
                         paths = ["bin", "etc", "include", "lib", "lib/pkgconfig", "Library",

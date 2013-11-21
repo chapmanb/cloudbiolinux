@@ -5,9 +5,10 @@ https://github.com/Homebrew/linuxbrew
 import os
 
 from cloudbio.flavor.config import get_config_file
+from cloudbio.fabutils import quiet, find_cmd
 from cloudbio.package.shared import _yaml_to_packages
 
-from fabric.api import quiet, cd
+from fabric.api import cd
 
 def install_packages(env, to_install=None, packages=None):
     """Install packages using the home brew package manager.
@@ -29,7 +30,7 @@ def install_packages(env, to_install=None, packages=None):
         if repo not in current_taps:
             env.safe_run("%s tap %s" % (brew_cmd, repo))
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
-             "current" : _get_current_pkgs(env, brew_cmd)}
+             "current": _get_current_pkgs(env, brew_cmd)}
     _install_brew_baseline(env, brew_cmd, ipkgs)
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
@@ -107,7 +108,7 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
         brew_subcmd = "upgrade"
     elif pkg in ipkgs["current"]:
         brew_subcmd = None
-        pkg_version =  _latest_pkg_version(env, brew_cmd, pkg)
+        pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
         if ipkgs["current"][pkg] != pkg_version:
             _install_pkg_version(env, pkg, pkg_version, brew_cmd, ipkgs)
     else:
@@ -141,10 +142,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs):
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.
     """
-    local_brew = os.path.join(env.system_install, "bin", "brew")
-    for cmd in [local_brew, "brew"]:
-        with quiet():
-            test_version = env.safe_run("%s --version" % cmd)
-        if test_version.succeeded:
-            return cmd
-    raise ValueError("Did not find working installation of Linuxbrew/Homebrew")
+    cmd = find_cmd(env, "brew", "--version")
+    if cmd is None:
+        raise ValueError("Did not find working installation of Linuxbrew/Homebrew")
+    else:
+        return cmd

@@ -12,6 +12,7 @@ Handles:
     - safe_sed: Run sed command.
 """
 import hashlib
+import os
 import re
 import shutil
 
@@ -184,6 +185,16 @@ def configure_runsudo(env):
             else:
                 env.safe_sudo = run
 
+def find_cmd(env, cmd, args):
+    """Retrieve location of a command, checking in installation directory.
+    """
+    local_cmd = os.path.join(env.system_install, "bin", cmd)
+    for cmd in [local_cmd, cmd]:
+        with quiet():
+            test_version = env.safe_run("%s %s" % (cmd, args))
+        if test_version.succeeded:
+            return cmd
+    return None
 
 try:
     from fabric.api import quiet
