@@ -21,7 +21,6 @@ pypi:
   - webhelpers
   - webob
   - xlrd
-  - yolk
   # build
   - Pyrex
   # concurrency/web
