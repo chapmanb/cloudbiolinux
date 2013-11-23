@@ -26,6 +26,7 @@ bio_nextgen:
     - ogap
     - rnaseqc
     - varianttools
+    - disambiguate
   analysis:
     - cufflinks
     # - echo # build problems on ubuntu 12.10

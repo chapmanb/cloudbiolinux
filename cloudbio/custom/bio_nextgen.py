@@ -624,6 +624,14 @@ def install_tabix(env):
     url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
     _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
 
+@_if_not_installed("disambiguate.py")
+def install_disambiguate(env):
+    """a  tool for disambiguating reads aligning to multiple genomes
+    https://github.com:mjafin/disambiguate
+    """
+    repository = "git clone https://github.com/mjafin/disambiguate.git"
+    _get_install(repository, env, _python_make)
+
 def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
