@@ -81,9 +81,7 @@ bio_proteomics_wine:
   - proteowizard
   - morpheus
 cloudman:
-  - nginx
-  - proftpd
-  - sge
+  - cloudman
   - novnc
 galaxy:
   - galaxy_webapp
