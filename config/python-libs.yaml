@@ -5,7 +5,6 @@ pypi:
   # infrastructure
   - amqplib
   - BeautifulSoup
-  - distribute
   - fabric
   - Logbook
   - lxml
@@ -22,7 +21,6 @@ pypi:
   - webhelpers
   - webob
   - xlrd
-  - yolk
   # build
   - Pyrex
   # concurrency/web

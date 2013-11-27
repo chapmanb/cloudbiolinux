@@ -3,7 +3,7 @@
 import os
 
 from fabric.api import env
-
+from cloudbio import fabutils
 
 def r_library_installer(config):
     """Install R libraries using CRAN and Bioconductor.
@@ -53,5 +53,9 @@ def r_library_installer(config):
         """ % (", ".join('"%s"' % p for p in config['bioc']))
         env.safe_append(out_file, bioc_install)
     # run the script and then get rid of it
-    env.safe_sudo("Rscript %s" % out_file)
+    rscript = fabutils.find_cmd(env, "Rscript", "--version")
+    if rscript:
+        env.safe_sudo("%s %s" % (rscript, out_file))
+    else:
+        env.logger.warn("Rscript not found; skipping install of R libraries.")
     env.safe_run("rm -f %s" % out_file)

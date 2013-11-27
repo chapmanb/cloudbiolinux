@@ -542,8 +542,8 @@ def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
     http://www.broadinstitute.org/gatk/
     """
-    min_version = "2.7-2"
-    version = "%s-g6bda569" % min_version
+    min_version = "2.7-4"
+    version = "%s-g6f46d11" % min_version
     if shared._symlinked_dir_exists("gatk", version, env, "java"):
         return
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
@@ -623,6 +623,14 @@ def install_tabix(env):
     version = "0.2.6"
     url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
     _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
+
+@_if_not_installed("disambiguate.py")
+def install_disambiguate(env):
+    """a  tool for disambiguating reads aligning to multiple genomes
+    https://github.com:mjafin/disambiguate
+    """
+    repository = "git clone https://github.com/mjafin/disambiguate.git"
+    _get_install(repository, env, _python_make)
 
 def install_grabix(env):
     """a wee tool for random access into BGZF files
@@ -708,8 +716,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-21"
-    revision = "4f2fe5eee"
+    version = "0.9.9.2-23"
+    revision = "5d5b8ac08"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
@@ -938,7 +946,7 @@ def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
     http://cortexassembler.sourceforge.net/index_cortex_var.html
     """
-    version = "1.0.5.20"
+    version = "1.0.5.21"
     url = "http://downloads.sourceforge.net/project/cortexassembler/cortex_var/" \
           "latest/CORTEX_release_v{0}.tgz".format(version)
     def _cortex_build(env):

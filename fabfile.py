@@ -348,16 +348,22 @@ def _read_main_config():
 # ### Library specific installation code
 
 def _python_library_installer(config):
-    """Install python specific libraries using easy_install.
+    """Install python specific libraries using pip, conda and easy_install.
     Handles using isolated anaconda environments.
     """
     if shared._is_anaconda(env):
+        conda_bin = shared._conda_cmd(env)
         for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
-            env.safe_run("{0} install --yes {1}".format(shared._conda_cmd(env), pname))
+            env.safe_run("{0} install --yes {1}".format(conda_bin, pname))
         cmd = env.safe_run
+        with settings(warn_only=True):
+            cmd("%s -U distribute" % os.path.join(os.path.dirname(conda_bin), "easy_install"))
     else:
-        version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
-        env.safe_sudo("easy_install%s -U pip" % version_ext)
+        pip_bin = shared._pip_cmd(env)
+        ei_bin = pip_bin.replace("pip", "easy_install")
+        env.safe_sudo("%s -U pip" % ei_bin)
+        with settings(warn_only=True):
+            env.safe_sudo("%s -U distribute" % ei_bin)
         cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
         cmd("{0} install --upgrade {1}".format(shared._pip_cmd(env), pname))

@@ -211,8 +211,9 @@ def _configure_make(env):
     env.safe_run("export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:%s/lib/pkgconfig && " \
                  "./configure --disable-werror --prefix=%s " %
                  (env.system_install, env.system_install))
-    env.safe_run("make")
-    env.safe_sudo("make install")
+    lib_export = "export LD_LIBRARY_PATH=%s/lib:$LD_LIBRARY_PATH" % env.system_install
+    env.safe_run("%s && make" % lib_export)
+    env.safe_sudo("%s && make install" % lib_export)
 
 def _ac_configure_make(env):
     env.safe_run("autoreconf -i -f")
