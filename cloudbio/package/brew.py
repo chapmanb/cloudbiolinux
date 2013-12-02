@@ -29,6 +29,7 @@ def install_packages(env, to_install=None, packages=None):
     for repo in formula_repos:
         if repo not in current_taps:
             env.safe_run("%s tap %s" % (brew_cmd, repo))
+    env.safe_run("%s tap --repair" % brew_cmd)
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
              "current": _get_current_pkgs(env, brew_cmd)}
     _install_brew_baseline(env, brew_cmd, ipkgs)
