@@ -9,6 +9,7 @@ bio_nextgen:
     - bamtools
     - bedtools
     - fastqc
+    - fastx_toolkit
     - qualimap
     - sambamba
   analysis:

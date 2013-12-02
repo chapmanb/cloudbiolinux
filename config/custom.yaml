@@ -22,7 +22,6 @@ bio_nextgen:
     - cram
     - dwgsim
     - fastq_screen
-    - fastx_toolkit
     - ogap
     - rnaseqc
     - varianttools
