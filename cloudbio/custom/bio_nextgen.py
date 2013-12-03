@@ -841,13 +841,15 @@ def SRC_install_cufflinks(env):
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
-@_if_not_installed("tophat")
 def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
-    default_version = "2.0.9"
+    default_version = "2.0.10"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "tophat", version, stdout_flag="TopHat"):
+        env.logger.info("tophat version {0} is up to date; not installing"
+            .format(version))
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -type f",
