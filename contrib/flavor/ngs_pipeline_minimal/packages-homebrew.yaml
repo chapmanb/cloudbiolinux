@@ -17,6 +17,8 @@ bio_nextgen:
     - samtools
     #- tophat
   variant:
+    - glia
     - lumpy-sv
     - tabix
+    - vcflib
     - vcftools

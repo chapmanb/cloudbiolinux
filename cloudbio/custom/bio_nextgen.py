@@ -729,21 +729,6 @@ def install_freebayes(env):
                  post_unpack_fn=_freebayes_fixes,
                  revision=revision)
 
-@_if_not_installed("vcfcreatemulti -h")
-def install_vcflib(env):
-    """Utilities for parsing and manipulating VCF files.
-    https://github.com/ekg/vcflib
-    """
-    version = "2ca6ec2d05"
-    repository = "git clone --recursive https://github.com/ekg/vcflib.git"
-    def _fix_tabixpp_library_order(env):
-        env.safe_sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
-    _get_install(repository, env,
-                 _make_copy("find -perm -100 -type f -name 'vcf*'"
-                            " | grep -v '.sh$' | grep -v '.r$'"),
-                 post_unpack_fn=_fix_tabixpp_library_order,
-                 revision=version)
-
 @_if_not_installed("bamtools")
 def install_bamtools(env):
     """command-line toolkit for working with BAM data
@@ -850,6 +835,7 @@ def install_tophat(env):
     if versioncheck.up_to_date(env, "tophat", version, stdout_flag="TopHat"):
         env.logger.info("tophat version {0} is up to date; not installing"
             .format(version))
+        return
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
     _get_install(url, env, _make_copy("find -perm -100 -type f",
