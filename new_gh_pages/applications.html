@@ -2,30 +2,87 @@
 <!--
 Design by Free CSS Templateshttp://www.freecsstemplates.orgReleased for free under a Creative Commons Attribution 2.5 LicenseName       : ProfessionalDescription: A two-column, fixed-width design with dark color scheme background.Version    : 1.0Released   : 20081230-->
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-	
-	<div class="post">
-		<h1 class="title">CloudBioLinux Services</h1>
-		<div class="entry">
-			<p>The CloudBioLinux project provides several services not available with the standard tool set of Galaxy. 
-			Such services include:</p>
-			<ul style="text-align: left;">
-				<li><span style="font-weight: bold;">Viral Assembly and Annotation</span></li>
-				<ul>
-					<li>This set of tools allows a user to assemble and/or annotate 454 sequence data 
-					(along with optional Sanger and Solexa) from any one of several viral organisms. 
-					The annotation is displayed in an extensive, graphical interface through which the user 
-					can easily acquire more information.</li>
-					<li>Detailed documentation can be found here.<span style="  font-weight: bold;"><br /></span></li>
-				</ul>
-				<li><span style="font-weight: bold;">Prokaryote Assembly</span></li>
-				<ul>
-					<li>The JCVI prokaryotic genome annotation pipeline runs a collection of scripts and 
-					programs allowing the identification of genes as well as structural and functional 
-					annotation of those genes.  A variety of 3rd-party tools is run alongside novel scripts 
-					that collect and analyze results.</li>
-				</ul>
-			</ul>
-		</div>
-	</div>
+  <head>
+    <meta http-equiv="content-type" content="application/xhtml+xml; charset=windows-1252" />
+    <link media="screen" href="style.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="post">
+      <h1 class="title">Applications</h1>
+      <div class="entry">
+        <p>CloudBioLinux raises the possibly of several applications to advance
+          Bioinformatics, many of which are already in development and
+          production:</p>
+        <p><span style="text-decoration: underline;"><span style="font-weight: bold;">
+		<a href="http://wiki.galaxyproject.org/CloudMan?action=show&amp;redirect=Admin%2FCloud" target="_blank">CloudMan</a>
+		</span></span></p>
+        <p>Written by Enis Afgan and the Galaxy Team, CloudMan is a manager that
+          uses CloudBioLinux as a platform to build a full SGE cluster
+          environment for hosting the Galaxy application. CloudMan also enables
+          Galaxy to run effectively by:</p>
+        <ul>
+          <li> Coordinating the cloud infrastructure needed by Galaxy.</li>
+          <li>Providing a framework for enabling applications to run on the
+            cloud and utilize the infrastructure's elasticity.</li>
+          <li>Providing a ready-to-run. dynamically scalable version of Galaxy
+            on Amazon AWS.</li>
+        </ul>
+        <p>Backed up by cloud environment provided by CloudMan, Galaxy can
+          utilize greater resources than the the traditional configuration of an
+          in-house installation. In addition, the scalability offered by cloud
+          computing via CloudMan spares users the concern of computing details
+          (i.e. number of nodes, etc), as CloudMan can optimize use of resources
+          to the workload in question. Many users and organizations may prefer
+          the cost of renting space and computational power to use the CloudMan-backed
+          Galaxy instance of a 3rd party over the costs of installing, and maintaining,
+          their own in-house instance.</p>
+        <p>The measure of CloudMan's benefits only increases when considering
+          Galaxy's own features of enabling users to add their own custom tools
+          and enabling the users of a common Galaxy deployment to share their data,
+          tools, pipelines, and workflows with one another.</p>
+        <p>Various pipelines have already been developed for Galaxy in
+          conjunction with CloudMan:</p>
+        <ul style="text-align: left;">
+          <li><span style="font-weight: bold;"><a href="http://172.17.31.104" target="_blank">Viral Assembly and Annotation</a></span></li>
+          <ul>
+            <li>This set of tools allows a user to assemble and/or annotate 454
+              sequence data (along with optional Sanger and Solexa) from any one
+              of several viral organisms. The annotation is displayed in an
+              extensive, graphical interface through which the user can easily
+              acquire more information.</li>
+          </ul>
+          <li><span style="font-weight: bold;">Prokaryote Assembly</span></li>
+          <ul>
+            <li>The JCVI prokaryotic genome annotation pipeline runs a
+              collection of scripts and programs allowing the identification of
+              genes as well as structural and functional annotation of those
+              genes. A variety of 3rd-party tools is run alongside novel scripts
+              that collect and analyze results.</li>
+          </ul>
+          <li><span style="font-weight: bold;">
+		  <a href="http://bcbio.wordpress.com/2011/08/19/distributed-exome-analysis-pipeline-with-cloudbiolinux-and-cloudman/" target="_blank">Distributed Exome Analysis Pipeline</a>
+		  </span></li>
+          <ul>
+            <li>A fully automated pipeline for processing high throughput exome
+              sequencing data. Using several 3rd-party tools, the pipeline
+              performs alignment, realignment, variant detection, and analysis
+              summary on input data.</li>
+          </ul>
+        </ul>
+        <p><span style="text-decoration: underline;"><span style="font-weight: bold;">
+		<a href="http://bcbio.wordpress.com/2011/11/29/making-next-generation-sequencing-analysis-pipelines-easier-with-biocloudcentral-and-galaxy-integration/" target="_blank">CloudBioCentral</a>
+		</span></span></p>
+        <p>An extension of CloudBioLinux, in response to feedback from the
+          CloudBioLinux community, CloudBioCentral is a web service that
+          launches CloudBioLinux and CloudMan clusters on Amazon Web Services
+          hardware. This removes all of the manual steps involved in setting up
+          security groups and launching a CloudBioLinux instance. A user only
+          needs to sign up for an AWS account; BioCloudCentral takes care of
+          everything else. The CloudBioCentral web interface itself can be found
+          <a href="https://biocloudcentral.herokuapp.com/launch" target="_blank">here</a>.</p>
+        <ul style="text-align: left;">
+        </ul>
+      </div>
+    </div>
+  </body>
 </html>

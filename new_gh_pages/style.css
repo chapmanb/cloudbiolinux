@@ -121,7 +121,7 @@ a img {
 
 #page {
 	width: 900px;
-	height: 950px;
+	height: 1100px;
 	margin: 0px auto;
 	padding: 10px 0px 0px 0px;
 	background: #FFFFFF;
@@ -138,13 +138,13 @@ a img {
 #content {
 	float: left;
 	width: 570px;
-	height: 950px;
+	height: 1050px;
 	background: #FFFFFF;
 }
 
 .post {
 	margin: 0px 0px 30px 0px;
-	height: 960px;
+	height: 1150px;
 	background: #FFFFFF;
 	overflow: visible;
 }
