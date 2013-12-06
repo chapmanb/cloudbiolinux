@@ -1,4 +1,3 @@
-
 body {
 	margin: 0px;
 	padding: 0px;
@@ -81,54 +80,18 @@ a img {
 	padding: 25px 0px 0px 0px;
 }
 
-/* Menu */
-
-#menu {
-	float: right;
-}
-
-#menu ul {
-	margin: 0px;
-	padding: 49px 0px 0px 0px;
-	list-style: none;
-	line-height: normal;
-}
-
-#menu li {
-	float: left;
-	margin: 0px;
-}
-
-#menu a {
-	display: block;
-	width: auto;
-	padding: 6px 20px;
-}
-
-#menu a:hover {
-	text-decoration: underline;
-}
-
-#menu .active {
-	background: #404040;
-}
-
-#menu .active a {
-	background: url(images/img02.gif) no-repeat 100% -40px;
-}
-
 /* Page */
 
 #page {
 	width: 900px;
-	height: 1100px;
+	height: 1200px;
 	margin: 0px auto;
 	padding: 10px 0px 0px 0px;
 	background: #FFFFFF;
 }
 
 #header-pic {
-	background: #FFFFFF url(images/logo.png) no-repeat center top;
+	background: #FFFFFF url(images/cloudbiolinux-logo.png) no-repeat center top;
 	width: 900px;
 	height: 280px;
 }
@@ -138,20 +101,20 @@ a img {
 #content {
 	float: left;
 	width: 570px;
-	height: 1050px;
+	height: 1200px;
 	background: #FFFFFF;
 }
 
 .post {
 	margin: 0px 0px 30px 0px;
-	height: 1150px;
+	height: 1210px;
 	background: #FFFFFF;
 	overflow: visible;
 }
 
 .post .title {
 	margin: 0px;
-	background: #444444 url(images/img02.jpg) no-repeat left 50%;
+	background: #444444 url(images/header-tab.jpg) no-repeat left 50%;
 	padding: 7px 25px;
 	font-size: 1.4em;
 }
@@ -184,11 +147,11 @@ a img {
 }
 
 #sidebar-bgbtm {
-	background: url(images/img03.jpg) no-repeat left bottom;
+	background: url(images/sidebar-bottom.jpg) no-repeat left bottom;
 }
 
 #sidebar-content {
-	background: url(images/img01.jpg) repeat-y left top;
+	background: url(images/sidebar-content-divider.jpg) repeat-y left top;
 }
 
 #sidebar ul {
@@ -203,7 +166,7 @@ a img {
 	line-height: 30px;
 	padding-left: 15px;
 	border-bottom: 1px dashed #BDBDBD;
-	background: url(images/img04.jpg) no-repeat left 50%;
+	background: url(images/sidebar-list-bullet.jpg) no-repeat left 50%;
 }
 
 #sidebar li ul {
@@ -212,7 +175,7 @@ a img {
 }
 
 #sidebar h2 {
-	background: #444444 url(images/img02.jpg) no-repeat left 50%;
+	background: #444444 url(images/header-tab.jpg) no-repeat left 50%;
 	padding: 7px 25px;
 	font-size: 1.4em;
 }
@@ -225,42 +188,16 @@ a img {
 	text-decoration: underline;
 }
 
-/* Search */
-
-#search {
-}
-
-#search form {
-	margin-bottom: 1.8em;
-	padding: 0px;
-}
-
-#search fieldset {
-	margin-left: 20px;
-	padding: 0px;
-	border: none;
-}
-
-#search #s {
-	width: 160px;
-}
-
 /* Footer */
 
 #footer {
-	clear: both;
-	width: 900px;
-	height: 100px;
-	margin: 0px auto 30px auto;
-	color: #FFFFFF;
-}
-
-#footer p {
-	margin: 0px;
-	padding: 19px 0px 0px 0px;
-	text-align: center;
-	line-height: normal;
-	font-size: smaller;
+	text-align:center;
+	border-top:2px solid #000;
+	padding:10px;
+	margin:30px 0 0 0;
+	color:#ccc;
+	width:760px;
+	margin:0 auto;
 }
 
 #footer a {
