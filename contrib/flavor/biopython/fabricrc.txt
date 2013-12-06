@@ -1,0 +1,37 @@
+# Configuration file for Fabric specifying filesystem information
+# This can be adjusted and passed to fab on the commandline as '-c'
+#
+# For example
+#
+#   fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data_s3:your_biodata.yaml
+
+# -- Details about the operating system
+distribution = __auto__
+dist_name = __auto__
+
+# -- Installation details
+
+# Global installation directory for packages and standard programs
+system_install = ~/biopython
+# Local install directory for versioned software that will not
+# be included in the path by default
+local_install = ~/biopython/share
+
+# Global setting for using sudo; allows installation of custom packages
+# by non-privileged users.
+# *Note*: ``system_install`` needs to point to a user-writeable directory if
+# ``use_sudo`` is set to ``False``
+use_sudo = False
+keep_isolated = True
+
+# Set to get CloudBioLinux customizations like setup scripts;
+# or set to different edition to get specific customizations
+#edition = cloudbiolinux
+
+# Whether to clean the system for EC2 AMI preparation;
+# do not set on vagrant or local machines
+is_ec2_image = false
+
+# Shell to be used by CBL scripts during runtime
+shell_config = ~/.bashrc
+shell = /bin/bash -i -c

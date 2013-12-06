@@ -1,0 +1,13 @@
+# Packages available in the Homebrew and Linuxbrew package manager
+---
+bio_alignment:
+  - clustal-w
+  - clustal-omega
+  - mafft
+bio_search:
+  - blast
+bio_nextgen:
+  utilities:
+    - bedtools
+  analysis:
+    - samtools
