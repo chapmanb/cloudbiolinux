@@ -225,8 +225,8 @@ class BroadGenome(_DownloadHelper):
             env.safe_run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "2.3"
-DBSNP_VERSION = "137"
+BROAD_BUNDLE_VERSION = "2.8"
+DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
