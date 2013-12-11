@@ -563,10 +563,14 @@ def _index_bowtie(ref_file):
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_bowtie2(ref_file):
-    print "sup"
     dir_name = "bowtie2"
     cmd = "bowtie2-build {ref_file} {index_name}"
-    return _index_w_command(dir_name, cmd, ref_file)
+    out_suffix = _index_w_command(dir_name, cmd, ref_file)
+    bowtie_link = os.path.join(os.path.dirname(ref_file), os.path.pardir,
+                               out_suffix + ".fa")
+    if not os.path.exists(bowtie_link):
+        os.symlink(ref_file, bowtie_link)
+    return out_suffix
 
 def _index_bwa(ref_file):
     dir_name = "bwa"
