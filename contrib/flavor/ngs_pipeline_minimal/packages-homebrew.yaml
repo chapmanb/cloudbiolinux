@@ -13,11 +13,11 @@ bio_nextgen:
     - sambamba
   analysis:
     #- cufflinks
-    - samtools
+    - chapmanb/cbl/samtools
+    - bcftools
     #- tophat
   variant:
     - glia
     - lumpy-sv
-    - tabix
     - vcflib
     - vcftools
