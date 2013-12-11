@@ -8,7 +8,7 @@ from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import quiet, find_cmd
 from cloudbio.package.shared import _yaml_to_packages
 
-from fabric.api import cd
+from fabric.api import cd, settings
 
 def install_packages(env, to_install=None, packages=None):
     """Install packages using the home brew package manager.
@@ -32,7 +32,7 @@ def install_packages(env, to_install=None, packages=None):
     env.safe_run("%s tap --repair" % brew_cmd)
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
              "current": _get_current_pkgs(env, brew_cmd)}
-    _install_brew_baseline(env, brew_cmd, ipkgs)
+    _install_brew_baseline(env, brew_cmd, ipkgs, packages)
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
 
@@ -75,7 +75,8 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     if pkg in ipkgs["current"]:
         env.safe_run("{brew_cmd} unlink {pkg}".format(**locals()))
     env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
-    env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
+    with settings(warn_only=True):
+        env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
     env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
     # reset Git back to latest
     with cd(brew_prefix):
@@ -130,13 +131,16 @@ def _get_pkg_and_version(pkg_str):
         assert len(parts) == 2
         return parts
 
-def _install_brew_baseline(env, brew_cmd, ipkgs):
+def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
 
     Handles installation of required Perl libraries.
     """
     for dep in ["cpanminus", "expat"]:
         _install_pkg_latest(env, dep, brew_cmd, ipkgs)
+    # if installing samtools, avoid conflicts with cbl and homebrew-science versions
+    if len([x for x in packages if x.find("samtools") >= 0]):
+        env.safe_run("{brew_cmd} unlink {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
