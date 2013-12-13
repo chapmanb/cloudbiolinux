@@ -140,7 +140,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
         _install_pkg_latest(env, dep, brew_cmd, ipkgs)
     # if installing samtools, avoid conflicts with cbl and homebrew-science versions
     if len([x for x in packages if x.find("samtools") >= 0]):
-        env.safe_run("{brew_cmd} unlink {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
+        with settings(warn_only=True):
+            env.safe_run("{brew_cmd} unlink {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
