@@ -11,7 +11,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_lib_dir, _get_include_dir)
+                    _get_lib_dir, _get_include_dir, _apply_patch)
 from cloudbio.custom import shared, versioncheck
 
 from cloudbio import libraries
@@ -838,8 +838,12 @@ def install_tophat(env):
         return
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f",
-                                      do_make=False))
+
+    def premake_cmd(env):
+        url = "http://dl.dropboxusercontent.com/u/2822886/tophat/tophat_fix.diff"
+        _apply_patch(env, url)
+    _get_install(url, env,
+                 _make_copy("find -perm -100 -type f", do_make=False), premake_cmd)
 
 install_tophat2 = install_tophat
 
