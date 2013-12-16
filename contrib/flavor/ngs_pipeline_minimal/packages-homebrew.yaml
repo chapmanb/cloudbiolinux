@@ -19,5 +19,6 @@ bio_nextgen:
   variant:
     - glia
     - lumpy-sv
+    - tabix
     - vcflib
     - vcftools
