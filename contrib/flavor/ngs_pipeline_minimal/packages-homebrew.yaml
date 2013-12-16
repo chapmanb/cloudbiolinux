@@ -13,7 +13,7 @@ bio_nextgen:
     - sambamba
   analysis:
     #- cufflinks
-    - chapmanb/cbl/samtools
+    - chapmanb/cbl/samtools==0.1.19
     - bcftools
     #- tophat
   variant:

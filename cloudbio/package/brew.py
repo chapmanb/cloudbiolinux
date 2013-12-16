@@ -2,6 +2,7 @@
 https://github.com/mxcl/homebrew
 https://github.com/Homebrew/linuxbrew
 """
+from distutils.version import LooseVersion
 import os
 
 from cloudbio.flavor.config import get_config_file
@@ -72,8 +73,17 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     print brew_prefix, git_fname
     with cd(brew_prefix):
         env.safe_run(git_cmd)
-    if pkg in ipkgs["current"]:
-        env.safe_run("{brew_cmd} unlink {pkg}".format(**locals()))
+    if pkg.split("/")[-1] in ipkgs["current"]:
+        with settings(warn_only=True):
+            env.safe_run("{brew_cmd} unlink {pkg}".format(
+                brew_cmd=brew_cmd, pkg=pkg.split("/")[-1]))
+    # if we have a more recent version, uninstall that first
+    cur_version_parts = env.safe_run_output("{brew_cmd} list --versions {pkg}".format(
+        brew_cmd=brew_cmd, pkg=pkg.split("/")[-1])).strip().split()
+    if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
+        with settings(warn_only=True):
+            env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
+    # finally install our desired version
     env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
     with settings(warn_only=True):
         env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
@@ -141,7 +151,10 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     # if installing samtools, avoid conflicts with cbl and homebrew-science versions
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
-            env.safe_run("{brew_cmd} unlink {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
+            has_bcftools = int(env.safe_run_output("{brew_cmd} list samtools | grep -c bcftools".format(
+                brew_cmd=brew_cmd)))
+            if has_bcftools:
+                env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
