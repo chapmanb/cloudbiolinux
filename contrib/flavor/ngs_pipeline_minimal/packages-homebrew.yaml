@@ -7,7 +7,7 @@ bio_nextgen:
     - novoalign
   utilities:
     - bamtools
-    - bedtools==2.17.0
+    - bedtools
     - fastqc
     - qualimap
     - sambamba
