@@ -2,6 +2,7 @@
 https://github.com/mxcl/homebrew
 https://github.com/Homebrew/linuxbrew
 """
+import contextlib
 from distutils.version import LooseVersion
 import os
 
@@ -25,8 +26,8 @@ def install_packages(env, to_install=None, packages=None):
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
     brew_cmd = _brew_cmd(env)
     formula_repos = ["homebrew/science", "chapmanb/cbl"]
-    env.safe_run("%s update" % brew_cmd)
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
+    _safe_update(env, brew_cmd, formula_repos, current_taps)
     for repo in formula_repos:
         if repo not in current_taps:
             env.safe_run("%s tap %s" % (brew_cmd, repo))
@@ -36,6 +37,17 @@ def install_packages(env, to_install=None, packages=None):
     _install_brew_baseline(env, brew_cmd, ipkgs, packages)
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
+
+def _safe_update(env, brew_cmd, formula_repos, cur_taps):
+    """Revert any taps if we fail to update due to local changes.
+    """
+    with settings(warn_only=True):
+        out = env.safe_run("%s update" % brew_cmd)
+    if out.failed:
+        for repo in formula_repos:
+            if repo in cur_taps:
+                env.safe_run("%s untap %s" % (brew_cmd, repo))
+        env.safe_run("%s update" % brew_cmd)
 
 def _get_current_pkgs(env, brew_cmd):
     out = {}
@@ -65,34 +77,44 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     """
     if ipkgs["current"].get(pkg) == version:
         return
+    with _git_pkg_version(env, brew_cmd, pkg, version):
+        if pkg.split("/")[-1] in ipkgs["current"]:
+            with settings(warn_only=True):
+                env.safe_run("{brew_cmd} unlink {pkg}".format(
+                    brew_cmd=brew_cmd, pkg=pkg.split("/")[-1]))
+        # if we have a more recent version, uninstall that first
+        cur_version_parts = env.safe_run_output("{brew_cmd} list --versions {pkg}".format(
+            brew_cmd=brew_cmd, pkg=pkg.split("/")[-1])).strip().split()
+        if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
+            with settings(warn_only=True):
+                env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
+        # finally install our desired version
+        env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
+        with settings(warn_only=True):
+            env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
+        env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+
+@contextlib.contextmanager
+def _git_pkg_version(env, brew_cmd, pkg, version):
+    """Convert homebrew Git to previous revision to install a specific package version.
+    """
     git_cmd = _git_cmd_for_pkg_version(env, brew_cmd, pkg, version)
     git_fname = git_cmd.split()[-1]
     brew_prefix = env.safe_run_output("{brew_cmd} --prefix".format(**locals()))
     if git_fname.startswith("{brew_prefix}/Library/Taps/".format(**locals())):
         brew_prefix = os.path.dirname(git_fname)
-    print brew_prefix, git_fname
-    with cd(brew_prefix):
-        env.safe_run(git_cmd)
-    if pkg.split("/")[-1] in ipkgs["current"]:
-        with settings(warn_only=True):
-            env.safe_run("{brew_cmd} unlink {pkg}".format(
-                brew_cmd=brew_cmd, pkg=pkg.split("/")[-1]))
-    # if we have a more recent version, uninstall that first
-    cur_version_parts = env.safe_run_output("{brew_cmd} list --versions {pkg}".format(
-        brew_cmd=brew_cmd, pkg=pkg.split("/")[-1])).strip().split()
-    if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
-        with settings(warn_only=True):
-            env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
-    # finally install our desired version
-    env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
-    with settings(warn_only=True):
-        env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
-    env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
-    # reset Git back to latest
-    with cd(brew_prefix):
-        cmd_parts = git_cmd.split()
-        cmd_parts[2] = "--"
-        env.safe_run(" ".join(cmd_parts))
+    print git_cmd, brew_prefix, git_fname
+    try:
+        with cd(brew_prefix):
+            env.safe_run(git_cmd)
+        yield
+    finally:
+        # reset Git back to latest
+        with cd(brew_prefix):
+            cmd_parts = git_cmd.split()
+            env.safe_run("%s reset HEAD %s" % (cmd_parts[0], cmd_parts[-1]))
+            cmd_parts[2] = "--"
+            env.safe_run(" ".join(cmd_parts))
 
 def _git_cmd_for_pkg_version(env, brew_cmd, pkg, version):
     """Retrieve git command to check out a specific version from homebrew.

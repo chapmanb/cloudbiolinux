@@ -833,7 +833,7 @@ def install_tophat(env):
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
 #    if versioncheck.up_to_date(env, "tophat", version, stdout_flag="TopHat"):
-    if versioncheck.is_version(env, "tophat", version, stdout_flag="TopHat"):
+    if versioncheck.is_version(env, "tophat", version, args="--version", stdout_flag="TopHat"):
         env.logger.info("tophat version {0} is up to date; not installing"
             .format(version))
         return
