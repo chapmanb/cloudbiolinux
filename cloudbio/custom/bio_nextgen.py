@@ -712,8 +712,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-23"
-    revision = "5d5b8ac08"
+    version = "0.9.10-3"
+    revision = "3c54afe2ea"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
