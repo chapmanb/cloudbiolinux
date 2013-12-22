@@ -4,8 +4,6 @@ bio_alignment:
   - clustal-w
   - clustal-omega
   - mafft
-bio_search:
-  - blast
 bio_nextgen:
   utilities:
     - bedtools

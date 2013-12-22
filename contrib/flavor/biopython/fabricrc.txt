@@ -21,7 +21,7 @@ local_install = ~/biopython/share
 # by non-privileged users.
 # *Note*: ``system_install`` needs to point to a user-writeable directory if
 # ``use_sudo`` is set to ``False``
-use_sudo = False
+use_sudo = True
 keep_isolated = True
 
 # Set to get CloudBioLinux customizations like setup scripts;
