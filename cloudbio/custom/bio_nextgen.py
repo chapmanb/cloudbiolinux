@@ -534,7 +534,7 @@ def install_gatk(env):
     # Install main gatk executable
     version = "2.3-9-gdcdccbb"
     ext = ".tar.bz2"
-    url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
+    url = "ftp://anonymous:anon@ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
@@ -542,8 +542,8 @@ def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
     http://www.broadinstitute.org/gatk/
     """
-    min_version = "2.7-4"
-    version = "%s-g6f46d11" % min_version
+    min_version = "2.8-1"
+    version = "%s-g932cd3a" % min_version
     if shared._symlinked_dir_exists("gatk", version, env, "java"):
         return
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
