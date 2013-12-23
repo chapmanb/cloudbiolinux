@@ -11,6 +11,7 @@ bio_nextgen:
     - fastqc
     - qualimap
     - sambamba
+    - seqtk==HEAD
   analysis:
     #- cufflinks
     - chapmanb/cbl/samtools==0.1.19
