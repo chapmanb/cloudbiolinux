@@ -667,8 +667,8 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "3_3"
-    genomes = ["GRCh37.71", "hg19", "GRCm38.71"]
+    version = "3_4"
+    genomes = ["GRCh37.74", "hg19", "GRCm38.74"]
     #genomes_notinstalled = ["NCBIM37.66","athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version

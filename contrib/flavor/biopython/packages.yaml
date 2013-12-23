@@ -1,0 +1,45 @@
+---
+minimal:
+  build:
+    - cmake
+    - gcc
+    - g++
+    - gfortran
+    - libtool
+    - make
+    - patch
+    - pkg-config
+  util:
+    - unzip
+  network:
+    - curl
+    - wget
+libraries:
+  - libzip-dev
+  - libbz2-dev
+  - zlib1g-dev
+  - libcurl4-openssl-dev
+  - libgsl0-dev
+  - libgsl0ldbl
+  - gsl-bin
+  - libncurses5-dev
+  - libpcre3-dev
+  - libpng12-dev
+  - libreadline-dev
+  - libssl-dev
+  - libxml2
+  - libxml2-dev
+  - zlib1g-dev
+python:
+ruby:
+  - ruby1.9.1 # default Ruby install
+  - ruby1.9.1-dev
+bio_general:
+  - primer3
+  - emboss # Broken on 13.10
+  - emboss-data # Broken on 13.10
+  - emboss-lib # broken on 13.10
+bio_search:
+  - ncbi-blast+
+bio_alignment:
+bio_nextgen:

@@ -88,10 +88,12 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
         if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
             with settings(warn_only=True):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
-        # finally install our desired version
-        env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
-        with settings(warn_only=True):
-            env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
+        if version == "HEAD":
+            env.safe_run("{brew_cmd} install --HEAD {pkg}".format(**locals()))
+        else:
+            env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
+            with settings(warn_only=True):
+                env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 @contextlib.contextmanager
@@ -106,15 +108,17 @@ def _git_pkg_version(env, brew_cmd, pkg, version):
     print git_cmd, brew_prefix, git_fname
     try:
         with cd(brew_prefix):
-            env.safe_run(git_cmd)
+            if version != "HEAD":
+                env.safe_run(git_cmd)
         yield
     finally:
         # reset Git back to latest
         with cd(brew_prefix):
-            cmd_parts = git_cmd.split()
-            env.safe_run("%s reset HEAD %s" % (cmd_parts[0], cmd_parts[-1]))
-            cmd_parts[2] = "--"
-            env.safe_run(" ".join(cmd_parts))
+            if version != "HEAD":
+                cmd_parts = git_cmd.split()
+                env.safe_run("%s reset HEAD %s" % (cmd_parts[0], cmd_parts[-1]))
+                cmd_parts[2] = "--"
+                env.safe_run(" ".join(cmd_parts))
 
 def _git_cmd_for_pkg_version(env, brew_cmd, pkg, version):
     """Retrieve git command to check out a specific version from homebrew.
