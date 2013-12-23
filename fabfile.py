@@ -93,8 +93,8 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
                 custom_add[k] = vs
     if target is None or target == "packages":
         env.keep_isolated = getattr(env, "keep_isolated", "false").lower() in ["true", "yes"]
-        # can only install native packages if we have sudo access.
-        if env.use_sudo:
+        # can only install native packages if we have sudo access or are root
+        if env.use_sudo or env.safe_run_output("whoami").strip() == "root":
             _configure_and_install_native_packages(env, pkg_install)
         elif not env.keep_isolated:
             _connect_native_packages(env, pkg_install, lib_install)
