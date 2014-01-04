@@ -10,6 +10,7 @@ import tempfile
 from tempfile import NamedTemporaryFile
 import urllib
 import uuid
+import subprocess
 
 from fabric.api import *
 from fabric.contrib.files import *
@@ -245,6 +246,10 @@ def _get_install(url, env, make_command, post_unpack_fn=None, revision=None, dir
                 post_unpack_fn(env)
             make_command(env)
 
+def _apply_patch(env, url):
+    patch = os.path.basename(url)
+    cmd = "wget {url}; patch -p0 < {patch}".format(url=url, patch=patch)
+    env.safe_run(cmd)
 
 def _get_install_local(url, env, make_command, dir_name=None,
                        post_unpack_fn=None, safe_tar=False, tar_file_name=None):

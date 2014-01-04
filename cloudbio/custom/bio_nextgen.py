@@ -11,7 +11,7 @@ from shared import (_if_not_installed, _make_tmp_dir,
                     _get_install, _get_install_local, _make_copy, _configure_make,
                     _java_install, _python_cmd,
                     _symlinked_java_version_dir, _fetch_and_unpack, _python_make,
-                    _get_lib_dir, _get_include_dir)
+                    _get_lib_dir, _get_include_dir, _apply_patch)
 from cloudbio.custom import shared, versioncheck
 
 from cloudbio import libraries
@@ -534,7 +534,7 @@ def install_gatk(env):
     # Install main gatk executable
     version = "2.3-9-gdcdccbb"
     ext = ".tar.bz2"
-    url = "ftp://ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
+    url = "ftp://anonymous:anon@ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
           "GenomeAnalysisTKLite-%s%s" % (version, ext)
     _java_install("gatk", version, url, env)
 
@@ -542,8 +542,8 @@ def install_gatk_protected(env):
     """Installation script for recent versions of GATK. Requires manual download from user.
     http://www.broadinstitute.org/gatk/
     """
-    min_version = "2.7-4"
-    version = "%s-g6f46d11" % min_version
+    min_version = "2.8-1"
+    version = "%s-g932cd3a" % min_version
     if shared._symlinked_dir_exists("gatk", version, env, "java"):
         return
     dl_fname = "GenomeAnalysisTK-%s.tar.bz2" % min_version
@@ -667,8 +667,8 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "3_3"
-    genomes = ["GRCh37.71", "hg19", "GRCm38.71"]
+    version = "3_4"
+    genomes = ["GRCh37.74", "hg19", "GRCm38.74"]
     #genomes_notinstalled = ["NCBIM37.66","athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
@@ -716,8 +716,8 @@ def install_freebayes(env):
     """Bayesian haplotype-based polymorphism discovery and genotyping.
     https://github.com/ekg/freebayes
     """
-    version = "0.9.9.2-23"
-    revision = "5d5b8ac08"
+    version = "0.9.10-3"
+    revision = "3c54afe2ea"
     if versioncheck.up_to_date(env, "freebayes", version, stdout_flag="version:"):
         return
     repository = "git clone --recursive https://github.com/ekg/freebayes.git"
@@ -732,21 +732,6 @@ def install_freebayes(env):
     _get_install(repository, env, _make_copy("ls -1 bin/*"),
                  post_unpack_fn=_freebayes_fixes,
                  revision=revision)
-
-@_if_not_installed("vcfcreatemulti -h")
-def install_vcflib(env):
-    """Utilities for parsing and manipulating VCF files.
-    https://github.com/ekg/vcflib
-    """
-    version = "2ca6ec2d05"
-    repository = "git clone --recursive https://github.com/ekg/vcflib.git"
-    def _fix_tabixpp_library_order(env):
-        env.safe_sed("tabixpp/Makefile", "-ltabix", "-ltabix -lz")
-    _get_install(repository, env,
-                 _make_copy("find -perm -100 -type f -name 'vcf*'"
-                            " | grep -v '.sh$' | grep -v '.r$'"),
-                 post_unpack_fn=_fix_tabixpp_library_order,
-                 revision=version)
 
 @_if_not_installed("bamtools")
 def install_bamtools(env):
@@ -845,17 +830,25 @@ def SRC_install_cufflinks(env):
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
-@_if_not_installed("tophat")
 def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
     http://tophat.cbcb.umd.edu/
     """
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
+#    if versioncheck.up_to_date(env, "tophat", version, stdout_flag="TopHat"):
+    if versioncheck.is_version(env, "tophat", version, args="--version", stdout_flag="TopHat"):
+        env.logger.info("tophat version {0} is up to date; not installing"
+            .format(version))
+        return
     url = "http://tophat.cbcb.umd.edu/downloads/" \
           "tophat-%s.Linux_x86_64.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f",
-                                      do_make=False))
+
+    # def premake_cmd(env):
+    #     url = "http://dl.dropboxusercontent.com/u/2822886/tophat/tophat_fix.diff"
+    #     _apply_patch(env, url)
+    _get_install(url, env,
+                 _make_copy("find -perm -100 -type f", do_make=False))
 
 install_tophat2 = install_tophat
 
@@ -979,7 +972,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.1.1"
+    version = "0.1.2"
     url = "https://github.com/chapmanb/bcbio.variation/releases/download/" \
           "v%s/bcbio.variation-%s-standalone.jar" % (version, version)
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)

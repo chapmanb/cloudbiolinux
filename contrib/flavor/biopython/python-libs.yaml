@@ -1,0 +1,11 @@
+---
+pypi:
+  - MySQL-python
+  - psycopg2
+  - rdflib
+  - reportlab
+conda:
+  - ipython
+  - matplotlib
+  - numpy
+  - pandas

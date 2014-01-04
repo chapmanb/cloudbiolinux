@@ -9,14 +9,17 @@ bio_nextgen:
     - bamtools
     - bedtools
     - fastqc
-    - fastx_toolkit
     - qualimap
     - sambamba
+    - seqtk==HEAD
   analysis:
     #- cufflinks
-    - samtools
+    - chapmanb/cbl/samtools==0.1.19
+    - bcftools
     #- tophat
   variant:
+    - glia
     - lumpy-sv
     - tabix
+    - vcflib
     - vcftools

@@ -141,6 +141,32 @@ class NCBIRest(_DownloadHelper):
             env.safe_run("mv %s %s" % (tmp_file, genome_file))
         return genome_file, []
 
+class VectorBase(_DownloadHelper):
+    """Retrieve genomes from VectorBase) """
+
+    def __init__(self, name, genus, species, strain, release, assembly_types):
+        _DownloadHelper.__init__(self)
+        self._name = name
+        self.data_source = "VectorBase"
+        self._base_url = ("http://www.vectorbase.org/sites/default/files/ftp/"
+                     "downloads/")
+        _base_file = ("{genus}-{species}-{strain}_{assembly}"
+                      "_{release}.fa.gz")
+        self._to_get = []
+        for assembly in assembly_types:
+            self._to_get.append(_base_file.format(**locals()))
+
+    def download(self, seq_dir):
+        print os.getcwd()
+        genome_file = "%s.fa" % self._name
+        for fn in self._to_get:
+            url = self._base_url + fn
+            if not self._exists(fn, seq_dir):
+                shared._remote_fetch(env, url)
+                env.safe_run("gunzip -c %s >> %s" % (fn, genome_file))
+        return genome_file, []
+
+
 class EnsemblGenome(_DownloadHelper):
     """Retrieve genome FASTA files from Ensembl.
 
@@ -199,8 +225,8 @@ class BroadGenome(_DownloadHelper):
             env.safe_run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
-BROAD_BUNDLE_VERSION = "2.3"
-DBSNP_VERSION = "137"
+BROAD_BUNDLE_VERSION = "2.8"
+DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
@@ -235,7 +261,13 @@ GENOMES_SUPPORTED = [
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
            ("Tguttata_Zebra_finch", "taeGut1", UCSCGenome("taeGut1")),
-          ]
+           ("Aalbimanus", "AalbS1", VectorBase("AalbS1", "Anopheles",
+                                               "albimanus", "STECLA",
+                                               "AalbS1", ["CONTIGS", "SCAFFOLDS"])),
+           ("Agambiae", "AgamP3", VectorBase("AgamP3", "Anopheles",
+                                               "gambiae", "PEST",
+                                               "AgamP3", ["CHROMOSOMES", "SCAFFOLDS"])),]
+
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
                             "ucsc", "mosaik"]
@@ -533,7 +565,12 @@ def _index_bowtie(ref_file):
 def _index_bowtie2(ref_file):
     dir_name = "bowtie2"
     cmd = "bowtie2-build {ref_file} {index_name}"
-    return _index_w_command(dir_name, cmd, ref_file)
+    out_suffix = _index_w_command(dir_name, cmd, ref_file)
+    bowtie_link = os.path.join(os.path.dirname(ref_file), os.path.pardir,
+                               out_suffix + ".fa")
+    if not os.path.exists(bowtie_link):
+        os.symlink(ref_file, bowtie_link)
+    return out_suffix
 
 def _index_bwa(ref_file):
     dir_name = "bwa"

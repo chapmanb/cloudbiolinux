@@ -17,7 +17,7 @@ def install_homebrew(env):
     """
     if env.distribution == "macosx":
         # XXX Test homebrew install on mac
-        env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"')
+        env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go/install)"')
     else:
         brewcmd = os.path.join(env.system_install, "bin", "brew")
         with quiet():
@@ -39,6 +39,8 @@ def install_homebrew(env):
                                  "lib/python2.7/site-packages", "lib/python2.6/site-packages",
                                  "lib/python3.2/site-packages", "lib/python3.3/site-packages",
                                  "lib/perl5", "lib/perl5/site_perl"]
+                        if not env.safe_exists("%s/bin" % env.system_install):
+                            env.safe_sudo("mkdir -p %s/bin" % env.system_install)
                         for path in paths:
                             if env.safe_exists("%s/%s" % (env.system_install, path)):
                                 env.safe_sudo("chown %s %s/%s" % (env.user, env.system_install, path))

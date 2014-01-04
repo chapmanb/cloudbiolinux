@@ -34,6 +34,24 @@ def _clean_version(x):
 
 def up_to_date(env, cmd, version, args=None, stdout_flag=None,
                stdout_index=-1):
+    iversion = get_installed_version(env, cmd, version, args, stdout_flag,
+                                     stdout_index)
+    if not iversion:
+        return False
+    else:
+        return LooseVersion(iversion) >= LooseVersion(version)
+
+def is_version(env, cmd, version, args=None, stdout_flag=None,
+               stdout_index=-1):
+    iversion = get_installed_version(env, cmd, version, args, stdout_flag,
+                                     stdout_index)
+    if not iversion:
+        return False
+    else:
+        return LooseVersion(iversion) == LooseVersion(version)
+
+def get_installed_version(env, cmd, version, args=None, stdout_flag=None,
+                          stdout_index=-1):
     """Check if the given command is up to date with the provided version.
     """
     if shared._executable_not_on_path(cmd):
@@ -50,7 +68,4 @@ def up_to_date(env, cmd, version, args=None, stdout_flag=None,
     else:
         iversion = out.strip()
     iversion = _clean_version(iversion)
-    if not iversion:
-        return False
-    else:
-        return LooseVersion(iversion) >= LooseVersion(version)
+    return iversion

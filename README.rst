@@ -173,6 +173,13 @@ a local or
 `cloud-based <https://bitbucket.org/galaxy/galaxy-central/wiki/cloud>`_
 Galaxy server.
 
+Not all of the genomes are hosted on the S3 bucket, but are still supported. If your
+genome fails to install with install_data_s3, you might be able to download the genome
+from from Ensembl, etc and prepare it::
+
+
+    fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data:your_biodata.yaml
+
 Supported virtual environments
 ==============================
 
