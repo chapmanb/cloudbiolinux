@@ -270,7 +270,7 @@ GENOMES_SUPPORTED = [
 
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "mosaik"]
+                            "ucsc", "mosaik", "star"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -294,6 +294,8 @@ def install_data(config_source, approaches=None):
     with path(os.path.join(env.system_install, 'bin')):
         genomes, genome_indexes, config = _get_genomes(config_source)
         genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
+        _make_genome_directories(env, genomes)
+        download_transcripts(genomes, env)
         _prep_genomes(env, genomes, genome_indexes, ready_approaches)
         _install_additional_data(genomes, genome_indexes, config)
 
@@ -303,6 +305,8 @@ def install_data_s3(config_source):
     _check_version()
     genomes, genome_indexes, config = _get_genomes(config_source)
     genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
+    _make_genome_directories(env, genomes)
+    download_transcripts(genomes, env)
     _download_genomes(genomes, genome_indexes)
     _install_additional_data(genomes, genome_indexes, config)
 
@@ -331,9 +335,9 @@ def upload_s3(config_source):
     _data_ngs_genomes(genomes, genome_indexes)
     _upload_genomes(genomes, genome_indexes)
 
+
 def _install_additional_data(genomes, genome_indexes, config):
     download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
-    download_transcripts(genomes, env)
     for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
@@ -393,6 +397,14 @@ def _make_genome_dir():
         env.safe_sudo("chown -R %s %s" % (env.user, genome_dir))
     return genome_dir
 
+
+def _make_genome_directories(env, genomes):
+    genome_dir = _make_genome_dir()
+    for (orgname, gid, manager) in genomes:
+        org_dir = os.path.join(genome_dir, orgname, gid)
+        if not env.safe_exists(org_dir):
+            env.safe_run('mkdir -p %s' % org_dir)
+
 def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
     """Prepare genomes with the given indexes, supporting multiple retrieval methods.
     """
@@ -438,8 +450,7 @@ def _prep_raw_index(env, manager, gid, idx):
     """
     env.logger.info("Preparing genome {0} with index {1}".format(gid, idx))
     ref_file = _get_ref_seq(env, manager)
-    if idx != "ref":
-        INDEX_FNS[idx](ref_file)
+    get_index_fn(idx)(ref_file)
 
 def _data_ngs_genomes(genomes, genome_indexes):
     """Download and create index files for next generation genomes.
@@ -466,7 +477,7 @@ def _index_to_galaxy(work_dir, ref_file, gid, genome_indexes, config):
     indexes = {}
     with cd(work_dir):
         for idx in genome_indexes:
-            index_file = INDEX_FNS[idx](ref_file)
+            index_file = get_index_fn(idx)(ref_file)
             if index_file:
                 indexes[idx] = os.path.join(work_dir, index_file)
     galaxy.prep_locs(gid, indexes, config)
@@ -617,6 +628,14 @@ def _index_sam(ref_file):
             env.safe_run("samtools faidx %s" % local_file)
     galaxy.index_picard(ref_file)
     return ref_file
+
+def _index_star(ref_file):
+    (ref_dir, local_file) = os.path.split(ref_file)
+    gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
+    dir_name = "star"
+    cmd = ("STAR --genomeDir . --genomeFastaFiles {ref_file} "
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (gtf_file))
+    return  _index_w_command(dir_name, cmd, ref_file)
 
 @_if_installed("MosaikJump")
 def _index_mosaik(ref_file):
@@ -786,14 +805,21 @@ def _index_blast_db(work_dir, base_file, db_type):
                          (base_file, db_type, db_name))
 
 
-INDEX_FNS = {
-    "seq" : _index_sam,
-    "bwa" : _index_bwa,
-    "bowtie": _index_bowtie,
-    "bowtie2": _index_bowtie2,
-    "maq": _index_maq,
-    "mosaik": _index_mosaik,
-    "novoalign": _index_novoalign,
-    "novoalign_cs": _index_novoalign_cs,
-    "ucsc": _index_twobit,
-    }
+def get_index_fn(index):
+    """
+    return the index function for an index, if it is missing return a function
+    that is a no-op
+    """
+    INDEX_FNS = {
+        "seq" : _index_sam,
+        "bwa" : _index_bwa,
+        "bowtie": _index_bowtie,
+        "bowtie2": _index_bowtie2,
+        "maq": _index_maq,
+        "mosaik": _index_mosaik,
+        "novoalign": _index_novoalign,
+        "novoalign_cs": _index_novoalign_cs,
+        "ucsc": _index_twobit,
+        "star": _index_star
+        }
+    return INDEX_FNS.get(index, lambda x: None)
