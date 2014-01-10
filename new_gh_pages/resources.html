@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	
+	<div class="post">
+		<h1 class="title">Resources</h1>
+		<div class="entry">
+			<ul><li><a href="http://groups.google.com/group/cloudbiolinux" target="_blank">Discussion List</a></li></ul>
+			<ul><li><a href="http://github.com/chapmanb/cloudbiolinux/tree/master/config/#readme" target="_blank">Included Software</a></li></ul>
+			<ul><li><a href="http://thecloudmarket.com/search?search_term=cloudbiolinux&amp;order=updated_at%20desc" target="_blank">Machine Images</a></li></ul>
+			<ul><li><a href="http://github.com/chapmanb/cloudbiolinux" target="_blank">Code Framework</a></li></ul>
+			<ul><li><a href="http://github.com/chapmanb/cloudbiolinux/tree/master/contributors.mkd" target="_blank">Contributors</a></li></ul>
+			<ul><li>Amazon EC2 (us-east-1): <i>ami-46d4792f</i> -- <a href="http://alestic.com" target="_blank">Ubuntu 12.04 64bit</a> (27 June 2012)</li>
+			<ul><li class="inner">These images work with micro instances, a cost effective way to explore Amazon resources.</li></ul>
+			<li>Cloud BioLinux can be executed on a desktop computer without the need for a cloud:</li>
+			<ul><li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/Cloud+BioLinux+32bit.ova" target="_blank">Cloud BioLinux 32-bit VirtualBox appliance</a>
+			<br /> Information for end-users <a href="http://www.virtualbox.org/wiki/Downloads" target="_blank">for installing Virtualbox</a> and
+			<a href="http://www.virtualbox.org/manual/ch01.html#ovf" target="_blank">importing Cloud BioLinux images </a> for execution within Virtualbox.</li></ul>
+			<li> Cloud BioLinux images are available for execution on a private <a href="http://open.eucalyptus.com" target="_blank">Eucalyptus</a> cloud: </li><ul>
+			<li class="inner"> <a href="https://s3.amazonaws.com/cloudbiolinuxvms/CloudBioLinux-32bit.Eucalyptus.img" target="_blank">Cloud BioLinux 32-bit Eucalyptus .img</a> <br />
+			The .img file can be uploaded to your Eucalyptus cloud by
+			simply running "uec-publish-image file.img" from the <a href="http://packages.ubuntu.com/lucid/cloud-utils" target="_blank">Ubuntu cloud-utils</a> </li></ul>
+			<li>Indexed genome builds for aligners such as <a href="http://bowtie-bio.sourceforge.net/" target="_blank">Bowtie</a>,
+			<a href="http://bio-bwa.sourceforge.net/" target="_blank">BWA</a> and <a href="http://www.novocraft.com/" target="_blank">Novoalign</a> in the 
+			<a href="http://s3.amazonaws.com/biodata" target="_blank">biodata S3 bucket</a>. An 
+			<a href="https://github.com/chapmanb/cloudbiolinux/blob/master/data_fabfile.py" target="_blank">automated script</a> pulls the requested genomes and aligner indexes 
+			to an Amazon machine or your local computer; integration with Galaxy is also provided.</li></ul>
+		</div>
+	</div>
+</html>
