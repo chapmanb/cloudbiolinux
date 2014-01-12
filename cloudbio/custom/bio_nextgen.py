@@ -670,8 +670,8 @@ def install_snpeff(env):
     http://snpeff.sourceforge.net/
     """
     version = "3_4"
-    genomes = ["GRCh37.74", "hg19", "GRCm38.74"]
-    #genomes_notinstalled = ["NCBIM37.66","athalianaTair10"]
+    genomes = []
+    #genomes = ["GRCh37.74", "hg19", "GRCm38.74", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
           "snpEff_v%s_core.zip" % version
     genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
