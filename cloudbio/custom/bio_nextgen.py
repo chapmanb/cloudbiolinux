@@ -699,15 +699,12 @@ def install_vep(env):
     """Variant Effects Predictor (VEP) from Ensembl.
     http://ensembl.org/info/docs/variation/vep/index.html
     """
-    version = "branch-ensembl-69"
+    version = "branch-ensembl-74"
     url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
           "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
           "&pathrev={0}".format(version)
-    cache_dbs = "24"
     def _vep_install(env):
-        env.safe_sed("INSTALL.pl", 'my \$ok = <>', 'my $ok = "y"')
-        env.safe_sed("INSTALL.pl", ", <>\)", ', "{0}")'.format(cache_dbs))
-        env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl")
+        env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl -a a")
     _get_install_local(url, env, _vep_install)
 
 def install_freebayes(env):

@@ -32,7 +32,7 @@ bio_nextgen:
     - picard
     - shrec
     - tophat
-    # - vep # lots of timeout failures on download
+    - vep
   assembly:
     - abyss
     - cortex_var
