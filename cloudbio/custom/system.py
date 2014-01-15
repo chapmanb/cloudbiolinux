@@ -22,11 +22,14 @@ def install_homebrew(env):
         brewcmd = os.path.join(env.system_install, "bin", "brew")
         with quiet():
             test_brewcmd = env.safe_run("%s --version" % brewcmd)
-        if not test_brewcmd.succeeded:
+        if not test_brewcmd.succeeded or _linuxbrew_origin_problem(brewcmd):
             with shared._make_tmp_dir() as tmp_dir:
                 with cd(tmp_dir):
                     if env.safe_exists("linuxbrew"):
                         env.safe_run("rm -rf linuxbrew")
+                    for cleandir in ["Library", ".git"]:
+                        if env.safe_exists("%s/%s" % (env.system_install, cleandir)):
+                            env.safe_run("rm -rf %s/%s" % (env.system_install, cleandir))
                     env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git")
                     with cd("linuxbrew"):
                         env.safe_sudo("chown %s %s" % (env.user, env.system_install))
@@ -53,6 +56,16 @@ def install_homebrew(env):
                             env.safe_run("mkdir -p %s/%s" % (env.system_install, man_dir))
                         env.safe_run("mv -f %s/brew.1 %s/%s" % (man_dir, env.system_install, man_dir))
                         env.safe_run("mv -f bin/brew %s/bin" % env.system_install)
+
+def _linuxbrew_origin_problem(brewcmd):
+    """Check for linuxbrew origins which point to Homebrew instead of Linuxbrew.
+    """
+    config_file = os.path.abspath(os.path.normpath((os.path.expanduser(
+        os.path.join(os.path.dirname(brewcmd), os.pardir, ".git", "config")))))
+    if not os.path.exists(config_file):
+        return True
+    with open(config_file) as in_handle:
+        return "linuxbrew" not in in_handle.read()
 
 @_if_not_installed("s3fs")
 def install_s3fs(env):
