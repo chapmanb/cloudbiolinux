@@ -172,9 +172,10 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False):
         out_file = os.path.basename(url)
     if not env.safe_exists(out_file):
         orig_dir = env.safe_run_output("pwd").strip()
-        temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL, "file://%s/%s/%s/%s" %
-                                      (env.host, socket.gethostname(),
-                                       datetime.datetime.now().isoformat(), out_file))
+        temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL,
+                                      str("file://%s/%s/%s/%s" %
+                                          (env.host, socket.gethostname(),
+                                           datetime.datetime.now().isoformat(), out_file)))
         with _make_tmp_dir(ext=temp_ext) as tmp_dir:
             with cd(tmp_dir):
                 with warn_only():
