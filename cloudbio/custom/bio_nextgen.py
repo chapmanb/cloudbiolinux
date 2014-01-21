@@ -808,7 +808,7 @@ def SRC_install_tophat(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.7"
+    default_version = "2.0.9"
     version = env.get("tool_version", default_version)
     url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
@@ -820,7 +820,7 @@ def SRC_install_cufflinks(env):
     """
     _install_samtools_libs(env)
     _install_boost(env)
-    default_version = "2.0.2"
+    default_version = "2.1.1"
     version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
