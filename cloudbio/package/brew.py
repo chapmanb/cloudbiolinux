@@ -75,7 +75,7 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     https://gist.github.com/gcatlin/1847248
     Handles both global packages and those installed via specific taps.
     """
-    if ipkgs["current"].get(pkg) == version:
+    if ipkgs["current"].get(pkg.split("/")[-1]) == version:
         return
     with _git_pkg_version(env, brew_cmd, pkg, version):
         if pkg.split("/")[-1] in ipkgs["current"]:
@@ -105,7 +105,6 @@ def _git_pkg_version(env, brew_cmd, pkg, version):
     brew_prefix = env.safe_run_output("{brew_cmd} --prefix".format(**locals()))
     if git_fname.startswith("{brew_prefix}/Library/Taps/".format(**locals())):
         brew_prefix = os.path.dirname(git_fname)
-    print git_cmd, brew_prefix, git_fname
     try:
         with cd(brew_prefix):
             if version != "HEAD":

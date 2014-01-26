@@ -14,7 +14,7 @@ bio_nextgen:
     - seqtk==HEAD
   analysis:
     #- cufflinks
-    - chapmanb/cbl/samtools==0.1.19
+    - chapmanb/cbl/samtools
     - bcftools
     #- tophat
   variant:
