@@ -41,6 +41,7 @@ genomes:
     name: C elegans (WS210)
   - dbkey: rn5
     name: Rat (rn5)
+    rnaseq: true
   - dbkey: canFam3
     name: Dog (canFam3)
 
