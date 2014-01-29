@@ -12,10 +12,10 @@ from fabric.api import cd
 from cloudbio.custom import shared
 from cloudbio.fabutils import warn_only
 
-VERSIONS = {"rn5": "-2013-11-19.tar.xz",
-            "GRCh37": "-2013-08-21",
-            "hg19": "-2013-09-25",
-            "mm10": "-2013-09-20"}
+VERSIONS = {"rn5": "2013-11-19",
+            "GRCh37": "2013-08-21",
+            "hg19": "2013-09-25",
+            "mm10": "2013-09-20"}
 
 def download_transcripts(genomes, env):
     folder_name = "rnaseq"
@@ -23,7 +23,7 @@ def download_transcripts(genomes, env):
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
                                     if m.config.get("rnaseq", False)):
         version = VERSIONS.get(gid, "")
-        base_url = "https://s3.amazonaws.com/biodata/annotation/{gid}-rnaseq{version}.tar.xz"
+        base_url = "https://s3.amazonaws.com/biodata/annotation/{gid}-rnaseq-{version}.tar.xz"
         org_dir = os.path.join(genome_dir, orgname)
         tx_dir = os.path.join(org_dir, gid, folder_name)
         version_dir = tx_dir + version
