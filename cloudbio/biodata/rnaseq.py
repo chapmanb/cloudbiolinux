@@ -12,7 +12,8 @@ from fabric.api import cd
 from cloudbio.custom import shared
 from cloudbio.fabutils import warn_only
 
-VERSIONS = {"GRCh37": "-2013-08-21",
+VERSIONS = {"rn5": "-2013-11-19.tar.xz",
+            "GRCh37": "-2013-08-21",
             "hg19": "-2013-09-25",
             "mm10": "-2013-09-20"}
 
