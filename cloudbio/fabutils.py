@@ -27,9 +27,10 @@ SUDO_ENV_KEEPS += ["http_proxy", "https_proxy"]  # Required for local sudo to wo
 def local_exists(path, use_sudo=False):
     func = env.safe_sudo if use_sudo else env.safe_run
     cmd = 'test -e "$(echo %s)"' % path
+    cmd_symbolic = 'test -h "$(echo %s)"' % path
     with settings(hide('everything'), warn_only=True):
         env.lcwd = env.cwd
-        return not func(cmd).failed
+        return (not func(cmd).failed) or (not func(cmd_symbolic).failed)
 
 def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
