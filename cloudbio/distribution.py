@@ -276,6 +276,8 @@ def _determine_distribution(env):
         return "centos"
     elif output.find("red hat enterprise linux server release") >= 0:
         return "centos"
+    elif output.find("fedora release"):
+        return "centos"
     elif output.find("scientific linux release") >= 0:
         return "scientificlinux"
     elif env.safe_exists("/etc/debian_version"):
