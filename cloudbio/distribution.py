@@ -276,7 +276,7 @@ def _determine_distribution(env):
         return "centos"
     elif output.find("red hat enterprise linux server release") >= 0:
         return "centos"
-    elif output.find("fedora release"):
+    elif output.find("fedora release") >= 0:
         return "centos"
     elif output.find("scientific linux release") >= 0:
         return "scientificlinux"
