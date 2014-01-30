@@ -26,7 +26,7 @@ def download_transcripts(genomes, env):
         base_url = "https://s3.amazonaws.com/biodata/annotation/{gid}-rnaseq-{version}.tar.xz"
         org_dir = os.path.join(genome_dir, orgname)
         tx_dir = os.path.join(org_dir, gid, folder_name)
-        version_dir = tx_dir + version
+        version_dir = "%s-%s" % (tx_dir, version)
         if not env.safe_exists(version_dir):
             with cd(org_dir):
                 has_rnaseq = _download_annotation_bundle(env, base_url.format(gid=gid, version=version), gid)
