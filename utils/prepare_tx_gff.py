@@ -20,9 +20,13 @@ import tempfile
 import glob
 from argparse import ArgumentParser
 
-import MySQLdb
 import gffutils
 import time
+
+try:
+    import MySQLdb
+except:
+    MySQLdb = None
 
 
 from bcbio.utils import chdir, safe_makedir, file_exists
@@ -56,6 +60,10 @@ def ensembl_to_ucsc(ensembl_dict, ucsc_dict):
 def ucsc_ensembl_map_via_query(org_build):
     """Retrieve UCSC to Ensembl name mappings from UCSC MySQL database.
     """
+    # if MySQLdb is not installed, figure it out via download
+    if not MySQLdb:
+        return ensembl_ensembl_map_via_download(org_build)
+
     db = MySQLdb.connect(host=ucsc_db, user=ucsc_user, db=org_build)
     cursor = db.cursor()
     cursor.execute("select * from ucscToEnsembl")
