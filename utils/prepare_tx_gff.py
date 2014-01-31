@@ -21,7 +21,6 @@ import glob
 from argparse import ArgumentParser
 
 import gffutils
-import time
 
 try:
     import MySQLdb
@@ -62,7 +61,7 @@ def ucsc_ensembl_map_via_query(org_build):
     """
     # if MySQLdb is not installed, figure it out via download
     if not MySQLdb:
-        return ensembl_ensembl_map_via_download(org_build)
+        return ucsc_ensembl_map_via_download(org_build)
 
     db = MySQLdb.connect(host=ucsc_db, user=ucsc_user, db=org_build)
     cursor = db.cursor()
@@ -93,8 +92,8 @@ build_info = {
                  "Rattus_norvegicus.Rnor_5.0." + ensembl_release)}
 
 NEEDS_REMAP = ["hg19", "mm9", "mm10"]
-ucsc_db= "genome-mysql.cse.ucsc.edu"
-ucsc_user="genome"
+ucsc_db = "genome-mysql.cse.ucsc.edu"
+ucsc_user = "genome"
 
 
 def parse_sequence_dict(fasta_dict):
@@ -125,7 +124,6 @@ class SequenceDictParser(object):
 
 def get_ensembl_dict(org_build):
     genome_dict = org_build + ".dict"
-    picard_jar = os.path.join(PICARD_DIR, "CreateSequenceDictionary.jar")
     if not os.path.exists(genome_dict):
         genome = _download_ensembl_genome(org_build)
         org_fa = org_build + ".fa"
@@ -217,7 +215,7 @@ def genepred_to_UCSC_table(genepred):
     header = ["#bin", "name", "chrom", "strand",
               "txStart", "txEnd", "cdsStart", "cdsEnd",
               "exonCount", "exonStarts", "exonEnds", "score",
-              "name2",	"cdsStartStat",	"cdsEndStat",
+              "name2", "cdsStartStat", "cdsEndStat",
               "exonFrames"]
     out_file = os.path.splitext(genepred)[0] + ".UCSCTable"
     if file_exists(out_file):
@@ -327,7 +325,7 @@ def prepare_mask_gtf(gtf):
     """
 
     mask_biotype = ["rRNA", "Mt_rRNA", "misc_RNA", "snRNA", "snoRNA",
-                    "tRNA","Mt_tRNA"]
+                    "tRNA", "Mt_tRNA"]
     mask_chrom = ["MT"]
     out_file = os.path.join(os.path.dirname(gtf), "ref-transcripts-mask.gtf")
     if file_exists(out_file):
