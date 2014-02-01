@@ -30,9 +30,22 @@ except:
 
 from bcbio.utils import chdir, safe_makedir, file_exists
 
-
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "73"
+
+# But its hardcoded and one release old? Perhaps this is intended, but how can this be done
+# dynamically (in python, which I'm starting to grasp by reading your source, thanks!)? 
+#
+#  The URL ~> ftp.ensembl.org/pub/current_{gtf,fasta,variantion, ...}/taxname  should always mirror the latest
+#  Or, perhaps even better - use the newish ensembl REST API? 
+#    http://beta.rest.ensembl.org/info/software?content-type=application/json
+# This allows use to say in the programs.txt with ensembl version over using the 'current' URLS and parsing readmes
+#
+# May be useful for specieces disambiguation/aliases? eg if I type "Rat" will it would error currently, 
+#  but perhaps use this as a way to direct users to select 
+#    http://beta.rest.ensembl.org/documentation/info/species
+#
+
+ensembl_release = "73"  
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 # taxname:
