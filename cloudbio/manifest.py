@@ -10,22 +10,24 @@ import collections
 import inspect
 import urllib2
 import subprocess
+import sys
 
 import yaml
-import yolk.yolklib
-import yolk.metadata
+try:
+    import yolk.yolklib
+    import yolk.metadata
+except ImportError:
+    yolk = None
 
-def create(out_dir, summary=None, fetch_remote=False):
+def create(out_dir, tooldir="/usr/local", fetch_remote=False):
     """Create a manifest in the output directory with installed packages.
-
-    summary is a list of package names to place in the summary.yaml file
-    to emphasize.
     """
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     write_debian_pkg_info(out_dir, fetch_remote)
     write_python_pkg_info(out_dir)
     write_r_pkg_info(out_dir)
+    write_brew_pkg_info(out_dir, tooldir)
     write_custom_pkg_info(out_dir)
 
 # ## Custom packages
@@ -71,22 +73,55 @@ def write_custom_pkg_info(out_dir):
                 pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
                 out[pkg["name"]] = pkg
         with open(out_file, "w") as out_handle:
-            out_handle.write(yaml.dump(out, default_flow_style=False, allow_unicode=False))
+            yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
+    return out_file
+
+# ## Homebrew/Linuxbrew packages
+
+def write_brew_pkg_info(out_dir, tooldir):
+    """Extract information for packages installed by homebrew/linuxbrew.
+    """
+    out_file = os.path.join(out_dir, "brew-packages.yaml")
+    if not os.path.exists(out_file):
+        brew_cmd = os.path.join(tooldir, "bin", "brew") if tooldir else None
+        if not brew_cmd or not os.path.exists(brew_cmd):
+            brew_cmd = "brew"
+        try:
+            vout = subprocess.check_output([brew_cmd, "which"])
+            uses_which = True
+        except subprocess.CalledProcessError:
+            vout = subprocess.check_output([brew_cmd, "list", "--versions"])
+            uses_which = False
+        except OSError:  # brew not installed/used
+            vout = ""
+        out = {}
+        for vstr in vout.split("\n"):
+            if vstr.strip():
+                if uses_which:
+                    name, v = vstr.rstrip().split(": ")
+                else:
+                    parts = vstr.rstrip().split()
+                    name = parts[0]
+                    v = parts[-1]
+                out[name] = {"name": name, "version": v}
+        with open(out_file, "w") as out_handle:
+            yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file
 
 # ## R packages
 
 def get_r_pkg_info():
-    r_command = "options(width=10000); subset(installed.packages(fields=c('Title', 'URL')), select=c('Version', 'Title','URL'))"
-    out = subprocess.check_output(["Rscript", "-e",r_command])
+    r_command = ("options(width=10000); subset(installed.packages(fields=c('Title', 'URL')), "
+                 "select=c('Version', 'Title','URL'))")
+    out = subprocess.check_output(["Rscript", "-e", r_command])
     pkg_raw_list = []
     for line in out.split("\n")[1:]:
-	pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
+        pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
     for pkg in pkg_raw_list:
-	if len(pkg)>0:
+        if len(pkg) > 0:
             yield {"name": pkg[0], "version": pkg[1],
                    "description": pkg[2],
-                   "homepage_uri": (pkg[3],'')[pkg[3]=='NA'] if len(pkg) > 3 else ""}
+                   "homepage_uri": (pkg[3], '')[pkg[3] == 'NA'] if len(pkg) > 3 else ""}
 
 def write_r_pkg_info(out_dir):
     out_file = os.path.join(out_dir, "r-packages.yaml")
@@ -95,17 +130,30 @@ def write_r_pkg_info(out_dir):
         for pkg in get_r_pkg_info():
             out[pkg["name"]] = pkg
         with open(out_file, "w") as out_handle:
-            out_handle.write(yaml.dump(out, default_flow_style=False, allow_unicode=False))
+            yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file
 
 # ## Python packages
 
 def get_python_pkg_info():
-    for dist in yolk.yolklib.Distributions().get_packages("all"):
-        md = yolk.metadata.get_metadata(dist)
-        yield {"name": md["Name"], "version": md["Version"],
-               "description": md.get("Summary", ""),
-               "homepage_uri": md.get("Home-page", "")}
+    if yolk:
+        for dist in yolk.yolklib.Distributions().get_packages("all"):
+            md = yolk.metadata.get_metadata(dist)
+            yield {"name": md["Name"].lower(), "version": md["Version"],
+                   "description": md.get("Summary", ""),
+                   "homepage_uri": md.get("Home-page", "")}
+    else:
+        base_dir = os.path.dirname(sys.executable)
+        if os.path.exists(os.path.join(base_dir, "conda")):
+            for line in subprocess.check_output([os.path.join(base_dir, "conda"), "list"]).split("\n"):
+                if line.strip() and not line.startswith("#"):
+                    name, version = line.split()[:2]
+                    yield {"name": name.lower(), "version": version}
+        else:
+            for line in subprocess.check_output([os.path.join(base_dir, "pip"), "list"]).split("\n"):
+                if line.strip() and not line.startswith("#"):
+                    name, version = line.split()[:2]
+                    yield {"name": name.lower(), "version": version[1:-1]}
 
 def _resolve_latest_pkg(pkgs):
     if len(pkgs) == 1:
@@ -124,7 +172,7 @@ def write_python_pkg_info(out_dir):
         for name in sorted(pkgs_by_name.keys()):
             out[name] = _resolve_latest_pkg(pkgs_by_name[name])
         with open(out_file, "w") as out_handle:
-            out_handle.write(yaml.dump(out, default_flow_style=False, allow_unicode=False))
+            yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file
 
 # ## Debian packages
@@ -153,17 +201,37 @@ def get_debian_pkg_info(fetch_remote=False):
     for pkg_line in [l for l in subprocess.check_output(["dpkg", "-l"]).split("\n")
                      if l.startswith("ii")]:
         info = pkg_line.split()[1:]
-        pkg = {"name": info[0], "version": info[1], "description": " ".join(info[2:]),
-               "downloads": pkg_popcon.get(info[0], 0)}
+        pkg = {"name": info[0], "version": info[1], "description": " ".join(info[2:])}
+        if pkg_popcon.get(info[0]):
+            pkg["downloads"] = pkg_popcon.get(info[0], 0)
         pkg.update(_parse_pkg_info(pkg))
         yield pkg
 
 def write_debian_pkg_info(out_dir, fetch_remote=False):
+    base_sections = set(["gnome", "admin", "utils", "web", "games",
+                         "sound", "devel", "kde", "x11", "net", "text",
+                         "graphics", "misc", "editors", "fonts", "doc",
+                         "mail", "otherosfs", "video", "kernel",
+                         "libs", "libdevel", "comm", "metapackages", "tex"])
+    for s in list(base_sections):
+        base_sections.add("universe/%s" % s)
     out_file = os.path.join(out_dir, "debian-packages.yaml")
-    if not os.path.exists(out_file):
+    out_base_file = os.path.join(out_dir, "debian-base-packages.yaml")
+    try:
+        subprocess.check_call(["dpkg", "--help"], stdout=subprocess.PIPE)
+        has_dpkg = True
+    except (subprocess.CalledProcessError, OSError):
+        has_dpkg = False
+    if has_dpkg and (not os.path.exists(out_file) or not os.path.exists(out_base_file)):
         out = {}
+        out_base = {}
         for pkg in get_debian_pkg_info(fetch_remote):
-            out[pkg["name"]] = pkg
+            if pkg["section"] in base_sections:
+                out_base[pkg["name"]] = pkg
+            else:
+                out[pkg["name"]] = pkg
         with open(out_file, "w") as out_handle:
-            out_handle.write(yaml.dump(out, default_flow_style=False, allow_unicode=False))
+            yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
+        with open(out_base_file, "w") as out_handle:
+            yaml.safe_dump(out_base, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file
