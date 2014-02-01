@@ -1,7 +1,6 @@
 ---
 bio_nextgen:
   alignment:
-    - bwa
     - star
   utilities:
     - biobambam
