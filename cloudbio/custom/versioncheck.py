@@ -24,6 +24,8 @@ def _parse_from_stdoutflag(out, flag, stdout_index=-1):
                   % (flag, out))
 
 def _clean_version(x):
+    if x.startswith("upstream/"):
+        x = x.replace("upstream/", "")
     if x.startswith("("):
         x = x[1:].strip()
     if x.endswith(")"):
