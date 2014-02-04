@@ -34,6 +34,7 @@ minimal:
     - bzr
     #- darcs # pulls in postfix mail configuration.
   build:
+    - clang
     - cmake
     - gcc
     - g++
