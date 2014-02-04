@@ -194,8 +194,6 @@ def main(org_build):
     upload_to_s3(tar_dirs, org_build)
 
 def cleanup(work_dir, out_dir, org_build):
-    db_files = glob.glob(os.path.join(work_dir, "*.db"))
-    map(os.remove, db_files)
     try:
         os.remove(os.path.join(work_dir, org_build + ".dict"))
     except:
