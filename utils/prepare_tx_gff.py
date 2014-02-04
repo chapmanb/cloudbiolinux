@@ -196,8 +196,10 @@ def main(org_build):
 def cleanup(work_dir, out_dir, org_build):
     db_files = glob.glob(os.path.join(work_dir, "*.db"))
     map(os.remove, db_files)
-    os.remove(os.path.join(work_dir, org_build + ".fa"))
-    os.remove(os.path.join(work_dir, org_build + ".dict"))
+    try:
+        os.remove(os.path.join(work_dir, org_build + ".dict"))
+    except:
+        pass
     shutil.move(work_dir, out_dir)
 
 def upload_to_s3(tar_dirs, org_build):
@@ -287,8 +289,45 @@ def prepare_tophat_index(gtf, org_build):
     cmd = ("tophat --transcriptome-index {tophat_dir} -G {gtf} "
            "-o {out_dir} {bowtie_dir} {fastq}")
     subprocess.check_call(cmd.format(**locals()), shell=True)
+    make_large_exons_gtf(gtf)
     shutil.rmtree(out_dir)
     os.remove(fastq)
+
+
+def make_large_exons_gtf(gtf_file):
+    """
+    Save all exons > 1000 bases to a separate file for estimating the
+    insert size distribution
+    """
+    out_dir = os.path.abspath(os.path.join(os.path.dirname(gtf_file), "tophat"))
+    out_file = os.path.join(out_dir, "large_exons.gtf")
+
+    if file_exists(out_file):
+        return out_file
+
+    dbfn = gtf_file + ".db"
+    if not file_exists(dbfn):
+        db = gffutils.create_db(gtf_file, dbfn=dbfn, keep_order=True,
+                                merge_strategy='merge', force=False,
+                                infer_gene_extent=False)
+    else:
+        db = gffutils.FeatureDB(dbfn)
+    processed_count = 0
+    kept_exons = []
+    for exon in db.features_of_type('exon'):
+        processed_count += 1
+        if processed_count % 10000 == 0:
+            print("Processed %d exons." % processed_count)
+        if exon.end - exon.start > 1000:
+            kept_exons.append(exon)
+
+    with open(out_file, "w") as out_handle:
+        print("Writing %d large exons to %s." % (processed_count,
+                                                 out_file))
+        for exon in kept_exons:
+            out_handle.write(str(exon) + "\n")
+    return out_file
+
 
 def _create_dummy_fastq():
     read = ("@HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
