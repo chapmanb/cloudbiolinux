@@ -28,7 +28,7 @@ def create(out_dir, tooldir="/usr/local", fetch_remote=False):
     write_python_pkg_info(out_dir)
     write_r_pkg_info(out_dir)
     write_brew_pkg_info(out_dir, tooldir)
-    write_custom_pkg_info(out_dir)
+    write_custom_pkg_info(out_dir, tooldir)
 
 # ## Custom packages
 
@@ -59,7 +59,16 @@ def _get_custom_pkg_info(name, fn):
             "homepage_uri": homepage,
             "version": version}
 
-def write_custom_pkg_info(out_dir):
+def _handle_gatk_custom(tooldir):
+    """Determine version of GATK enabled. Handle special cases.
+    """
+    # Installed via custom package system, encorporating gatk_protected
+    gatk_symlink = os.path.join(tooldir, "share", "java", "gatk")
+    if os.path.lexists(gatk_symlink):
+        gatk_name = os.path.basename(os.path.realpath(gatk_symlink))
+        return gatk_name.replace("gatk-", "")
+
+def write_custom_pkg_info(out_dir, tooldir):
     custom_names = ["bio_general", "bio_nextgen", "cloudman", "distributed",
                     "java", "python", "phylogeny", "system"]
     out_file = os.path.join(out_dir, "custom-packages.yaml")
@@ -72,6 +81,9 @@ def write_custom_pkg_info(out_dir):
             for prog in [x for x in dir(mod) if x.startswith("install")]:
                 pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
                 out[pkg["name"]] = pkg
+        gatk_custom_v = _handle_gatk_custom(tooldir)
+        if gatk_custom_v:
+            out["gatk"]["version"] = gatk_custom_v
         with open(out_file, "w") as out_handle:
             yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file
@@ -177,15 +189,6 @@ def write_python_pkg_info(out_dir):
 
 # ## Debian packages
 
-def _parse_pkg_info(pkg):
-    details = {}
-    for line in subprocess.check_output(["apt-cache", "show", pkg["name"]]).split("\n"):
-        if ":" in line:
-            name, info = line.split(":", 1)
-            details[name] = info
-    return {"homepage_uri": details.get("Homepage", "").strip(),
-            "section": details.get("Section", "").strip()}
-
 def _get_pkg_popcon():
     """Retrieve popularity information for debian packages.
     """
@@ -198,13 +201,16 @@ def _get_pkg_popcon():
 
 def get_debian_pkg_info(fetch_remote=False):
     pkg_popcon = _get_pkg_popcon() if fetch_remote else {}
-    for pkg_line in [l for l in subprocess.check_output(["dpkg", "-l"]).split("\n")
-                     if l.startswith("ii")]:
-        info = pkg_line.split()[1:]
-        pkg = {"name": info[0], "version": info[1], "description": " ".join(info[2:])}
-        if pkg_popcon.get(info[0]):
-            pkg["downloads"] = pkg_popcon.get(info[0], 0)
-        pkg.update(_parse_pkg_info(pkg))
+    cmd = ("dpkg-query --show --showformat "
+           "'${Status}\t${Package}\t${Version}\t${Section}\t${Homepage}\t${binary:Summary}\n'")
+    for pkg_line in [l for l in subprocess.check_output(cmd, shell=True).split("\n")
+                     if l.startswith("install ok")]:
+        parts = pkg_line.rstrip("\n").split("\t")
+        pkg = {"name": parts[1], "version": parts[2],
+               "section": parts[3], "homepage_uri": parts[4],
+               "description": parts[5]}
+        if pkg_popcon.get(pkg["name"]):
+            pkg["downloads"] = pkg_popcon.get(pkg["name"], 0)
         yield pkg
 
 def write_debian_pkg_info(out_dir, fetch_remote=False):
@@ -212,9 +218,11 @@ def write_debian_pkg_info(out_dir, fetch_remote=False):
                          "sound", "devel", "kde", "x11", "net", "text",
                          "graphics", "misc", "editors", "fonts", "doc",
                          "mail", "otherosfs", "video", "kernel",
-                         "libs", "libdevel", "comm", "metapackages", "tex"])
+                         "libs", "libdevel", "comm", "metapackages", "tex",
+                         "introspection"])
     for s in list(base_sections):
         base_sections.add("universe/%s" % s)
+        base_sections.add("partner/%s" % s)
     out_file = os.path.join(out_dir, "debian-packages.yaml")
     out_base_file = os.path.join(out_dir, "debian-base-packages.yaml")
     try:
@@ -226,7 +234,7 @@ def write_debian_pkg_info(out_dir, fetch_remote=False):
         out = {}
         out_base = {}
         for pkg in get_debian_pkg_info(fetch_remote):
-            if pkg["section"] in base_sections:
+            if pkg.get("section") in base_sections:
                 out_base[pkg["name"]] = pkg
             else:
                 out[pkg["name"]] = pkg
