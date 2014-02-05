@@ -183,6 +183,15 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+    # Ensure paths we may have missed on install are accessible to regular user
+    if env.use_sudo:
+        paths = ["share", "share/java"]
+        for path in paths:
+            with quiet():
+                test_access = env.safe_run("test -d %s/%s && test -O %s/%s" % (env.system_install, path,
+                                                                               env.system_install, path))
+            if test_access.failed and env.safe_exists("%s/%s" % (env.system_install, path)):
+                env.safe_sudo("chown %s %s/%s" % (env.user, env.system_install, path))
 
 def _brew_cmd(env):
     """Retrieve brew command for installing homebrew packages.

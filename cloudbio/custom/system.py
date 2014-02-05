@@ -34,7 +34,7 @@ def install_homebrew(env):
                     with cd("linuxbrew"):
                         env.safe_sudo("chown %s %s" % (env.user, env.system_install))
                         paths = ["bin", "etc", "include", "lib", "lib/pkgconfig", "Library",
-                                 "sbin", "share", "var", "var/log", "share/locale",
+                                 "sbin", "share", "var", "var/log", "share/java", "share/locale",
                                  "share/man", "share/man/man1", "share/man/man2",
                                  "share/man/man3", "share/man/man4", "share/man/man5",
                                  "share/man/man6", "share/man/man7", "share/man/man8",
