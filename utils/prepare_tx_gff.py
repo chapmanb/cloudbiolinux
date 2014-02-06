@@ -89,9 +89,11 @@ build_info = {
                   "Mus_musculus.GRCm38." + ensembl_release),
     "rn5": Build("rattus_norvegicus", None,
                  ucsc_ensembl_map_via_download,
-                 "Rattus_norvegicus.Rnor_5.0." + ensembl_release)}
+                 "Rattus_norvegicus.Rnor_5.0." + ensembl_release),
+    "GRCh37": Build("homo_sapiens", "hsapiens_gene_ensembl",
+                    None,
+                    "Homo_sapiens.GRCh37." + ensembl_release)}
 
-NEEDS_REMAP = ["hg19", "mm9", "mm10"]
 ucsc_db = "genome-mysql.cse.ucsc.edu"
 ucsc_user = "genome"
 
@@ -406,32 +408,18 @@ def gtf_to_genepred(gtf):
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
 
-def high_abudance_transcripts(build):
-    """Get identifiers for high abundance transcriptions using R biomaRt.
-    """
-    robjects.r.assign("biomart.org", build.biomart_name)
-    robjects.r('''
-      library(biomaRt)
-      mart <- useMart("ensembl", dataset=biomart.org)
-      attrs <- c("ensembl_transcript_id")
-      filters <- c("biotype")
-      filter.types <- c("Mt_rRNA", "rRNA")
-      result <- getBM(attributes=attrs, filters=filters, values=filter.types,
-                      mart=mart)
-      result <- unique(result)
-    ''')
-    # get first column of data frame: the transcript IDs
-    return set(robjects.r["result"][0])
-
-# ## Retrieve GFF file from Ensembl and map to UCSC coordinates
-
 def prepare_tx_gff(build, org_name):
     """Prepare UCSC ready transcript file given build information.
     """
     ensembl_gff = _download_ensembl_gff(build)
-    ucsc_name_map = build.ucsc_map(org_name)
-    tx_gff = _remap_gff(ensembl_gff, ucsc_name_map)
-    os.remove(ensembl_gff)
+    # if we need to do the name remapping
+    if build.ucsc_map:
+        ucsc_name_map = build.ucsc_map(org_name)
+        tx_gff = _remap_gff(ensembl_gff, ucsc_name_map)
+        os.remove(ensembl_gff)
+    else:
+        tx_gff = "ref-transcripts.gtf"
+        os.rename(ensembl_gff, tx_gff)
     return tx_gff
 
 def _remap_gff(base_gff, name_map):
