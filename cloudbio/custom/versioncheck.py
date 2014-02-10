@@ -70,4 +70,6 @@ def get_installed_version(env, cmd, version, args=None, stdout_flag=None,
     else:
         iversion = out.strip()
     iversion = _clean_version(iversion)
+    if " not found in the pkg-config search path" in iversion:
+        return False
     return iversion
