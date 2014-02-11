@@ -1000,7 +1000,7 @@ def install_hydra(env):
     url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         env.safe_run("make clean")
-    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
+    _get_install(url, env, _make_copy("ls --color=never -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
 
 def install_lumpy(env):
@@ -1019,7 +1019,7 @@ def install_lumpy(env):
         env.safe_append("defs.local", ("GSL_INCLUDE=-I/usr/local/include -I/usr/local/include/gsl "
                                        "-I/usr/include/gsl -I%s/include/gsl" % env.system_install))
         env.safe_append("defs.local", ("GSL_LINK=-L/usr/local/lib -L/usr/lib -L%s/lib" % env.system_install))
-    _get_install(repository, env, _make_copy("ls -1 bin/*", _add_gsl_includes),
+    _get_install(repository, env, _make_copy("ls --color=never -1 bin/*", _add_gsl_includes),
                  revision=revision)
 
 def install_delly(env):
@@ -1057,7 +1057,7 @@ def install_crisp(env):
           "CRISP-linux-v{0}.tar.gz".format(version)
     def _make_executable():
         env.safe_run("chmod a+x *.py")
-    _get_install(url, env, _make_copy("ls -1 CRISP.py crisp_to_vcf.py",
+    _get_install(url, env, _make_copy("ls --color=never -1 CRISP.py crisp_to_vcf.py",
                                       premake_cmd=_make_executable,
                                       do_make=False))
 
