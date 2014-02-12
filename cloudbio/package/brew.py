@@ -55,10 +55,14 @@ def _get_current_pkgs(env, brew_cmd):
         which_out = env.safe_run_output("{brew_cmd} which".format(**locals()))
     for line in which_out.split("\n"):
         if line:
-            pkg, version = line.rstrip().split()
-            if pkg.endswith(":"):
-                pkg = pkg[:-1]
-            out[pkg] = version
+            try:
+                pkg, version = line.rstrip().split()
+                if pkg.endswith(":"):
+                    pkg = pkg[:-1]
+                    out[pkg] = version
+            except:
+                print(line)
+                continue
     return out
 
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
