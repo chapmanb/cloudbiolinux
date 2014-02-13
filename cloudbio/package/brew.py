@@ -188,8 +188,6 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                     brew_cmd=brew_cmd)).split("\n")[-1].rstrip())
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
-            if has_bcftools:
-                env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
