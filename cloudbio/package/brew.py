@@ -52,13 +52,15 @@ def _safe_update(env, brew_cmd, formula_repos, cur_taps):
 def _get_current_pkgs(env, brew_cmd):
     out = {}
     with quiet():
-        which_out = env.safe_run_output("{brew_cmd} which".format(**locals()))
+        which_out = env.safe_run_output("{brew_cmd} list --versions".format(**locals()))
     for line in which_out.split("\n"):
         if line:
-            pkg, version = line.rstrip().split()
-            if pkg.endswith(":"):
-                pkg = pkg[:-1]
-            out[pkg] = version
+            parts = line.rstrip().split()
+            if len(parts) == 2:
+                pkg, version = line.rstrip().split()
+                if pkg.endswith(":"):
+                    pkg = pkg[:-1]
+                out[pkg] = version
     return out
 
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
@@ -77,24 +79,25 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     """
     if ipkgs["current"].get(pkg.split("/")[-1]) == version:
         return
-    with _git_pkg_version(env, brew_cmd, pkg, version):
-        if pkg.split("/")[-1] in ipkgs["current"]:
-            with settings(warn_only=True):
-                env.safe_run("{brew_cmd} unlink {pkg}".format(
-                    brew_cmd=brew_cmd, pkg=pkg.split("/")[-1]))
-        # if we have a more recent version, uninstall that first
-        cur_version_parts = env.safe_run_output("{brew_cmd} list --versions {pkg}".format(
-            brew_cmd=brew_cmd, pkg=pkg.split("/")[-1])).strip().split()
-        if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
-            with settings(warn_only=True):
-                env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
-        if version == "HEAD":
-            env.safe_run("{brew_cmd} install --HEAD {pkg}".format(**locals()))
-        else:
+    if version == "HEAD":
+        env.safe_run("{brew_cmd} install --HEAD {pkg}".format(**locals()))
+    else:
+        raise ValueError("Cannot currently handle installing brew packages by version.")
+        with _git_pkg_version(env, brew_cmd, pkg, version):
+            if pkg.split("/")[-1] in ipkgs["current"]:
+                with settings(warn_only=True):
+                    env.safe_run("{brew_cmd} unlink {pkg}".format(
+                        brew_cmd=brew_cmd, pkg=pkg.split("/")[-1]))
+            # if we have a more recent version, uninstall that first
+            cur_version_parts = env.safe_run_output("{brew_cmd} list --versions {pkg}".format(
+                brew_cmd=brew_cmd, pkg=pkg.split("/")[-1])).strip().split()
+            if len(cur_version_parts) > 1 and LooseVersion(cur_version_parts[1]) > LooseVersion(version):
+                with settings(warn_only=True):
+                    env.safe_run("{brew_cmd} uninstall {pkg}".format(**locals()))
             env.safe_run("{brew_cmd} install {pkg}".format(**locals()))
             with settings(warn_only=True):
                 env.safe_run("{brew_cmd} switch {pkg} {version}".format(**locals()))
-        env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+    env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 @contextlib.contextmanager
 def _git_pkg_version(env, brew_cmd, pkg, version):
@@ -134,9 +137,11 @@ def _git_cmd_for_pkg_version(env, brew_cmd, pkg, version):
 def _latest_pkg_version(env, brew_cmd, pkg):
     """Retrieve the latest available version of a package.
     """
-    for git_line in env.safe_run_output("{brew_cmd} versions {pkg}".format(**locals())).split("\n"):
+    for git_line in env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n"):
         if git_line.strip():
-            return git_line.split()[0].strip()
+            _, version_str = git_line.split(":")
+            versions = version_str.split(",")
+            return versions[0].split()[-1].strip()
 
 def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     """Install the latest version of the given package.
@@ -147,7 +152,7 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
         brew_subcmd = None
         pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
         if ipkgs["current"][pkg] != pkg_version:
-            _install_pkg_version(env, pkg, pkg_version, brew_cmd, ipkgs)
+            brew_subcmd = "upgrade"
     else:
         brew_subcmd = "install"
     if brew_subcmd:

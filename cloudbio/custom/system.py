@@ -32,6 +32,8 @@ def install_homebrew(env):
                             env.safe_run("rm -rf %s/%s" % (env.system_install, cleandir))
                     env.safe_run("git clone https://github.com/Homebrew/linuxbrew.git")
                     with cd("linuxbrew"):
+                        if not env.safe_exists(env.system_install):
+                            env.safe_sudo("mkdir -p %s" % env.system_install)
                         env.safe_sudo("chown %s %s" % (env.user, env.system_install))
                         paths = ["bin", "etc", "include", "lib", "lib/pkgconfig", "Library",
                                  "sbin", "share", "var", "var/log", "share/java", "share/locale",

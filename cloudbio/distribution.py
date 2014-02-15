@@ -18,6 +18,10 @@ def _setup_distribution_environment(ignore_distcheck=False):
     In low-level terms, this method attempts to populate various values in the fabric
     env data structure for use other places in CloudBioLinux.
     """
+    if "distribution" not in env:
+        env.distribution = "__auto__"
+    if "dist_name" not in env:
+        env.dist_name = "__auto__"
     env.logger.info("Distribution %s" % env.distribution)
 
     if env.hosts == ["vagrant"]:
@@ -42,7 +46,7 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _setup_debian()
     elif env.distribution == "macosx":
         _setup_macosx(env)
-        ignore_distcheck=True
+        ignore_distcheck = True
     else:
         raise ValueError("Unexpected distribution %s" % env.distribution)
     if not ignore_distcheck:
