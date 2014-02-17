@@ -181,8 +181,11 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     # if installing samtools, avoid conflicts with cbl and homebrew-science versions
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
-            has_bcftools = int(env.safe_run_output("{brew_cmd} list samtools | grep -c bcftools".format(
-                brew_cmd=brew_cmd)))
+            try:
+                has_bcftools = int(env.safe_run_output("{brew_cmd} list samtools | grep -c bcftools".format(
+                    brew_cmd=brew_cmd)))
+            except ValueError:
+                has_bcftools = 0
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
