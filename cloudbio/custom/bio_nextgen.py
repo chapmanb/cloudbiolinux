@@ -76,12 +76,11 @@ def install_star(env):
     """The STAR spliced short read aligner.
     http://code.google.com/p/rna-star/
     """
-    default_version = "2.3.1p"
+    default_version = "2.3.1z"
     version = env.get("tool_version", default_version)
     # Need latest alpha release to work around 13.04 compile error
     # https://groups.google.com/forum/#!topic/rna-star/13S344Jknf4
     url = "ftp://ftp2.cshl.edu/gingeraslab/tracks/STARrelease/Alpha/STAR_{version}.tgz"
-    #url = "http://rna-star.googlecode.com/files/STAR_{version}.tgz"
     _get_install(url.format(version=version), env,
                  _make_copy("find -name 'STAR'"))
 
