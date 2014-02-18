@@ -146,12 +146,12 @@ def _latest_pkg_version(env, brew_cmd, pkg):
 def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     """Install the latest version of the given package.
     """
-    if pkg in ipkgs["outdated"]:
+    if pkg in ipkgs["outdated"] or pkg.split("/")[-1] in ipkgs["outdated"]:
         brew_subcmd = "upgrade"
-    elif pkg in ipkgs["current"]:
+    elif pkg in ipkgs["current"] or pkg.split("/")[-1] in ipkgs["current"]:
         brew_subcmd = None
         pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
-        if ipkgs["current"][pkg] != pkg_version:
+        if ipkgs["current"].get(pkg, ipkgs["current"][pkg.split("/")[-1]]) != pkg_version:
             brew_subcmd = "upgrade"
     else:
         brew_subcmd = "install"
@@ -188,6 +188,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 has_bcftools = 0
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
+    if "htslib" in ipkgs["outdated"] or "chapmanb/cbl/htslib" in ipkgs["outdated"]:
+        _install_pkg_latest(env, "chapmanb/cbl/htslib", brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))

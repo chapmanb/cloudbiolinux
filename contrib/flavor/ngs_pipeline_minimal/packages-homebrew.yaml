@@ -15,7 +15,8 @@ bio_nextgen:
   analysis:
     #- cufflinks
     - chapmanb/cbl/samtools
-    - bcftools
+    - chapmanb/cbl/htslib
+    - chapmanb/cbl/bcftools
     #- tophat
   variant:
     - glia
