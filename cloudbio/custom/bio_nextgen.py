@@ -513,6 +513,16 @@ def install_picard(env):
           "picard-tools/%s/picard-tools-%s.zip" % (version, version)
     _java_install("picard", version, url, env)
 
+def install_alientrimmer(env):
+    """
+    Adapter removal tool
+    http://www.ncbi.nlm.nih.gov/pubmed/23912058
+    """
+    version = "0.3.2"
+    url = ("ftp://ftp.pasteur.fr/pub/gensoft/projects/AlienTrimmer/"
+           "AlienTrimmer_%s.tar.gz" % version)
+    _java_install("AlienTrimmer", version, url, env)
+
 def install_rnaseqc(env):
     """Quality control metrics for RNA-seq data
     https://www.broadinstitute.org/cancer/cga/rna-seqc
