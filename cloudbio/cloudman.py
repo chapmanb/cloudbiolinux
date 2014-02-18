@@ -309,7 +309,7 @@ def _cleanup_ec2(env):
         sudo('/etc/init.d/rabbitmq-server stop')
         sudo('service rabbitmq-server stop')
         # Clean up packages that are causing issues or are unnecessary
-        pkgs_to_remove = ['tntnet', 'tntnet-runtime', 'libtntnet9']
+        pkgs_to_remove = ['tntnet', 'tntnet-runtime', 'libtntnet9', 'vsftpd']
         for ptr in pkgs_to_remove:
             sudo('apt-get -y --force-yes remove --purge {0}'.format(ptr))
     sudo('initctl reload-configuration')
