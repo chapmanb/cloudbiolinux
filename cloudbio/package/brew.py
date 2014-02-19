@@ -189,6 +189,9 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     if "htslib" in ipkgs["outdated"] or "chapmanb/cbl/htslib" in ipkgs["outdated"]:
+        env.safe_run("{brew_cmd} remove --force htslib".format(**locals()))
+        ipkgs["outdated"].pop("htslib", None)
+        ipkgs["outdated"].pop("chapmanb/cbl/htslib", None)
         _install_pkg_latest(env, "chapmanb/cbl/htslib", brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
