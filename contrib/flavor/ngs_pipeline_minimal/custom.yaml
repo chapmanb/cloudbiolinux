@@ -11,7 +11,6 @@ bio_nextgen:
     - tophat
   variant:
     - bcbio_variation
-    - freebayes
     - gatk
     - grabix
     - mutect

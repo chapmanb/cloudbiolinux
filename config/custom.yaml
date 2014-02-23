@@ -47,7 +47,6 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - crisp
-    - freebayes
     - gatk
     #- gatk_protected
     - gemini

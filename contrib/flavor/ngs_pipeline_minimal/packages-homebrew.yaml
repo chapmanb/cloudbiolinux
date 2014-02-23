@@ -19,8 +19,10 @@ bio_nextgen:
     - chapmanb/cbl/bcftools
     #- tophat
   variant:
+    - freebayes
     - glia
     - lumpy-sv
+    - platypus
     - tabix
     - vcflib
     - vcftools

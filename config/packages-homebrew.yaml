@@ -18,8 +18,10 @@ bio_nextgen:
     #- tophat
   variant:
     - delly
+    - freebayes
     - glia
     - lumpy-sv
+    - platypus
     - tabix
     - vcflib
     - vcftools
