@@ -22,7 +22,7 @@ bio_nextgen:
     - freebayes
     - glia
     - lumpy-sv
-    - platypus
+    - platypus-variant
     - tabix
     - vcflib
     - vcftools
