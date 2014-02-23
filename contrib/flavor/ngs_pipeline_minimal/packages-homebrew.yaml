@@ -26,3 +26,4 @@ bio_nextgen:
     - tabix
     - vcflib
     - vcftools
+    - vt
