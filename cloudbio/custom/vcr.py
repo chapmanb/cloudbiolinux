@@ -1,6 +1,6 @@
 #
 # vcr.py
-#  - Configures the environment for running the Viral Assembly (vir-assembly-pipeline.sh) and VIGOR (VIGOR3.pl) pipelines (creating directory structure and installs software). 
+#  - Configures the environment for running the Viral Assembly (viral_assembly_pipeline.py) and VIGOR (VIGOR3.pl) pipelines (creating directory structure and installs software). 
 #
 
 import os.path, re, mmap
@@ -80,25 +80,20 @@ def install_viralassembly_cleanall(env):
 def _initialize_area_viral():
 	_initialize_env("viral")
 	
-	env.VIRAL_SCRIPT = "%s/vir-assembly-pipeline.sh" % dependency_URL
+	env.VIRAL_SCRIPT = "%s/viral_assembly_pipeline.py" % dependency_URL
 	
 	viral_dirs["PROJECT_DIR"] = "%(VIRAL_ROOT_DIR)s/project" % env
 	viral_dirs["REF_DIR"] = "%(VIRAL_ROOT_DIR)s/references"  % env
 	viral_dirs["TOOLS_DIR"] = "%(VIRAL_ROOT_DIR)s/tools"     % env
 	viral_dirs["TOOLS_BINARIES_DIR"] = "%s/BINARIES"         % viral_dirs["TOOLS_DIR"]
 	viral_dirs["TOOLS_PERL_DIR"] = "%s/PERL"                 % viral_dirs["TOOLS_DIR"]
-	viral_dirs["TOOLS_SFF_DIR"] = "%s/SFF"                   % viral_dirs["TOOLS_DIR"]
-	viral_dirs["TOOLS_FASTX_DIR"] = "%s/FASTX"               % viral_dirs["TOOLS_DIR"]
 	
 	env.VIRAL_REF_FILES = "corona_virus,hadv,influenza_a_virus,jev,mpv,norv,rota_virus,rsv,veev,vzv,yfv"
 	
-	viral_urls["FASTX_URL"] = "http://hannonlab.cshl.edu/fastx_toolkit"
 	viral_urls["BIO_LINUX_URL"] = "http://nebc.nerc.ac.uk/bio-linux/"
 	
 	viral_tars["BINARIES_TARBALL"] = "BINARIES.tgz"
 	viral_tars["PERL_TARBALL"] = "PERL.tgz"
-	viral_tars["SFF_TARBALL"] = "seq454-64_v2.6.tgz"
-	viral_tars["FASTX_TARBALL"] = "fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2"
 	
 	print("user:   %(user)s" % env)
 	print("host:   %(host)s" % env)
@@ -127,24 +122,17 @@ def _add_tools_viral():
 			print("No DEBIAN_FRONTEND present! Adding...")
 			sudo("echo -e \"DEBIAN_FRONTEND=noninteractive\" >> %s" % bashrc_file)
 	
-	sudo("wget --no-check-certificate -O %s/vir-assembly-pipeline.sh %s" % (env.VIRAL_ROOT_DIR,env.VIRAL_SCRIPT))
+	sudo("wget --no-check-certificate -O %s/viral_assembly_pipeline.py %s" % (env.VIRAL_ROOT_DIR,env.VIRAL_SCRIPT))
 	_add_package(dependency_URL,viral_tars["BINARIES_TARBALL"],viral_dirs["TOOLS_BINARIES_DIR"],"tar")
 	_add_package(dependency_URL,viral_tars["PERL_TARBALL"],viral_dirs["TOOLS_PERL_DIR"],"tar")
-	_add_package(dependency_URL,viral_tars["SFF_TARBALL"],viral_dirs["TOOLS_SFF_DIR"],"tar")
 	_apt_get_install("csh")
 	_apt_get_install("gawk")
-	_add_fastx()
 	_initialize_bio_linux()
 
 def _add_refs():
 	files = (env.VIRAL_REF_FILES).split(",")
 	for file in files:
 		_add_package(dependency_URL,"%s.tgz" % file,viral_dirs["REF_DIR"],"tar")
-
-def _add_fastx():
-	_add_package(viral_urls["FASTX_URL"],viral_tars["FASTX_TARBALL"],viral_dirs["TOOLS_FASTX_DIR"],"bz2")
-	sudo("cp %s/bin/* %s" % (viral_dirs["TOOLS_FASTX_DIR"],viral_dirs["TOOLS_FASTX_DIR"]))
-	sudo("rm -fr %s/bin"  % viral_dirs["TOOLS_FASTX_DIR"])
 
 def _initialize_bio_linux():
 	sudo("echo -e \"deb %s unstable bio-linux\" >> /etc/apt/sources.list" % viral_urls["BIO_LINUX_URL"])
