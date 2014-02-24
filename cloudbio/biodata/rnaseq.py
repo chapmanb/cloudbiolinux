@@ -13,8 +13,8 @@ from cloudbio.custom import shared
 from cloudbio.fabutils import warn_only
 
 VERSIONS = {"rn5": "2014-02-13",
-            "GRCh37": "2014-02-13",
-            "hg19": "2014-02-13",
+            "GRCh37": "2014-02-12",
+            "hg19": "2014-02-14",
             "mm10": "2014-02-13"}
 
 def download_transcripts(genomes, env):
