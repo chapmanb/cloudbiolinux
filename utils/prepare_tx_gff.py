@@ -32,7 +32,7 @@ from bcbio.utils import chdir, safe_makedir, file_exists
 
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "73"
+ensembl_release = "74"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 # taxname:
@@ -198,6 +198,7 @@ def main(org_build):
 def cleanup(work_dir, out_dir, org_build):
     try:
         os.remove(os.path.join(work_dir, org_build + ".dict"))
+        os.remove(os.path.join(work_dir, org_build + ".fa"))
     except:
         pass
     shutil.move(work_dir, out_dir)
