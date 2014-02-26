@@ -5,6 +5,8 @@ bio_nextgen:
   utilities:
     - biobambam
     - rnaseqc
+    - alientrimmer
+    - featurecounts
   analysis:
     - cufflinks
     - picard
