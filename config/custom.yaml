@@ -15,7 +15,6 @@ bio_nextgen:
     - mosaik
     # - perm # difficult build process with directory names
     - snap
-    - star
     #- stampy # no version names on tarballs
   utilities:
     - biobambam
