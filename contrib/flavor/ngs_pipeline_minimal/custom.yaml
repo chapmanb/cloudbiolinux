@@ -2,6 +2,7 @@
 bio_nextgen:
   alignment:
     - star
+    - bowtie2
   utilities:
     - biobambam
     - rnaseqc
