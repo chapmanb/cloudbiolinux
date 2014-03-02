@@ -146,19 +146,23 @@ def _latest_pkg_version(env, brew_cmd, pkg):
 def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
     """Install the latest version of the given package.
     """
-    if pkg in ipkgs["outdated"] or pkg.split("/")[-1] in ipkgs["outdated"]:
-        brew_subcmd = "upgrade"
-    elif pkg in ipkgs["current"] or pkg.split("/")[-1] in ipkgs["current"]:
-        brew_subcmd = None
+    short_pkg = pkg.split("/")[-1]
+    do_install = True
+    remove_old = False
+    if pkg in ipkgs["outdated"] or short_pkg in ipkgs["outdated"]:
+        remove_old = True
+    elif pkg in ipkgs["current"] or short_pkg in ipkgs["current"]:
+        do_install = False
         pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
-        if ipkgs["current"].get(pkg, ipkgs["current"][pkg.split("/")[-1]]) != pkg_version:
-            brew_subcmd = "upgrade"
-    else:
-        brew_subcmd = "install"
-    if brew_subcmd:
+        if ipkgs["current"].get(pkg, ipkgs["current"][short_pkg]) != pkg_version:
+            remove_old = True
+            do_install = True
+    if do_install:
+        if remove_old:
+            env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
         compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
-        env.safe_run("%s && %s && %s %s --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, brew_subcmd, pkg))
+        env.safe_run("%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_and_version(pkg_str):
@@ -189,9 +193,6 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
     if "htslib" in ipkgs["outdated"] or "chapmanb/cbl/htslib" in ipkgs["outdated"]:
-        env.safe_run("{brew_cmd} remove --force htslib".format(**locals()))
-        ipkgs["outdated"].pop("htslib", None)
-        ipkgs["outdated"].pop("chapmanb/cbl/htslib", None)
         _install_pkg_latest(env, "chapmanb/cbl/htslib", brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:

@@ -3,7 +3,7 @@
 bio_nextgen:
   alignment:
     - bwa
-    - bowtie2
+#    - bowtie2       (2.2.0 doesn't work with Tophat, so use the source version for now)
     - novoalign
   utilities:
     - bamtools
