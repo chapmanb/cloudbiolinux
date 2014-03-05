@@ -105,12 +105,15 @@ phylogeny:
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
 vcr:
+  - galaxy_vcr
   - viralassembly
   - viralassembly_cleanall
   - viralvigor
   - viralvigor_test
   - viralvigor_validate
   - viralvigor_cleanall
+  - vicvb
+  - vicvb_cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

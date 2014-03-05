@@ -176,24 +176,26 @@ def prepare_gff_db(gff_file):
 
 # ## Main driver functions
 
-def main(org_build):
+def main(org_build, gtf_file=None):
     work_dir = os.path.join(os.getcwd(), org_build, "tmpcbl")
     out_dir = os.path.join(os.getcwd(), org_build,
                            "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
     safe_makedir(work_dir)
     with chdir(work_dir):
-        build = build_info[org_build]
-        tx_gff = prepare_tx_gff(build, org_build)
-        db = prepare_gff_db(tx_gff)
-        gtf_to_refflat(tx_gff)
-        mask_gff = prepare_mask_gtf(tx_gff)
-        rrna_gtf = prepare_rrna_gtf(tx_gff)
+        if not gtf_file:
+            build = build_info[org_build]
+            gtf_file = prepare_tx_gff(build, org_build)
+        db = prepare_gff_db(gtf_file)
+        gtf_to_refflat(gtf_file)
+        mask_gff = prepare_mask_gtf(gtf_file)
+        rrna_gtf = prepare_rrna_gtf(gtf_file)
         gtf_to_interval(rrna_gtf, org_build)
-        prepare_tophat_index(tx_gff, org_build)
+        prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
     tar_dirs = [out_dir]
     upload_to_s3(tar_dirs, org_build)
+
 
 def cleanup(work_dir, out_dir, org_build):
     try:
@@ -458,11 +460,13 @@ def _get_gtf_db(gtf):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
                             "organism.")
+    parser.add_argument("--gtf",
+                        help="Optional GTF file (instead of downloading from Ensembl.",
+                        default=None),
     parser.add_argument("picard",
                         help="Path to Picard")
-    parser.add_argument("org_build", help="Build of organism to run.",
-                        choices=build_info.keys())
+    parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
     global PICARD_DIR
     PICARD_DIR = args.picard
-    main(args.org_build)
+    main(args.org_build, args.gtf)
