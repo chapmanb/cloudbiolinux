@@ -130,7 +130,7 @@ def get_r_pkg_info():
     for line in out.split("\n")[1:]:
         pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
     for pkg in pkg_raw_list:
-        if len(pkg) > 0:
+        if len(pkg) > 2:
             yield {"name": pkg[0], "version": pkg[1],
                    "description": pkg[2],
                    "homepage_uri": (pkg[3], '')[pkg[3] == 'NA'] if len(pkg) > 3 else ""}
