@@ -125,7 +125,10 @@ def write_brew_pkg_info(out_dir, tooldir):
 def get_r_pkg_info():
     r_command = ("options(width=10000); subset(installed.packages(fields=c('Title', 'URL')), "
                  "select=c('Version', 'Title','URL'))")
-    out = subprocess.check_output(["Rscript", "-e", r_command])
+    try:
+        out = subprocess.check_output(["Rscript", "-e", r_command])
+    except (subprocess.CalledProcessError, OSError):
+        out = ""
     pkg_raw_list = []
     for line in out.split("\n")[1:]:
         pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
