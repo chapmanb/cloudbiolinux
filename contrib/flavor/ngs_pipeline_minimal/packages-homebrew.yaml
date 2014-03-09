@@ -15,12 +15,13 @@ bio_nextgen:
     - seqtk==HEAD
   analysis:
     #- cufflinks
-    - chapmanb/cbl/samtools
-    - chapmanb/cbl/htslib
-    - chapmanb/cbl/bcftools
+    - samtools
+    - htslib
+    - bcftools
     #- tophat
   variant:
     - freebayes
+    - gatk-framework
     - glia
     - lumpy-sv
     - platypus-variant
