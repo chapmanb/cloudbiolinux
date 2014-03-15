@@ -3,7 +3,6 @@ bio_nextgen:
   alignment:
     - bowtie2
   utilities:
-    - biobambam
     - rnaseqc
     - alientrimmer
     - featurecounts

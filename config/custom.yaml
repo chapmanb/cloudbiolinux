@@ -17,7 +17,6 @@ bio_nextgen:
     - snap
     #- stampy # no version names on tarballs
   utilities:
-    - biobambam
     - cram
     - dwgsim
     - fastq_screen

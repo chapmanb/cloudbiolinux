@@ -9,6 +9,8 @@ bio_nextgen:
   utilities:
     - bamtools
     - bedtools
+    - libmaus
+    - biobambam
     - fastqc
     - qualimap
     - sambamba
