@@ -198,7 +198,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
     for dependency in ["htslib", "libmaus"]:
-        if dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]:
+        if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
+              or dependency not in ipkgs["current"]):
             _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
