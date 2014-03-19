@@ -29,5 +29,5 @@ bio_nextgen:
     - platypus-variant
     - tabix
     - vcflib
-    - vcftools
+    # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
