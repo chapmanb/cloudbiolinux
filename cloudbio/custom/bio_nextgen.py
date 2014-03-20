@@ -65,7 +65,7 @@ def install_featurecounts(env):
     featureCounts from the subread package for counting reads mapping to
     genomic features
     """
-    default_version = "1.4.3-p1"
+    default_version = "1.4.4"
     version = env.get("tool_version", default_version)
     url = ("http://downloads.sourceforge.net/project/subread/"
            "subread-%s/subread-%s-Linux-i386.tar.gz"
