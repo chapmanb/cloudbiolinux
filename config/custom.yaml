@@ -15,10 +15,8 @@ bio_nextgen:
     - mosaik
     # - perm # difficult build process with directory names
     - snap
-    - star
     #- stampy # no version names on tarballs
   utilities:
-    - biobambam
     - cram
     - dwgsim
     - fastq_screen
@@ -106,12 +104,15 @@ phylogeny:
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
 vcr:
+  - galaxy_vcr
   - viralassembly
   - viralassembly_cleanall
   - viralvigor
   - viralvigor_test
   - viralvigor_validate
   - viralvigor_cleanall
+  - vicvb
+  - vicvb_cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

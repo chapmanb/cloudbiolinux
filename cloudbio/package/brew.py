@@ -143,7 +143,7 @@ def _latest_pkg_version(env, brew_cmd, pkg):
             versions = version_str.split(",")
             return versions[0].split()[-1].strip()
 
-def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
+def _install_pkg_latest(env, pkg, brew_cmd, ipkgs, flags=""):
     """Install the latest version of the given package.
     """
     short_pkg = pkg.split("/")[-1]
@@ -162,7 +162,8 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs):
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
         compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
-        env.safe_run("%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, pkg))
+        env.safe_run("%s && %s && %s install %s --env=inherit %s" % (compiler_setup, perl_setup,
+                                                                     brew_cmd, flags, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_and_version(pkg_str):
@@ -178,11 +179,13 @@ def _get_pkg_and_version(pkg_str):
 def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
 
-    Handles installation of required Perl libraries.
+    - Installation of required Perl libraries.
+    - Ensures installed samtools does not overlap with bcftools
+    - Upgrades any package dependencies
     """
     for dep in ["cpanminus", "expat"]:
         _install_pkg_latest(env, dep, brew_cmd, ipkgs)
-    # if installing samtools, avoid conflicts with cbl and homebrew-science versions
+    # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
             try:
@@ -192,8 +195,12 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 has_bcftools = 0
             if has_bcftools:
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
-    if "htslib" in ipkgs["outdated"] or "chapmanb/cbl/htslib" in ipkgs["outdated"]:
-        _install_pkg_latest(env, "chapmanb/cbl/htslib", brew_cmd, ipkgs)
+                ipkgs["current"].pop("samtools", None)
+        _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
+    for dependency in ["htslib", "libmaus"]:
+        if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
+              or dependency not in ipkgs["current"]):
+            _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
     for perl_lib in ["Statistics::Descriptive"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))

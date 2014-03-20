@@ -5,9 +5,12 @@ bio_nextgen:
     - bwa
     - bowtie2
     - novoalign
+    - rna-star
   utilities:
     - bamtools
     - bedtools
+    - libmaus
+    - biobambam
     - fastqc
     - fastx_toolkit
     - qualimap

@@ -5,25 +5,29 @@ bio_nextgen:
     - bwa
 #    - bowtie2       (2.2.0 doesn't work with Tophat, so use the source version for now)
     - novoalign
+    - rna-star
   utilities:
     - bamtools
     - bedtools
+    - libmaus
+    - biobambam
     - fastqc
     - qualimap
     - sambamba
     - seqtk==HEAD
   analysis:
     #- cufflinks
-    - chapmanb/cbl/samtools
-    - chapmanb/cbl/htslib
-    - chapmanb/cbl/bcftools
+    - samtools
+    - htslib
+    - bcftools
     #- tophat
   variant:
     - freebayes
+    - gatk-framework
     - glia
     - lumpy-sv
     - platypus-variant
     - tabix
     - vcflib
-    - vcftools
+    # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
