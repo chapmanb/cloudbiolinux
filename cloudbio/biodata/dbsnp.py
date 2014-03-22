@@ -56,7 +56,7 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
                    "1000G_omni2.5",
                    "Mills_and_1000G_gold_standard.indels"]
     for dl_name in to_download:
-        for ext in ["", ".idx"]:
+        for ext in [""]:
             _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
     _download_cosmic(gid)
     # XXX Wait to get this by default until it is used more widely
@@ -64,17 +64,27 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     broad_fname = "{name}.{gid}.vcf{ext}".format(gid=gid, name=name, ext=ext)
-    fname = broad_fname.replace(".{0}".format(gid), "").replace(".sites", "")
+    fname = broad_fname.replace(".{0}".format(gid), "").replace(".sites", "") + ".gz"
     base_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
                "{bundle}/{gid}/{fname}.gz".format(
                    bundle=bundle_version, fname=broad_fname, gid=gid)
+    # compress and prepare existing uncompressed versions
+    if env.safe_exists(fname.replace(".vcf.gz", ".vcf")):
+        env.safe_run("bgzip %s" % fname.replace(".vcf.gz", ".vcf"))
+        env.safe_run("tabix -f -p vcf %s" % fname)
+    # otherwise, download and bgzip and tabix index
     if not env.safe_exists(fname):
         out_file = shared._remote_fetch(env, base_url, allow_fail=True)
         if out_file:
-            env.safe_run("gunzip %s" % out_file)
-            env.safe_run("mv %s %s" % (broad_fname, fname))
+            env.safe_run("gunzip -c %s | bgzip -c > %s" % (out_file, fname))
+            env.safe_run("tabix -f -p vcf %s" % fname)
+            env.safe_run("rm -f %s" % out_file)
         else:
             env.logger.warn("dbSNP resources not available for %s" % gid)
+    # clean up old files
+    for ext in [".vcf", ".vcf.idx"]:
+        if env.safe_exists(fname.replace(".vcf.gz", ext)):
+            env.safe_run("rm -f %s" % (fname.replace(".vcf.gz", ext)))
     return fname
 
 def _download_cosmic(gid):
@@ -83,18 +93,15 @@ def _download_cosmic(gid):
     COSMIC resources.
     """
     base_url = "https://s3.amazonaws.com/biodata/variants"
-    version = "v67_20131024"
+    version = "v68"
     supported = ["hg19", "GRCh37"]
     if gid in supported:
         url = "%s/cosmic-%s-%s.vcf.gz" % (base_url, version, gid)
-        gzip_fname = os.path.basename(url)
-        fname = os.path.splitext(gzip_fname)[0]
+        fname = os.path.basename(url)
         if not env.safe_exists(fname):
-            if not env.safe_exists(gzip_fname):
-                shared._remote_fetch(env, url)
-            env.safe_run("gunzip %s" % fname)
-        if not env.safe_exists(fname + ".idx"):
-            shared._remote_fetch(env, url.replace(".gz", ".idx"))
+            shared._remote_fetch(env, url)
+        if not env.safe_exists(fname + ".tbi"):
+            shared._remote_fetch(env, url + ".tbi")
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.

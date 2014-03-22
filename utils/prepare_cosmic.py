@@ -10,29 +10,29 @@ import subprocess
 import sys
 
 FTP_DIR = "ftp://ngs.sanger.ac.uk/production/cosmic/"
-VERSION = "v67_20131024"
-BCBIO_NEXTGEN_BASE="/usr/local"
+VERSION = "v68"
+BCBIO_NEXTGEN_BASE = "/usr/local"
 
 def main():
     work_dir = "tmp-cosmic-GRCh37"
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
     os.chdir(work_dir)
-    gatk_jar = BCBIO_NEXTGEN_BASE + "/share/java/gatk/GenomeAnalysisTK.jar"
     ref_file = BCBIO_NEXTGEN_BASE + "/share/bcbio_nextgen/genomes/Hsapiens/GRCh37/seq/GRCh37.fa"
     fnames = [reorder_reference(x, ref_file) for x in get_cosmic_files()]
-    grc_cosmic = combine_cosmic(fnames, ref_file, gatk_jar)
-    hg_cosmic = map_coords_to_ucsc(grc_cosmic, ref_file, gatk_jar)
+    grc_cosmic = combine_cosmic(fnames, ref_file)
+    hg_cosmic = map_coords_to_ucsc(grc_cosmic, ref_file)
     for ready_file in [bgzip_vcf(x) for x in [grc_cosmic, hg_cosmic]]:
         upload_to_s3(ready_file)
         upload_to_s3(ready_file.replace(".gz", ".idx"))
+        upload_to_s3(ready_file + ".tbi")
 
 def upload_to_s3(fname):
-    upload_script = os.path.join(os.path.dirname(__file__), os.path.pardir, "s3_multipart_upload.py")
+    upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
     subprocess.check_call([sys.executable, upload_script, fname, "biodata",
                            "variants/%s" % os.path.basename(fname), "--public"])
 
-def map_coords_to_ucsc(grc_cosmic, ref_file, gatk_jar):
+def map_coords_to_ucsc(grc_cosmic, ref_file):
     hg19_ref_file = ref_file.replace("GRCh37", "hg19")
     out_file = grc_cosmic.replace("GRCh37.vcf", "hg19.vcf")
     if not os.path.exists(out_file):
@@ -56,7 +56,7 @@ def map_coords_to_ucsc(grc_cosmic, ref_file, gatk_jar):
                         line = _rename_to_ucsc(line)
                         out_handle.write(line)
         # Create clean VCF and index for upload
-        subprocess.check_call(["java", "-jar", gatk_jar, "-R", hg19_ref_file, "-T", "SelectVariants",
+        subprocess.check_call(["gatk-framework", "-R", hg19_ref_file, "-T", "SelectVariants",
                                "--variant", tmp_file, "--out", out_file])
     return out_file
 
@@ -68,10 +68,10 @@ def _rename_to_ucsc(line):
         new_chrom = "chr%s" % chrom
     return "%s\t%s" % (new_chrom, rest)
 
-def combine_cosmic(fnames, ref_file, gatk_jar):
+def combine_cosmic(fnames, ref_file):
     out_file = "cosmic-%s-GRCh37.vcf" % VERSION
     if not os.path.exists(out_file):
-        cmd = ["java", "-jar", gatk_jar, "-T", "CombineVariants", "-R", ref_file, "--out", out_file,
+        cmd = ["gatk-framework", "-T", "CombineVariants", "-R", ref_file, "--out", out_file,
                "--suppressCommandLineHeader", "--setKey", "null"]
         for v in fnames:
             cmd += ["--variant", v]
@@ -82,7 +82,7 @@ def reorder_reference(fname, ref_file):
     """Move mitochondrial calls to end to match GATK reference ordering.
     """
     out_file = "%s-prep%s" % os.path.splitext(fname)
-    bcbiov_jar = BCBIO_NEXTGEN_BASE + "/share/java/bcbio_variation/bcbio.variation-0.1.2-SNAPSHOT-standalone.jar"
+    bcbiov_jar = BCBIO_NEXTGEN_BASE + "/share/java/bcbio_variation/bcbio.variation-0.1.6-SNAPSHOT-standalone.jar"
     if not os.path.exists(out_file):
         cmd = ["java", "-jar", bcbiov_jar, "variant-utils", "sort-vcf", fname, ref_file, ""]
         subprocess.check_call(cmd)
@@ -105,6 +105,9 @@ def bgzip_vcf(in_file):
     out_file = in_file + ".gz"
     if not os.path.exists(out_file):
         subprocess.check_call("bgzip -c %s > %s" % (in_file, out_file), shell=True)
+    tabix_file = out_file + ".tbi"
+    if not os.path.exists(tabix_file):
+        subprocess.check_call(["tabix", "-p", "vcf", out_file])
     return out_file
 
 if __name__ == "__main__":
