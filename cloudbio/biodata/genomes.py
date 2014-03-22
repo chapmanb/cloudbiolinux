@@ -263,10 +263,10 @@ GENOMES_SUPPORTED = [
            ("Tguttata_Zebra_finch", "taeGut1", UCSCGenome("taeGut1")),
            ("Aalbimanus", "AalbS1", VectorBase("AalbS1", "Anopheles",
                                                "albimanus", "STECLA",
-                                               "AalbS1", ["CONTIGS", "SCAFFOLDS"])),
+                                               "AalbS1", ["SCAFFOLDS"])),
            ("Agambiae", "AgamP3", VectorBase("AgamP3", "Anopheles",
                                                "gambiae", "PEST",
-                                               "AgamP3", ["CHROMOSOMES", "SCAFFOLDS"])),]
+                                               "AgamP3", ["CHROMOSOMES"])),]
 
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
