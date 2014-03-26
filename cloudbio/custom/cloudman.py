@@ -104,7 +104,7 @@ def install_sge(env):
     out_dir = "ge6.2u5"
     url = "%s/ge62u5_lx24-amd64.tar.gz" % CDN_ROOT_URL
     install_dir = env.install_dir
-    if exists(os.path.join(install_dir, out_dir)):
+    if env.safe_exists(os.path.join(install_dir, out_dir)):
         return
     with _make_tmp_dir() as work_dir:
         with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
