@@ -87,9 +87,10 @@ galaxy_tools:
 galaxyp:
   - galaxy_protk
   - protvis
-distributed:
-  - pydoop
-  - seal
+# Pydoop and seal need update and should only be installed on cloud systems
+#distributed:
+#  - pydoop
+#  - seal
 system:
   - homebrew
   - s3fs
