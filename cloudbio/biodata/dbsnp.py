@@ -54,6 +54,7 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
     to_download = ["dbsnp_{ver}".format(ver=dbsnp_version),
                    "hapmap_3.3",
                    "1000G_omni2.5",
+                   "1000G_phase1.snps.high_confidence",
                    "Mills_and_1000G_gold_standard.indels"]
     for dl_name in to_download:
         for ext in [""]:
