@@ -65,9 +65,11 @@ def _add_apt_gpg_keys():
         ]
     standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
     for key in standalone:
-        env.safe_sudo("wget -q -O- %s | apt-key add -" % key)
+        with settings(warn_only=True):
+            env.safe_sudo("wget -q -O- %s | apt-key add -" % key)
     for url, key in keyserver:
-        env.safe_sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
+        with settings(warn_only=True):
+            env.safe_sudo("apt-key adv --keyserver %s --recv %s" % (url, key))
     with settings(warn_only=True):
         env.safe_sudo("apt-get update")
         env.safe_sudo("sudo apt-get install -y --force-yes bio-linux-keyring")
