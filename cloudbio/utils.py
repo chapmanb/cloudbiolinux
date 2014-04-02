@@ -115,13 +115,13 @@ def _setup_flavor(env, flavor):
             "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
         env.flavor_dir = flavor_dir
         # Load python customizations to base configuration if present
-        py_flavor = "{0}flavor".format(os.path.split(os.path.realpath(flavor_dir))[1])
-        flavor_custom_py = os.path.join(flavor_dir, "{0}.py".format(py_flavor))
-        if os.path.exists(flavor_custom_py):
-            sys.path.append(flavor_dir)
-            mod = __import__(py_flavor, fromlist=[py_flavor])
+        for ext in ["", "flavor"]:
+            py_flavor = os.path.split(os.path.realpath(flavor_dir))[1] + ext
+            flavor_custom_py = os.path.join(flavor_dir, "{0}.py".format(py_flavor))
+            if os.path.exists(flavor_custom_py):
+                sys.path.append(flavor_dir)
+                mod = __import__(py_flavor, fromlist=[py_flavor])
     env.logger.info("This is a %s" % env.flavor.name)
-
 
 def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
