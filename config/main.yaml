@@ -34,9 +34,11 @@ packages:
   - bio_visualization
   - bio_utils
   - phylogeny
-  - galaxy
-  - galaxy_tools
-#  - cloudman  # Do not install by default to avoid errors with local installs
+# Do not install by default to avoid errors with local installs
+# Injected in cloudbio/edition/base.CloudBioLinux for CBL editions
+#  - galaxy
+#  - galaxy_tools
+#  - cloudman
 libraries:
   #- haskell-libs
   - perl-libs

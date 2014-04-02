@@ -337,6 +337,7 @@ def _read_main_config():
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data.get('packages', [])
+    packages = env.edition.rewrite_config_items("main_packages", packages)
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
     custom_add = full_data.get("custom_additional")
