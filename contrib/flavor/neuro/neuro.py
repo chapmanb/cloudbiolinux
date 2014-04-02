@@ -18,6 +18,14 @@ class NeuroFlavor(Flavor):
         Flavor.__init__(self, env)
         self.name = "Neuroinformatics Flavor"
 
+	def rewrite_config_items(self, name, packages):
+		if name == 'packages':
+			packages.extend([
+				"git"
+			])
+		return packages
+
+
     def rewrite_apt_sources_list(self, name, sources):
         sources = [
             'deb http://neurodeb.pirsquared.org data main contrib non-free',
