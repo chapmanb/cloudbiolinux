@@ -2,7 +2,6 @@ from fabric.api import *
 from fabric.contrib.files import *
 
 from cloudbio.flavor import Flavor
-from cloudbio.edition import Edition
 
 # This flavour installs several neuroinformatics software from NeuroDebian
 #
