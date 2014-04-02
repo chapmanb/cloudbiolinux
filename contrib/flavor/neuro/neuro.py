@@ -11,19 +11,19 @@ from cloudbio.flavor import Flavor
 
 class NeuroFlavor(Flavor):
     """ A flavour for installing NeuroDebian. A debian neuroinformatics repository
-	    of software and datasets.
-	"""
+        of software and datasets.
+    """
 
     def __init__(self, env):
         Flavor.__init__(self, env)
         self.name = "Neuroinformatics Flavor"
 
-	def rewrite_config_items(self, name, packages):
-		if name == 'packages':
-			packages.extend([
-				"git"
-			])
-		return packages
+    def rewrite_config_items(self, name, packages):
+        if name == 'packages':
+            packages.extend([
+                "git"
+            ])
+        return packages
 
 
     def rewrite_apt_sources_list(self, name, sources):
