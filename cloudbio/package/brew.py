@@ -6,6 +6,7 @@ import contextlib
 from distutils.version import LooseVersion
 import os
 
+from cloudbio.custom import system
 from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import quiet, find_cmd
 from cloudbio.package.shared import _yaml_to_packages
@@ -24,6 +25,10 @@ def install_packages(env, to_install=None, packages=None):
     config_file = get_config_file(env, "packages-homebrew.yaml")
     if to_install:
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
+    # if we have no packages to install, do not try to install or update brew
+    if len(packages) == 0:
+        return
+    system.install_homebrew(env)
     brew_cmd = _brew_cmd(env)
     formula_repos = ["homebrew/science", "chapmanb/cbl"]
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])

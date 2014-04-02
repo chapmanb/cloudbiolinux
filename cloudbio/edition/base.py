@@ -74,6 +74,18 @@ class CloudBioLinux(Edition):
         self.name = "CloudBioLinux Edition"
         self.short_name = "cloudbiolinux"
 
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        to_add = ["galaxy", "galaxy_tools", "cloudman"]
+        for x in to_add:
+            if x not in items:
+                items.append(x)
+        return items
+
     def post_install(self, pkg_install=None):
         """Add scripts for starting FreeNX and CloudMan.
         """

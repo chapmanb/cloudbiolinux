@@ -66,7 +66,7 @@ wine %s "$@"
 """ % to
     bin_dir = _get_bin_dir(env)
     dest = "%s/%s" % (bin_dir, basename)
-    _write_to_file(contents, dest, 0755)
+    _write_to_file(contents, dest, '0755')
 
 
 def _conf_wine(env):
