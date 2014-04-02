@@ -33,7 +33,7 @@ from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom import shared, system
+from cloudbio.custom import shared
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package import brew
 from cloudbio.package import (_configure_and_install_native_packages,
@@ -290,7 +290,6 @@ def install_brew(p=None, version=None, flavor=None):
     """
     _setup_logging(env)
     _configure_fabric_environment(env, flavor, ignore_distcheck=True)
-    system.install_homebrew(env)
     if p is not None:
         if version:
             p = "%s==%s" % (p, version)
