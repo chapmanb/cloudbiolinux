@@ -110,7 +110,7 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
     if target is None or target == "puppet_classes":
         _provision_puppet_classes(pkg_install, custom_ignore)
     if target is None or target == "brew":
-        install_brew(flavor=flavor)
+        install_brew(flavor=flavor, automated=False)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -284,12 +284,13 @@ def _install_custom(p, pkg_to_group=None):
     fn = _custom_install_function(env, p, pkg_to_group)
     fn(env)
 
-def install_brew(p=None, version=None, flavor=None):
+def install_brew(p=None, version=None, flavor=None, automated=False):
     """Top level access to homebrew/linuxbrew packages.
     p is a package name to install, or all configured packages if not specified.
     """
-    _setup_logging(env)
-    _configure_fabric_environment(env, flavor, ignore_distcheck=True)
+    if not automated:
+        _setup_logging(env)
+        _configure_fabric_environment(env, flavor, ignore_distcheck=True)
     if p is not None:
         if version:
             p = "%s==%s" % (p, version)
