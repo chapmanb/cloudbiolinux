@@ -124,7 +124,7 @@ def install_bwa(env):
         # if not 64bit, remove the appropriate flag
         if arch.find("x86_64") == -1:
             env.safe_run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 bwa qualfa2fq.pl",
+    _get_install(url, env, _make_copy("ls -1 bwa qualfa2fq.pl",
                                         _fix_makefile))
 
 @_if_not_installed("bfast")
@@ -156,7 +156,7 @@ def install_perm(env):
         print result.return_code
         if result.return_code == 0:
             env.safe_sed("makefile", "g\+\+", gcc_cmd)
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 perm", gcc44_makefile_patch))
+    _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
 
 @_if_not_installed("snap")
 def install_snap(env):
@@ -383,7 +383,7 @@ def install_dwgsim(env):
         shared._remote_fetch(env, samtools_url)
         env.safe_run("tar jxf samtools-{0}.tar.bz2".format(samtools_version))
         env.safe_run("ln -s samtools-{0} samtools".format(samtools_version))
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
+    _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
                  post_unpack_fn=_get_samtools)
 
 @_if_not_installed("fastqc --version")
@@ -437,7 +437,7 @@ def install_bedtools(env):
         return
     url = "https://bedtools.googlecode.com/files/" \
           "BEDTools.v%s.tar.gz" % version
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 bin/*"))
+    _get_install(url, env, _make_copy("ls -1 bin/*"))
 
 _shrec_run = """
 #!/usr/bin/perl
@@ -576,7 +576,7 @@ def install_bamutil(env):
     """
     version = "1.0.7"
     url = "http://genome.sph.umich.edu/w/images/5/5d/BamUtilLibStatGen.%s.tgz" % version
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 bamUtil/bin/bam"),
+    _get_install(url, env, _make_copy("ls -1 bamUtil/bin/bam"),
                  dir_name="bamUtil_%s" % version)
 
 @_if_not_installed("tabix")
@@ -586,7 +586,7 @@ def install_tabix(env):
     """
     version = "0.2.6"
     url = "http://downloads.sourceforge.net/project/samtools/tabix/tabix-%s.tar.bz2" % version
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 tabix bgzip"))
+    _get_install(url, env, _make_copy("ls -1 tabix bgzip"))
 
 @_if_not_installed("disambiguate.py")
 def install_disambiguate(env):
@@ -610,7 +610,7 @@ def install_grabix(env):
     if uptodate:
         return
     repository = "git clone https://github.com/arq5x/grabix.git"
-    _get_install(repository, env, _make_copy("unset LS_COLORS && ls -1 grabix"),
+    _get_install(repository, env, _make_copy("ls -1 grabix"),
                  revision=revision)
 
 @_if_not_installed("pbgzip")
@@ -693,7 +693,7 @@ def install_ogap(env):
     """
     version = "652c525"
     repository = "git clone --recursive https://github.com/ekg/ogap.git"
-    _get_install(repository, env, _make_copy("unset LS_COLORS && ls ogap"),
+    _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
 def _install_samtools_libs(env):
@@ -941,7 +941,7 @@ def install_hydra(env):
     url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         env.safe_run("make clean")
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 bin/* scripts/*"),
+    _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
 
 def install_lumpy(env):
@@ -960,7 +960,7 @@ def install_lumpy(env):
         env.safe_append("defs.local", ("GSL_INCLUDE=-I/usr/local/include -I/usr/local/include/gsl "
                                        "-I/usr/include/gsl -I%s/include/gsl" % env.system_install))
         env.safe_append("defs.local", ("GSL_LINK=-L/usr/local/lib -L/usr/lib -L%s/lib" % env.system_install))
-    _get_install(repository, env, _make_copy("unset LS_COLORS && ls -1 bin/*", _add_gsl_includes),
+    _get_install(repository, env, _make_copy("ls -1 bin/*", _add_gsl_includes),
                  revision=revision)
 
 def install_delly(env):
@@ -998,7 +998,7 @@ def install_crisp(env):
           "CRISP-linux-v{0}.tar.gz".format(version)
     def _make_executable():
         env.safe_run("chmod a+x *.py")
-    _get_install(url, env, _make_copy("unset LS_COLORS && ls -1 CRISP.py crisp_to_vcf.py",
+    _get_install(url, env, _make_copy("ls -1 CRISP.py crisp_to_vcf.py",
                                       premake_cmd=_make_executable,
                                       do_make=False))
 
