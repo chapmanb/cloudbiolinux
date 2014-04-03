@@ -155,7 +155,7 @@ def _safe_dir_name(dir_name, need_dir=True):
                        dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            dirs = env.safe_run_output("unset LS_COLORS && ls -d1 *%s*/" % check_part).split("\n")
+            dirs = env.safe_run_output("ls -d1 *%s*/" % check_part).split("\n")
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
         if len(dirs) == 1 and dirs[0]:
             return dirs[0]
