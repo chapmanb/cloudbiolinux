@@ -149,6 +149,11 @@ def local_append(filename, text, use_sudo=False, partial=False, escape=True, she
         line = line.replace("'", r"'\\''") if escape else line
         func("echo '%s' >> %s" % (line, _expand_path(filename)))
 
+def run_output(*args, **kwargs):
+    if not 'shell' in kwargs:
+        kwargs['shell'] = False
+    return run(*args, **kwargs)
+
 def configure_runsudo(env):
     """Setup env variable with safe_sudo and safe_run,
     supporting non-privileged users and local execution.
@@ -171,7 +176,7 @@ def configure_runsudo(env):
         env.safe_append = append
         env.safe_exists = exists
         env.safe_run = run
-        env.safe_run_output = run
+        env.safe_run_output = run_output
     if isinstance(getattr(env, "use_sudo", "true"), basestring):
         if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
             env.use_sudo = True
