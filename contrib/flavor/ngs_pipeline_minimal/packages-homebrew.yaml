@@ -15,6 +15,7 @@ bio_nextgen:
     - qualimap
     - sambamba
     - seqtk==HEAD
+    - staden_io_lib
   analysis:
     #- cufflinks
     - samtools
