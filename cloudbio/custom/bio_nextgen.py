@@ -555,20 +555,6 @@ def install_mutect(env):
                 env.safe_run("unzip %s" % out_file)
                 env.safe_sudo("mv *.jar version.txt LICENSE* %s" % install_dir)
 
-def install_cram(env):
-    """Highly efficient and tunable reference-based compression of sequence data.
-    http://www.ebi.ac.uk/ena/about/cram_toolkit/
-    """
-    version = "2.0"
-    url = "https://github.com/vadimzalunin/crammer/raw/master/" \
-          "cramtools-%s.jar" % version
-    install_dir = _symlinked_java_version_dir("cram", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                out_file = shared._remote_fetch(env, url)
-                env.safe_sudo("mv %s %s" % (out_file, install_dir))
-
 @_if_not_installed("bam")
 def install_bamutil(env):
     """Utilities for working with BAM files, from U of M Center for Statistical Genetics.
