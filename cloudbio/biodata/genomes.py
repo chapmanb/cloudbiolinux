@@ -84,6 +84,25 @@ class UCSCGenome(_DownloadHelper):
             return parts
         return sorted(xs, key=karyotype_keyfn)
 
+    def _split_multifasta(self, fasta_file):
+        chrom = ""
+        file_handle = None
+        file_names = []
+        out_dir = os.path.dirname(fasta_file)
+        with open(fasta_file) as in_handle:
+            for line in in_handle:
+                if line.startswith(">"):
+                    chrom = line.split(">")[1].strip()
+                    file_handle.close() if file_handle else None
+                    file_names.append(chrom + ".fa")
+                    file_handle = open(os.path.join(out_dir, chrom + ".fa"), "w")
+                    file_handle.write(line)
+                else:
+                    file_handle.write(line)
+        file_handle.close()
+        return file_names
+
+
     def download(self, seq_dir):
         zipped_file = None
         genome_file = "%s.fa" % self._name
@@ -98,8 +117,11 @@ class UCSCGenome(_DownloadHelper):
             else:
                 raise ValueError("Do not know how to handle: %s" % zipped_file)
             tmp_file = genome_file.replace(".fa", ".txt")
-            result = env.safe_run_output("find . -name '*.fa'")
-            result = self._karyotype_sort([x.strip() for x in result.split("\n")])
+            result = env.safe_run_output("find `pwd` -name '*.fa'")
+            result = [x.strip() for x in result.split("\n")]
+            if len(result) == 1:
+                result = self._split_multifasta(result[0])
+            result = self._karyotype_sort(result)
             env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
             env.safe_run("rm -f *.fa")
             env.safe_run("mv %s %s" % (tmp_file, genome_file))
