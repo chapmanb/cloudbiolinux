@@ -654,6 +654,9 @@ def _index_sam(ref_file):
 def _index_star(ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
     gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
+    if not os.path.exists(gtf_file):
+        print "%s not found, skipping creating the STAR index." % (gtf_file)
+        return None
     dir_name = "star"
     cmd = ("STAR --genomeDir . --genomeFastaFiles {ref_file} "
            "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (gtf_file))
