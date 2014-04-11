@@ -59,7 +59,6 @@ def _download_executables(env, base_url, tools):
                     env.safe_sudo("cp -f %s %s" % (tool, install_dir))
 
 # --- Alignment tools
-@_if_not_installed("featureCounts")
 def install_featurecounts(env):
     """
     featureCounts from the subread package for counting reads mapping to
@@ -67,9 +66,12 @@ def install_featurecounts(env):
     """
     default_version = "1.4.4"
     version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "featureCounts", version, stdout_flag="Version"):
+        return
+    platform = "MacOS" if env.distribution == "macosx" else "Linux"
     url = ("http://downloads.sourceforge.net/project/subread/"
-           "subread-%s/subread-%s-Linux-i386.tar.gz"
-           % (version, version))
+           "subread-%s/subread-%s-{platform}-x86_64.tar.gz"
+           % (version, version, platform))
     _get_install(url, env, _make_copy("find -type f -perm -100 -name 'featureCounts'",
                                       do_make=False))
 
