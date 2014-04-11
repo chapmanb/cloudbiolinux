@@ -9,12 +9,14 @@ bio_nextgen:
   utilities:
     - bamtools
     - bedtools
+    - cramtools
     - libmaus
     - biobambam
     - fastqc
     - qualimap
     - sambamba
     - seqtk==HEAD
+    - staden_io_lib
   analysis:
     #- cufflinks
     - samtools
@@ -27,6 +29,7 @@ bio_nextgen:
     - glia
     - lumpy-sv
     - platypus-variant
+    - rtg-tools
     - tabix
     - vcflib
     # - vcftools # Build problems with default libz on Ubuntu 12.04
