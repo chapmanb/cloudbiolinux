@@ -70,7 +70,7 @@ def install_featurecounts(env):
         return
     platform = "MacOS" if env.distribution == "macosx" else "Linux"
     url = ("http://downloads.sourceforge.net/project/subread/"
-           "subread-%s/subread-%s-{platform}-x86_64.tar.gz"
+           "subread-%s/subread-%s-%s-x86_64.tar.gz"
            % (version, version, platform))
     _get_install(url, env, _make_copy("find -type f -perm -100 -name 'featureCounts'",
                                       do_make=False))
