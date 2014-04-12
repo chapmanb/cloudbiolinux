@@ -162,7 +162,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _remote_fetch(env, url, out_file=None, allow_fail=False):
+def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None):
     """Retrieve url using wget, performing download in a temporary directory.
 
     Provides a central location to handle retrieval issues and avoid
@@ -181,6 +181,8 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False):
                 with warn_only():
                     result = env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
                 if result.succeeded:
+                    if fix_fn:
+                        out_file = fix_fn(env, out_file)
                     env.safe_run("mv %s %s" % (out_file, orig_dir))
                 elif allow_fail:
                     out_file = None

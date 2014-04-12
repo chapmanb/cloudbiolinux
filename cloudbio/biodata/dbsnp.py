@@ -12,10 +12,14 @@ Retrieves dbSNP plus training data for variant recalibration:
 
 For MuTect and cancer calling:
   - cosmic
+
+For structural variant calling and SNP/indel filtering
+  - low complexity regions
+  - centromere and telomere regions
 """
 import os
 
-from fabric.api import env, warn_only
+from fabric.api import env
 from fabric.contrib.files import cd
 
 from cloudbio.custom import shared
@@ -60,6 +64,7 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
         for ext in [""]:
             _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
     _download_cosmic(gid)
+    _download_repeats(gid)
     # XXX Wait to get this by default until it is used more widely
     #_download_background_vcf(gid)
 
@@ -112,3 +117,40 @@ def _download_background_vcf(gid):
     if gid in ["GRCh37"] and not env.safe_exists("{0}.gz".format(base_name)):
         for ext in ["gz", "gz.tbi"]:
             shared._remote_fetch(env, "{0}/{1}.{2}".format(base_url, base_name, ext))
+
+def _download_repeats(gid):
+    _download_sv_repeats(gid)
+    _download_lcrs(gid)
+
+def _download_sv_repeats(gid):
+    """Retrieve telomere and centromere exclusion regions for structural variant calling.
+    From Delly: https://github.com/tobiasrausch/delly
+    """
+    mere_url = "https://raw.githubusercontent.com/tobiasrausch/delly/master/human.hg19.excl.tsv"
+    out_file = "sv_repeat_telomere_centromere.bed"
+    if not env.safe_exists(out_file):
+        def _select_by_gid(env, orig_file):
+            if gid == "hg19":
+                env.safe_run("grep ^chr %s > %s" % (orig_file, out_file))
+            else:
+                assert gid == "GRCh37"
+                env.safe_run("grep -v ^chr %s > %s" % (orig_file, out_file))
+            return out_file
+        shared._remote_fetch(env, mere_url, fix_fn=_select_by_gid)
+
+def _download_lcrs(gid):
+    """Retrieve low complexity regions from Heng Li's variant analysis paper.
+    """
+    lcr_url = "https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz"
+    out_file = "LCR.bed.gz"
+    if not env.safe_exists(out_file):
+        def _fix_chrom_names(env, orig_file):
+            if gid == "hg19":
+                convert_cmd = "| grep -v ^GL | grep -v ^NC | grep -v ^hs | sed 's/^/chr/'"
+            else:
+                assert gid == "GRCh37"
+                convert_cmd = ""
+            env.safe_run("zcat %s %s | bgzip -c > %s" % (orig_file, convert_cmd, out_file))
+            return out_file
+        shared._remote_fetch(env, lcr_url, fix_fn=_fix_chrom_names)
+        env.safe_run("tabix -p vcf -f %s" % out_file)
