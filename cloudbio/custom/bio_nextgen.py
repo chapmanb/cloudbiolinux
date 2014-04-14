@@ -760,19 +760,16 @@ def install_tophat(env):
     """
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
-#    if versioncheck.up_to_date(env, "tophat", version, stdout_flag="TopHat"):
     if versioncheck.is_version(env, "tophat", version, args="--version", stdout_flag="TopHat"):
         env.logger.info("tophat version {0} is up to date; not installing"
             .format(version))
         return
+    platform = "OSX" if env.distribution == "macosx" else "Linux"
     url = "http://tophat.cbcb.umd.edu/downloads/" \
-          "tophat-%s.Linux_x86_64.tar.gz" % version
+          "tophat-%s.%s_x86_64.tar.gz" % (version, platform)
 
-    # def premake_cmd(env):
-    #     url = "http://dl.dropboxusercontent.com/u/2822886/tophat/tophat_fix.diff"
-    #     _apply_patch(env, url)
     _get_install(url, env,
-                 _make_copy("find -perm -100 -type f", do_make=False))
+                 _make_copy("find . -perm -100 -type f", do_make=False))
 
 install_tophat2 = install_tophat
 
