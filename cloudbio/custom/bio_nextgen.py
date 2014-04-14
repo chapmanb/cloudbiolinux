@@ -72,7 +72,7 @@ def install_featurecounts(env):
     url = ("http://downloads.sourceforge.net/project/subread/"
            "subread-%s/subread-%s-%s-x86_64.tar.gz"
            % (version, version, platform))
-    _get_install(url, env, _make_copy("find -type f -perm -100 -name 'featureCounts'",
+    _get_install(url, env, _make_copy("find . -type f -perm -100 -name 'featureCounts'",
                                       do_make=False))
 
 
@@ -85,7 +85,7 @@ def install_bowtie(env):
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie/%s/" \
           "bowtie-%s-src.zip" % (version, version)
-    _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie*'"))
+    _get_install(url, env, _make_copy("find . -perm -100 -name 'bowtie*'"))
 
 @_if_not_installed("STAR")
 def install_star(env):
@@ -98,7 +98,7 @@ def install_star(env):
     # https://groups.google.com/forum/#!topic/rna-star/13S344Jknf4
     url = "ftp://ftp2.cshl.edu/gingeraslab/tracks/STARrelease/Alpha/STAR_{version}.tgz"
     _get_install(url.format(version=version), env,
-                 _make_copy("find -name 'STAR'"))
+                 _make_copy("find . -name 'STAR'"))
 
 @_if_not_installed("bowtie2")
 def install_bowtie2(env):
@@ -109,7 +109,7 @@ def install_bowtie2(env):
     version = env.get("tool_version", default_version)
     url = "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/%s/" \
           "bowtie2-%s-source.zip" % (version, version)
-    _get_install(url, env, _make_copy("find -perm -100 -name 'bowtie2*'"))
+    _get_install(url, env, _make_copy("find . -perm -100 -name 'bowtie2*'"))
 
 def install_bwa(env):
     """BWA:  aligns short nucleotide sequences against a long reference sequence.
@@ -168,7 +168,7 @@ def install_snap(env):
     version = "0.15"
     url = "http://github.com/downloads/amplab/snap/" \
           "snap-%s-linux.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
+    _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
 
 def install_stampy(env):
     """Stampy: mapping of short reads from illumina sequencing machines onto a reference genome.
@@ -264,7 +264,7 @@ def install_lastz(env):
           "lastz-%s.tar.gz" % version
     def _remove_werror(env):
         env.safe_sed("src/Makefile", " -Werror", "")
-    _get_install(url, env, _make_copy("find -perm -100 -name 'lastz'"),
+    _get_install(url, env, _make_copy("find . -perm -100 -name 'lastz'"),
                  post_unpack_fn=_remove_werror)
 
 @_if_not_installed("MosaikAligner")
@@ -275,7 +275,7 @@ def install_mosaik(env):
     version = "2.1.73"
     url = "http://mosaik-aligner.googlecode.com/files/" \
           "MOSAIK-%s-binary.tar" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
+    _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
 
 # --- Utilities
 
@@ -782,7 +782,7 @@ def install_cufflinks(env):
     version = env.get("tool_version", default_version)
     url = "http://cufflinks.cbcb.umd.edu/downloads/" \
           "cufflinks-%s.Linux_x86_64.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f",
+    _get_install(url, env, _make_copy("find . -perm -100 -type f",
                                       do_make=False))
 
 # --- Assembly
@@ -828,7 +828,7 @@ def install_velvet(env):
         error-installing-velvet-assembler-1-1-06-on-ubuntu-server
         """
         env.safe_sed("Makefile", "Z_LIB_FILES=-lz", "Z_LIB_FILES=-lz -lm")
-    _get_install(url, env, _make_copy("find -perm -100 -name 'velvet*'"),
+    _get_install(url, env, _make_copy("find . -perm -100 -name 'velvet*'"),
                  post_unpack_fn=_fix_library_order)
 
 @_if_not_installed("Ray")
@@ -841,7 +841,7 @@ def install_ray(env):
     url = "http://downloads.sourceforge.net/project/denovoassembler/Ray-v%s.tar.bz2" % version
     def _ray_do_nothing(env):
         return
-    _get_install(url, env, _make_copy("find -name Ray"),
+    _get_install(url, env, _make_copy("find . -name Ray"),
                  post_unpack_fn=_ray_do_nothing)
 
 def install_trinity(env):
@@ -956,7 +956,7 @@ def install_delly(env):
     if versioncheck.up_to_date(env, "delly", version, stdout_flag="Deletion finder"):
         return
     url = "http://www.embl.de/~rausch/delly_v%s.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f",
+    _get_install(url, env, _make_copy("find . -perm -100 -type f",
                                       do_make=False))
 
 def install_freec(env):
@@ -971,7 +971,7 @@ def install_freec(env):
             url = "http://bioinfo-out.curie.fr/projects/freec/src/FREEC_LINUX32.tar.gz"
 
         if not versioncheck.up_to_date(env, "freec", version, stdout_index=1):
-            _get_install(url, env, _make_copy("find -name 'freec'"), dir_name=".")
+            _get_install(url, env, _make_copy("find . -name 'freec'"), dir_name=".")
 
 @_if_not_installed("CRISP.py")
 def install_crisp(env):
@@ -1028,7 +1028,7 @@ def install_weblogo(env):
     """
     version = "2.8.2"
     url = "http://weblogo.berkeley.edu/release/weblogo.%s.tar.gz" % version
-    _get_install(url, env, _make_copy("find -perm -100 -type f", do_make=False))
+    _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
     def _cp_pm(env):
         for perl_module in ["template.pm", "logo.pm", "template.eps"]:
             env.safe_sudo("cp %s %s/lib/perl5" % (perl_module, env.system_install))
