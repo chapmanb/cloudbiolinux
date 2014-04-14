@@ -111,24 +111,6 @@ def install_bowtie2(env):
           "bowtie2-%s-source.zip" % (version, version)
     _get_install(url, env, _make_copy("find . -perm -100 -name 'bowtie2*'"))
 
-def install_bwa(env):
-    """BWA:  aligns short nucleotide sequences against a long reference sequence.
-    http://bio-bwa.sourceforge.net/
-    """
-    default_version = "0.7.5a"
-    version = env.get("tool_version", default_version)
-    if versioncheck.up_to_date(env, "bwa", version, stdout_flag="Version:"):
-        return
-    url = "http://downloads.sourceforge.net/project/bio-bwa/bwa-%s.tar.bz2" % (
-            version)
-    def _fix_makefile():
-        arch = env.safe_run_output("uname -m")
-        # if not 64bit, remove the appropriate flag
-        if arch.find("x86_64") == -1:
-            env.safe_run("sed -i.bak -r -e 's/-O2 -m64/-O2/g' Makefile")
-    _get_install(url, env, _make_copy("ls -1 bwa qualfa2fq.pl",
-                                        _fix_makefile))
-
 @_if_not_installed("bfast")
 def install_bfast(env):
     """BFAST: Blat-like Fast Accurate Search Tool.
@@ -278,50 +260,6 @@ def install_mosaik(env):
     _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
 
 # --- Utilities
-
-def install_samtools(env):
-    """SAM Tools provide various utilities for manipulating alignments in the SAM format.
-    http://samtools.sourceforge.net/
-    """
-    default_version = "0.1.19"
-    version = env.get("tool_version", default_version)
-    if versioncheck.up_to_date(env, "samtools", version, stdout_flag="Version:"):
-        env.logger.info("samtools version {0} is up to date; not installing"
-            .format(version))
-        return
-    url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
-          "%s/samtools-%s.tar.bz2" % (version, version)
-    def _safe_ncurses_make(env):
-        """Combine samtools, removing ncurses refs if not present on system.
-        """
-        with settings(warn_only=True):
-            result = env.safe_run("make")
-        # no ncurses, fix Makefile and rebuild
-        if result.failed:
-            env.safe_sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
-            env.safe_sed("Makefile", "-lcurses", "# -lcurses")
-            env.safe_run("make clean")
-            env.safe_run("make")
-        install_dir = shared._get_bin_dir(env)
-        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools bcftools/vcfutils.pl misc/wgsim").split("\n"):
-            env.safe_sudo("cp -f %s %s" % (fname.rstrip("\r"), install_dir))
-    _get_install(url, env, _safe_ncurses_make)
-
-@_if_not_installed("fastq_quality_boxplot_graph.sh")
-def install_fastx_toolkit(env):
-    """FASTX-Toolkit: collection of command line tools for Short-Reads FASTA/FASTQ files preprocessing.
-    http://hannonlab.cshl.edu/fastx_toolkit/
-    """
-    default_version = "0.0.13.2"
-    version = env.get("tool_version", default_version)
-    gtext_version = "0.6"
-    url_base = "http://hannonlab.cshl.edu/fastx_toolkit/"
-    fastx_url = "%sfastx_toolkit-%s.tar.bz2" % (url_base, version)
-    gtext_url = "%slibgtextutils-%s.tar.bz2" % (url_base, gtext_version)
-    def _remove_werror(env):
-        env.safe_sed("configure", " -Werror", "")
-    _get_install(gtext_url, env, _configure_make, post_unpack_fn=_remove_werror)
-    _get_install(fastx_url, env, _configure_make, post_unpack_fn=_remove_werror)
 
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
@@ -633,7 +571,7 @@ def install_snpeff(env):
                 dir_name = _fetch_and_unpack(url)
                 with cd(dir_name):
                     env.safe_sudo("mv *.jar %s" % install_dir)
-                    env.safe_run("sed -i.bak -r -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
+                    env.safe_run("sed -i.bak -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
                                  (install_dir.replace("/", "\/"), "snpEff.config"))
                     env.safe_run("chmod a+r *.config")
                     env.safe_sudo("mv *.config %s" % install_dir)
@@ -928,36 +866,6 @@ def install_hydra(env):
         env.safe_run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
                  post_unpack_fn=clean_libs)
-
-def install_lumpy(env):
-    """a general probabilistic framework for structural variant discovery
-    https://github.com/arq5x/lumpy-sv
-    """
-    version = "0.1.2"
-    revision = "a8b9e14cc5"
-    if versioncheck.up_to_date(env, "lumpy", version, stdout_flag="Program:"):
-        return
-    repository = "git clone https://github.com/arq5x/lumpy-sv.git"
-    def _add_gsl_includes():
-        """Add multi-environment include and library links for finding GNU Scientific Libraries.
-        """
-        env.safe_sed("defs.local", "^\([^#]\)", "#\1")
-        env.safe_append("defs.local", ("GSL_INCLUDE=-I/usr/local/include -I/usr/local/include/gsl "
-                                       "-I/usr/include/gsl -I%s/include/gsl" % env.system_install))
-        env.safe_append("defs.local", ("GSL_LINK=-L/usr/local/lib -L/usr/lib -L%s/lib" % env.system_install))
-    _get_install(repository, env, _make_copy("ls -1 bin/*", _add_gsl_includes),
-                 revision=revision)
-
-def install_delly(env):
-    """DELLY: Structural variant discovery by integrated paired-end and split-read analysis
-    http://www.embl.de/~rausch/delly.html
-    """
-    version = "0.0.11"
-    if versioncheck.up_to_date(env, "delly", version, stdout_flag="Deletion finder"):
-        return
-    url = "http://www.embl.de/~rausch/delly_v%s.tar.gz" % version
-    _get_install(url, env, _make_copy("find . -perm -100 -type f",
-                                      do_make=False))
 
 def install_freec(env):
     """Control-FREEC: a tool for detection of copy number changes and allelic imbalances.
