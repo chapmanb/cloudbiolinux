@@ -37,20 +37,20 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
         with cd(vrn_dir):
             if gid in ["GRCh37", "hg19"]:
                 _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
-            elif gid in ["mm10"]:
-                _dbsnp_mouse(env, gid)
+            elif gid in ["mm10", "canFam3"]:
+                _dbsnp_custom(env, gid)
 
-def _dbsnp_mouse(env, gid):
-    """Retrieve resources for mouse variant analysis from custom S3 biodata bucket.
+def _dbsnp_custom(env, gid):
+    """Retrieve resources for dbsnp builds from custom S3 biodata bucket.
     """
     remote_dir = "https://s3.amazonaws.com/biodata/variants/"
-    files = {"mm10": ["mm10-dbSNP-2013-09-12.vcf"]}
+    files = {"mm10": ["mm10-dbSNP-2013-09-12.vcf.gz"],
+             "canFam3": ["canFam3-dbSNP-2014-04-10.vcf.gz"]}
     for f in files[gid]:
-        for ext in ["", ".idx"]:
+        for ext in ["", ".tbi"]:
             fname = f + ext
             if not env.safe_exists(fname):
-                out_file = shared._remote_fetch(env, "%s%s.gz" % (remote_dir, fname))
-                env.safe_run("gunzip %s" % out_file)
+                shared._remote_fetch(env, "%s%s" % (remote_dir, fname))
 
 def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
     """Retrieve resources for human variant analysis from Broad resource bundles.
