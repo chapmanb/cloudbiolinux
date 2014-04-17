@@ -261,6 +261,34 @@ def install_mosaik(env):
 
 # --- Utilities
 
+def install_samtools(env):
+    """SAM Tools provide various utilities for manipulating alignments in the SAM format.
+    http://samtools.sourceforge.net/
+    """
+    default_version = "0.1.19"
+    version = env.get("tool_version", default_version)
+    if versioncheck.up_to_date(env, "samtools", version, stdout_flag="Version:"):
+        env.logger.info("samtools version {0} is up to date; not installing"
+                        .format(version))
+        return
+    url = "http://downloads.sourceforge.net/project/samtools/samtools/" \
+          "%s/samtools-%s.tar.bz2" % (version, version)
+    def _safe_ncurses_make(env):
+        """Combine samtools, removing ncurses refs if not present on system.
+        """
+        with settings(warn_only=True):
+            result = env.safe_run("make")
+        # no ncurses, fix Makefile and rebuild
+        if result.failed:
+            env.safe_sed("Makefile", "-D_CURSES_LIB=1", "-D_CURSES_LIB=0")
+            env.safe_sed("Makefile", "-lcurses", "# -lcurses")
+            env.safe_run("make clean")
+            env.safe_run("make")
+        install_dir = shared._get_bin_dir(env)
+        for fname in env.safe_run_output("ls -1 samtools bcftools/bcftools bcftools/vcfutils.pl misc/wgsim").split("\n"):
+            env.safe_sudo("cp -f %s %s" % (fname.rstrip("\r"), install_dir))
+    _get_install(url, env, _safe_ncurses_make)
+
 def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
