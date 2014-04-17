@@ -110,7 +110,7 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
     if target is None or target == "puppet_classes":
         _provision_puppet_classes(pkg_install, custom_ignore)
     if target is None or target == "brew":
-        install_brew(flavor=flavor, automated=False)
+        install_brew(flavor=flavor, automated=True)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
