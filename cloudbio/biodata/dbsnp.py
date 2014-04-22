@@ -126,7 +126,7 @@ def _download_sv_repeats(gid):
     """Retrieve telomere and centromere exclusion regions for structural variant calling.
     From Delly: https://github.com/tobiasrausch/delly
     """
-    mere_url = "https://raw.githubusercontent.com/tobiasrausch/delly/master/human.hg19.excl.tsv"
+    mere_url = "https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv"
     out_file = "sv_repeat_telomere_centromere.bed"
     if not env.safe_exists(out_file):
         def _select_by_gid(env, orig_file):
