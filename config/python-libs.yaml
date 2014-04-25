@@ -22,7 +22,7 @@ pypi:
   - webob
   - xlrd
   # build
-  - Pyrex
+  - Pyrex-real
   # concurrency/web
   - Twisted
   # science
