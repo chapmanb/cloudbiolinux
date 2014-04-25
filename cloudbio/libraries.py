@@ -17,6 +17,7 @@ def r_library_installer(config):
     env.safe_sudo("mkdir -p %s" % lib_loc)
     repo_info = """
     .libPaths(c("%s"))
+    library(methods)
     cran.repos <- getOption("repos")
     cran.repos["CRAN" ] <- "%s"
     options(repos=cran.repos)
