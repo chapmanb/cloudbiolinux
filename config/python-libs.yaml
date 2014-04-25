@@ -42,7 +42,7 @@ pypi:
   - pysqlite
   - psycopg2
   # visualization
-  - gnuplot-py
+#  - gnuplot-py
   - PIL
   - pypdf
   - reportlab
