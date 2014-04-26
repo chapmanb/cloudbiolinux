@@ -369,7 +369,7 @@ def _python_library_installer(config):
             env.safe_sudo("%s -U distribute" % ei_bin)
         cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        cmd("{0} install --upgrade {1}".format(shared._pip_cmd(env), pname))
+        cmd("{0} install --upgrade {1} --allow-unverified {1} --allow-external {1}".format(shared._pip_cmd(env), pname)) # fixes problem with packages not being in pypi
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.

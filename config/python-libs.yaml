@@ -23,7 +23,8 @@ pypi:
   - xlrd
   # build
   - Pyrex-real
-  # concurrency/web
+  - cython  # needed for installing pybedtools
+# concurrency/web
   - Twisted
   # science
   - cutadapt
@@ -42,7 +43,7 @@ pypi:
   - pysqlite
   - psycopg2
   # visualization
-#  - gnuplot-py
+  - gnuplot-py
   - PIL
   - pypdf
   - reportlab
