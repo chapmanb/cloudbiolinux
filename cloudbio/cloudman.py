@@ -54,10 +54,12 @@ def _configure_cloudman(env, use_repo_autorun=False):
 def _configure_desktop(env):
     """
     Configure a desktop manager to work with VNC. At the moment, this is tailored
-    to `JWM` (and `jwm` and `vnc4server` packages needs to be installed).
+    to `JWM` (and `jwm` and `vnc4server` packages need to be installed).
     """
     if not _read_boolean(env, "configure_desktop", False):
         return
+    # Create a start script for X
+    _setup_conf_file(env, "/home/ubuntu/.vnc/xstartup", "xstartup", default_source="xstartup")
     # Create jwmrc config file
     _setup_conf_file(env, "/home/ubuntu/.jwmrc", "jwmrc.xml",
         default_source="jwmrc.xml", mode="0644")
