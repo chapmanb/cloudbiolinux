@@ -571,9 +571,9 @@ def _extend_env(env, defaults={}, overrides={}):
     return new_env
 
 
-def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
+def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None, mode="0755"):
     conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
-    _write_to_file(conf_file_contents, dest, mode="0755")
+    _write_to_file(conf_file_contents, dest, mode=mode)
 
 
 def _add_to_profiles(line, profiles=[], use_sudo=True):

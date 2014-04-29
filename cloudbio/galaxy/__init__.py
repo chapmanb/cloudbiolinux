@@ -524,8 +524,6 @@ def _configure_postgresql(env, delete_main_dbcluster=False):
             pg_ver = raw_input(red("Enter the correct one (eg, 9.1; not 9.1.3): "))
     if delete_main_dbcluster:
         env.safe_sudo('pg_dropcluster --stop %s main' % pg_ver, user='postgres')
-    # Not sure why I ever added this to gvl, doesn't seem needed. -John
-    #_put_installed_file_as_user("postgresql-%s.conf" % env.postgres_version, "/etc/postgresql/%s/main/postgresql.conf" % env.postgres_version, user='root')
     exp = "export PATH=/usr/lib/postgresql/%s/bin:$PATH" % pg_ver
     if not env.safe_contains('/etc/bash.bashrc', exp):
         env.safe_append('/etc/bash.bashrc', exp, use_sudo=True)

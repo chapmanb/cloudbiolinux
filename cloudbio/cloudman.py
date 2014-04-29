@@ -15,8 +15,8 @@ exec python %s 2> %s.log
 """
 import os
 
-from fabric.api import sudo, put, cd, run
-from fabric.contrib.files import exists, settings, append
+from fabric.api import sudo, cd, run
+from fabric.contrib.files import exists, settings
 
 from cloudbio.galaxy import _setup_users
 from cloudbio.flavor.config import get_config_file
@@ -47,7 +47,21 @@ def _configure_cloudman(env, use_repo_autorun=False):
     _configure_hadoop(env)
     _configure_nfs(env)
     _configure_novnc(env)
+    _configure_desktop(env)
     install_s3fs(env)
+
+
+def _configure_desktop(env):
+    """
+    Configure a desktop manager to work with VNC. At the moment, this is tailored
+    to `JWM` (and `jwm` and `vnc4server` packages needs to be installed).
+    """
+    if not _read_boolean(env, "configure_desktop", False):
+        return
+    # Create jwmrc config file
+    _setup_conf_file(env, "/home/ubuntu/.jwmrc", "jwmrc.xml",
+        default_source="jwmrc.xml", mode="0644")
+    env.logger.info("----- Done configuring desktop -----")
 
 
 def _configure_novnc(env):
