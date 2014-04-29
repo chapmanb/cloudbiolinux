@@ -92,7 +92,11 @@ build_info = {
                  "Rattus_norvegicus.Rnor_5.0." + ensembl_release),
     "GRCh37": Build("homo_sapiens", "hsapiens_gene_ensembl",
                     None,
-                    "Homo_sapiens.GRCh37." + ensembl_release)}
+                    "Homo_sapiens.GRCh37." + ensembl_release),
+    "canFam3": Build("canis_familiaris", None,
+                     ucsc_ensembl_map_via_download,
+                     "Canis_familiaris.CanFam3.1." + ensembl_release)
+}
 
 ucsc_db = "genome-mysql.cse.ucsc.edu"
 ucsc_user = "genome"
