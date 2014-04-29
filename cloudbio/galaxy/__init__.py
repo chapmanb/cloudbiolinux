@@ -6,8 +6,7 @@ https://bitbucket.org/afgane/mi-deployment
 import os
 import contextlib
 
-from fabric.api import sudo, run, cd, settings, hide
-from fabric.contrib.files import exists, contains, sed, append
+from fabric.api import sudo, cd, settings, hide
 from fabric.colors import red
 
 from cloudbio.custom.shared import (_write_to_file, _setup_conf_file,
@@ -318,7 +317,7 @@ def _configure_galaxy_repository(env):
         # Make sure Galaxy runs in a new shell and does not
         # inherit the environment by adding the '-ES' flag
         # to all invocations of python within run.sh
-        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' %s/run.sh" % ( env.galaxy_home ), user=env.galaxy_user)
+        env.safe_sudo("sed -i 's/python .\//python -ES .\//g' %s/run.sh" % (env.galaxy_home), user=env.galaxy_user)
         if _read_boolean(env, "galaxy_cloud", True):
             # Append DRMAA_LIBRARY_PATH in run.sh as well (this file will exist
             # once SGE is installed - which happens at instance contextualization)
@@ -372,11 +371,36 @@ def _install_nginx_standalone(env):
     _setup_nginx_service(env)
 
 
+def _install_nginx_package(env):
+    """
+    Install nginx from a custom package; also see
+    https://github.com/afgane/gvl_flavor/tree/master/playbook
+    """
+    version = "1.4.7-gvl20140407b03"
+    package_url = "http://cloudman-dev.s3.amazonaws.com/gvl-nginx-%s-precise-amd64.deb" % version
+
+    with _make_tmp_dir() as work_dir:
+        with contextlib.nested(cd(work_dir), settings(hide('stdout'))):
+            env.safe_run("wget %s" % package_url)
+            env.safe_sudo("dpkg -i %s" % os.path.split(package_url)[1])
+
+    # The path for `nginx.conf` depends on how the package was built and
+    # what's set in `nginx_remote_conf_path` must match that!
+    defaults = {"galaxy_home": "/mnt/galaxy/galaxy-app"}
+    _setup_conf_file(env, env.nginx_remote_conf_path, "nginx.conf", defaults=defaults)
+    env.logger.debug("Nginx v{0} installed from package {1}".format(version, package_url))
+
+
 def _install_nginx(env):
     """Nginx open source web server.
     http://www.nginx.org/
     """
-    version = "1.2.0"
+    if "use_nginx_package" in env and env.use_nginx_package.upper() in ["TRUE", "YES"]:
+        _install_nginx_package(env)
+        return
+
+    # Install nginx from directly
+    version = "1.3.8"
     url = "http://nginx.org/download/nginx-%s.tar.gz" % version
 
     install_dir = os.path.join(env.install_dir, "nginx")
@@ -396,7 +420,7 @@ def _install_nginx(env):
             with cd("nginx-%s" % version):
                 env.safe_run("./configure --prefix=%s --with-ipv6 %s "
                     "--user=galaxy --group=galaxy --with-debug "
-                    "--with-http_ssl_module --with-http_gzip_static_module" %
+                    "--with-http_ssl_module --with-http_gzip_static_module " %
                     (install_dir, module_flags))
                 env.safe_sed("objs/Makefile", "-Werror", "")
                 env.safe_run("make")
