@@ -87,19 +87,6 @@ def install_bowtie(env):
           "bowtie-%s-src.zip" % (version, version)
     _get_install(url, env, _make_copy("find . -perm -100 -name 'bowtie*'"))
 
-@_if_not_installed("STAR")
-def install_star(env):
-    """The STAR spliced short read aligner.
-    http://code.google.com/p/rna-star/
-    """
-    default_version = "2.3.1z"
-    version = env.get("tool_version", default_version)
-    # Need latest alpha release to work around 13.04 compile error
-    # https://groups.google.com/forum/#!topic/rna-star/13S344Jknf4
-    url = "ftp://ftp2.cshl.edu/gingeraslab/tracks/STARrelease/Alpha/STAR_{version}.tgz"
-    _get_install(url.format(version=version), env,
-                 _make_copy("find . -name 'STAR'"))
-
 @_if_not_installed("bowtie2")
 def install_bowtie2(env):
     """bowtie2 short read aligner, with gap support.
