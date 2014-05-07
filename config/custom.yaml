@@ -17,7 +17,6 @@ bio_nextgen:
     - snap
     #- stampy # no version names on tarballs
   utilities:
-    - cram
     - dwgsim
     - fastq_screen
     - ogap
@@ -51,7 +50,6 @@ bio_nextgen:
     - gemini
     - grabix
     - mutect
-    - pbgzip
     - tassel
     - snpeff
     - stacks

@@ -15,7 +15,6 @@ bio_nextgen:
     - gatk
     - grabix
     - mutect
-    - pbgzip
     - snpeff
     - varscan
   needs_64bit:

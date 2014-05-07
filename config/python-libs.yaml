@@ -22,8 +22,9 @@ pypi:
   - webob
   - xlrd
   # build
-  - Pyrex
-  # concurrency/web
+  - Pyrex-real
+  - cython  # needed for installing pybedtools
+# concurrency/web
   - Twisted
   # science
   - cutadapt

@@ -6,10 +6,11 @@ import os
 import contextlib
 
 from fabric.api import cd
-from fabric.contrib.files import exists, settings, hide
+from fabric.contrib.files import settings, hide
 
 from cloudbio.custom.shared import (_make_tmp_dir, _setup_conf_file)
-from cloudbio.cloudman import _configure_cloudman, _configure_novnc, _configure_ec2_autorun
+from cloudbio.cloudman import (_configure_cloudman, _configure_novnc,
+    _configure_desktop, _configure_ec2_autorun)
 from cloudbio.galaxy import _install_nginx
 
 CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
@@ -33,6 +34,7 @@ def install_ec2_autorun(env):
 
 def install_novnc(env):
     _configure_novnc(env)
+    _configure_desktop(env)
 
 
 def install_nginx(env):

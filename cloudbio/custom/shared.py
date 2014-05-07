@@ -155,14 +155,14 @@ def _safe_dir_name(dir_name, need_dir=True):
                        dir_name.lower().split(".")[0]):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
-            dirs = env.safe_run_output("unset LS_COLORS && ls -d1 *%s*/" % check_part).split("\n")
+            dirs = env.safe_run_output("ls -d1 *%s*/" % check_part).split("\n")
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
         if len(dirs) == 1 and dirs[0]:
             return dirs[0]
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _remote_fetch(env, url, out_file=None, allow_fail=False):
+def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None):
     """Retrieve url using wget, performing download in a temporary directory.
 
     Provides a central location to handle retrieval issues and avoid
@@ -181,6 +181,8 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False):
                 with warn_only():
                     result = env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
                 if result.succeeded:
+                    if fix_fn:
+                        out_file = fix_fn(env, out_file)
                     env.safe_run("mv %s %s" % (out_file, orig_dir))
                 elif allow_fail:
                     out_file = None
@@ -569,9 +571,9 @@ def _extend_env(env, defaults={}, overrides={}):
     return new_env
 
 
-def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None):
+def _setup_conf_file(env, dest, name, defaults={}, overrides={}, default_source=None, mode="0755"):
     conf_file_contents = _render_config_file_template(env, name, defaults, overrides, default_source)
-    _write_to_file(conf_file_contents, dest, mode="0755")
+    _write_to_file(conf_file_contents, dest, mode=mode)
 
 
 def _add_to_profiles(line, profiles=[], use_sudo=True):

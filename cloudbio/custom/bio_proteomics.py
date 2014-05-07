@@ -68,7 +68,7 @@ def install_omssa(env):
     env.safe_sudo("mkdir -p '%s'" % env["system_install"])
     ## OMSSA really wants mods.xml, usermods.xml, etc... in the same directory
     ## so just copying everything there.
-    _get_install(url, env, _make_copy(find_cmd="unset LS_COLORS && ls -1", do_make=False))
+    _get_install(url, env, _make_copy(find_cmd="ls -1", do_make=False))
 
 
 @_if_not_installed("OpenMSInfo")

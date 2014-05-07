@@ -16,8 +16,10 @@ def install_homebrew(env):
     https://github.com/Homebrew/linuxbrew
     """
     if env.distribution == "macosx":
-        # XXX Test homebrew install on mac
-        env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go/install)"')
+        with quiet():
+            test_brewcmd = env.safe_run("brew --version")
+        if not test_brewcmd.succeeded:
+            env.safe_run('ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go/install)"')
     else:
         brewcmd = os.path.join(env.system_install, "bin", "brew")
         with quiet():

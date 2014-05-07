@@ -372,7 +372,7 @@ bio_annotation:
   - bio-linux-artemis
   - bio-linux-big-blast
   - bio-linux-cd-hit
-  - bio-linux-estscan
+  # - bio-linux-estscan  # broken on ubuntu 14.04 (#163)
   - bio-linux-jprofilegrid
   # - bio-linux-msatfinder # broken on 13.10
 #   - bio-linux-prot4est - broken, fix in progress

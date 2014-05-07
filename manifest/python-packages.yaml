@@ -134,7 +134,7 @@ Pygments:
   homepage_uri: http://pygments.org/
   name: Pygments
   version: '1.5'
-Pyrex:
+Pyrex-real:
   description: UNKNOWN
   homepage_uri: http://www.cosc.canterbury.ac.nz/~greg/python/Pyrex/
   name: Pyrex
