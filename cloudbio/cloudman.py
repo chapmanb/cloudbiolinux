@@ -15,7 +15,7 @@ exec python %s 2> %s.log
 """
 import os
 
-from fabric.api import sudo, cd, run
+from fabric.api import sudo, cd, run, put
 from fabric.contrib.files import exists, settings
 
 from cloudbio.galaxy import _setup_users
@@ -53,8 +53,8 @@ def _configure_cloudman(env, use_repo_autorun=False):
 
 def _configure_desktop(env):
     """
-    Configure a desktop manager to work with VNC. At the moment, this is tailored
-    to `JWM` (and `jwm` and `vnc4server` packages need to be installed).
+    Configure a desktop manager to work with VNC. Note that `xfce4` (or `jwm`)
+    and `vnc4server` packages need to be installed for this to have effect.
     """
     if not _read_boolean(env, "configure_desktop", False):
         return
@@ -64,9 +64,9 @@ def _configure_desktop(env):
     env.safe_sudo('usermod -a -G shadow galaxy')
     # Create a start script for X
     _setup_conf_file(env, "/home/ubuntu/.vnc/xstartup", "xstartup", default_source="xstartup")
-    # Create jwmrc config file
-    _setup_conf_file(env, "/home/ubuntu/.jwmrc", "jwmrc.xml",
-        default_source="jwmrc.xml", mode="0644")
+    # Create jwmrc config file (uncomment this if using jwm window manager)
+    # _setup_conf_file(env, "/home/ubuntu/.jwmrc", "jwmrc.xml",
+    #     default_source="jwmrc.xml", mode="0644")
     env.logger.info("----- Done configuring desktop -----")
 
 
@@ -311,6 +311,7 @@ def _cleanup_ec2(env):
     to the machine is no longer possible.
     """
     env.logger.info("Cleaning up for EC2 AMI creation")
+    # Clean up log files and such
     fnames = [".bash_history", "/var/log/firstboot.done", ".nx_setup_done",
               "/var/crash/*", "%s/ec2autorun.py.log" % env.install_dir,
               "%s/ec2autorun.err" % env.install_dir, "%s/ec2autorun.log" % env.install_dir,
@@ -320,6 +321,13 @@ def _cleanup_ec2(env):
     rmdirs = ["/mnt/galaxyData", "/mnt/cm", "/tmp/cm"]
     for rmdir in rmdirs:
         sudo("rm -rf %s" % rmdir)
+    # Seed the history with frequently used commands
+    env.logger.debug("Setting bash history")
+    local = os.path.join(env.config_dir, os.pardir, "installed_files", "bash_history")
+    remote = os.path.join('/home', 'ubuntu', '.bash_history')
+    put(local, remote, mode=0660, use_sudo=True)
+    # Make sure the default config dir is owned by ubuntu
+    sudo("chown ubuntu:ubuntu ~/.config")
     # Stop Apache from starting automatically at boot (it conflicts with Galaxy's nginx)
     sudo('/usr/sbin/update-rc.d -f apache2 remove')
     with settings(warn_only=True):
