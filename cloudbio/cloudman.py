@@ -58,6 +58,10 @@ def _configure_desktop(env):
     """
     if not _read_boolean(env, "configure_desktop", False):
         return
+    # Set nginx PAM module to allow logins for any system user
+    if env.safe_exists("/etc/pam.d"):
+        env.safe_sudo('echo "@include common-auth" > /etc/pam.d/nginx')
+    env.safe_sudo('usermod -a -G shadow galaxy')
     # Create a start script for X
     _setup_conf_file(env, "/home/ubuntu/.vnc/xstartup", "xstartup", default_source="xstartup")
     # Create jwmrc config file
