@@ -45,7 +45,7 @@ def _dbsnp_custom(env, gid):
     """
     remote_dir = "https://s3.amazonaws.com/biodata/variants/"
     files = {"mm10": ["mm10-dbSNP-2013-09-12.vcf.gz"],
-             "canFam3": ["canFam3-dbSNP-2014-04-10.vcf.gz"]}
+             "canFam3": ["canFam3-dbSNP-2014-05-10.vcf.gz"]}
     for f in files[gid]:
         for ext in ["", ".tbi"]:
             fname = f + ext
