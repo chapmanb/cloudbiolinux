@@ -2,7 +2,6 @@ edition = minimal
 flavor = NeuroFlavor 
 flavor_path = neuro.neuro
 distribution = ubuntu
-#dist_name = 
 
 # Global installation directory for packages and standard programs
 system_install = /usr
@@ -10,4 +9,3 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
