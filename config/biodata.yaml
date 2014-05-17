@@ -29,16 +29,6 @@ genomes:
     name: Mouse (mm10)
     dbsnp: true
     rnaseq: true
-  - dbkey: dm3
-    name: D melangogaster (dm3)
-  - dbkey: araTha_tair9
-    name: Arabidopsis thaliana (TAIR9)
-  - dbkey: xenTro2
-    name: X tropicalis (xenTro2)
-  - dbkey: sacCer2
-    name: S cerevisiae (sacCer2)
-  - dbkey: WS210
-    name: C elegans (WS210)
   - dbkey: rn5
     name: Rat (rn5)
     rnaseq: true
@@ -46,6 +36,18 @@ genomes:
     name: Dog (canFam3)
     dbsnp: true
     rnaseq: true
+  - dbkey: dm3
+    name: D melangogaster (dm3)
+  - dbkey: araTha_tair9
+    name: Arabidopsis thaliana (TAIR9)
+  - dbkey: xenTro2
+    name: X tropicalis (xenTro2)
+  - dbkey: Zv9
+    name: Zebrafish (Zv9)
+  - dbkey: sacCer2
+    name: S cerevisiae (sacCer2)
+  - dbkey: WS210
+    name: C elegans (WS210)
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py

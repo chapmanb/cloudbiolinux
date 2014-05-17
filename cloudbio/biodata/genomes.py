@@ -278,7 +278,7 @@ GENOMES_SUPPORTED = [
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
            ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),
            ("Cfamiliaris_Dog", "canFam2", UCSCGenome("canFam2")),
-           ("Drerio_Zebrafish", "danRer6", UCSCGenome("danRer6")),
+           ("Drerio_Zebrafish", "Zv9", UCSCGenome("danRer7")),
            ("Ecaballus_Horse", "equCab2", UCSCGenome("equCab2")),
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
