@@ -20,6 +20,8 @@ bio_nextgen:
   analysis:
     #- cufflinks
     - samtools
+    - htslib
+    - bcftools
     #- tophat
   variant:
     - delly
@@ -28,7 +30,6 @@ bio_nextgen:
     - lumpy-sv
     - platypus-variant
     - rtg-tools
-    - tabix
     - vcflib
     - vcftools
     - yaha

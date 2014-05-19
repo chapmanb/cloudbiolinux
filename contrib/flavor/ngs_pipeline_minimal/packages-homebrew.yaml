@@ -32,7 +32,6 @@ bio_nextgen:
     - lumpy-sv
     - platypus-variant
     - rtg-tools
-    - tabix
     - vcflib
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
