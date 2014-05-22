@@ -107,24 +107,30 @@ class UCSCGenome(_DownloadHelper):
         zipped_file = None
         genome_file = "%s.fa" % self._name
         if not self._exists(genome_file, seq_dir):
-            zipped_file = self._download_zip(seq_dir)
-            if zipped_file.endswith(".tar.gz"):
-                env.safe_run("tar -xzpf %s" % zipped_file)
-            elif zipped_file.endswith(".zip"):
-                env.safe_run("unzip %s" % zipped_file)
-            elif zipped_file.endswith(".gz"):
-                env.safe_run("gunzip -c %s > out.fa" % zipped_file)
-            else:
-                raise ValueError("Do not know how to handle: %s" % zipped_file)
-            tmp_file = genome_file.replace(".fa", ".txt")
-            result = env.safe_run_output("find `pwd` -name '*.fa'")
-            result = [x.strip() for x in result.split("\n")]
-            if len(result) == 1:
-                result = self._split_multifasta(result[0])
-            result = self._karyotype_sort(result)
-            env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
-            env.safe_run("rm -f *.fa")
-            env.safe_run("mv %s %s" % (tmp_file, genome_file))
+            prep_dir = "seq_prep"
+            env.safe_run("mkdir -p %s" % prep_dir)
+            with cd(prep_dir):
+                zipped_file = self._download_zip(seq_dir)
+                if zipped_file.endswith(".tar.gz"):
+                    env.safe_run("tar -xzpf %s" % zipped_file)
+                elif zipped_file.endswith(".zip"):
+                    env.safe_run("unzip %s" % zipped_file)
+                elif zipped_file.endswith(".gz"):
+                    if not env.safe_exists("out.fa"):
+                        env.safe_run("gunzip -c %s > out.fa" % zipped_file)
+                else:
+                    raise ValueError("Do not know how to handle: %s" % zipped_file)
+                tmp_file = genome_file.replace(".fa", ".txt")
+                result = env.safe_run_output("find `pwd` -name '*.fa'")
+                result = [x.strip() for x in result.split("\n")]
+                if len(result) == 1:
+                    result = self._split_multifasta(result[0])
+                result = self._karyotype_sort(result)
+                env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
+                env.safe_run("rm -f *.fa")
+                env.safe_run("mv %s %s" % (tmp_file, genome_file))
+                zipped_file = os.path.join(prep_dir, zipped_file)
+                genome_file = os.path.join(prep_dir, genome_file)
         return genome_file, [zipped_file]
 
     def _download_zip(self, seq_dir):

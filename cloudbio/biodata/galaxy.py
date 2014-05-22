@@ -128,7 +128,7 @@ def index_picard(ref_file):
                 picard_jar = test_jar
                 break
     if picard_jar and not env.safe_exists(index_file):
-        env.safe_run("java -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
+        env.safe_run("java -Xms500m -Xmx1g -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
             jar=picard_jar, ref=ref_file, out=index_file))
     return index_file
 
