@@ -193,12 +193,13 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
-            try:
-                has_bcftools = int(env.safe_run_output("{brew_cmd} list samtools | grep -c bcftools".format(
-                    brew_cmd=brew_cmd)))
-            except ValueError:
-                has_bcftools = 0
-            if has_bcftools:
+            def _has_prog(prog):
+                try:
+                    return int(env.safe_run_output("{brew_cmd} list samtools | grep -c {prog}".format(
+                        brew_cmd=brew_cmd, prog=prog)))
+                except ValueError:
+                    return 0
+            if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
