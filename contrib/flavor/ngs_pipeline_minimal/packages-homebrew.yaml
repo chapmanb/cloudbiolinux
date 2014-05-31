@@ -29,9 +29,11 @@ bio_nextgen:
     - freebayes
     - gatk-framework
     - glia
+    - hall-lab-sv-tools
     - lumpy-sv
     - platypus-variant
     - rtg-tools
+    - scalpel
     - vcflib
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
