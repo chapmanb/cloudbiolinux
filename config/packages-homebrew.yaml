@@ -30,8 +30,10 @@ bio_nextgen:
     - lumpy-sv
     - platypus-variant
     - rtg-tools
+    - snpeff
     - vcflib
     - vcftools
+    - vep
     - yaha
 distributed:
   - parallel

@@ -34,6 +34,8 @@ bio_nextgen:
     - platypus-variant
     - rtg-tools
     - scalpel
+    - snpeff
     - vcflib
+    - vep
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt

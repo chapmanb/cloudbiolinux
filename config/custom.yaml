@@ -30,7 +30,6 @@ bio_nextgen:
     - picard
     - shrec
     - tophat
-    - vep
     - featurecounts
   assembly:
     - abyss

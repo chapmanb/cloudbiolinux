@@ -280,7 +280,7 @@ def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
-    version = "0.6.4"
+    version = "0.7.0"
     if versioncheck.up_to_date(env, "gemini -v", version, stdout_flag="gemini"):
         return
     elif not shared._executable_not_on_path("gemini -v"):
@@ -572,7 +572,7 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "3_4"
+    version = "3_6"
     genomes = []
     #genomes = ["GRCh37.74", "hg19", "GRCm38.74", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
@@ -597,18 +597,6 @@ def install_snpeff(env):
                             gurl = genome_url_base % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
-
-def install_vep(env):
-    """Variant Effects Predictor (VEP) from Ensembl.
-    http://ensembl.org/info/docs/variation/vep/index.html
-    """
-    version = "branch-ensembl-74"
-    url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
-          "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
-          "&pathrev={0}".format(version)
-    def _vep_install(env):
-        env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl -a a")
-    _get_install_local(url, env, _vep_install)
 
 @_if_not_installed("bamtools")
 def install_bamtools(env):
