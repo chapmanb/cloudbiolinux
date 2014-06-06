@@ -208,7 +208,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
               or dependency not in ipkgs["current"]):
             _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
     cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
-    for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "DBI", "LWP::Simple"]:
+    for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
+                     "LWP::Simple", "LWP::Protocol::https", "Time::HiRes"]:
         env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
     # Ensure paths we may have missed on install are accessible to regular user
     if env.use_sudo:
