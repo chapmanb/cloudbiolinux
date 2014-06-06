@@ -39,6 +39,7 @@ def _configure_cloudman(env, use_repo_autorun=False):
 
     ..Also see: ``custom/cloudman.py``
     """
+    env.logger.debug("Configuring CloudMan")
     _setup_users(env)
     _setup_env(env)
     _configure_logrotate(env)
@@ -267,19 +268,21 @@ def _configure_nfs(env):
         env.safe_sudo("ln -s %s %s" % (cloudman_dir, nfs_dir))
     env.safe_sudo("chown -R %s %s" % (env.user, os.path.dirname(nfs_dir)))
     # Setup /etc/exports paths, to be used as NFS mount points
-    galaxy_data_mount = env.get("galaxy_data_mount", "/mnt/galaxyData")
-    galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
-    galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
+    # galaxy_data_mount = env.get("galaxy_data_mount", "/mnt/galaxyData")
+    # galaxy_indices_mount = env.get("galaxy_indices_mount", "/mnt/galaxyIndices")
+    # galaxy_tools_mount = env.get("galaxy_tools_mount", "/mnt/galaxyTools")
     exports = ['/opt/sge           *(rw,sync,no_root_squash,no_subtree_check)',
                '/opt/hadoop           *(rw,sync,no_root_squash,no_subtree_check)',
-               '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
-               '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
-               '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
-               '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
-               '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir]
+               # '%s    *(rw,sync,no_root_squash,subtree_check,no_wdelay)' % galaxy_data_mount,
+               # '%s *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_indices_mount,
+               # '%s   *(rw,sync,no_root_squash,no_subtree_check)' % galaxy_tools_mount,
+               # '%s       *(rw,sync,no_root_squash,no_subtree_check)' % nfs_dir,
+               # '%s/openmpi         *(rw,sync,no_root_squash,no_subtree_check)' % env.install_dir
+               ]
     extra_nfs_exports = env.get("extra_nfs_exports", "")
-    for extra_nfs_export in extra_nfs_exports.split(","):
-        exports.append('%s   *(rw,sync,no_root_squash,no_subtree_check)' % extra_nfs_export)
+    if extra_nfs_exports:
+        for extra_nfs_export in extra_nfs_exports.split(","):
+            exports.append('%s   *(rw,sync,no_root_squash,no_subtree_check)' % extra_nfs_export)
     env.safe_append('/etc/exports', exports, use_sudo=True)
     # Create a symlink for backward compatibility where all of CloudMan's
     # stuff is expected to be in /opt/galaxy
