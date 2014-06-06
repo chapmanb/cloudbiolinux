@@ -597,7 +597,7 @@ def install_venvburrito():
     """
     url = "https://raw.github.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh"
     if not env.safe_exists("$HOME/.venvburrito/startup.sh"):
-        env.safe_run("curl -s {0} | $SHELL".format(url))
+        env.safe_run("curl -sL {0} | $SHELL".format(url))
         # Add the startup script into the ubuntu user's bashrc
         _add_to_profiles(". $HOME/.venvburrito/startup.sh", [env.shell_config], use_sudo=False)
 
