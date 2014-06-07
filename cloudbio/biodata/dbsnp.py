@@ -131,7 +131,7 @@ def _download_dbnsfp(env, gid, gconfig):
                 env.safe_run("rm -f %s/* && rmdir %s" % (outdir, outdir))
                 env.safe_run("rm -f %s" % (zipfile))
             if not env.safe_exists(outfile + ".tbi"):
-                env.safe_run("tabix -s 1 -b 2 -e 2 %s" % outfile)
+                env.safe_run("tabix -s 1 -b 2 -e 2 -c '#' %s" % outfile)
         elif gid == "hg19":  # symlink to GRCh37 download
             if not env.safe_exists(outfile):
                 env.safe_run("ln -s ../../GRCh37/variation/%s %s" % (outfile, outfile))
