@@ -123,7 +123,7 @@ def _download_dbnsfp(env, gid, gconfig):
         outfile = "dbNSFP_v%s.gz" % (version)
         if gid == "GRCh37":  # download and prepare bgzipped output file
             if not env.safe_exists(outfile):
-                zipfile = shared._remote_fetch(env, url)
+                zipfile = shared._remote_fetch(env, url, samedir=True)
                 outdir = "dbNSFPv%s" % version
                 env.safe_run("mkdir -p %s" % outdir)
                 env.safe_run("unzip %s -d %s" % (zipfile, outdir))
