@@ -680,7 +680,7 @@ def SRC_install_tophat(env):
     _install_boost(env)
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
-    url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
+    url = "http://ccb.jhu.edu/software/tophat/downloads/tophat-%s.tar.gz" % version
     _get_install(url, env, _cufflinks_configure_make)
 
 @_if_not_installed("cufflinks")
@@ -706,7 +706,7 @@ def install_tophat(env):
             .format(version))
         return
     platform = "OSX" if env.distribution == "macosx" else "Linux"
-    url = "http://tophat.cbcb.umd.edu/downloads/" \
+    url = "http://ccb.jhu.edu/software/tophat/downloads/" \
           "tophat-%s.%s_x86_64.tar.gz" % (version, platform)
 
     _get_install(url, env,
