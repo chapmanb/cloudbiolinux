@@ -625,79 +625,9 @@ def install_ogap(env):
     _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
-def _install_samtools_libs(env):
-    repository = "svn co --non-interactive " \
-                 "https://samtools.svn.sourceforge.net/svnroot/samtools/trunk/samtools"
-    def _samtools_lib_install(env):
-        lib_dir = _get_lib_dir(env)
-        include_dir = os.path.join(env.system_install, "include", "bam")
-        env.safe_run("make")
-        env.safe_sudo("mv -f libbam* %s" % lib_dir)
-        env.safe_sudo("mkdir -p %s" % include_dir)
-        env.safe_sudo("mv -f *.h %s" % include_dir)
-    check_dir = os.path.join(_get_include_dir(env), "bam")
-    if not env.safe_exists(check_dir):
-        _get_install(repository, env, _samtools_lib_install)
-
-def _install_boost(env):
-    version = "1.49.0"
-    url = "http://downloads.sourceforge.net/project/boost/boost" \
-          "/%s/boost_%s.tar.bz2" % (version, version.replace(".", "_"))
-    check_version = "_".join(version.split(".")[:2])
-    boost_dir = os.path.join(env.system_install, "boost")
-    boost_version_file = os.path.join(boost_dir, "include", "boost", "version.hpp")
-    def _boost_build(env):
-        env.safe_run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
-        env.safe_run("./b2")
-        env.safe_sudo("./b2 install")
-    thread_lib = "libboost_thread.so.%s" % version
-    final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
-    if (not env.safe_exists(boost_version_file) or not env.safe_contains(boost_version_file, check_version)
-          or not env.safe_exists(final_thread_lib)):
-        _get_install(url, env, _boost_build)
-        orig_lib = os.path.join(boost_dir, "lib", thread_lib)
-        if not env.safe_exists(final_thread_lib):
-            env.safe_sudo("ln -s %s %s" % (orig_lib, final_thread_lib))
-
-def _cufflinks_configure_make(env):
-    orig_eigen = "%s/include/eigen3" % env.system_install
-    need_eigen = "%s/include/eigen3/include" % env.system_install
-    if not env.safe_exists(need_eigen):
-        env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
-    env.safe_run("./configure --disable-werror --prefix=%s --with-eigen=%s"
-                 % (env.system_install, orig_eigen))
-    #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
-    #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
-    env.safe_run("make")
-    env.safe_sudo("make install")
-
-@_if_not_installed("tophat")
-def SRC_install_tophat(env):
-    """TopHat is a fast splice junction mapper for RNA-Seq reads
-    http://tophat.cbcb.umd.edu/
-    """
-    _install_samtools_libs(env)
-    _install_boost(env)
-    default_version = "2.0.9"
-    version = env.get("tool_version", default_version)
-    url = "http://ccb.jhu.edu/software/tophat/downloads/tophat-%s.tar.gz" % version
-    _get_install(url, env, _cufflinks_configure_make)
-
-@_if_not_installed("cufflinks")
-def SRC_install_cufflinks(env):
-    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
-    http://cufflinks.cbcb.umd.edu/
-    """
-    _install_samtools_libs(env)
-    _install_boost(env)
-    default_version = "2.1.1"
-    version = env.get("tool_version", default_version)
-    url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
-    _get_install(url, env, _cufflinks_configure_make)
-
 def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
-    http://tophat.cbcb.umd.edu/
+    http://ccb.jhu.edu/software/tophat/index.shtml
     """
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
