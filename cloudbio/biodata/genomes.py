@@ -258,7 +258,7 @@ DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
-           ("Scerevisiae", "sacCer2", UCSCGenome("sacCer2")),
+           ("Scerevisiae", "sacCer3", UCSCGenome("sacCer3")),
            ("Mmusculus", "mm10", UCSCGenome("mm10")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
