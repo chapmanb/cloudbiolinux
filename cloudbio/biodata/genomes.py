@@ -841,16 +841,17 @@ def get_index_fn(index):
     return the index function for an index, if it is missing return a function
     that is a no-op
     """
-    INDEX_FNS = {
-        "seq" : _index_sam,
-        "bwa" : _index_bwa,
-        "bowtie": _index_bowtie,
-        "bowtie2": _index_bowtie2,
-        "maq": _index_maq,
-        "mosaik": _index_mosaik,
-        "novoalign": _index_novoalign,
-        "novoalign_cs": _index_novoalign_cs,
-        "ucsc": _index_twobit,
-        "star": _index_star
-        }
     return INDEX_FNS.get(index, lambda x: None)
+
+INDEX_FNS = {
+    "seq" : _index_sam,
+    "bwa" : _index_bwa,
+    "bowtie": _index_bowtie,
+    "bowtie2": _index_bowtie2,
+    "maq": _index_maq,
+    "mosaik": _index_mosaik,
+    "novoalign": _index_novoalign,
+    "novoalign_cs": _index_novoalign_cs,
+    "ucsc": _index_twobit,
+    "star": _index_star
+    }
