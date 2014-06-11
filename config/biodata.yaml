@@ -44,8 +44,8 @@ genomes:
     name: X tropicalis (xenTro2)
   - dbkey: Zv9
     name: Zebrafish (Zv9)
-  - dbkey: sacCer2
-    name: S cerevisiae (sacCer2)
+  - dbkey: sacCer3
+    name: S cerevisiae (sacCer3)
   - dbkey: WS210
     name: C elegans (WS210)
 
