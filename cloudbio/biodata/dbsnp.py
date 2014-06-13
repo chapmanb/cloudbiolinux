@@ -145,17 +145,16 @@ def _download_ancestral(env, gid, gconfig):
     Used by LOFTEE VEP plugin: https://github.com/konradjk/loftee
     """
     base_url = "http://www.broadinstitute.org/~konradk/loftee/human_ancestor.fa.rz"
-    if gconfig.get("ancestral"):
-        if gid == "GRCh37":
-            for ext in ["", ".fai"]:
-                outfile = os.path.basename(base_url) + ext
-                if not env.safe_exists(outfile):
-                    shared._remote_fetch(env, base_url + ext, samedir=True)
-        elif gid == "hg19":  # symlink to GRCh37 download
-            for ext in ["", ".fai"]:
-                outfile = os.path.basename(base_url) + ext
-                if not env.safe_exists(outfile):
-                    env.safe_run("ln -s ../../GRCh37/variation/%s %s" % (outfile, outfile))
+    if gid == "GRCh37":
+        for ext in ["", ".fai"]:
+            outfile = os.path.basename(base_url) + ext
+            if not env.safe_exists(outfile):
+                shared._remote_fetch(env, base_url + ext, samedir=True)
+    elif gid == "hg19":  # symlink to GRCh37 download
+        for ext in ["", ".fai"]:
+            outfile = os.path.basename(base_url) + ext
+            if not env.safe_exists(outfile):
+                env.safe_run("ln -s ../../GRCh37/variation/%s %s" % (outfile, outfile))
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.
