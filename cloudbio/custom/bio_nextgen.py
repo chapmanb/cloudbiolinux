@@ -465,8 +465,8 @@ def install_rnaseqc(env):
     https://www.broadinstitute.org/cancer/cga/rna-seqc
     """
     version = "1.1.7"
-    url = ("http://www.broadinstitute.org/cancer/cga/sites/default/files/"
-           "data/tools/rnaseqc/RNA-SeQC_v%s.jar" % version)
+    url = ("https://github.com/chapmanb/RNA-SeQC/releases/download/"
+           "v%s/RNA-SeQC_v%s.jar" % (version, version))
     install_dir = _symlinked_java_version_dir("RNA-SeQC", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
