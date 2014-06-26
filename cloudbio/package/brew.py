@@ -188,7 +188,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["cpanminus", "expat"]:
+    for dep in ["expat"]:
         _install_pkg_latest(env, dep, brew_cmd, ipkgs)
     # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
@@ -204,13 +204,16 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
     for dependency in ["htslib", "libmaus"]:
-        if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
-              or dependency not in ipkgs["current"]):
-            _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
-    cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
-    for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
-                     "LWP::Simple", "LWP::Protocol::https", "Time::HiRes"]:
-        env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+        if dependency in packages:
+            if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
+                  or dependency not in ipkgs["current"]):
+                _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
+    if "cpanminus" in packages:
+        _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
+        cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
+        for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
+                         "LWP::Simple", "LWP::Protocol::https", "Time::HiRes"]:
+            env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
     # Ensure paths we may have missed on install are accessible to regular user
     if env.use_sudo:
         paths = ["share", "share/java"]

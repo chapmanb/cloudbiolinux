@@ -1,0 +1,20 @@
+# -- Installation details
+
+# Global installation directory for packages and standard programs
+system_install = ~/tmp/cbl_demo
+
+# Local install directory for versioned software that will not
+# be included in the path by default
+local_install = ~/tmp/cbl_demo/share
+
+# Global setting for using sudo; allows installation of custom packages
+# by non-privileged users.
+# *Note*: ``system_install`` needs to point to a user-writeable directory if
+# ``use_sudo`` is set to ``False``
+use_sudo = False
+keep_isolated = True
+
+# -- Details about reference data installation
+
+# Path where biological reference data files should be retrieved to
+data_files = ~/tmp/cbl_demo/biodata

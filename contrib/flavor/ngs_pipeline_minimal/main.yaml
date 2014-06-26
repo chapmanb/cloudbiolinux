@@ -4,6 +4,7 @@
 packages:
   - minimal
   - libraries
+  - perl
   - python
   - java
   - r
