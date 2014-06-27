@@ -57,6 +57,8 @@ def _download_executables(env, base_url, tools):
                 if not env.safe_exists(final_tool) and shared._executable_not_on_path(tool):
                     shared._remote_fetch(env, "%s%s" % (base_url, tool))
                     env.safe_sudo("cp -f %s %s" % (tool, install_dir))
+                    final_path = os.path.join(install_dir, tool)
+                    env.safe_sudo("chmod uga+rx %s" % final_path)
 
 # --- Alignment tools
 def install_featurecounts(env):
