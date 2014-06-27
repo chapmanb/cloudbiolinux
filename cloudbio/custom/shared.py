@@ -306,23 +306,24 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     """Create a symlinked directory of files inside the shared environment.
     """
     base_dir, install_dir = _symlinked_install_dir(pname, version, env, extra_dir)
+    relative_install_dir = os.path.relpath(install_dir, os.path.dirname(base_dir))
     # Does not exist, change symlink to new directory
     if not env.safe_exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
         if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
         return install_dir
     items = env.safe_run_output("ls %s" % install_dir)
     # empty directory, change symlink and re-download
     if items.strip() == "":
         if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
         return install_dir
     # Create symlink if previously deleted
     if not env.safe_exists(base_dir):
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
     return None
 
 def _symlinked_java_version_dir(pname, version, env):
