@@ -135,9 +135,9 @@ def _download_dbnsfp(env, gid, gconfig):
                 env.safe_run("tabix -s 1 -b 2 -e 2 -c '#' %s" % outfile)
         elif gid == "hg19":  # symlink to GRCh37 download
             if not env.safe_exists(outfile):
-                env.safe_run("ln -s ../../GRCh37/variation/%s %s" % (outfile, outfile))
+                env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
             if not env.safe_exists(outfile + ".tbi"):
-                env.safe_run("ln -s ../../GRCh37/variation/%s.tbi %s.tbi" % (outfile, outfile))
+                env.safe_run("ln -sf ../../GRCh37/variation/%s.tbi %s.tbi" % (outfile, outfile))
 
 def _download_ancestral(env, gid, gconfig):
     """Download ancestral genome sequence for loss of function evaluation.
@@ -154,7 +154,7 @@ def _download_ancestral(env, gid, gconfig):
         for ext in ["", ".fai"]:
             outfile = os.path.basename(base_url) + ext
             if not env.safe_exists(outfile):
-                env.safe_run("ln -s ../../GRCh37/variation/%s %s" % (outfile, outfile))
+                env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.

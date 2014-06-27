@@ -605,13 +605,11 @@ def _index_bowtie2(ref_file):
     dir_name = "bowtie2"
     cmd = "bowtie2-build {ref_file} {index_name}"
     out_suffix = _index_w_command(dir_name, cmd, ref_file)
-    bowtie_link = os.path.join(os.path.dirname(ref_file), os.path.pardir,
-                               out_suffix + ".fa")
-    try:
-        os.symlink(ref_file, bowtie_link)
-    except OSError:
-        pass
-
+    bowtie_link = os.path.normpath(os.path.join(os.path.dirname(ref_file), os.path.pardir,
+                                                out_suffix + ".fa"))
+    relative_ref_file = os.path.relpath(ref_file, os.path.dirname(bowtie_link))
+    if not env.safe_exists(bowtie_link):
+        env.safe_run("ln -sf %s %s" % (relative_ref_file, bowtie_link))
     return out_suffix
 
 def _index_bwa(ref_file):
@@ -620,7 +618,7 @@ def _index_bwa(ref_file):
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
         with cd(dir_name):
-            env.safe_run("ln -s %s" % os.path.join(os.pardir, ref_file))
+            env.safe_run("ln -sf %s" % os.path.join(os.pardir, ref_file))
             with settings(warn_only=True):
                 result = env.safe_run("bwa index -a bwtsw %s" % local_ref)
             # work around a bug in bwa indexing for small files
@@ -634,7 +632,7 @@ def _index_maq(ref_file):
     cmd = "maq fasta2bfa {ref_file} {index_name}"
     def link_local(ref_file):
         local = os.path.basename(ref_file)
-        env.safe_run("ln -s {0} {1}".format(ref_file, local))
+        env.safe_run("ln -sf {0} {1}".format(ref_file, local))
         return local
     def rm_local(local_file):
         env.safe_run("rm -f {0}".format(local_file))

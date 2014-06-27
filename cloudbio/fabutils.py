@@ -30,7 +30,8 @@ def local_exists(path, use_sudo=False):
     cmd_symbolic = 'test -h "$(echo %s)"' % path
     with settings(hide('everything'), warn_only=True):
         env.lcwd = env.cwd
-        return (not func(cmd).failed) or (not func(cmd_symbolic).failed)
+        # We do not use cmd_symbolic so we avoid rescuing broken symlinks
+        return not func(cmd).failed
 
 def run_local(use_sudo=False, capture=False):
     def _run(command, *args, **kwags):
