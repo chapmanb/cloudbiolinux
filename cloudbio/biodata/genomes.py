@@ -580,7 +580,7 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None)
     full_ref_path = os.path.join(os.pardir, ref_file)
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
-        with cd(dir_name):
+        with lcd(dir_name):
             if pre:
                 full_ref_path = pre(full_ref_path)
             env.safe_run(command.format(ref_file=full_ref_path, index_name=index_name))
@@ -664,9 +664,9 @@ def _index_star(ref_file):
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the STAR index." % (gtf_file)
         return None
-    dir_name = "star"
-    cmd = ("STAR --genomeDir . --genomeFastaFiles {ref_file} "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (gtf_file))
+    dir_name = os.path.join(ref_dir, os.pardir, "star")
+    cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (dir_name, gtf_file))
     return  _index_w_command(dir_name, cmd, ref_file)
 
 @_if_installed("MosaikJump")
