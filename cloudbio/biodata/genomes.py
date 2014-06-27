@@ -607,8 +607,11 @@ def _index_bowtie2(ref_file):
     out_suffix = _index_w_command(dir_name, cmd, ref_file)
     bowtie_link = os.path.join(os.path.dirname(ref_file), os.path.pardir,
                                out_suffix + ".fa")
-    if not os.path.exists(bowtie_link):
+    try:
         os.symlink(ref_file, bowtie_link)
+    except OSError:
+        pass
+
     return out_suffix
 
 def _index_bwa(ref_file):
