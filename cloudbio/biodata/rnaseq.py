@@ -46,7 +46,7 @@ def _symlink_refgenome(env, gid, org_dir):
                 for ext in ["", ".fai"]:
                     orig_seq = os.path.join(os.pardir, "seq", "%s.fa%s" % (gid, ext))
                     if env.safe_exists(orig_seq) and not env.safe_exists(os.path.basename(orig_seq)):
-                        env.safe_run("ln -s %s" % orig_seq)
+                        env.safe_run("ln -sf %s" % orig_seq)
 
 def _symlink_version(env, tx_dir, version_dir):
     """Symlink the expected base output directory to our current version.
@@ -54,7 +54,7 @@ def _symlink_version(env, tx_dir, version_dir):
     if env.safe_exists(tx_dir):
         env.safe_run("rm -rf %s" % tx_dir)
     with cd(os.path.dirname(version_dir)):
-        env.safe_run("ln -s %s %s" % (os.path.basename(version_dir), os.path.basename(tx_dir)))
+        env.safe_run("ln -sf %s %s" % (os.path.basename(version_dir), os.path.basename(tx_dir)))
 
 def _download_annotation_bundle(env, url, gid):
     """Download bundle of RNA-seq data from S3 biodata/annotation
