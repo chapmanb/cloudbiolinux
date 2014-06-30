@@ -1,9 +1,10 @@
-CloudBioLinux is a build and deployment system which installs a large
-selection of Bioinformatics and machine learning libraries on a bare
-virtual machine (VM) image, freshly installed PC, or in the Cloud. By
-default CloudBioLinux includes a large suite of tools installed through
-the default distribution installer, native installers, and libraries for
-Perl, R, Python, Java and Ruby.
+CloudBioLinux is a build and deployment system which installs an easily
+customizable selection of bioinformatics and machine learning libraries on a
+linux container, bare virtual machine (VM) image, freshly installed PC, or in
+the cloud. CloudBioLinux is a curated and community developed set of
+instructions for tools provided by operating system packages (debs and RPMs),
+external packaging efforts (`homebrew-science <https://github.com/Homebrew/homebrew-science>`_)
+and language specific library installers (Python, R, Perl and Ruby).
 
 CloudBioLinux included software packages are fully customizable. In
 addition to the default configuration, we support custom configuration
@@ -11,8 +12,8 @@ builds through flavors. Flavors support overriding default package
 installations, making it simple to create derived installs for specific
 purposes.
 
-CloudBioLinux is a single install route both for desktop VMs such as
-`VirtualBox <http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/>`_,
+CloudBioLinux is a single install route for `Docker containers <http://www.docker.com/>`_
+,desktop VMs such as `VirtualBox <http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/>`_,
 cloud providers such as `Amazon EC2 <http://aws.amazon.com/ec2/>`_ or
 desktop machines. This works equally well for other virtual machines and
 private cloud environments, including `XEN <http://xen.org/>`_, Linux
@@ -20,8 +21,8 @@ private cloud environments, including `XEN <http://xen.org/>`_, Linux
 `Eucalyptus <http://open.eucalyptus.com/>`_ and
 `Openstack <http://www.openstack.org/>`_.
 
-Using pre-built images
-======================
+Using pre-built cloud images
+============================
 
 Amazon
 ------
@@ -42,35 +43,27 @@ short version for users familiar with Amazon is:
 Installing CloudBioLinux on a local machine
 ===========================================
 
-The install process for CloudBioLinux is fully automated through a
-`Fabric build file <http://fabfile.org/>`_ written in Python. The Fabric
-build files are useful for automating installation of scientific
-software on local systems as well as Amazon cloud servers. Everything is
-fully configurable through plain text YAML configuration files, and
-custom build targets allow installation of a subset of the total
-available packages.
+The install process for CloudBioLinux is fully automated through a `Fabric build
+file <http://fabfile.org/>`_ written in Python. Everything is fully configurable
+through plain text YAML configuration files, and custom build targets allow
+installation of a subset of the total available packages.
 
-Installation
-------------
+Setup
+-----
 
-Retrieve the CloudBioLinux code base and install libraries and
-dependencies:
+Retrieve the CloudBioLinux code base and install fabric::
 
-::
-
-        git clone git://github.com/chapmanb/cloudbiolinux.git
-        cd cloudbiolinux
-        python setup.py build
-        sudo python setup.py install
+    pip install fabric
+    git clone git://github.com/chapmanb/cloudbiolinux.git
+    cd cloudbiolinux
 
 Usage
 -----
 
-The basic usage specifies the hostname of a machine accessible via ssh:
+The basic usage specifies the hostname of a machine accessible via ssh or the
+local machine::
 
-::
-
-      fab -f fabfile.py -H localhost install_biolinux
+    fab -f fabfile.py -H localhost install_biolinux
 
 Fabric contains some other useful commandline arguments for customizing
 this to your environments:
@@ -80,27 +73,32 @@ this to your environments:
    and other server specific details. See the default
    ``config/fabricrc.txt`` for a full list of options.
 
--  ``-u username`` -- The username on the remote machine, overriding the
+-  ``-u username`` -- The username on a remote machine, overriding the
    default of your current username.
 
 Customization with flavors
 --------------------------
 
-CloudBioLinux normally creates a full system for bioinformatics, but can
-be easily configured to install only a subset of tools through flavors:
+In most cases you want to customize a specific set of packages,
+or install into an isolated directory without root access, using flavors::
 
-::
-
-      fab -f fabfile.py -H localhost install_biolinux:flavor=my_flavor
+    fab -f fabfile.py -H localhost install_biolinux:flavor=my_flavor
 
 ``my_flavor`` can be the name of an existing flavor in
 ``contrib/flavor`` or the path to a directory with customization
 information. The files in your flavor directory replace those in the
 standard ``config`` directory, allowing replacement of any of the
 configuration files like ``main.yaml`` with customized copies.
-
 If you desire even more control, flavors allow custom python hooks. See
 ``doc/hacking.md`` for more details.
+
+The best place to get started is the `demo flavor
+<https://github.com/chapmanb/cloudbiolinux/tree/master/contrib/flavor/demo>`_
+included with CloudBioLinux. This installs a small number of common packages
+into an isolated directory (``~/tmp/cbl_demo`` by default), without root access.
+Run the example with::
+
+    fab -f fabfile.py -H localhost install_biolinux:flavor=demo
 
 Specific install targets
 ------------------------
@@ -112,31 +110,47 @@ only build portions of CloudBioLinux:
    packages.
 -  ``install_biolinux:libraries`` -- Install all libraries for various
    programming languages.
+-  ``install_biolinux:brew`` -- Install homebrew packages only.
 -  ``install_libraries:language`` -- Install libraries for a specific
    language.
 -  ``install_biolinux:custom`` -- Install all custom programs.
+-  ``install_brew:a_package_name`` -- Install a specific brew package.
 -  ``install_custom:a_package_name`` -- Install a specific custom
    program.
+
+Homebrew package installation
+-----------------------------
+
+`Homebrew <https://github.com/Homebrew/homebrew>`_ and `Linuxbrew
+<https://github.com/Homebrew/linuxbrew>`_ provide a Ruby-based environment for
+installing packages on MacOSX and Linux. The active
+`homebrew-science <https://github.com/Homebrew/homebrew-science>`_ packaging
+community maintains a number of common scientific tools. We also maintain a
+`homebrew-cbl <https://github.com/chapmanb/homebrew-cbl>`_ repository with tools
+not yet integrated into homebrew-science.
+
+CloudBioLinux manages installation of the Linuxbrew or Homebrew framework and
+pulls in the ``homebrew/science`` and ``chapmanb/cbl`` taps, as well as
+injecting your current compilers into the homebrew build scripts. To install a
+`supported package
+<https://github.com/chapmanb/cloudbiolinux/blob/master/config/packages-homebrew.yaml>`_
+using CloudBioLinux::
+
+     fab -f fabfile.py -H localhost install_custom:bedtools
 
 Specific package installation
 -----------------------------
 
 The custom directory contains installation instructions for programs
-that are not available from standard package repositories. These
-instructions are written in Python using the
-`Fabric <http://fabfile.org/>`_ remote deployment tool and can also be
-used for installing individual packages locally on your machine. To do
-this, run:
-
-::
+that are not available from standard package repositories, written in Python
+using the `Fabric <http://fabfile.org/>`_ remote deployment tool. To install
+individual `custom packages
+<https://github.com/chapmanb/cloudbiolinux/blob/master/config/custom.yaml>`_::
 
       fab -f fabfile.py -H localhost install_custom:your_package_name
 
-To build and install ``your_package_name`` on the local machine. We
-welcome additional custom bioinformatics package definitions for
-inclusion in CloudBioLinux. ``custom/shared.py`` contains a number of
-higher level functions which make it easier to write installation
-instructions.
+We prefer using the Homebrew framework for new packages over writing custom
+packages.
 
 Biological data
 ---------------
@@ -154,15 +168,11 @@ format <https://github.com/chapmanb/cloudbiolinux/blob/master/config/biodata.yam
 aligner indexes to use. The ``config/fabricrc.txt`` file specifies
 details about the system and where to install the data.
 
-The basic commandline is:
-
-::
+The basic commandline is::
 
     fab -f data_fabfile.py -H your_machine install_data_s3
 
-and you can pass in custom biodata and fabricrc files with:
-
-::
+and you can pass in custom biodata and fabricrc files with::
 
     fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data_s3:your_biodata.yaml
 
@@ -180,53 +190,26 @@ from from Ensembl, etc and prepare it::
 
     fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data:your_biodata.yaml
 
-Supported virtual environments
-==============================
+Supported environments
+======================
 
-Vagrant VirtualBox
-------------------
+Docker
+------
+`Docker <http://www.docker.com/>`_ provides lightweight local containers for
+Linux machines, allowing isolation without the associated overhead of full
+virtual machines. Include any of the standard CloudBioLinux commands inside
+a `Dockerfile <http://docs.docker.com/reference/builder/>`_ to use CloudBioLinux
+to build up the set of tools on your instance. See the
+`Dockerfile examples <http://docs.docker.com/installation/#examples>`_ for
+information how to write Dockerfiles.
 
-Vagrant allows easy deploying and connecting to VirtualBox images. The
-setup is ideal for runnig CloudBioLinux on a desktop computer. Install
-`VirtualBox
-4.0 <http://digitizor.com/2011/01/07/virtualbox-4-0-install-ubuntu/>`_
-and `vagrant <http://vagrantup.com/>`_. Then add a pre-built CloudLinux
-VirtualBox images and start it up:
+To use a pre-built Docker image made with CloudBioLinux infrastructure, using
+this `bcbio-nextgen Dockerfile
+<https://github.com/chapmanb/bcbio-nextgen/blob/master/Dockerfile>`_, you can
+import the `bcbio-nextgen <https://github.com/chapmanb/bcbio-nextgen>`_
+container into your local docker environment::
 
-::
-
-        vagrant box add biolinux_$VERSION https://s3.amazonaws.com/cloudbiolinux/biolinux_$VERSION.box
-        mkdir tmp/biolinux
-        cd tmp/biolinux
-        vagrant init biolinux_version
-
-(note with vagrant you need disk space - at least 3x the image size).
-The created ./Vagrantfile can be edited to get a full GUI, extra RAM,
-and a local IP address. Next, fire up the image with
-
-::
-
-        vagrant up
-
-Once you have a running virtual machine with CloudBioLinux, connect to
-it with:
-
-::
-
-        vagrant ssh
-
-no passwords needed! Get root with
-
-::
-
-        sudo bash
-
-Through Vagrant additional facilities are available, such as a shared
-network drive. It is also possible to tweak the image (e.g. RAM/CPU
-settings, and getting the all important guest additions) by firing up
-virtualbox itself. For more information, see the BioLinux `Vagrant
-documentation <https://github.com/chapmanb/cloudbiolinux>`_, as well as
-the documentation on the `Vagrant website <http://vagrantup.com/>`_.
+    docker import https://s3.amazonaws.com/bcbio_nextgen/bcbio-nextgen-docker-image.gz chapmanb/bcbio-nextgen-cbl
 
 Amazon
 ------
@@ -262,8 +245,33 @@ software.
    console <https://console.aws.amazon.com/ec2/home>`_ to create an AMI.
    Thereafter make it public so it can be used by others.
 
-Virtualbox
-----------
+Vagrant and VirtualBox
+----------------------
+
+Vagrant allows easy deploying and connecting to VirtualBox images. The
+setup is ideal for runnig CloudBioLinux on a desktop computer. Install
+`VirtualBox <https://www.virtualbox.org/>`_
+and `vagrant <http://vagrantup.com/>`_. Then add a pre-built CloudLinux
+VirtualBox images and start it up::
+
+        vagrant box add biolinux_$VERSION https://s3.amazonaws.com/cloudbiolinux/biolinux_$VERSION.box
+        mkdir tmp/biolinux
+        cd tmp/biolinux
+        vagrant init biolinux_version
+
+(note with vagrant you need disk space - at least 3x the image size).
+The created ./Vagrantfile can be edited to get a full GUI, extra RAM,
+and a local IP address. Start and log into the image with::
+
+        vagrant up
+        vagrant ssh
+        sudo bash
+
+Through Vagrant additional facilities are available, such as a shared
+network drive. It is also possible to tweak the image (e.g. RAM/CPU
+settings, and getting the all important guest additions) by firing up
+virtualbox itself. For more information, see the
+documentation on the `Vagrant website <http://vagrantup.com/>`_.
 
 See `the VirtualBox and Vagrant
 documentation <https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md>`_
