@@ -40,8 +40,8 @@ genomes:
     name: D melangogaster (dm3)
   - dbkey: araTha_tair9
     name: Arabidopsis thaliana (TAIR9)
-  - dbkey: xenTro2
-    name: X tropicalis (xenTro2)
+  - dbkey: xenTro3
+    name: X tropicalis (xenTro3)
   - dbkey: Zv9
     name: Zebrafish (Zv9)
   - dbkey: sacCer3

@@ -270,7 +270,7 @@ GENOMES_SUPPORTED = [
                                               "human_g1k_v37.fasta", "b37")),
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
-           ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
+           ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
                "Arabidopsis_thaliana", "TAIR9")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
