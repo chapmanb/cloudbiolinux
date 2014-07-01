@@ -33,6 +33,7 @@ from cloudbio.biodata import galaxy
 from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
+from cloudbio.fabutils import quiet
 
 # -- Configuration for genomes to download and prepare
 
@@ -124,9 +125,16 @@ class UCSCGenome(_DownloadHelper):
                 result = env.safe_run_output("find `pwd` -name '*.fa'")
                 result = [x.strip() for x in result.split("\n")]
                 if len(result) == 1:
+                    orig_result = result[0]
                     result = self._split_multifasta(result[0])
+                    env.safe_run("rm %s" % orig_result)
                 result = self._karyotype_sort(result)
-                env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
+                result = [os.path.basename(x) for x in result]
+                env.safe_run("rm -f inputs.txt")
+                for fname in result:
+                    with quiet():
+                        env.safe_run("echo '%s' >> inputs.txt" % fname)
+                env.safe_run("cat `cat inputs.txt` > %s" % (tmp_file))
                 env.safe_run("rm -f *.fa")
                 env.safe_run("mv %s %s" % (tmp_file, genome_file))
                 zipped_file = os.path.join(prep_dir, zipped_file)
