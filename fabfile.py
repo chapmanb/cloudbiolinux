@@ -73,7 +73,7 @@ def install_biolinux(target=None, flavor=None):
     env.logger.debug("Target is '%s'" % target)
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
-    if env.keep_isolated:
+    if hasattr(env, "keep_isolated") and env.keep_isolated:
         _print_shell_exports(env)
 
 def _perform_install(target=None, flavor=None, more_custom_add=None):
