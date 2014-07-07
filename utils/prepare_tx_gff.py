@@ -199,6 +199,7 @@ def main(org_build, gtf_file=None):
         gtf_file = clean_gtf(gtf_file, org_build)
         db = prepare_gff_db(gtf_file)
         gtf_to_refflat(gtf_file)
+        prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
         gtf_to_interval(rrna_gtf, org_build)
@@ -493,6 +494,33 @@ def _get_gtf_db(gtf):
         gffutils.create_db(gtf, dbfn=db_file)
 
     return gffutils.FeatureDB(db_file)
+
+def _dexseq_preparation_path():
+    PREP_FILE = "python_scripts/dexseq_prepare_annotation.py"
+    cmd = "Rscript -e 'find.package(\"DEXSeq\")'"
+    output = subprocess.check_output(cmd, shell=True)
+    for line in output.split("\n"):
+        if line.startswith("["):
+            dirname = line.split("[1]")[1].replace("\"", "").strip()
+            path = os.path.join(dirname, PREP_FILE)
+            if os.path.exists(path):
+                return path
+    return None
+
+def prepare_dexseq(gtf):
+    out_file = os.path.splitext(gtf)[0] + ".dexseq.gff"
+    if file_exists(out_file):
+        return out_file
+
+    dexseq_path = _dexseq_preparation_path()
+    if not dexseq_path:
+        return None
+    cmd = "python {dexseq_path} {gtf} {out_file}"
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return out_file
+
+# Rscript -e "find.package('DEXSeq')" -> [1] "/Volumes/Clotho/Users/rory/opt/lib/R/DEXSeq"
+# path/python_scripts/dexseq_prepare_annotation.py
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
