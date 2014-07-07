@@ -190,6 +190,13 @@ def main(org_build, gtf_file=None):
         if not gtf_file:
             build = build_info[org_build]
             gtf_file = prepare_tx_gff(build, org_build)
+        else:
+            work_gtf = os.path.join(work_dir, "ref-transcripts.gtf")
+            if not os.path.exists(work_gtf):
+                shutil.copy(gtf_file, work_gtf)
+            gtf_file = work_gtf
+
+        gtf_file = clean_gtf(gtf_file, org_build)
         db = prepare_gff_db(gtf_file)
         gtf_to_refflat(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
@@ -199,6 +206,33 @@ def main(org_build, gtf_file=None):
         cleanup(work_dir, out_dir, org_build)
     tar_dirs = [out_dir]
 
+def clean_gtf(gtf_file, org_build):
+    """
+    remove transcripts that don't have a corresponding ID in the reference
+    also remove entries without both a gene_id and a transcript_id
+    """
+    temp_gtf = tempfile.NamedTemporaryFile(suffix=".gtf").name
+    fa_names = get_fasta_names(org_build)
+    with open(gtf_file) as in_gtf, open(temp_gtf, "w") as out_gtf:
+        for line in in_gtf:
+            if line.split()[0].strip() not in fa_names:
+                continue
+            if "transcript_id" not in line:
+                continue
+            if "gene_id" not in line:
+                continue
+            out_gtf.write(line)
+    shutil.move(temp_gtf, gtf_file)
+    return gtf_file
+
+def get_fasta_names(org_build):
+    fa_dict = os.path.join(os.getcwd(), os.pardir, "seq", org_build + ".dict")
+    seqs = []
+    with open(fa_dict) as in_handle:
+        for line in in_handle:
+            if line.startswith("@SQ"):
+                seqs.append(line.split("\t")[1].split("SN:")[1].strip())
+    return seqs
 
 def cleanup(work_dir, out_dir, org_build):
     try:
