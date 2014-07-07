@@ -476,17 +476,6 @@ def install_rnaseqc(env):
                 out_file = shared._remote_fetch(env, url)
                 env.safe_sudo("mv %s %s" % (out_file, install_dir))
 
-def install_gatk(env):
-    """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
-    http://www.broadinstitute.org/gatk/
-    """
-    # Install main gatk executable
-    version = "2.3-9-gdcdccbb"
-    ext = ".tar.bz2"
-    url = "ftp://anonymous:anon@ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
-          "GenomeAnalysisTKLite-%s%s" % (version, ext)
-    _java_install("gatk", version, url, env)
-
 def install_varscan(env):
     """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/

@@ -44,8 +44,6 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - crisp
-    - gatk
-    #- gatk_protected
     - gemini
     - grabix
     - mutect
