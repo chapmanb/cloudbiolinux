@@ -181,8 +181,9 @@ def prepare_gff_db(gff_file):
 # ## Main driver functions
 
 def main(org_build, gtf_file=None):
-    work_dir = os.path.join(os.getcwd(), org_build, "tmpcbl")
-    out_dir = os.path.join(os.getcwd(), org_build,
+    build_dir = os.path.abspath(os.path.join(os.curdir, org_build))
+    work_dir = os.path.join(build_dir, "tmpcbl")
+    out_dir = os.path.join(build_dir,
                            "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
     safe_makedir(work_dir)
@@ -227,12 +228,9 @@ def clean_gtf(gtf_file, org_build):
     return gtf_file
 
 def get_fasta_names(org_build):
-    fa_dict = os.path.join(os.getcwd(), os.pardir, "seq", org_build + ".dict")
-    seqs = []
+    fa_dict = os.path.abspath(os.path.join(os.curdir, os.pardir, "seq", org_build + ".fa.fai"))
     with open(fa_dict) as in_handle:
-        for line in in_handle:
-            if line.startswith("@SQ"):
-                seqs.append(line.split("\t")[1].split("SN:")[1].strip())
+        return [line.split("\t")[0] for line in in_handle]
     return seqs
 
 def cleanup(work_dir, out_dir, org_build):
