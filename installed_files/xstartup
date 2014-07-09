@@ -3,4 +3,5 @@
 xsetroot -solid grey
 vncconfig -iconic &
 x-terminal-emulator -geometry 80x24+10+10 -ls -title "$VNCDESKTOP Desktop" &
-jwm &
+# jwm &
+startxfce4 &

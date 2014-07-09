@@ -1,0 +1,9 @@
+---
+# Demonstration flavor for learning use
+packages:
+  - minimal
+  - libraries
+  - python
+  - java
+  - ruby
+  - bio_nextgen

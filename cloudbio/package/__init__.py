@@ -11,7 +11,6 @@ from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
 from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
                                   _setup_yum_sources)
 
-
 def _configure_and_install_native_packages(env, pkg_install):
     """
     Setups up native package repositories, determines list
@@ -32,6 +31,8 @@ def _configure_and_install_native_packages(env, pkg_install):
         _yum_packages(pkg_install)
         if env.edition.short_name not in ["minimal"]:
             _setup_yum_bashrc()
+    elif env.distribution == "arch":
+        pass  # No package support for Arch yet
     elif env.distribution == "macosx":
         brew.install_packages(env, pkg_install)
     else:
@@ -44,24 +45,36 @@ def _connect_native_packages(env, pkg_install, lib_install):
     that needs a local version in our non-root directory tree.
     """
     bin_dir = os.path.join(env.system_install, "bin")
+    exports = _get_shell_exports(env)
     path = env.safe_run_output("echo $PATH")
     comment_line = "# CloudBioLinux PATH updates"
     if not env.safe_contains(env.shell_config, comment_line):
         env.safe_append(env.shell_config, "\n" + comment_line)
     if bin_dir not in path and env.safe_exists(env.shell_config):
-        add_path = "export PATH=%s:$PATH" % bin_dir
-        if not env.safe_contains(env.shell_config, add_path):
-            env.safe_append(env.shell_config, add_path)
-    ldlib_path = os.path.join(env.system_install, "lib")
-    add_ldlibrary = "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path
-    if not env.safe_contains(env.shell_config, add_ldlibrary):
-        env.safe_append(env.shell_config, add_ldlibrary)
-    perl_export = ("export PERL5LIB=%s/lib/perl5:%s/lib/perl5/site_perl:${PERL5LIB}"
-                   % (env.system_install, env.system_install))
-    if not env.safe_contains(env.shell_config, perl_export):
-        env.safe_append(env.shell_config, perl_export)
+        if not env.safe_contains(env.shell_config, exports["path"]):
+            env.safe_append(env.shell_config, exports["path"])
+    if not env.safe_contains(env.shell_config, exports["ld_library"]):
+        env.safe_append(env.shell_config, exports["ld_library"])
+    if not env.safe_contains(env.shell_config, exports["perl"]):
+        env.safe_append(env.shell_config, exports["perl"])
     if "python" in pkg_install and "python" in lib_install:
         _create_local_virtualenv(env.system_install)
+
+def _get_shell_exports(env):
+    bin_dir = os.path.join(env.system_install, "bin")
+    ldlib_path = os.path.join(env.system_install, "lib")
+    return {"path": "export PATH=%s:$PATH" % bin_dir,
+            "ld_library": "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path,
+            "perl": ("export PERL5LIB=%s/lib/perl5:%s/lib/perl5/site_perl:${PERL5LIB}"
+                     % (env.system_install, env.system_install))}
+
+def _print_shell_exports(env):
+    """Print a set of exports to add to shell in isolated installations.
+    """
+    exports = _get_shell_exports(env)
+    print "\nIsolated installation: add the following to your shell to include installed files:"
+    for e in ["path", "ld_library", "perl"]:
+        print exports[e]
 
 def _create_local_virtualenv(target_dir):
     """Create virtualenv in target directory for non-sudo installs.

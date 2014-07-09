@@ -1,5 +1,7 @@
 # Packages available in the Homebrew and Linuxbrew package manager
 ---
+perl:
+  - cpanminus
 bio_nextgen:
   alignment:
     - bwa
@@ -29,10 +31,13 @@ bio_nextgen:
     - freebayes
     - gatk-framework
     - glia
+    - hall-lab-sv-tools
     - lumpy-sv
     - platypus-variant
     - rtg-tools
-    - tabix
+    - scalpel
+    - snpeff
     - vcflib
+    - vep
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt

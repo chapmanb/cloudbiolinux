@@ -33,6 +33,7 @@ from cloudbio.biodata import galaxy
 from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
+from cloudbio.fabutils import quiet
 
 # -- Configuration for genomes to download and prepare
 
@@ -107,24 +108,37 @@ class UCSCGenome(_DownloadHelper):
         zipped_file = None
         genome_file = "%s.fa" % self._name
         if not self._exists(genome_file, seq_dir):
-            zipped_file = self._download_zip(seq_dir)
-            if zipped_file.endswith(".tar.gz"):
-                env.safe_run("tar -xzpf %s" % zipped_file)
-            elif zipped_file.endswith(".zip"):
-                env.safe_run("unzip %s" % zipped_file)
-            elif zipped_file.endswith(".gz"):
-                env.safe_run("gunzip -c %s > out.fa" % zipped_file)
-            else:
-                raise ValueError("Do not know how to handle: %s" % zipped_file)
-            tmp_file = genome_file.replace(".fa", ".txt")
-            result = env.safe_run_output("find `pwd` -name '*.fa'")
-            result = [x.strip() for x in result.split("\n")]
-            if len(result) == 1:
-                result = self._split_multifasta(result[0])
-            result = self._karyotype_sort(result)
-            env.safe_run("cat %s > %s" % (" ".join(result), tmp_file))
-            env.safe_run("rm -f *.fa")
-            env.safe_run("mv %s %s" % (tmp_file, genome_file))
+            prep_dir = "seq_prep"
+            env.safe_run("mkdir -p %s" % prep_dir)
+            with cd(prep_dir):
+                zipped_file = self._download_zip(seq_dir)
+                if zipped_file.endswith(".tar.gz"):
+                    env.safe_run("tar -xzpf %s" % zipped_file)
+                elif zipped_file.endswith(".zip"):
+                    env.safe_run("unzip %s" % zipped_file)
+                elif zipped_file.endswith(".gz"):
+                    if not env.safe_exists("out.fa"):
+                        env.safe_run("gunzip -c %s > out.fa" % zipped_file)
+                else:
+                    raise ValueError("Do not know how to handle: %s" % zipped_file)
+                tmp_file = genome_file.replace(".fa", ".txt")
+                result = env.safe_run_output("find `pwd` -name '*.fa'")
+                result = [x.strip() for x in result.split("\n")]
+                if len(result) == 1:
+                    orig_result = result[0]
+                    result = self._split_multifasta(result[0])
+                    env.safe_run("rm %s" % orig_result)
+                result = self._karyotype_sort(result)
+                result = [os.path.basename(x) for x in result]
+                env.safe_run("rm -f inputs.txt")
+                for fname in result:
+                    with quiet():
+                        env.safe_run("echo '%s' >> inputs.txt" % fname)
+                env.safe_run("cat `cat inputs.txt` > %s" % (tmp_file))
+                env.safe_run("rm -f *.fa")
+                env.safe_run("mv %s %s" % (tmp_file, genome_file))
+                zipped_file = os.path.join(prep_dir, zipped_file)
+                genome_file = os.path.join(prep_dir, genome_file)
         return genome_file, [zipped_file]
 
     def _download_zip(self, seq_dir):
@@ -252,7 +266,7 @@ DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
-           ("Scerevisiae", "sacCer2", UCSCGenome("sacCer2")),
+           ("Scerevisiae", "sacCer3", UCSCGenome("sacCer3")),
            ("Mmusculus", "mm10", UCSCGenome("mm10")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
@@ -264,7 +278,7 @@ GENOMES_SUPPORTED = [
                                               "human_g1k_v37.fasta", "b37")),
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
-           ("Xtropicalis", "xenTro2", UCSCGenome("xenTro2")),
+           ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
            ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
                "Arabidopsis_thaliana", "TAIR9")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
@@ -278,7 +292,7 @@ GENOMES_SUPPORTED = [
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
            ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),
            ("Cfamiliaris_Dog", "canFam2", UCSCGenome("canFam2")),
-           ("Drerio_Zebrafish", "danRer6", UCSCGenome("danRer6")),
+           ("Drerio_Zebrafish", "Zv9", UCSCGenome("danRer7")),
            ("Ecaballus_Horse", "equCab2", UCSCGenome("equCab2")),
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
@@ -574,7 +588,7 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None)
     full_ref_path = os.path.join(os.pardir, ref_file)
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
-        with cd(dir_name):
+        with lcd(dir_name):
             if pre:
                 full_ref_path = pre(full_ref_path)
             env.safe_run(command.format(ref_file=full_ref_path, index_name=index_name))
@@ -599,10 +613,11 @@ def _index_bowtie2(ref_file):
     dir_name = "bowtie2"
     cmd = "bowtie2-build {ref_file} {index_name}"
     out_suffix = _index_w_command(dir_name, cmd, ref_file)
-    bowtie_link = os.path.join(os.path.dirname(ref_file), os.path.pardir,
-                               out_suffix + ".fa")
-    if not os.path.exists(bowtie_link):
-        os.symlink(ref_file, bowtie_link)
+    bowtie_link = os.path.normpath(os.path.join(os.path.dirname(ref_file), os.path.pardir,
+                                                out_suffix + ".fa"))
+    relative_ref_file = os.path.relpath(ref_file, os.path.dirname(bowtie_link))
+    if not env.safe_exists(bowtie_link):
+        env.safe_run("ln -sf %s %s" % (relative_ref_file, bowtie_link))
     return out_suffix
 
 def _index_bwa(ref_file):
@@ -611,7 +626,7 @@ def _index_bwa(ref_file):
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
         with cd(dir_name):
-            env.safe_run("ln -s %s" % os.path.join(os.pardir, ref_file))
+            env.safe_run("ln -sf %s" % os.path.join(os.pardir, ref_file))
             with settings(warn_only=True):
                 result = env.safe_run("bwa index -a bwtsw %s" % local_ref)
             # work around a bug in bwa indexing for small files
@@ -625,7 +640,7 @@ def _index_maq(ref_file):
     cmd = "maq fasta2bfa {ref_file} {index_name}"
     def link_local(ref_file):
         local = os.path.basename(ref_file)
-        env.safe_run("ln -s {0} {1}".format(ref_file, local))
+        env.safe_run("ln -sf {0} {1}".format(ref_file, local))
         return local
     def rm_local(local_file):
         env.safe_run("rm -f {0}".format(local_file))
@@ -657,9 +672,9 @@ def _index_star(ref_file):
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the STAR index." % (gtf_file)
         return None
-    dir_name = "star"
-    cmd = ("STAR --genomeDir . --genomeFastaFiles {ref_file} "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (gtf_file))
+    dir_name = os.path.join(ref_dir, os.pardir, "star")
+    cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (dir_name, gtf_file))
     return  _index_w_command(dir_name, cmd, ref_file)
 
 @_if_installed("MosaikJump")
@@ -835,16 +850,17 @@ def get_index_fn(index):
     return the index function for an index, if it is missing return a function
     that is a no-op
     """
-    INDEX_FNS = {
-        "seq" : _index_sam,
-        "bwa" : _index_bwa,
-        "bowtie": _index_bowtie,
-        "bowtie2": _index_bowtie2,
-        "maq": _index_maq,
-        "mosaik": _index_mosaik,
-        "novoalign": _index_novoalign,
-        "novoalign_cs": _index_novoalign_cs,
-        "ucsc": _index_twobit,
-        "star": _index_star
-        }
     return INDEX_FNS.get(index, lambda x: None)
+
+INDEX_FNS = {
+    "seq" : _index_sam,
+    "bwa" : _index_bwa,
+    "bowtie": _index_bowtie,
+    "bowtie2": _index_bowtie2,
+    "maq": _index_maq,
+    "mosaik": _index_mosaik,
+    "novoalign": _index_novoalign,
+    "novoalign_cs": _index_novoalign_cs,
+    "ucsc": _index_twobit,
+    "star": _index_star
+    }

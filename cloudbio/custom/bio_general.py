@@ -13,9 +13,9 @@ def install_anaconda(env):
     """Pre-packaged Anaconda Python installed from Continuum.
     http://docs.continuum.io/anaconda/index.html
     """
-    version = "1.7.0"
+    version = "2.0.0"
     outdir = os.path.join(env.system_install, "anaconda")
-    if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian"]:
+    if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian", "arch"]:
         platform = "Linux"
     elif env.distribution in ["macosx"]:
         platform = "MacOSX"

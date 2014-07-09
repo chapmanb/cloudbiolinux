@@ -79,7 +79,7 @@ def _if_not_python_lib(library):
 
 
 @contextmanager
-def _make_tmp_dir(ext=None):
+def _make_tmp_dir(ext=None, work_dir=None):
     """
     Setup a temporary working directory for building custom software. First checks
     fabric environment for a `work_dir` path, if that is not set it will use the
@@ -88,7 +88,8 @@ def _make_tmp_dir(ext=None):
     `ext` allows creation of tool specific temporary directories to avoid conflicts
     using CloudBioLinux inside of CloudBioLinux.
     """
-    work_dir = __work_dir()
+    if not work_dir:
+        work_dir = __work_dir()
     if ext:
         work_dir += ext
     use_sudo = False
@@ -162,7 +163,7 @@ def _safe_dir_name(dir_name, need_dir=True):
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 
-def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None):
+def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedir=False):
     """Retrieve url using wget, performing download in a temporary directory.
 
     Provides a central location to handle retrieval issues and avoid
@@ -173,13 +174,12 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None):
     if not env.safe_exists(out_file):
         orig_dir = env.safe_run_output("pwd").strip()
         temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL,
-                                      str("file://%s/%s/%s/%s" %
-                                          (env.host, socket.gethostname(),
-                                           datetime.datetime.now().isoformat(), out_file)))
-        with _make_tmp_dir(ext=temp_ext) as tmp_dir:
+                                      str("file://%s/%s/%s" %
+                                          (env.host, socket.gethostname(), out_file)))
+        with _make_tmp_dir(ext=temp_ext, work_dir=orig_dir if samedir else None) as tmp_dir:
             with cd(tmp_dir):
                 with warn_only():
-                    result = env.safe_run("wget --no-check-certificate -O %s '%s'" % (out_file, url))
+                    result = env.safe_run("wget --continue --no-check-certificate -O %s '%s'" % (out_file, url))
                 if result.succeeded:
                     if fix_fn:
                         out_file = fix_fn(env, out_file)
@@ -306,23 +306,24 @@ def _symlinked_shared_dir(pname, version, env, extra_dir=None):
     """Create a symlinked directory of files inside the shared environment.
     """
     base_dir, install_dir = _symlinked_install_dir(pname, version, env, extra_dir)
+    relative_install_dir = os.path.relpath(install_dir, os.path.dirname(base_dir))
     # Does not exist, change symlink to new directory
     if not env.safe_exists(install_dir):
         env.safe_sudo("mkdir -p %s" % install_dir)
         if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
         return install_dir
     items = env.safe_run_output("ls %s" % install_dir)
     # empty directory, change symlink and re-download
     if items.strip() == "":
         if env.safe_exists(base_dir):
             env.safe_sudo("rm -f %s" % base_dir)
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
         return install_dir
     # Create symlink if previously deleted
     if not env.safe_exists(base_dir):
-        env.safe_sudo("ln -s %s %s" % (install_dir, base_dir))
+        env.safe_sudo("ln -sf %s %s" % (relative_install_dir, base_dir))
     return None
 
 def _symlinked_java_version_dir(pname, version, env):
@@ -597,7 +598,7 @@ def install_venvburrito():
     """
     url = "https://raw.github.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh"
     if not env.safe_exists("$HOME/.venvburrito/startup.sh"):
-        env.safe_run("curl -s {0} | $SHELL".format(url))
+        env.safe_run("curl -sL {0} | $SHELL".format(url))
         # Add the startup script into the ubuntu user's bashrc
         _add_to_profiles(". $HOME/.venvburrito/startup.sh", [env.shell_config], use_sudo=False)
 

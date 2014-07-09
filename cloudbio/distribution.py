@@ -44,6 +44,8 @@ def _setup_distribution_environment(ignore_distcheck=False):
         if env.dist_name == "__auto__":
             env.dist_name = _debian_dist_name(env)
         _setup_debian()
+    elif env.distribution == "arch":
+        pass  # No package support for Arch yet
     elif env.distribution == "macosx":
         _setup_macosx(env)
         ignore_distcheck = True
@@ -286,6 +288,8 @@ def _determine_distribution(env):
         return "scientificlinux"
     elif env.safe_exists("/etc/debian_version"):
         return "debian"
+    elif output.find("id=arch"):
+        return "arch"
     # check for file used by Python's platform.mac_ver
     elif env.safe_exists("/System/Library/CoreServices/SystemVersion.plist"):
         return "macosx"

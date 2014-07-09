@@ -24,10 +24,10 @@ BSgenome.Ecoli.NCBI.20080805:
   homepage_uri: ''
   name: BSgenome.Ecoli.NCBI.20080805
   version: 1.3.17
-BSgenome.Scerevisiae.UCSC.sacCer2:
-  description: Saccharomyces cerevisiae (Yeast) full genome (UCSC version sacCer2)
+BSgenome.Scerevisiae.UCSC.sacCer3:
+  description: Saccharomyces cerevisiae (Yeast) full genome (UCSC version sacCer3)
   homepage_uri: ''
-  name: BSgenome.Scerevisiae.UCSC.sacCer2
+  name: BSgenome.Scerevisiae.UCSC.sacCer3
   version: 1.3.17
 BayesPeak:
   description: Bayesian Analysis of ChIP-seq Data

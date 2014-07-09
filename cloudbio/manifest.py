@@ -59,15 +59,6 @@ def _get_custom_pkg_info(name, fn):
             "homepage_uri": homepage,
             "version": version}
 
-def _handle_gatk_custom(tooldir):
-    """Determine version of GATK enabled. Handle special cases.
-    """
-    # Installed via custom package system, encorporating gatk_protected
-    gatk_symlink = os.path.join(tooldir, "share", "java", "gatk")
-    if os.path.lexists(gatk_symlink):
-        gatk_name = os.path.basename(os.path.realpath(gatk_symlink))
-        return gatk_name.replace("gatk-", "")
-
 def write_custom_pkg_info(out_dir, tooldir):
     custom_names = ["bio_general", "bio_nextgen", "cloudman", "distributed",
                     "java", "python", "phylogeny", "system"]
@@ -81,9 +72,6 @@ def write_custom_pkg_info(out_dir, tooldir):
             for prog in [x for x in dir(mod) if x.startswith("install")]:
                 pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
                 out[pkg["name"]] = pkg
-        gatk_custom_v = _handle_gatk_custom(tooldir)
-        if gatk_custom_v:
-            out["gatk"]["version"] = gatk_custom_v
         with open(out_file, "w") as out_handle:
             yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file

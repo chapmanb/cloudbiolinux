@@ -6,6 +6,7 @@ import gzip
 import os
 import subprocess
 from argparse import ArgumentParser
+import re
 import shutil
 
 FTP = "ftp.ncbi.nih.gov"
@@ -35,23 +36,31 @@ def main(org):
                         if i == 0:
                             out_handle.write(line)
                     else:
-                        out_handle.write(fix_chrom(line))
+                        out_handle.write("\t".join(fix_info(fix_chrom(line.rstrip().split("\t")))) + "\n")
     subprocess.check_call(["bgzip", out_file])
     shutil.move(out_file + ".gz", os.path.join(os.pardir, out_file + ".gz"))
     os.chdir(os.pardir)
+    subprocess.check_call(["tabix", "-p", "vcf", out_file + ".gz"])
     shutil.rmtree(work_dir)
 
-def fix_chrom(line):
+multi_whitespace = re.compile(r"\s+")
+
+def fix_info(parts):
+    """Fix the INFO file to remove whitespace.
+    """
+    parts[7] = multi_whitespace.sub("_", parts[7])
+    return parts
+
+def fix_chrom(parts):
     MAX_CHROMOSOMES = 50
-    parts = line.split("\t")
     if parts[0] in [str(x) for x in range(1, MAX_CHROMOSOMES)] + ["X", "Y"]:
         new_chrom = "chr%s" % parts[0]
     elif parts[0] == "MT":
         new_chrom = "chrM"
     else:
-        raise NotImplementedError(line)
+        raise NotImplementedError(parts)
     parts[0] = new_chrom
-    return "\t".join(parts)
+    return parts
 
 def get_file(x, ftp_dir, conn):
     if not os.path.exists(x):

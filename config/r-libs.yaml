@@ -125,7 +125,7 @@ bioc:
  #- BSgenome.Dmelanogaster.UCSC.dm3
  #- BSgenome.Hsapiens.UCSC.hg19
  #- BSgenome.Mmusculus.UCSC.mm9
- #- BSgenome.Scerevisiae.UCSC.sacCer2
+ #- BSgenome.Scerevisiae.UCSC.sacCer3
  - ChIPpeakAnno
  - chipseq
  - ChIPseqR

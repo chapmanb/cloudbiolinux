@@ -188,27 +188,32 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["cpanminus", "expat"]:
+    for dep in ["expat"]:
         _install_pkg_latest(env, dep, brew_cmd, ipkgs)
     # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
-            try:
-                has_bcftools = int(env.safe_run_output("{brew_cmd} list samtools | grep -c bcftools".format(
-                    brew_cmd=brew_cmd)))
-            except ValueError:
-                has_bcftools = 0
-            if has_bcftools:
+            def _has_prog(prog):
+                try:
+                    return int(env.safe_run_output("{brew_cmd} list samtools | grep -c {prog}".format(
+                        brew_cmd=brew_cmd, prog=prog)))
+                except ValueError:
+                    return 0
+            if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
     for dependency in ["htslib", "libmaus"]:
-        if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
-              or dependency not in ipkgs["current"]):
-            _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
-    cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
-    for perl_lib in ["Statistics::Descriptive"]:
-        env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+        if dependency in packages:
+            if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
+                  or dependency not in ipkgs["current"]):
+                _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
+    if "cpanminus" in packages:
+        _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
+        cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
+        for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
+                         "LWP::Simple", "LWP::Protocol::https", "Time::HiRes"]:
+            env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
     # Ensure paths we may have missed on install are accessible to regular user
     if env.use_sudo:
         paths = ["share", "share/java"]

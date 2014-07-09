@@ -37,7 +37,7 @@ from cloudbio.custom import shared
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package import brew
 from cloudbio.package import (_configure_and_install_native_packages,
-                              _connect_native_packages)
+                              _connect_native_packages, _print_shell_exports)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
 from cloudbio.flavor.config import get_config_file
 from cloudbio.config_management.puppet import _puppet_provision
@@ -73,6 +73,8 @@ def install_biolinux(target=None, flavor=None):
     env.logger.debug("Target is '%s'" % target)
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
+    if hasattr(env, "keep_isolated") and env.keep_isolated:
+        _print_shell_exports(env)
 
 def _perform_install(target=None, flavor=None, more_custom_add=None):
     """

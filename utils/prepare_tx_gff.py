@@ -181,8 +181,9 @@ def prepare_gff_db(gff_file):
 # ## Main driver functions
 
 def main(org_build, gtf_file=None):
-    work_dir = os.path.join(os.getcwd(), org_build, "tmpcbl")
-    out_dir = os.path.join(os.getcwd(), org_build,
+    build_dir = os.path.abspath(os.path.join(os.curdir, org_build))
+    work_dir = os.path.join(build_dir, "tmpcbl")
+    out_dir = os.path.join(build_dir,
                            "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
     safe_makedir(work_dir)
@@ -190,16 +191,47 @@ def main(org_build, gtf_file=None):
         if not gtf_file:
             build = build_info[org_build]
             gtf_file = prepare_tx_gff(build, org_build)
+        else:
+            work_gtf = os.path.join(work_dir, "ref-transcripts.gtf")
+            if not os.path.exists(work_gtf):
+                shutil.copy(gtf_file, work_gtf)
+            gtf_file = work_gtf
+
+        gtf_file = clean_gtf(gtf_file, org_build)
         db = prepare_gff_db(gtf_file)
         gtf_to_refflat(gtf_file)
+        prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
         gtf_to_interval(rrna_gtf, org_build)
         prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
     tar_dirs = [out_dir]
-    upload_to_s3(tar_dirs, org_build)
 
+def clean_gtf(gtf_file, org_build):
+    """
+    remove transcripts that don't have a corresponding ID in the reference
+    also remove entries without both a gene_id and a transcript_id
+    """
+    temp_gtf = tempfile.NamedTemporaryFile(suffix=".gtf").name
+    fa_names = get_fasta_names(org_build)
+    with open(gtf_file) as in_gtf, open(temp_gtf, "w") as out_gtf:
+        for line in in_gtf:
+            if line.split()[0].strip() not in fa_names:
+                continue
+            if "transcript_id" not in line:
+                continue
+            if "gene_id" not in line:
+                continue
+            out_gtf.write(line)
+    shutil.move(temp_gtf, gtf_file)
+    return gtf_file
+
+def get_fasta_names(org_build):
+    fa_dict = os.path.abspath(os.path.join(os.curdir, os.pardir, "seq", org_build + ".fa.fai"))
+    with open(fa_dict) as in_handle:
+        return [line.split("\t")[0] for line in in_handle]
+    return seqs
 
 def cleanup(work_dir, out_dir, org_build):
     try:
@@ -460,6 +492,33 @@ def _get_gtf_db(gtf):
         gffutils.create_db(gtf, dbfn=db_file)
 
     return gffutils.FeatureDB(db_file)
+
+def _dexseq_preparation_path():
+    PREP_FILE = "python_scripts/dexseq_prepare_annotation.py"
+    cmd = "Rscript -e 'find.package(\"DEXSeq\")'"
+    output = subprocess.check_output(cmd, shell=True)
+    for line in output.split("\n"):
+        if line.startswith("["):
+            dirname = line.split("[1]")[1].replace("\"", "").strip()
+            path = os.path.join(dirname, PREP_FILE)
+            if os.path.exists(path):
+                return path
+    return None
+
+def prepare_dexseq(gtf):
+    out_file = os.path.splitext(gtf)[0] + ".dexseq.gff"
+    if file_exists(out_file):
+        return out_file
+
+    dexseq_path = _dexseq_preparation_path()
+    if not dexseq_path:
+        return None
+    cmd = "python {dexseq_path} {gtf} {out_file}"
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return out_file
+
+# Rscript -e "find.package('DEXSeq')" -> [1] "/Volumes/Clotho/Users/rory/opt/lib/R/DEXSeq"
+# path/python_scripts/dexseq_prepare_annotation.py
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "

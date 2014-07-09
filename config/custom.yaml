@@ -30,7 +30,6 @@ bio_nextgen:
     - picard
     - shrec
     - tophat
-    - vep
     - featurecounts
   assembly:
     - abyss
@@ -45,8 +44,6 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - crisp
-    - gatk
-    #- gatk_protected
     - gemini
     - grabix
     - mutect

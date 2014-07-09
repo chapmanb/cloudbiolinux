@@ -376,8 +376,8 @@ def _install_nginx_package(env):
     Install nginx from a custom package; also see
     https://github.com/afgane/gvl_flavor/tree/master/playbook
     """
-    version = "1.4.7-gvl20140407b03"
-    package_url = "http://cloudman-dev.s3.amazonaws.com/gvl-nginx-%s-precise-amd64.deb" % version
+    version = "1.4.7-gvl20140507b01-precise"
+    package_url = "http://cloudman-dev.s3.amazonaws.com/gvl-nginx-%s-amd64.deb" % version
 
     with _make_tmp_dir() as work_dir:
         with contextlib.nested(cd(work_dir), settings(hide('stdout'))):

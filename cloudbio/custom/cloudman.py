@@ -13,7 +13,7 @@ from cloudbio.cloudman import (_configure_cloudman, _configure_novnc,
     _configure_desktop, _configure_ec2_autorun)
 from cloudbio.galaxy import _install_nginx
 
-CDN_ROOT_URL = "http://userwww.service.emory.edu/~eafgan/content"
+CDN_ROOT_URL = "http://linuxcourse.rutgers.edu/rate/Clusters/download"
 REPO_ROOT_URL = "https://bitbucket.org/afgane/mi-deployment/raw/tip"
 
 
@@ -22,10 +22,12 @@ def install_cloudman(env):
         Allows CloudMan and all of its dependencies to be installed via:
         fab -f fabfile.py -i <key> -H ubuntu@<IP> install_custom:cloudman
     """
+    env.logger.debug("Installing CloudMan")
     _configure_cloudman(env, use_repo_autorun=False)
     install_nginx(env)
     install_proftpd(env)
     install_sge(env)
+    install_novnc(env)
 
 
 def install_ec2_autorun(env):

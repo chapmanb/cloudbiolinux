@@ -133,7 +133,10 @@ def _parse_fabricrc(env):
     if not env.has_key("distribution") and not env.has_key("system_install"):
         env.logger.info("Reading default fabricrc.txt")
         env.update(load_settings(get_config_file(env, "fabricrc.txt").base))
-
+    if "shell_config" not in env:
+        env.shell_config = "~/.bashrc"
+    if "shell" not in env:
+        env.shell = "/bin/bash -i -c"
 
 def _create_local_paths(env):
     """Expand any paths defined in terms of shell shortcuts (like ~).

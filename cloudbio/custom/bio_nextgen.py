@@ -57,6 +57,8 @@ def _download_executables(env, base_url, tools):
                 if not env.safe_exists(final_tool) and shared._executable_not_on_path(tool):
                     shared._remote_fetch(env, "%s%s" % (base_url, tool))
                     env.safe_sudo("cp -f %s %s" % (tool, install_dir))
+                    final_path = os.path.join(install_dir, tool)
+                    env.safe_sudo("chmod uga+rx %s" % final_path)
 
 # --- Alignment tools
 def install_featurecounts(env):
@@ -280,7 +282,7 @@ def install_gemini(env):
     """A lightweight db framework for disease and population genetics.
     https://github.com/arq5x/gemini
     """
-    version = "0.6.4"
+    version = "0.7.0"
     if versioncheck.up_to_date(env, "gemini -v", version, stdout_flag="gemini"):
         return
     elif not shared._executable_not_on_path("gemini -v"):
@@ -465,25 +467,14 @@ def install_rnaseqc(env):
     https://www.broadinstitute.org/cancer/cga/rna-seqc
     """
     version = "1.1.7"
-    url = ("http://www.broadinstitute.org/cancer/cga/sites/default/files/"
-           "data/tools/rnaseqc/RNA-SeQC_v%s.jar" % version)
+    url = ("https://github.com/chapmanb/RNA-SeQC/releases/download/"
+           "v%s/RNA-SeQC_v%s.jar" % (version, version))
     install_dir = _symlinked_java_version_dir("RNA-SeQC", version, env)
     if install_dir:
         with _make_tmp_dir() as work_dir:
             with cd(work_dir):
                 out_file = shared._remote_fetch(env, url)
                 env.safe_sudo("mv %s %s" % (out_file, install_dir))
-
-def install_gatk(env):
-    """GATK-lite: library for writing efficient analysis tools using next-generation sequencing data
-    http://www.broadinstitute.org/gatk/
-    """
-    # Install main gatk executable
-    version = "2.3-9-gdcdccbb"
-    ext = ".tar.bz2"
-    url = "ftp://anonymous:anon@ftp.broadinstitute.org/pub/gsa/GenomeAnalysisTK/"\
-          "GenomeAnalysisTKLite-%s%s" % (version, ext)
-    _java_install("gatk", version, url, env)
 
 def install_varscan(env):
     """Variant detection in massively parallel sequencing data
@@ -572,7 +563,7 @@ def install_snpeff(env):
     """Variant annotation and effect prediction tool.
     http://snpeff.sourceforge.net/
     """
-    version = "3_4"
+    version = "3_6"
     genomes = []
     #genomes = ["GRCh37.74", "hg19", "GRCm38.74", "athalianaTair10"]
     url = "http://downloads.sourceforge.net/project/snpeff/" \
@@ -597,18 +588,6 @@ def install_snpeff(env):
                             gurl = genome_url_base % (version, version, org)
                             _fetch_and_unpack(gurl, need_dir=False)
                             env.safe_sudo("mv data/%s %s" % (org, data_dir))
-
-def install_vep(env):
-    """Variant Effects Predictor (VEP) from Ensembl.
-    http://ensembl.org/info/docs/variation/vep/index.html
-    """
-    version = "branch-ensembl-74"
-    url = "http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-tools/scripts/" \
-          "variant_effect_predictor.tar.gz?view=tar&root=ensembl" \
-          "&pathrev={0}".format(version)
-    def _vep_install(env):
-        env.safe_run("export FTP_PASSIVE=1 && perl INSTALL.pl -a a")
-    _get_install_local(url, env, _vep_install)
 
 @_if_not_installed("bamtools")
 def install_bamtools(env):
@@ -637,79 +616,9 @@ def install_ogap(env):
     _get_install(repository, env, _make_copy("ls ogap"),
                  revision=version)
 
-def _install_samtools_libs(env):
-    repository = "svn co --non-interactive " \
-                 "https://samtools.svn.sourceforge.net/svnroot/samtools/trunk/samtools"
-    def _samtools_lib_install(env):
-        lib_dir = _get_lib_dir(env)
-        include_dir = os.path.join(env.system_install, "include", "bam")
-        env.safe_run("make")
-        env.safe_sudo("mv -f libbam* %s" % lib_dir)
-        env.safe_sudo("mkdir -p %s" % include_dir)
-        env.safe_sudo("mv -f *.h %s" % include_dir)
-    check_dir = os.path.join(_get_include_dir(env), "bam")
-    if not env.safe_exists(check_dir):
-        _get_install(repository, env, _samtools_lib_install)
-
-def _install_boost(env):
-    version = "1.49.0"
-    url = "http://downloads.sourceforge.net/project/boost/boost" \
-          "/%s/boost_%s.tar.bz2" % (version, version.replace(".", "_"))
-    check_version = "_".join(version.split(".")[:2])
-    boost_dir = os.path.join(env.system_install, "boost")
-    boost_version_file = os.path.join(boost_dir, "include", "boost", "version.hpp")
-    def _boost_build(env):
-        env.safe_run("./bootstrap.sh --prefix=%s --with-libraries=thread" % boost_dir)
-        env.safe_run("./b2")
-        env.safe_sudo("./b2 install")
-    thread_lib = "libboost_thread.so.%s" % version
-    final_thread_lib = os.path.join(env.system_install, "lib", thread_lib)
-    if (not env.safe_exists(boost_version_file) or not env.safe_contains(boost_version_file, check_version)
-          or not env.safe_exists(final_thread_lib)):
-        _get_install(url, env, _boost_build)
-        orig_lib = os.path.join(boost_dir, "lib", thread_lib)
-        if not env.safe_exists(final_thread_lib):
-            env.safe_sudo("ln -s %s %s" % (orig_lib, final_thread_lib))
-
-def _cufflinks_configure_make(env):
-    orig_eigen = "%s/include/eigen3" % env.system_install
-    need_eigen = "%s/include/eigen3/include" % env.system_install
-    if not env.safe_exists(need_eigen):
-        env.safe_sudo("ln -s %s %s" % (orig_eigen, need_eigen))
-    env.safe_run("./configure --disable-werror --prefix=%s --with-eigen=%s"
-                 % (env.system_install, orig_eigen))
-    #run("./configure --disable-werror --prefix=%s --with-eigen=%s" \
-    #    " --with-boost=%s/boost" % (env.system_install, orig_eigen, env.system_install))
-    env.safe_run("make")
-    env.safe_sudo("make install")
-
-@_if_not_installed("tophat")
-def SRC_install_tophat(env):
-    """TopHat is a fast splice junction mapper for RNA-Seq reads
-    http://tophat.cbcb.umd.edu/
-    """
-    _install_samtools_libs(env)
-    _install_boost(env)
-    default_version = "2.0.9"
-    version = env.get("tool_version", default_version)
-    url = "http://tophat.cbcb.umd.edu/downloads/tophat-%s.tar.gz" % version
-    _get_install(url, env, _cufflinks_configure_make)
-
-@_if_not_installed("cufflinks")
-def SRC_install_cufflinks(env):
-    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
-    http://cufflinks.cbcb.umd.edu/
-    """
-    _install_samtools_libs(env)
-    _install_boost(env)
-    default_version = "2.1.1"
-    version = env.get("tool_version", default_version)
-    url = "http://cufflinks.cbcb.umd.edu/downloads/cufflinks-%s.tar.gz" % version
-    _get_install(url, env, _cufflinks_configure_make)
-
 def install_tophat(env):
     """TopHat is a fast splice junction mapper for RNA-Seq reads
-    http://tophat.cbcb.umd.edu/
+    http://ccb.jhu.edu/software/tophat/index.shtml
     """
     default_version = "2.0.9"
     version = env.get("tool_version", default_version)
@@ -718,7 +627,7 @@ def install_tophat(env):
             .format(version))
         return
     platform = "OSX" if env.distribution == "macosx" else "Linux"
-    url = "http://tophat.cbcb.umd.edu/downloads/" \
+    url = "http://ccb.jhu.edu/software/tophat/downloads/" \
           "tophat-%s.%s_x86_64.tar.gz" % (version, platform)
 
     _get_install(url, env,
