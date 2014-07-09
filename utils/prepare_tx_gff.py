@@ -206,6 +206,11 @@ def main(org_build, gtf_file=None):
         gtf_to_interval(rrna_gtf, org_build)
         prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
+        rnaseq_dir = os.path.join(build_dir, "rnaseq")
+        if os.path.exists(rnaseq_dir):
+            shutil.rmtree(rnaseq_dir)
+        os.symlink(out_dir, rnaseq_dir)
+
     tar_dirs = [out_dir]
 
 def clean_gtf(gtf_file, org_build):
