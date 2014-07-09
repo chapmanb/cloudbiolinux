@@ -8,7 +8,6 @@
 #
 edition = bionode
 edition_version = 0.93
-flavor = PhylogenyFlavor
 flavor_path = phylogeny.phylogenyflavor
 distribution = ubuntu
 dist_name = natty

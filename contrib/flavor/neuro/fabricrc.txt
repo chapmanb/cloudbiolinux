@@ -1,14 +1,11 @@
 edition = minimal
-#edition_version = 0.10
-flavor_path = seal.sealflavor
-distribution = scientificlinux
-#dist_name = 
+flavor_path = neuro.neuro
+distribution = ubuntu
+user = vagrant 
 
 # Global installation directory for packages and standard programs
-system_install = /usr
+system_install = /usr/local
 local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
-
