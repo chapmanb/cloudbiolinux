@@ -15,7 +15,6 @@ class NeuroFlavor(Flavor):
     """
 
     def __init__(self, env):
-        Flavor.__init__(self, env)
         self.name = "Neuroinformatics Flavor"
 
     def rewrite_config_items(self, name, packages):
@@ -37,4 +36,4 @@ class NeuroFlavor(Flavor):
 #wget -O- http://neuro.debian.net/lists/saucy.us-ca.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
 #sudo apt-key adv --recv-keys --keyserver pgp.mit.edu 2649A5A9
 
-env.flavor = NeuroFlavor(env)
+#env.flavor = NeuroFlavor(env)

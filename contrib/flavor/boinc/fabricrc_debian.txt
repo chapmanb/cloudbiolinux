@@ -1,6 +1,5 @@
 edition = minimal
 edition_version = 0.10
-flavor = BoincFlavor
 flavor_path = boinc.boincflavor
 distribution = debian
 dist_name = squeeze

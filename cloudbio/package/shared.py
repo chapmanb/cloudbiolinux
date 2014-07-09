@@ -10,6 +10,8 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     env.logger.info("Reading %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
+        if full_data is None:
+            full_data = {}
     if subs_yaml_file is not None:
         with open(subs_yaml_file) as in_handle:
             subs = yaml.load(in_handle)

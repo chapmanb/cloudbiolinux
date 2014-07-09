@@ -1,6 +1,5 @@
 edition = minimal
 edition_version = 0.10
-flavor = BioTestFlavor
 flavor_path = pjotrp.biotest.biotestflavor
 distribution = debian
 dist_name = squeeze
