@@ -1,0 +1,14 @@
+---                                                                                                                                                                          
+vm_provider: novm                                                                                                                                                           
+
+fabricrc_overrides:
+  # Directory to install Galaxy dependencies into. Be sure to update Galaxy's universe_wsgi.ini file
+  # so that tool_dependency_dir in the app:main section points to this same directory.
+  galaxy_tools_dir: /opt/galaxy/tools
+
+  # System user Galaxy will run as.
+  galaxy_user: galaxy
+
+  galaxy_tools_conf: $__contrib_dir__/flavor/proteomics/galaxyp/tools.yaml
+
+  galaxy_install_dependencies: True

@@ -1,0 +1,147 @@
+worker_processes  2;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    gzip  on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 4;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/x-javascript text/xml application/xml text/javascript application/json;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6].(?!.*SV1)";
+
+    upstream galaxy_app {
+        server localhost:8080;
+    }
+
+    upstream cm_app {
+        server localhost:42284;
+    }
+
+    upstream protvis-site {
+        server 127.0.0.1:$protvis_port;
+    }
+
+    server {
+        listen       80;
+        client_max_body_size 2048m;
+        server_name  localhost;
+                proxy_read_timeout 600;
+
+        location /cloud {
+            proxy_pass  http://cm_app;
+            proxy_set_header   X-Forwarded-Host $$host;
+            proxy_set_header   X-Forwarded-For  $$proxy_add_x_forwarded_for;
+            error_page   502    /errdoc/cm_502.html;
+        }
+
+        location /cloud/static {
+            alias /mnt/cm/static;
+            expires 24h;
+        }
+
+        location /cloud/static/style {
+            alias /mnt/cm/static/style;
+            expires 24h;
+        }
+
+        location /cloud/static/scripts {
+            alias /mnt/cm/static/scripts;
+            expires 24h;
+        }
+
+        location / {
+            proxy_pass  http://galaxy_app;
+            proxy_set_header   X-Forwarded-Host $$host;
+            proxy_set_header   X-Forwarded-For  $$proxy_add_x_forwarded_for;
+        }
+
+        location /static {
+            alias $galaxy_home/static;
+            expires 24h;
+        }
+
+        location /static/style {
+            alias $galaxy_home/static/june_2007_style/blue;
+            expires 24h;
+        }
+
+        location /static/scripts {
+            alias $galaxy_home/static/scripts/packed;
+            expires 24h;
+        }
+
+        location /robots.txt {
+            alias $galaxy_home/static/robots.txt;
+        }
+
+        location /favicon.ico {
+            alias $galaxy_home/static/favicon.ico;
+        }
+
+        location /_x_accel_redirect/ {
+            internal;
+            alias /;
+        }
+
+        location /_upload {
+            upload_store /mnt/galaxyData/upload_store;
+            upload_pass_form_field "";
+            upload_set_form_field "__$${upload_field_name}__is_composite" "true";
+            upload_set_form_field "__$${upload_field_name}__keys" "name path";
+            upload_set_form_field "$${upload_field_name}_name" "$$upload_file_name";
+            upload_set_form_field "$${upload_field_name}_path" "$$upload_tmp_path";
+            upload_pass_args on;
+            upload_pass /_upload_done;
+        }
+
+        location /_upload_done {
+            set $$dst /tool_runner/index;
+            if ($$args ~ nginx_redir=([^&]+)) {
+                set $$dst $$1;
+            }
+            rewrite "" $$dst;
+        }
+
+        error_page   502    /errdoc/502.html;
+        location /errdoc {
+            root   html;
+        }
+
+        location /protvis {
+            rewrite                 ^/protvis/(.*) /\$1 break;
+            proxy_set_header        Host $host;
+            proxy_set_header        X-Real-IP \$remote_addr;
+            proxy_set_header        X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header        X-Forwarded-Proto \$scheme;
+
+            client_max_body_size    16m;
+            client_body_buffer_size 128k;
+            proxy_connect_timeout   60s;
+            proxy_send_timeout      90s;
+            proxy_read_timeout      90s;
+            proxy_buffering         off;
+            proxy_temp_file_write_size 64k;
+            proxy_pass http://protvis-site;
+            proxy_redirect          off;
+        }
+
+        location /protvis/res/ {
+             alias $protvis_home/res/;
+             expires                 30d;
+             add_header              Cache-Control public;
+             access_log              off;
+        }
+
+    }
+
+}

@@ -1,0 +1,47 @@
+  ---                                                                                                                                                                          
+vm_provider: aws                                                                                                                                                             
+                                                                                                                                                                             
+hostname: minimal
+
+fabricrc_overrides:
+  distribution: ubuntu
+  # UPDATE: Change this if you are targetting quantal or even newer Ubuntu.
+  dist_name: precise
+
+
+aws:
+  # UPDATE: Path to your galaxy keys file
+  key_file: keys/galaxy1.pem
+  # UPDATE: Set this to the name of the keypair corresponding to the above key_file.
+  keypair_name: "galaxy1"
+  # UPDATE: Set this to you access_id
+  access_id: "XXXXXXXXXXXXXXXXXXXXXX"
+  # UPDATE: Set this to your secret key.
+  secret_key: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  # UPDATE: Set this to the size you want.
+  size_id: "m1.small"
+  # UPDATE: set this to the Ubuntu AMI you would like to target.
+  image_id: ami-9b85eef2 # EBS backed 12.04.2 (64-bit)
+  # UPDATE: Set this to the availability zone to target.
+  availability_zone: us-east-1
+
+  # Create a new instnace on first use, then reuses same instance for subsequent calls.
+  use_existing_instance: __auto__
+
+  ## Packing Options  
+
+  # Use Amazon's create image API, only works with EBS volumes and AWS.
+  package_type: create_image
+
+  # Make new AMI public
+  make_public: True
+
+  # UPDATE: Name to give AMI image.
+  package_image_name: "marys_minimal_cbl_${the_date_with_time}"
+
+# Advanced option sections ignored for CloudMan workflow outlined in cloudman.md
+galaxy:
+
+genomes:
+
+tools:

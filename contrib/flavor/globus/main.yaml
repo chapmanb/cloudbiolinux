@@ -1,0 +1,5 @@
+---
+packages:
+  - minimal
+  - globus
+libraries:

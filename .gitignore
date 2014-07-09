@@ -2,7 +2,16 @@
 tags
 cloudbiolinux.egg-info/
 build/
+doc/build
 dist/
 *.pem
 dpkg.lst
 *.log
+venv/
+venv_cbl/
+deploy/build
+deploy/keys
+deploy/settings.yaml
+deploy/.venv-deploy
+deploy/.vagrant
+.ropeproject

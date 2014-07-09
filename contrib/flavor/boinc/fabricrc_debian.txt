@@ -1,6 +1,5 @@
 edition = minimal
 edition_version = 0.10
-flavor = BoincFlavor
 flavor_path = boinc.boincflavor
 distribution = debian
 dist_name = squeeze
@@ -14,5 +13,4 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
 

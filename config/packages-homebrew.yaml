@@ -1,0 +1,39 @@
+# Packages available in the Homebrew and Linuxbrew package manager
+---
+bio_nextgen:
+  alignment:
+    - bwa
+    - bowtie2
+    - novoalign
+    - rna-star
+  utilities:
+    - bamtools
+    - bedtools
+    - cramtools
+    - libmaus
+    - biobambam
+    - fastqc
+    - fastx_toolkit
+    - qualimap
+    - sambamba
+    - staden_io_lib
+  analysis:
+    #- cufflinks
+    - samtools
+    - htslib
+    - bcftools
+    #- tophat
+  variant:
+    - delly
+    - freebayes
+    - glia
+    - lumpy-sv
+    - platypus-variant
+    - rtg-tools
+    - snpeff
+    - vcflib
+    - vcftools
+    - vep
+    - yaha
+distributed:
+  - parallel

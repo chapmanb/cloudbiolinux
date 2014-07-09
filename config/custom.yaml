@@ -1,83 +1,114 @@
 ---
-# List of custom programs to install that are not packaged. These each require 
+# List of custom programs to install that are not packaged. These each require
 # a install_name function in the appropriate place in the 'custom' directory to
 # define the steps for downloading, building, and installing the package.
 bio_general:
- - bio4j
+ #- bio4j # no easy download for 0.8
+ - anaconda
  - emboss
  - pgdspider
 bio_nextgen:
   alignment:
-    - bwa
     - bowtie
-    - bowtie2
     - gmap
     - lastz
     - mosaik
-    - perm
-    - stampy
-  utilitites:
-    - bedtools
+    # - perm # difficult build process with directory names
+    - snap
+    #- stampy # no version names on tarballs
+  utilities:
     - dwgsim
-    - fastqc
-    - fastx_toolkit
-    # - solexaqa
+    - fastq_screen
+    - ogap
+    - rnaseqc
     - varianttools
-    - vcftools
+    - disambiguate
+    - alientrimmer
   analysis:
     - cufflinks
-    - echo
-    - freebayes
-    - gatk
-    - gatk_queue
+    # - echo # build problems on ubuntu 12.10
     - picard
-    - samtools
-    - sambamba
     - shrec
-    - snpeff
     - tophat
+    - featurecounts
   assembly:
     - abyss
+    - cortex_var
+    - ray
     - transabyss
     - trinity
     - velvet
   sv:
     - hydra
+    - freec
   variant:
+    - bcbio_variation
     - crisp
+    - gemini
+    - grabix
+    - mutect
     - tassel
+    - snpeff
     - stacks
+    - varscan
   chip:
     - macs
   needs_64bit:
     - ucsc_tools
     - bfast
-    - novoalign
     - plink_seq
+bio_proteomics:
+  - transproteomic_pipeline
+  - omssa
+  - mzmine
+  - myrimatch
+  - directag
+  - tagrecon
+  - idpqonvert
+  - pepitome
+  - percolator
+bio_proteomics_wine:
+  - proteomics_wine_env
+  #- multiplierz
+  - proteowizard
+  - morpheus
 cloudman:
-  - nginx
-  - proftpd
-  - sge
-distributed:
-  - pydoop
-  - seal
+  - cloudman
+  - novnc
+galaxy:
+  - galaxy_webapp
+galaxy_tools:
+  - cbl_galaxy_tools
+galaxyp:
+  - galaxy_protk
+  - protvis
+# Pydoop and seal need update and should only be installed on cloud systems
+#distributed:
+#  - pydoop
+#  - seal
 system:
+  - homebrew
   - s3fs
 python:
   - bx-python
-  - matplotlib
+  - netsa-python
   - rpy
 java:
-  - leinengin
+  - leiningen
 phylogeny:
   - tracer
   - beast
 #Viral Cloud Resource (VCR) - JCVI's Viral Genomic Pipelines on the cloud
 vcr:
-  - cloudvigor
-  - testcloudvigor
-  - validatevigor 
-  - cleanall
+  - galaxy_vcr
+  - viralassembly
+  - viralassembly_cleanall
+  - viralvigor
+  - viralvigor_test
+  - viralvigor_validate
+  - viralvigor_cleanall
+  - vicvb
+  - vicvb_cleanall
 # ToDo -- test on 64bit with bfast
 #- dnaa
 #- srma

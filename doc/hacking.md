@@ -14,7 +14,7 @@ The Minimal edition is the smallest common denominator of all Editions, as it
 installs the minimum of packages to bootstrap a full install. Once the
 vagrant box is up and running, Minimal is invoked from the desktop by
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/minimal
 
 where $source points to your biolinux source tree (replace 'target_hostname'
 with 'vagrant' when using that). In fact, the testing script in
@@ -40,9 +40,9 @@ To expand on the package list you can define your own main.yaml, and pass that
 in. In your main.yaml file add the meta-packages listed in
 config/packages.yaml. Invoke your new package list with
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=myproject/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=/path/to/myproject
 
-It is that simple!
+where the `myproject` directory contains your main.yaml. It is that simple!
 
 If packages.yaml is not complete, you may suggest changing its contents in the
 main repository. The alternative is to create your own flavor, which we will do
@@ -71,7 +71,7 @@ statement. For example:
 The flavor is itself is found through a fabricrc.txt file. The main package
 list may be in a new main.yaml file.  Kicking it into submission:
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/pjotrp/biotest/main.yaml
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/flavor/pjotrp/biotest
 
 The flavor module itsefl sets env.flavor on loading the module (this can only
 happen once). For more examples see the files in ./contrib/flavor.
@@ -161,7 +161,7 @@ a script by adding a post_install method to your flavor. E.g.
 You can run post_install on its own (convenient for testing!) using the finalize
 target, e.g.
 
-         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,target=finalize
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:flavor=$flavor,target=finalize
 
 (Note: finalize may become post-install in the future)
 
@@ -178,7 +178,7 @@ could add a parameter to the fabricrc file. Even better, add a command
 line parameter named 'environment' to the install_biolinux parameter
 list. E.g.
 
-         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:packagelist=$flavor/main.yaml,environment=special
+         fab -H hostname -f $source/fabfile.py -c  $flavor/fabricrc_debian.txt install_biolinux:flavor=$flavor,environment=special
 
 which automatically becomes part of the Flavor environment state as
 'env.environment'. Use this parameter to distinguish between targets.

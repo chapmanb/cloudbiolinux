@@ -1,19 +1,23 @@
 ---
 # Top level configuration file that specifies which groups of programs
 # should be installed. New sections that are added to individual config
-# files should go here. Comment out any groups you don't want to have 
+# files should go here. Comment out any groups you don't want to have
 # installed.
 packages:
   - minimal
   - desktop
   - programming
   - distributed
+  - documentation
+  - libraries
+  - hadoop
   - amazon
   - python
   - r
   - ruby
   - perl
   - java
+  - java_extras
   - erlang
   - haskell
   - databases
@@ -30,10 +34,13 @@ packages:
   - bio_visualization
   - bio_utils
   - phylogeny
-  - galaxy
-  - cloudman
+# Do not install by default to avoid errors with local installs
+# Injected in cloudbio/edition/base.CloudBioLinux for CBL editions
+#  - galaxy
+#  - galaxy_tools
+#  - cloudman
 libraries:
-  - haskell-libs
+  #- haskell-libs
   - perl-libs
   - python-libs
   - r-libs

@@ -5,7 +5,8 @@ import os
 from fabric.api import *
 from fabric.contrib.files import *
 
-from shared import _if_not_python_lib, _get_install, _python_make
+from shared import (_if_not_python_lib, _get_install, _python_make, _pip_cmd,
+                    _is_anaconda)
 
 @_if_not_python_lib("bx")
 def install_bx_python(env):
@@ -13,18 +14,11 @@ def install_bx_python(env):
     https://bitbucket.org/james_taylor/bx-python/wiki/Home
     """
     version = "bitbucket"
-    url = "hg clone http://bitbucket.org/james_taylor/bx-python"
-    _get_install(url, env, _python_make)
-
-@_if_not_python_lib("matplotlib")
-def install_matplotlib(env):
-    """matplotlib is a python 2D plotting library which produces publication quality figures
-    http://matplotlib.sourceforge.net/
-    """
-    version = "1.0.1"
-    url = "http://downloads.sourceforge.net/project/matplotlib/matplotlib/" \
-          "matplotlib-%s/matplotlib-%s.tar.gz" % (version, version)
-    _get_install(url, env, _python_make)
+    url = "https://bitbucket.org/james_taylor/bx-python/get/tip.tar.bz2"
+    cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
+    if not _is_anaconda(env):
+        cmd("%s install --upgrade distribute" % _pip_cmd(env))
+    cmd("%s install --upgrade %s" % (_pip_cmd(env), url))
 
 @_if_not_python_lib("rpy")
 def install_rpy(env):
@@ -36,5 +30,20 @@ def install_rpy(env):
     url = "http://downloads.sourceforge.net/project/rpy/rpy/" \
           "%s/rpy-%s%s.zip" % (version, version, ext)
     def _fix_libraries(env):
-        run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
+        env.safe_run("""sed -i.bak -r -e "s/,'Rlapack'//g" setup.py""")
+    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
+                  warn_only=True):
+        result = env.safe_run("R --version")
+        if result.failed:
+            return
     _get_install(url, env, _python_make, post_unpack_fn=_fix_libraries)
+
+@_if_not_python_lib("netsa")
+def install_netsa_python(env):
+    """A suite of open source tools for monitoring large-scale networks using flow data.
+    http://tools.netsa.cert.org/index.html
+    """
+    version = "1.3"
+    url = "http://tools.netsa.cert.org/releases/netsa-python-%s.tar.gz" % version
+    cmd = env.safe_run if _is_anaconda(env) else env.safe_sudo
+    cmd("%s install %s" % (_pip_cmd(env), url))

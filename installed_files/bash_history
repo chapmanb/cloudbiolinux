@@ -1,0 +1,3 @@
+sudo -i
+sudo su galaxy
+tail -444f /mnt/cm/paster.log

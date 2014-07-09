@@ -1,0 +1,10 @@
+---
+cranrepo: http://cran.fhcrc.org/
+cran:
+  - ggplot2
+  - gsalib
+  - snow
+biocrepo: http://bioconductor.org/biocLite.R
+bioc:
+ - cn.mops
+ - rtracklayer

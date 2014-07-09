@@ -1,0 +1,43 @@
+# Packages available in the Homebrew and Linuxbrew package manager
+---
+perl:
+  - cpanminus
+bio_nextgen:
+  alignment:
+    - bwa
+#    - bowtie2       (2.2.0 doesn't work with Tophat, so use the source version for now)
+    - novoalign
+    - rna-star
+  utilities:
+    - bamtools
+    - bedtools
+    - cramtools
+    - libmaus
+    - biobambam
+    - fastqc
+    - qualimap
+    - sambamba
+    - samblaster
+    - seqtk==HEAD
+    - speedseq
+    - staden_io_lib
+  analysis:
+    #- cufflinks
+    - samtools
+    - htslib
+    - bcftools
+    #- tophat
+  variant:
+    - freebayes
+    - gatk-framework
+    - glia
+    - hall-lab-sv-tools
+    - lumpy-sv
+    - platypus-variant
+    - rtg-tools
+    - scalpel
+    - snpeff
+    - vcflib
+    - vep
+    # - vcftools # Build problems with default libz on Ubuntu 12.04
+    - vt

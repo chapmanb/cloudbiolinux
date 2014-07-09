@@ -4,16 +4,20 @@ An open source project is nothing without the great people who generously
 contribute time and expertise.
 
 - Enis Afgan
+- Sébastien Boisvert
 - Tim Booth
 - Brad Chapman
+- John Chilton
 - Michael Heuer
 - Richard Holland
 - Mark Jensen
 - Justin Johnson
 - Ntino Krampis
+- Hervé Ménager
 - Dave Messina
 - Steffen Möller
 - Pjotr Prins
 - Mitch Skinner
 - Bela Tiwari
 - Roman Valls
+- Luca Pireddu

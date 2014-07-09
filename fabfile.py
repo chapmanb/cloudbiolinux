@@ -19,7 +19,6 @@ import os
 import sys
 from datetime import datetime
 
-from fabric.main import load_settings
 from fabric.api import *
 from fabric.contrib.files import *
 import yaml
@@ -30,150 +29,90 @@ for to_remove in [p for p in sys.path if p.find("cloudbiolinux-") > 0]:
 sys.path.append(os.path.dirname(__file__))
 import cloudbio
 
-from cloudbio.edition import _setup_edition
-from cloudbio.distribution import _setup_distribution_environment
-from cloudbio.utils import _setup_logging, _update_biolinux_log
+from cloudbio import libraries
+from cloudbio.utils import _setup_logging, _configure_fabric_environment
 from cloudbio.cloudman import _cleanup_ec2
 from cloudbio.cloudbiolinux import _cleanup_space
-from cloudbio.custom.shared import _make_tmp_dir
+from cloudbio.custom import shared
 from cloudbio.package.shared import _yaml_to_packages
-from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
-                                  _setup_apt_automation, _setup_apt_sources)
-from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
-                                  _setup_yum_sources)
+from cloudbio.package import brew
+from cloudbio.package import (_configure_and_install_native_packages,
+                              _connect_native_packages, _print_shell_exports)
 from cloudbio.package.nix import _setup_nix_sources, _nix_packages
-
-# ## Utility functions for establishing our build environment
-
-def _parse_fabricrc():
-    """Defaults from fabricrc.txt file; loaded if not specified at commandline.
-    """
-    # ## General setup
-    env.config_dir = os.path.join(os.path.dirname(__file__), "config")
-
-    if not env.has_key("distribution") and not env.has_key("system_install"):
-        env.logger.info("Reading default fabricrc.txt")
-        config_file = os.path.join(env.config_dir, "fabricrc.txt")
-        if os.path.exists(config_file):
-            env.update(load_settings(config_file))
-    else:
-        env.logger.warn("Skipping fabricrc.txt as distribution is already defined")
-
-def _create_local_paths():
-    """Expand any paths defined in terms of shell shortcuts (like ~).
-    """
-    with settings(hide('warnings', 'running', 'stdout', 'stderr'),
-                  warn_only=True):
-        # This is the first point we call into a remote host - make sure
-        # it does not fail silently by calling a dummy run
-        env.logger.info("Now, testing connection to host...")
-        test = run("pwd")
-        # If there is a connection failure, the rest of the code is (sometimes) not
-        # reached - for example with Vagrant the program just stops after above run
-        # command.
-        if test != None:
-          env.logger.info("Connection to host appears to work!")
-        else:
-          raise NotImplementedError("Connection to host failed")
-        env.logger.debug("Expand paths")
-        if env.has_key("local_install"):
-            if not exists(env.local_install):
-                run("mkdir -p %s" % env.local_install)
-            with cd(env.local_install):
-                result = run("pwd")
-                env.local_install = result
-
-def _setup_flavor(flavor, environment=None):
-    """Setup flavor
-    """
-    if not flavor:
-        flavor = env.get("flavor", None)
-    if not environment:
-        environment = env.get("environment", None)
-    if environment:
-        env.environment = environment
-        env.logger.info("Environment %s" % env.environment)
-    if flavor:
-        # import a flavor defined through parameters flavor and flavor_path
-        flavor_path = env.get("flavor_path", None)
-        if flavor_path == None:
-          raise ImportError("You need to define the flavor_path for %s!" % flavor)
-        # Add path for flavors
-        sys.path.append(os.path.join(os.path.dirname(__file__), "contrib", "flavor"))
-        env.logger.info("Flavor %s loaded from %s" % (flavor, flavor_path))
-        try:
-            mod = __import__(flavor_path, fromlist=[flavor])
-        except ImportError:
-            raise ImportError("Failed to import %s" % flavor)
-    else:
-        # import default Flavor
-        from cloudbio.flavor import Flavor
-    env.logger.info("This is a %s" % env.flavor.name)
+from cloudbio.flavor.config import get_config_file
+from cloudbio.config_management.puppet import _puppet_provision
+from cloudbio.config_management.chef import _chef_provision, chef, _configure_chef
 
 # ### Shared installation targets for all platforms
 
-def install_biolinux(target=None, packagelist=None, flavor=None, environment=None,
-        pkg_config_file_path=None):
-    """
-    Main entry point for installing BioLinux on a remote server.
+def install_biolinux(target=None, flavor=None):
+    """Main entry point for installing BioLinux on a remote server.
 
-    ``packagelist`` should point to a top level file (eg, ``main.yaml``) listing
-    all the package categories that should be installed. This allows a different
-    package list and/or use of Flavor. So you can say::
+    `flavor` allows customization of CloudBioLinux behavior. It can either
+    be a flavor name that maps to a corresponding directory in contrib/flavor
+    or the path to a custom directory. This can contain:
 
-      install_biolinux:packagelist=contrib/mylist/main.yaml,flavor=specialflavor
+      - alternative package lists (main.yaml, packages.yaml, custom.yaml)
+      - custom python code (nameflavor.py) that hooks into the build machinery
 
-    ``pkg_config_file_path`` can be used to specify a path where a custom
-    ``packages.yaml`` and ``packages-[dist].yaml`` are located, allowing fine-
-    grained (i.e., individual package) customization. Otherwise, default
-    to ``./contrib`` where the CBL files are defined.
-
-    Both ``packagelist`` and ``flavor``, as well as the Edition, can also be
-    passed in through the ``fabricrc`` file.
-
-    target can also be supplied on the fab CLI. Special targets are:
+    `target` allows running only particular parts of the build process. Valid choices are:
 
       - packages     Install distro packages
       - custom       Install custom packages
+      - chef_recipes Provision chef recipes
       - libraries    Install programming language libraries
       - post_install Setup CloudMan, FreeNX and other system services
       - cleanup      Remove downloaded files and prepare images for AMI builds
-
-    ``environment`` allows adding additional information on the command line -
-    usually for defining environments, for example ``environment=testing``, or
-    ``environment=production``, will set the deployment environment and tune
-    post-installation settings.
     """
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_flavor(flavor, environment)
-    _setup_distribution_environment() # get parameters for distro, packages etc.
-    _create_local_paths()
-    env.logger.debug("Meta-package list is '%s'" % packagelist)
-    env.logger.debug("File path for explicit packages is '%s'" % pkg_config_file_path)
+    _configure_fabric_environment(env, flavor,
+                                  ignore_distcheck=(target is not None
+                                                    and target in ["libraries", "custom"]))
     env.logger.debug("Target is '%s'" % target)
-    pkg_install, lib_install = _read_main_config(packagelist) # read main yaml
+    _perform_install(target, flavor)
+    _print_time_stats("Config", "end", time_start)
+    if hasattr(env, "keep_isolated") and env.keep_isolated:
+        _print_shell_exports(env)
+
+def _perform_install(target=None, flavor=None, more_custom_add=None):
+    """
+    Once CBL/fabric environment is setup, this method actually
+    runs the required installation procedures.
+
+    See `install_biolinux` for full details on arguments
+    `target` and `flavor`.
+    """
+    pkg_install, lib_install, custom_ignore, custom_add = _read_main_config()
+    if more_custom_add:
+        if custom_add is None:
+            custom_add = {}
+        for k, vs in more_custom_add.iteritems():
+            if k in custom_add:
+                custom_add[k].extend(vs)
+            else:
+                custom_add[k] = vs
     if target is None or target == "packages":
-        if env.distribution in ["debian", "ubuntu"]:
-            _setup_apt_sources()
-            _setup_apt_automation()
-            _add_apt_gpg_keys()
-            _apt_packages(pkg_install, pkg_config_file_path=pkg_config_file_path)
-        elif env.distribution in ["centos", "scientificlinux"]:
-            _setup_yum_sources()
-            _yum_packages(pkg_install)
-            _setup_yum_bashrc()
-        else:
-            raise NotImplementedError("Unknown target distribution")
-        if env.nixpkgs: # ./doc/nixpkgs.md
+        env.keep_isolated = getattr(env, "keep_isolated", "false").lower() in ["true", "yes"]
+        # Only touch system information if we're not an isolated installation
+        if not env.keep_isolated:
+            # can only install native packages if we have sudo access or are root
+            if env.use_sudo or env.safe_run_output("whoami").strip() == "root":
+                _configure_and_install_native_packages(env, pkg_install)
+            else:
+                _connect_native_packages(env, pkg_install, lib_install)
+        if env.nixpkgs:  # ./doc/nixpkgs.md
             _setup_nix_sources()
             _nix_packages(pkg_install)
-        _update_biolinux_log(env, target, flavor)
     if target is None or target == "custom":
-        _custom_installs(pkg_install)
+        _custom_installs(pkg_install, custom_ignore, custom_add)
+    if target is None or target == "chef_recipes":
+        _provision_chef_recipes(pkg_install, custom_ignore)
+    if target is None or target == "puppet_classes":
+        _provision_puppet_classes(pkg_install, custom_ignore)
+    if target is None or target == "brew":
+        install_brew(flavor=flavor, automated=True)
     if target is None or target == "libraries":
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
@@ -181,24 +120,23 @@ def install_biolinux(target=None, packagelist=None, flavor=None, environment=Non
         env.flavor.post_install()
     if target is None or target == "cleanup":
         _cleanup_space(env)
-        if env.has_key("is_ec2_image") and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+        if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _cleanup_ec2(env)
-    _print_time_stats("Config", "end", time_start)
 
 def _print_time_stats(action, event, prev_time=None):
     """ A convenience method for displaying time event during configuration.
-    
+
     :type action: string
     :param action: Indicates type of action (eg, Config, Lib install, Pkg install)
-    
+
     :type event: string
     :param event: The monitoring event (eg, start, stop)
-    
+
     :type prev_time: datetime
     :param prev_time: A timeststamp of a previous event. If provided, duration between
                       the time the method is called and the time stamp is included in
                       the printout
-                      
+
     :rtype: datetime
     :return: A datetime timestamp of when the method was called
     """
@@ -215,141 +153,225 @@ def _check_fabric_version():
     if int(version.split(".")[0]) < 1:
         raise NotImplementedError("Please install fabric version 1 or higher")
 
-def _custom_installs(to_install):
-    if not exists(env.local_install):
-        run("mkdir -p %s" % env.local_install)
-    pkg_config = os.path.join(env.config_dir, "custom.yaml")
+def _custom_installs(to_install, ignore=None, add=None):
+    if not env.safe_exists(env.local_install) and env.local_install:
+        env.safe_run("mkdir -p %s" % env.local_install)
+    pkg_config = get_config_file(env, "custom.yaml").base
     packages, pkg_to_group = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    if add is not None:
+        for key, vals in add.iteritems():
+            for v in vals:
+                pkg_to_group[v] = key
+                packages.append(v)
     for p in env.flavor.rewrite_config_items("custom", packages):
         install_custom(p, True, pkg_to_group)
 
-def install_custom(p, automated=False, pkg_to_group=None):
-    """Install a single custom package by name.
-    This method fetches names from custom.yaml that delegate to a method
-    in the custom/name.py program. Alternatively, if a program install method is
-    defined in approapriate package, it will be called directly (see param p).
-    
-    Usage: fab [-i key] [-u user] -H host install_custom:program_name
-    
-    :type p:  string
-    :param p: A name of a custom program to install. This has to be either a name
-              that is listed in custom.yaml as a subordinate to a group name or a
-              program name whose install method is defined in either cloudbio or
-              custom packages (eg, install_cloudman).
-    
+
+def _provision_chef_recipes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "chef_recipes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    recipes = [recipe for recipe in env.flavor.rewrite_config_items("chef_recipes", packages)]
+    if recipes:  # Don't bother running chef if nothing to configure
+        install_chef_recipe(recipes, True)
+
+
+def _provision_puppet_classes(to_install, ignore=None):
+    """
+    Much like _custom_installs, read config file, determine what to install,
+    and install it.
+    """
+    pkg_config = get_config_file(env, "puppet_classes.yaml").base
+    packages, _ = _yaml_to_packages(pkg_config, to_install)
+    packages = [p for p in packages if ignore is None or p not in ignore]
+    classes = [recipe for recipe in env.flavor.rewrite_config_items("puppet_classes", packages)]
+    if classes:  # Don't bother running chef if nothing to configure
+        install_puppet_class(classes, True)
+
+
+def install_chef_recipe(recipe, automated=False, flavor=None):
+    """Install one or more chef recipes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_chef_recipe:recipe
+
+    :type recipe:  string or list
+    :param recipe: TODO
+
     :type automated:  bool
-    :param automated: If set to True, the environment is not loaded and reading of
-                      the custom.yaml is skipped.
+    :param automated: If set to True, the environment is not loaded.
     """
     _setup_logging(env)
-    p = p.lower() # All packages are listed in custom.yaml are in lower case
-    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
     if not automated:
-        _parse_fabricrc()
-        _setup_edition(env)
-        _setup_distribution_environment()
-        _create_local_paths()
-        pkg_config = os.path.join(env.config_dir, "custom.yaml")
-        packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+        _configure_fabric_environment(env, flavor)
 
+    time_start = _print_time_stats("Chef provision for recipe(s) '{0}'".format(recipe), "start")
+    _configure_chef(env, chef)
+    recipes = recipe if isinstance(recipe, list) else [recipe]
+    for recipe_to_add in recipes:
+        chef.add_recipe(recipe_to_add)
+    _chef_provision(env, recipes)
+    _print_time_stats("Chef provision for recipe(s) '%s'" % recipe, "end", time_start)
+
+
+def install_puppet_class(classes, automated=False, flavor=None):
+    """Install one or more puppet classes by name.
+
+    Usage: fab [-i key] [-u user] -H host install_puppet_class:class
+
+    :type classes:  string or list
+    :param classes: TODO
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded.
+    """
+    _setup_logging(env)
+    if not automated:
+        _configure_fabric_environment(env, flavor)
+
+    time_start = _print_time_stats("Puppet provision for class(es) '{0}'".format(classes), "start")
+    classes = classes if isinstance(classes, list) else [classes]
+    _puppet_provision(env, classes)
+    _print_time_stats("Puppet provision for classes(s) '%s'" % classes, "end", time_start)
+
+
+def install_custom(p, automated=False, pkg_to_group=None, flavor=None):
+    """
+    Install a single custom program or package by name.
+
+    This method fetches program name from ``config/custom.yaml`` and delegates
+    to a method in ``custom/*name*.py`` to proceed with the installation.
+    Alternatively, if a program install method is defined in the appropriate
+    package, it will be called directly (see param ``p``).
+
+    Usage: fab [-i key] [-u user] -H host install_custom:program_name
+
+    :type p:  string
+    :param p: A name of the custom program to install. This has to be either a name
+              that is listed in ``custom.yaml`` as a subordinate to a group name or a
+              program name whose install method is defined in either ``cloudbio`` or
+              ``custom`` packages
+              (e.g., ``cloudbio/custom/cloudman.py -> install_cloudman``).
+
+    :type automated:  bool
+    :param automated: If set to True, the environment is not loaded and reading of
+                      the ``custom.yaml`` is skipped.
+    """
+    p = p.lower() # All packages listed in custom.yaml are in lower case
+    if not automated:
+        _setup_logging(env)
+        _configure_fabric_environment(env, flavor, ignore_distcheck=True)
+        pkg_config = get_config_file(env, "custom.yaml").base
+        packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    time_start = _print_time_stats("Custom install for '{0}'".format(p), "start")
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+    ## TODO: Replace the previous 4 lines with the following one, barring
+    ## objections. Slightly different behavior because pkg_to_group will be
+    ## loaded regardless of automated if it is None, but IMO this shouldn't
+    ## matter because the following steps look like they would fail if
+    ## automated is True and pkg_to_group is None.
+    # _install_custom(p, pkg_to_group)
+    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+
+
+def _install_custom(p, pkg_to_group=None):
+    if pkg_to_group is None:
+        pkg_config = get_config_file(env, "custom.yaml").base
+        packages, pkg_to_group = _yaml_to_packages(pkg_config, None)
+    fn = _custom_install_function(env, p, pkg_to_group)
+    fn(env)
+
+def install_brew(p=None, version=None, flavor=None, automated=False):
+    """Top level access to homebrew/linuxbrew packages.
+    p is a package name to install, or all configured packages if not specified.
+    """
+    if not automated:
+        _setup_logging(env)
+        _configure_fabric_environment(env, flavor, ignore_distcheck=True)
+    if p is not None:
+        if version:
+            p = "%s==%s" % (p, version)
+        brew.install_packages(env, packages=[p])
+    else:
+        pkg_install = _read_main_config()[0]
+        brew.install_packages(env, to_install=pkg_install)
+
+def _custom_install_function(env, p, pkg_to_group):
+    """
+    Find custom install function to execute based on package name to
+    pkg_to_group dict.
+    """
     try:
-        env.logger.debug("Import %s" % p)
         # Allow direct calling of a program install method, even if the program
         # is not listed in the custom list (ie, not contained as a key value in
         # pkg_to_group). For an example, see 'install_cloudman' or use p=cloudman.
         mod_name = pkg_to_group[p] if p in pkg_to_group else p
+        env.logger.debug("Importing module cloudbio.custom.%s" % mod_name)
         mod = __import__("cloudbio.custom.%s" % mod_name,
                          fromlist=["cloudbio", "custom"])
     except ImportError:
-        raise ImportError("Need to write a %s module in custom." %
+        raise ImportError("Need to write module cloudbio.custom.%s" %
                 pkg_to_group[p])
     replace_chars = ["-"]
     try:
         for to_replace in replace_chars:
             p = p.replace(to_replace, "_")
+        env.logger.debug("Looking for custom install function %s.install_%s"
+            % (mod.__name__, p))
         fn = getattr(mod, "install_%s" % p)
     except AttributeError:
         raise ImportError("Need to write a install_%s function in custom.%s"
                 % (p, pkg_to_group[p]))
-    fn(env)
-    _print_time_stats("Custom install for '%s'" % p, "end", time_start)
+    return fn
 
-def _read_main_config(yaml_file=None):
+
+def _read_main_config():
     """Pull a list of groups to install based on our main configuration YAML.
 
     Reads 'main.yaml' and returns packages and libraries
     """
-    if yaml_file is None:
-        yaml_file = os.path.join(env.config_dir, "main.yaml")
+    yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
-    packages = full_data['packages']
-    packages = packages if packages else []
-    libraries = full_data['libraries']
-    libraries = libraries if libraries else []
+    packages = full_data.get('packages', [])
+    packages = env.edition.rewrite_config_items("main_packages", packages)
+    libraries = full_data.get('libraries', [])
+    custom_ignore = full_data.get('custom_ignore', [])
+    custom_add = full_data.get("custom_additional")
+    if packages is None: packages = []
+    if libraries is None: libraries = []
+    if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
-    return packages, sorted(libraries)
+    return packages, sorted(libraries), custom_ignore, custom_add
 
 # ### Library specific installation code
 
-def _r_library_installer(config):
-    """Install R libraries using CRAN and Bioconductor.
-    """
-    # Create an Rscript file with install details.
-    out_file = "install_packages.R"
-    if exists(out_file):
-        run("rm -f %s" % out_file)
-    run("touch %s" % out_file)
-    repo_info = """
-    cran.repos <- getOption("repos")
-    cran.repos["CRAN" ] <- "%s"
-    options(repos=cran.repos)
-    source("%s")
-    """ % (config["cranrepo"], config["biocrepo"])
-    append(out_file, repo_info)
-    install_fn = """
-    repo.installer <- function(repos, install.fn) {
-      update.or.install <- function(pname) {
-        if (pname %in% installed.packages())
-          update.packages(lib.loc=c(pname), repos=repos, ask=FALSE)
-        else
-          install.fn(pname)
-      }
-    }
-    """
-    append(out_file, install_fn)
-    std_install = """
-    std.pkgs <- c(%s)
-    std.installer = repo.installer(cran.repos, install.packages)
-    lapply(std.pkgs, std.installer)
-    """ % (", ".join('"%s"' % p for p in config['cran']))
-    append(out_file, std_install)
-    bioc_install = """
-    bioc.pkgs <- c(%s)
-    bioc.installer = repo.installer(biocinstallRepos(), biocLite)
-    lapply(bioc.pkgs, bioc.installer)
-    """ % (", ".join('"%s"' % p for p in config['bioc']))
-    append(out_file, bioc_install)
-    final_update = """
-    update.packages(repos=biocinstallRepos(), ask=FALSE)
-    update.packages(ask=FALSE)
-    """
-    append(out_file, final_update)
-    # run the script and then get rid of it
-    env.safe_sudo("Rscript %s" % out_file)
-    run("rm -f %s" % out_file)
-
 def _python_library_installer(config):
-    """Install python specific libraries using easy_install.
+    """Install python specific libraries using pip, conda and easy_install.
+    Handles using isolated anaconda environments.
     """
-    version_ext = "-%s" % env.python_version_ext if env.python_version_ext else ""
-    env.safe_sudo("easy_install%s -U pip" % version_ext)
+    if shared._is_anaconda(env):
+        conda_bin = shared._conda_cmd(env)
+        for pname in env.flavor.rewrite_config_items("python", config.get("conda", [])):
+            env.safe_run("{0} install --yes {1}".format(conda_bin, pname))
+        cmd = env.safe_run
+        with settings(warn_only=True):
+            cmd("%s -U distribute" % os.path.join(os.path.dirname(conda_bin), "easy_install"))
+    else:
+        pip_bin = shared._pip_cmd(env)
+        ei_bin = pip_bin.replace("pip", "easy_install")
+        env.safe_sudo("%s -U pip" % ei_bin)
+        with settings(warn_only=True):
+            env.safe_sudo("%s -U distribute" % ei_bin)
+        cmd = env.safe_sudo
     for pname in env.flavor.rewrite_config_items("python", config['pypi']):
-        env.safe_sudo("easy_install%s -U %s" % (version_ext, pname))
-        # Use pip when it doesn't re-download even if latest package installed
-        # https://bitbucket.org/ianb/pip/issue/13/upgrade-always-downloads-most-recent
-        #sudo("pip%s install -U %s" % (version_ext,  pname))
+        cmd("{0} install --upgrade {1} --allow-unverified {1} --allow-external {1}".format(shared._pip_cmd(env), pname)) # fixes problem with packages not being in pypi
 
 def _ruby_library_installer(config):
     """Install ruby specific gems.
@@ -358,7 +380,7 @@ def _ruby_library_installer(config):
     def _cur_gems():
         with settings(
                 hide('warnings', 'running', 'stdout', 'stderr')):
-            gem_info = run("gem%s list --no-versions" % gem_ext)
+            gem_info = env.safe_run_output("gem%s list --no-versions" % gem_ext)
         return [l.rstrip("\r") for l in gem_info.split("\n") if l.rstrip("\r")]
     installed = _cur_gems()
     for gem in env.flavor.rewrite_config_items("ruby", config['gems']):
@@ -373,24 +395,18 @@ def _ruby_library_installer(config):
 def _perl_library_installer(config):
     """Install perl libraries from CPAN with cpanminus.
     """
-    with _make_tmp_dir() as tmp_dir:
+    with shared._make_tmp_dir() as tmp_dir:
         with cd(tmp_dir):
-            run("wget --no-check-certificate -O cpanm "
-                "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
-            run("chmod a+rwx cpanm")
+            env.safe_run("wget --no-check-certificate -O cpanm "
+                         "https://raw.github.com/miyagawa/cpanminus/master/cpanm")
+            env.safe_run("chmod a+rwx cpanm")
             env.safe_sudo("mv cpanm %s/bin" % env.system_install)
     sudo_str = "--sudo" if env.use_sudo else ""
     for lib in env.flavor.rewrite_config_items("perl", config['cpan']):
         # Need to hack stdin because of some problem with cpanminus script that
         # causes fabric to hang
         # http://agiletesting.blogspot.com/2010/03/getting-past-hung-remote-processes-in.html
-        run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
-
-def _clojure_library_installer(config):
-    """Install clojure libraries using cljr.
-    """
-    for lib in config['cljr']:
-        run("cljr install %s" % lib)
+        env.safe_run("cpanm %s --skip-installed --notest %s < /dev/null" % (sudo_str, lib))
 
 def _haskell_library_installer(config):
     """Install haskell libraries using cabal.
@@ -398,14 +414,13 @@ def _haskell_library_installer(config):
     run("cabal update")
     for lib in config["cabal"]:
         sudo_str = "--root-cmd=sudo" if env.use_sudo else ""
-        run("cabal install %s --global %s" % (sudo_str, lib))
+        env.safe_run("cabal install %s --global %s" % (sudo_str, lib))
 
 lib_installers = {
-    "r-libs" : _r_library_installer,
+    "r-libs" : libraries.r_library_installer,
     "python-libs" : _python_library_installer,
     "ruby-libs" : _ruby_library_installer,
     "perl-libs" : _perl_library_installer,
-    "clojure-libs": _clojure_library_installer,
     "haskell-libs": _haskell_library_installer,
     }
 
@@ -414,16 +429,12 @@ def install_libraries(language):
     """
     _setup_logging(env)
     _check_fabric_version()
-    _parse_fabricrc()
-    _setup_edition(env)
-    _setup_flavor(None)
-    _setup_distribution_environment()
-    _create_local_paths()
+    _configure_fabric_environment(env, ignore_distcheck=True)
     _do_library_installs(["%s-libs" % language])
 
 def _do_library_installs(to_install):
     for iname in to_install:
-        yaml_file = os.path.join(env.config_dir, "%s.yaml" % iname)
+        yaml_file = get_config_file(env, "%s.yaml" % iname).base
         with open(yaml_file) as in_handle:
             config = yaml.load(in_handle)
         lib_installers[iname](config)

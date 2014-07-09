@@ -1,6 +1,5 @@
 edition = minimal
 #edition_version = 0.10
-flavor = SealFlavor
 flavor_path = seal.sealflavor
 distribution = scientificlinux
 #dist_name = 

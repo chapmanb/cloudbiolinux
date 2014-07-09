@@ -1,0 +1,5 @@
+TODO: Refactor use_existing_instance out of cloud specific config, make command-line option
+TODO: Allow specification of clouds by name instead of type.
+TODO: Implement alternate transfer mechanisms (fabric-based transfer has not proven very robust). 
+TODO: Improve documentation.
+

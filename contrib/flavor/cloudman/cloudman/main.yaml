@@ -1,0 +1,5 @@
+---
+packages:
+  - minimal
+  - cloudman
+libraries:

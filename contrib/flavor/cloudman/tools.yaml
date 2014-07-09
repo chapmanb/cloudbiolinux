@@ -1,0 +1,116 @@
+---
+applications:
+  ## Coming from bio_nextgen.py
+  # bwa: "0.5.9" # ToolShed installed
+  ucsc_tools: "default"
+  # bowtie: "0.12.7" # ToolShed installed
+  samtools:
+    - version: "0.1.16"
+  # abyss: "1.3.3" # Compile error
+  bfast: "0.7.0a"
+  velvet: "1.2.07"
+  # perm: "3.6" # Compile error
+  lastz: "1.02.00"
+  mosaik: "default" # Version ignored now, CBL pulls from trunk
+  # freebayes: "default" # ToolShed installed
+  macs: "1.4.2-1"
+
+  ## Coming from bio_general.py
+  emboss:
+    - version: "6.5.7"
+      symlink_versions: "5.0.0"  # Setup a symbolic link, so when Galaxy looks for 5.0.0 it finds newest version
+
+  ## Coming from applications.py
+
+  ## Tried with bio_nextgen didn't work. [ubuntu@10.1.0.3] out: No package 'gtextutils' found
+  fastx_toolkit: "0.0.13.2"
+  ## Tried with bio_nextgen Eventually got bam to work, not eigen dependencies...
+  ## switching to version 2.0.0 didn't help
+  cufflinks:
+    - "1.3.0"
+    - "2.0.2"
+  tophat:
+    - "1.3.3"
+    - "2.0.6"
+
+  picard: "1.56"
+  fastqc: "0.10.0"
+  gatk: "2.3-9-gdcdccbb"
+
+  # maq: "0.7.1" # Compile error
+  megablast: "2.2.22"
+  blast: "2.2.25+"
+  sputnik: "r1"
+  taxonomy: "r2"
+  add_scores: "r1"
+  # hyphy: "r418" # Compile error
+  srma: "0.1.15"
+  beam: "2"
+  pass: "2.0"
+  lps_tool: "2010.09.30"
+  plink: "1.07"
+  haploview: "4.2b"
+  # eigenstrat: "3.0" # Compile error
+
+r_packages:
+  - DBI
+  - RColorBrewer
+  - RCurl
+  - RSQLite
+  - XML
+  - biglm
+  - bitops
+  - digest
+  - ggplot2
+  - graph
+  - hexbin
+  - hwriter
+  - kernlab
+  - latticeExtra
+  - leaps
+  - pamr
+  - plyr
+  - proto
+  - qvalue
+  - reshape
+  - statmod
+  - xtable
+  - yacca
+
+bioconductor_packages:
+  - AnnotationDbi
+  - ArrayExpress
+  - ArrayTools
+  - Biobase
+  - Biostrings
+  - DynDoc
+  - GEOquery
+  - GGBase
+  - GGtools
+  - GSEABase
+  - IRanges
+  - affy
+  - affyPLM
+  - affyQCReport
+  - affydata
+  - affyio
+  - annaffy
+  - annotate
+  - arrayQualityMetrics
+  - beadarray
+  - biomaRt
+  - gcrma
+  - genefilter
+  - geneplotter
+  - globaltest
+  - hgu95av2.db
+  - limma
+  - lumi
+  - makecdfenv
+  - marray
+  - preprocessCore
+  - ShortRead
+  - siggenes
+  - simpleaffy
+  - snpMatrix
+  - vsn

@@ -17,9 +17,6 @@
 genomes:
   - dbkey: phix
     name: phiX174
-  - dbkey: hg18
-    name: Human (hg18)
-    dbsnp: true
   - dbkey: hg19
     name: Human (hg19)
     dbsnp: true
@@ -27,28 +24,35 @@ genomes:
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
+    rnaseq: true
+  - dbkey: mm10
+    name: Mouse (mm10)
+    dbsnp: true
+    rnaseq: true
+  - dbkey: rn5
+    name: Rat (rn5)
+    rnaseq: true
+  - dbkey: canFam3
+    name: Dog (canFam3)
+    dbsnp: true
+    rnaseq: true
   - dbkey: dm3
     name: D melangogaster (dm3)
-  - dbkey: mm9
-    name: Mouse (mm9)
-    rnaseq: true
   - dbkey: araTha_tair9
     name: Arabidopsis thaliana (TAIR9)
-  - dbkey: xenTro2
-    name: X tropicalis (xenTro2)
-  - dbkey: sacCer2
-    name: S cerevisiae (sacCer2)
+  - dbkey: xenTro3
+    name: X tropicalis (xenTro3)
+  - dbkey: Zv9
+    name: Zebrafish (Zv9)
+  - dbkey: sacCer3
+    name: S cerevisiae (sacCer3)
   - dbkey: WS210
     name: C elegans (WS210)
-#custom:
-#  - dbkey: GRCh37-NA12878-xprize-fosmid
-#    base: GRCh37
-#    mask: https://s3.amazonaws.com/chapmanb/xprize/GRCh37-NA12878-xprize-fosmid.bed
 
 # Global set of indexes to include for each genome.
-# Available choices are in GENOMES_INDEXES_SUPPORTED in data_fabfile.py
+# Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
 genome_indexes:
-  - bowtie
+  - bowtie2
   - bwa
   - novoalign
   - ucsc

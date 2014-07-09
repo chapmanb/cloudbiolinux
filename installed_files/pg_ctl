@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# This script is required because of CloudMan - CloudMan's path resolution
+# code would result in using the latest version of PostgreSQL installed via
+# a package manager. However, if a user switches images, the database data
+# may not match the version of PostgreSQL being invoked so this script
+# is used to differentiate which PostgreSQL version is actually invoked.
+# This had to be done here because it was the only variable for old
+# clusters being invoked with a new image. Also note that this script
+# is image dependent (because PostgreSQL v9.1 will be the default version).
+
+# Recompose args so pg_ctl will work
+args=""
+
+# If an argument contains whitespace, add double quotes around it
+whitespace="[[:space:]]"
+for arg in "$@"; do
+    if [[ $arg =~ $whitespace ]]; then
+        arg=\"$arg\"
+    fi
+    args="$args $arg"
+done
+
+# If the -D option is specified (path to data dir), extract PG_VERSION from the data dir
+while getopts ":D:" opt; do
+  case $opt in
+    D)
+      # Get current Postgres DB version
+      PG_VERSION=`cat "$OPTARG"/PG_VERSION`
+      ;;
+  esac
+done
+
+if [ "$PG_VERSION" == "8.4" ]; then
+    CMD="/usr/lib/postgresql/8.4/bin/pg_ctl $args"
+else
+    CMD="/usr/lib/postgresql/9.1/bin/pg_ctl_orig $args"
+fi
+# Must eval here; otherwise quotes in the args don’t get passed through properly
+eval $CMD

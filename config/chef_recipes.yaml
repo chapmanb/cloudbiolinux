@@ -1,0 +1,5 @@
+minimal:
+globus:
+  - globus::client-tools
+  - globus::myproxy
+  - globus::gridftp-default

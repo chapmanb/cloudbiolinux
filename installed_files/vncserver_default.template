@@ -1,0 +1,14 @@
+# The Username:Group that will run VNC
+export USER="$vnc_user"
+
+# The display that VNC will use
+export DISPLAY="$vnc_display"
+
+# Color depth (between 8 and 32)
+export DEPTH="$vnc_depth"
+
+# The Desktop geometry to use.
+export GEOMETRY="$vnc_geometry"
+
+# The name that the VNC Desktop will have.
+export DESKTOP_NAME="cloudbiolinux-vnc-server"

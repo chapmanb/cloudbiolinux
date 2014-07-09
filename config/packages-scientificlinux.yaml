@@ -1,23 +1,156 @@
+minimal:
+  version_control:
+    - git-core
+    - subversion
+    - mercurial
+  build:
+    - cmake
+    - gcc
+    - gcc-c++
+    - gcc-gfortran
+    - make
+  util:
+    - screen
+    - unzip
+    - tar
+    - less
+  network:
+    - curl
+    - wget
+libraries:
+  - atlas
+  - atlas-devel
+  - blas
+  - blas-devel
+  - bzip2-devel
+  - freetype-devel
+  - gsl-devel
+  - libpng-devel
+  - openssl-devel
+  - ncurses-devel
+documentation:
 programming:
   - protobuf-c
   - protobuf-compiler
   - protobuf-python
-  - gcc-c++
-  - openssl-devel
 java:
   - ant
   - ant-junit
   - ant-nodeps
-  - java-1.6.0-openjdk
+  - java-1.7.0-openjdk
+  - java-1.7.0-openjdk-devel
   - junit4
 python:
   - python
   - python-devel
   - boost-python-devel
+  - numpy
   - python-pip
+r:
+  - R
+  - R-core
+  - libRmath
+  - libRmath-devel
 distributed:
   - hadoop-0.20
   - hadoop-0.20-native
   - hadoop-0.20-pipes
   - hadoop-0.20-source
   - hadoop-0.20-libhdfs
+  - mpich2
+  - mpich2-devel
+galaxy:
+  all:
+    - postgresql
+    - gcc-gfortran
+    - java-1.7.0-openjdk
+    - xorg-x11-server-Xvfb
+    - cmake
+    - zlib-devel
+    - ncurses-devel
+    - xz-devel
+    - tcl-devel
+    - tk-devel    
+    - ImageMagick
+    #  - scipy  ## Available in CentOS but not SL, install some prequirements instead including numpy (likely many tools just require this.)
+    - numpy
+    - numpy-f2py
+    - blas-devel 
+    - atlas-devel
+
+    # Following requrie EPEL repository (setup by CloudBioLinux)    
+    - pdfjam
+    - sparsehash-devel
+
+    # cran packages for CentOS are not maintained, do what we can with EPEL.
+    - R
+    - R-devel
+    # Missing relative to ubuntu install: All missing in CentOS (e.g. axel, python-rpy, many R modules)
+    # Missing relative to CentOS install: scipy.
+    #   Information on setting up scipy and rpy can be found at http://getgalaxyp.org/install.html
+bio_proteomics:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel
+galaxyp:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # Needed for nbic galaxy database utilities
+  - perl-Log-Log4perl
+  # - libswiss-perl NOT AVAILABLE, ONE TOOL WON'T WORK.
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel

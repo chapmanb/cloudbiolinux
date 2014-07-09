@@ -1,14 +1,13 @@
-# Flavor targetting runningy Phylogeny programs in the Cloud, 
-# such as recent edititions of mrbayes-mpi, raxml, BEAST and 
+# Flavor targetting runningy Phylogeny programs in the Cloud,
+# such as recent edititions of mrbayes-mpi, raxml, BEAST and
 # tracer.
 #
 # This VM is used for a practical Phylogeny course.
 #
-# Copyright (C) 2011 Pjotr Prins <pjotr.prins@thebird.nl> 
+# Copyright (C) 2011 Pjotr Prins <pjotr.prins@thebird.nl>
 #
 edition = bionode
 edition_version = 0.93
-flavor = PhylogenyFlavor
 flavor_path = phylogeny.phylogenyflavor
 distribution = ubuntu
 dist_name = natty
@@ -23,5 +22,4 @@ local_install = ~/install
 shell_config = ~/.bashrc
 shell = /bin/bash -l -c
 # data_files = /mnt/biodata
-# galaxy_base = /mnt/biodata/galaxy
 

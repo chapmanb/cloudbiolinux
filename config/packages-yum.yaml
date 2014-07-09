@@ -1,5 +1,42 @@
 ---
 # List of packages to be installed via the yum package manager.
+minimal:
+  version_control:
+    - git-core
+    - subversion
+    - mercurial
+  build:
+    - cmake
+    - gcc
+    - gcc-c++
+    - gcc-gfortran
+    - make
+  util:
+    - screen
+    - unzip
+    - tar
+    - less
+  network:
+    - curl
+    - wget
+libraries:
+  - atlas
+  - atlas-devel
+  - blas
+  - blas-devel
+  - bzip2-devel
+  - freetype-devel
+  - gsl-devel
+  - lapack
+  - lapack-devel
+  - libgfortran
+  - libpng-devel
+  - openssl-devel
+  - ncurses-devel
+  - libxml2-devel
+  - zlib-devel
+  - netcdf-devel
+documentation:
 desktop:
   - gnome-panel
   - freenx
@@ -15,64 +52,36 @@ programming:
     - vim-X11
     - ctags
   version_control:
-    - git
     - cvs
-    - subversion
-    - mercurial
     - bzr
-  documentation:
   build:
     - swig
-    - curl
     - curl-devel
-    - libxml2
-    - libxml2-devel
     - libxslt
     - libxslt-devel
-    - gsl
-    - gsl-devel
     - xfsprogs
     - glibc
     - glibc-devel
     - zip
-    - zlib
-    - zlib-devel
     - zziplib-devel
-    - bzip2
-    - bzip2-devel
     - xz
     - xz-devel
     - gtk2
     - gtk2-devel
-    - ncurses-devel
-    - globus-openss
-    - globus-openssl-devel
+    - globus-openssl-module
+    - globus-openssl-module-devel
     - pcre
     - pcre-devel
     - readline
     - readline-devel
-    - gcc
-    - gcc-gfortran
-    - gcc-c++
-    - gcc44
-    - gcc44-c++
-    - gcc44-gfortran
     - rsync
     - librsync
     - librsync-devel
   libraries:
-    - lapack
-    - lapack-devel
-    - libgfortran
-    - atlas
-    - atlas-devel
-    - blas
-    - blas-devel
+    - libuuid-devel
     - tcl-devel
     - tk-devel
     - ImageMagick
-    - boost141
-    - boost141-devel
     - boost
     - boost-devel
     - openmpi
@@ -87,28 +96,24 @@ programming:
     - libgnomeui-devel
     - pango
     - pango-devel
-  packaging:
-    - unzip
   virtual:
   util:
     - tree
-    - screen
   lang:
     - aspell
 distributed:
-  - rabbitmq-server
 amazon:
 python:
-  meta:
-    - python26
-    - python26-devel
-    - python26-distribute
+  - python
+  - python-devel
+  - python-pip
+  - python-virtualenv
+  - boost-python-devel
+  - numpy
 ruby:
   - ruby
   - ruby-devel
   - rubygems
-  - ruby-irb
-  - rubygem-rake
 r:
   - R
   - R-core
@@ -116,13 +121,20 @@ r:
   - libRmath-devel
 perl: 
   - perl
+  - perl-ExtUtils-MakeMaker
+  - perl-ExtUtils-AutoInstall
+  - perl-ExtUtils-CBuilder
+  - perl-CPAN
 java:
-  - java-1.6.0-openjdk
-  - java-1.6.0-openjdk-devel
   - ant
+  - ant-junit
+  - ant-nodeps
+  - java-1.7.0-openjdk
+  - java-1.7.0-openjdk-devel
+  - junit4
 erlang:
   - erlang
-  - erlang-devel
+  # - erlang-devel  ## Not available, erlang seems to install quite a bit.
 haskell:
   - ghc
 databases:
@@ -147,7 +159,7 @@ databases:
     - hdf5
     #- hdf5-devel
 math:
-  - prover9
+  # - prover9  # No longer available? Cannot find.
   - octave
   - octave-devel
 viz:
@@ -172,3 +184,92 @@ bio_utils:
 phylogeny:
   all:
   needs_64bit:
+galaxy:
+  all:
+    - postgresql
+    - gcc-gfortran
+    - java-1.7.0-openjdk
+    - xorg-x11-server-Xvfb
+    - cmake
+    - zlib-devel
+    - ncurses-devel
+    - xz-devel
+    - tcl-devel
+    - tk-devel    
+    - ImageMagick
+    - scipy
+    # Following requrie EPEL repository (setup by CloudBioLinux)    
+    - pdfjam
+    - sparsehash-devel
+
+    # cran packages for CentOS are not maintained, do what we can with EPEL.
+    - R
+    - R-devel
+    # Missing relative to ubuntu install: axel, python-rpy, all R modules
+    #   Information on setting up rpy can be found at http://getgalaxyp.org/install.html
+bio_proteomics:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel
+galaxyp:
+  # Needed for TPP
+  - libxslt
+  - perl-libxml-perl
+  - libXpm-devel
+  - bzip2-devel
+  - gnuplot
+  # Needed for percolator
+  - xerces-c-devel
+  - xerces-c
+  - xsd
+  - sqlite-devel
+  # - libboost-serialization-dev, libboost-system-dev, libboost-filesystem-dev Installed by boost-devel
+  - zlib-devel
+  - boost-devel
+
+  # Needed for nbic galaxy database utilities
+  - perl-Log-Log4perl
+  # - libswiss-perl NOT AVAILABLE, ONE TOOL WON'T WORK.
+
+  # needed for building OpenMS
+  - qt-devel
+  - qtwebkit-devel
+
+  # Needed for PSM-eval
+  - libyaml-devel
+
+  # Needed for RVM (in turn required for ProtK)
+  - bison
+  - libffi-devel
+  - libtool
+  - libyaml-devel
+  - openssl-devel
+  - patch
+  - readline-devel

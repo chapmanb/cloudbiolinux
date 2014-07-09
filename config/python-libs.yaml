@@ -5,20 +5,15 @@ pypi:
   # infrastructure
   - amqplib
   - BeautifulSoup
-  - boto
   - fabric
-  - ipython
   - Logbook
   - lxml
   - mako
-  - nose
-  - numpy
   - paste
   - pastescript
   - pycrypto
   - python-cjson
   - pyOpenSSL
-  - pyyaml
   - routes
   - simplejson
   - sphinx
@@ -26,50 +21,62 @@ pypi:
   - webhelpers
   - webob
   - xlrd
-  - yolk
   # build
-  - cython
-  - Pyrex
-  - virtualenv
-  # concurrency/web
-  - pyzmq
-  - tornado
+  - Pyrex-real
+  - cython  # needed for installing pybedtools
+# concurrency/web
   - Twisted
   # science
-  - biopython
-  - bcbio-nextgen
+  - cutadapt
   - ruffus
-  #- cogent
   - DendroPy
   - HTSeq
-  - networkx
-  - pandas
   - pybedtools
   - pygr
-  - pysam
   - PyVCF
   - rpy2
-  - rpy2-bioconductor-extensions
-  - scikits.learn
-  - scikits.statsmodels
-  - scipy
+  - ramp
   # databases
   - CouchDB
-  - h5py
   - MySQL-python
   - pymongo
   - pysqlite
   - psycopg2
-  - SQLAlchemy
   # visualization
   - gnuplot-py
   - PIL
-  - pydot
-  - pygooglechart
+  - pypdf
   - reportlab
-
+  # cloudman
+  - oca
+  - hoover
+  - Mako
+conda:
+  - boto
+  - biopython
+  - cython
+  - h5py
+  - ipython
+  - matplotlib
+  - networkx
+  - nose
+  - numpy
+  - pandas
+  - pysam
+  - pyyaml
+  - pyzmq
+  - scikit-learn
+  - scipy
+  - SQLAlchemy
+  - statsmodels
+  - tornado
+  
 ## compile problems
+  #- cogent
   #- tables
   #- pygraphviz
   #- pysparse
   #- sympy
+  #- pydot # references python 3-only pyparsing
+  #- pygooglechart
+  #- rpy2-bioconductor-extensions
