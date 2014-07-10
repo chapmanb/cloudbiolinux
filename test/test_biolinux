@@ -151,7 +151,7 @@ fab_opts += " -i #{$sshkey}" if $sshkey
 fab_opts += " -H #{$hostname}"
 fab_opts += ":#{$port}" if $port
 
-run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:flavor=#{packagelist},environment=biolinux-test"
+run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:flavor=#{packagelist}"
 
 # Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
 Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
