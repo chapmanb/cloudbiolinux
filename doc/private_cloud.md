@@ -22,14 +22,14 @@ Check the network (e.g. with Debian)
 
 You should be able to use the IP address to login from your desktop
 
-       ssh user@VM_IP_address
+       ssh biolinux@VM_IP_address
 
 ## Get password free ssh access
 
 The CloudBioLinux fabric tools work best when you have password free
 login. If you can login to the remote with
 
-       ssh user@VM_IP_address
+       ssh biolinux@VM_IP_address
 
 you are set. Otherwise, create a password free ssh key. To achieve
 this, see the many Internet resources, e.g.
@@ -40,9 +40,9 @@ http://www.mtu.net/~engstrom/ssh-agent.php.
 Install the sudo program. Next, edit /etc/sudoers with the 'visudo'
 command, and add the line
 
-       user ALL=NOPASSWD: /bin/bash
+       biolinux ALL=NOPASSWD: /bin/bash
 
-where user is your VM user login name. Alternatively add user to the sudo
+where biolinux is your VM user login name. Alternatively add biolinux to the sudo
 group.
 
 Now try:
@@ -59,7 +59,7 @@ See the README for installing CloudBioLinux and fabric.
 
 Now you should be set! To install BioLinux
 
-       fab -f $source/fabfile.py -H user@$VM_IP_address -c $fabricrc install_biolinux:packagelist=$packagelist
+       fab -f $source/fabfile.py -H biolinux@$VM_IP_address -c $fabricrc install_biolinux:packagelist=$packagelist
 
 Where source points to the checked out source tree, e.g.
 
@@ -68,7 +68,7 @@ Where source points to the checked out source tree, e.g.
 For example, to install the Minimal flavor on Debian stable on a VM
 running on IP 192.168.64.105:
 
-       fab -f $source/fabfile.py -H user@192.168.64.105 \
+       fab -f $source/fabfile.py -H biolinux@192.168.64.105 \
        -c $source/contrib/minimal/fabricrc_debian.txt \
        install_biolinux:packagelist=$source/contrib/minimal/main.yaml
 
@@ -91,7 +91,7 @@ environment
         cloudbiolinux INFO: Now, testing connection to host...
         cloudbiolinux INFO: Connection to host appears to work!
         cloudbiolinux DEBUG: Expand paths
-        cloudbiolinux INFO: packagelist=/home/user/izip/git/opensource/debian/biolinux/contrib/minimal/main.yaml
+        cloudbiolinux INFO: packagelist=/home/biolinux/izip/git/opensource/debian/biolinux/contrib/minimal/main.yaml
         cloudbiolinux INFO: Meta-package information
         cloudbiolinux INFO: minimal,ruby
         cloudbiolinux INFO:
@@ -137,7 +137,7 @@ write an entry in the log file
         [192.168.64.105] run: uname -m
         [192.168.64.105] out: x86_64
         [192.168.64.105] out:
-        cloudbiolinux INFO: Reading /home/user/izip/git/opensource/debian/biolinux/config/custom.yaml
+        cloudbiolinux INFO: Reading /home/biolinux/izip/git/opensource/debian/biolinux/config/custom.yaml
         cloudbiolinux DEBUG: Packages:
         cloudbiolinux DEBUG:
         cloudbiolinux INFO: Cleaning up space from package builds
