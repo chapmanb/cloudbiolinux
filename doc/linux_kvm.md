@@ -57,11 +57,14 @@ the smaller net install of Debian Linux:
       qemu-system-x86_64 -cdrom debian-6.0.3-amd64-netinst.iso -hda hda.img
 
 hit ESC and optionally type 'install fb=false' to disable the frame buffer.
-Fire up the installer. With the base install, boot the new system
+Fire up the installer. Note that the file system of the installer can be slow,
+that speed is not representative for an installed VM later (with -enable-kvm).
+
+With the base install, boot the new system
 
       qemu-system-x86_64 -enable-kvm -redir tcp:2222::22 -hda hda.img
 
-and set up ssh on the VM
+and install ssh on the VM (it comes already on netinst)
 
       apt-get install openssh-server
 
@@ -71,7 +74,14 @@ so that ssh login works
 
 on user biolinux without a password (preferably using a key with
 empty password). And give that user 'sudo bash'. This ssh and sudo
-configuration is described in ./doc/private_cloud.md.
+configuration is described in ./doc/private_cloud.md. After generating
+the key 
+
+      ssh -i ~/.ssh/biolinux -p 2222 biolinux@localhost
+
+test run sudo without a password
+
+      sudo bash
 
 Not much to installing Linux with KVM! From this point onwards you can install
 CloudBioLinux using the fabric file. Make a copy of the hda.img file,
@@ -80,12 +90,11 @@ so you can have the same starting point every time
       cp hda.img kvm_with_biolinux_login.img
 
 The CloudBioLinux test script also starts from here.
-
 Try the ./test/test_biolinux script to test drive the VM. test_biolinux
 will install a CloudBioLinux flavor, and check whether the installation is
 complete. Essentially with a running instance:
 
-      ./test/test_biolinux -p 2222 -u biolinux 127.0.0.1
+      ./test/test_biolinux -p 2222 -u biolinux -i ~/.ssh/biolinux 127.0.0.1
 
 (note the use of 127.0.0.1 over localhost - this is because of a bug
 in fabric - still true?).
