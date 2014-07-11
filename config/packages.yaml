@@ -95,7 +95,7 @@ desktop:
     - gnome-system-tools
     - synaptic
     - software-center
-    - freenx-server
+    #- freenx-server  # Gone on 14.04
     - gnome-backgrounds
     - gnome-terminal
     - firefox
@@ -203,9 +203,6 @@ hadoop:
 amazon:
   - s3cmd
   - euca2ools
-  - ec2-ami-tools
-  - ec2-api-tools
-  - python-vm-builder-ec2
 python:
   - python
   - python-dev
@@ -273,8 +270,8 @@ databases:
   postgres:
     - postgresql
     - postgresql-client
-    - postgresql-plpython-9.1
-    - postgresql-plperl-9.1
+    - postgresql-plpython-9.3
+    - postgresql-plperl-9.3
     - libpq-dev
   sqlite:
     - libsqlite0
@@ -284,7 +281,7 @@ databases:
     - sqlite3
   document:
     - libdb-dev
-    - mongodb-10gen
+    - mongodb
     - couchdb
     - tokyocabinet-bin
     - libtokyocabinet-dev
@@ -333,13 +330,13 @@ bio_search:
   # - bio-linux-nrdb # broken Depends: ia32-libs
   - cdbfasta
 bio_alignment:
-  - bio-linux-clustal
+  # - bio-linux-clustal # Broken on 14.04
   - bio-linux-dotter
-  - bio-linux-jalview
+  #- bio-linux-jalview # Broken on 14.04
   - bio-linux-mcl
   - bio-linux-mummer
   - bio-linux-pfaat
-  - bio-linux-seaview
+  #- bio-linux-seaview # Broken on 14.04
   - bio-linux-squint
   - bio-linux-t-coffee
   - exonerate
@@ -359,8 +356,8 @@ bio_nextgen:
 bio_sequencing:
   #- bio-linux-assembly-conversion-tools # broken Depends: bio-linux-staden
   - bio-linux-cap3
-  - bio-linux-dust
-  - bio-linux-lucy
+  #- bio-linux-dust  # broken on 14.04
+  #- bio-linux-lucy  # broken on 14.04
   # - bio-linux-staden # broken Depends: ia32-libs
   # - bio-linux-stars # broken Depends: bio-linux-staden
   - bio-linux-tablet
@@ -373,12 +370,12 @@ bio_annotation:
   - bio-linux-big-blast
   - bio-linux-cd-hit
   # - bio-linux-estscan  # broken on ubuntu 14.04 (#163)
-  - bio-linux-jprofilegrid
+  # - bio-linux-jprofilegrid # broken on 14.04
   # - bio-linux-msatfinder # broken on 13.10
 #   - bio-linux-prot4est - broken, fix in progress
   - bio-linux-rbs-finder
   - bio-linux-transterm-hp
-  - bio-linux-trnascan
+  # - bio-linux-trnascan # Broken on 14.04
   # - bio-linux-tetra # broken Depends: ia32-libs
   # 500Mb of disk: - bio-linux-priam
 bio_markergenes:
@@ -523,7 +520,7 @@ cloudman:
     # Needed to enable updates for Galaxy
     # - mercurial ## Included in minimal
     # Required for compiling ProFTPd (must match installed PostgreSQL version!)
-    - postgresql-server-dev-9.1
+    - postgresql-server-dev-9.3
     # Actually not sure what of the following is really needed
     - libboost-all-dev
     - libreadline6-dev
