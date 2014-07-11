@@ -99,18 +99,18 @@ def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None,
 def _setup_flavor(env, flavor):
     """Setup a flavor, providing customization hooks to modify CloudBioLinux installs.
 
-    Specify flavor as a name, in which case we look it up in the standard flavor
-    directory (contrib/flavor/your_flavor), or as a path to a flavor directory outside
-    of cloudbiolinux.
+    Specify flavor as a name, in which case we look it up in the standard
+    flavor directory (contrib/flavor/your_flavor), or as an absolute path to a
+    flavor directory outside of cloudbiolinux.
     """
     env.flavor = Flavor(env)
     env.flavor_dir = None
     if flavor:
-        # setup the directory for flavor customizations
-        if os.path.isabs(flavor):
+        # set the directory for flavor customizations
+        if os.path.isabs(flavor) or os.path.exists(flavor):
             flavor_dir = flavor
         else:
-            flavor_dir = os.path.join(os.path.dirname(__file__), "..", "contrib", "flavor", flavor)
+            flavor_dir = os.path.join(os.path.dirname(__file__), '..', 'contrib', flavor)
         assert os.path.exists(flavor_dir), \
             "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
         env.flavor_dir = flavor_dir
