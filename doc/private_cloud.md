@@ -31,9 +31,27 @@ login. If you can login to the remote with
 
        ssh biolinux@VM_IP_address
 
-you are set. Otherwise, create a password free ssh key. To achieve
-this, see the many Internet resources, e.g.
-http://www.mtu.net/~engstrom/ssh-agent.php.
+you are set. Otherwise, create a password free ssh key. To achieve this, see
+the many Internet resources, e.g.  http://www.mtu.net/~engstrom/ssh-agent.php.
+Combine username, key, hostname and port in ./ssh/config as
+
+    Host biolinux
+      hostname localhost
+      user biolinux
+      port 2222
+      IdentityFile ~/.ssh/biolinux
+
+so you can login with
+
+    ssh biolinux
+
+If this works it is possible cloudbiolinux comes with a fab error saying
+
+    Fatal error: Low level socket error connecting to host localhost on port 2222
+
+One possibility is that it tries IPv6 to connect to localhost. You may have
+to comment out the line '::1 localhost ' in /etc/hosts to run fab (it has bitten
+me several times).
 
 ## Install sudo without password
 
