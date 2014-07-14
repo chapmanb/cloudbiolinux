@@ -110,7 +110,7 @@ def _setup_flavor(env, flavor):
         if os.path.isabs(flavor) or os.path.exists(flavor):
             flavor_dir = flavor
         else:
-            flavor_dir = os.path.join(os.path.dirname(__file__), '..', 'contrib', flavor)
+            flavor_dir = os.path.join(os.path.dirname(__file__), '..', 'contrib', 'flavor', flavor)
         assert os.path.exists(flavor_dir), \
             "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
         env.flavor_dir = flavor_dir
