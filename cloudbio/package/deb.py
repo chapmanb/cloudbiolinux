@@ -97,6 +97,8 @@ def _setup_apt_automation():
             "postfix postfix/main_mailer_type select 'No configuration'",
             "mysql-server-5.1 mysql-server/root_password string '(password omitted)'",
             "mysql-server-5.1 mysql-server/root_password_again string '(password omitted)'",
+            "mysql-server-5.5 mysql-server/root_password string '(password omitted)'",
+            "mysql-server-5.5 mysql-server/root_password_again string '(password omitted)'",
             "sun-java6-jdk shared/accepted-sun-dlj-v1-1 select true",
             "sun-java6-jre shared/accepted-sun-dlj-v1-1 select true",
             "sun-java6-bin shared/accepted-sun-dlj-v1-1 select true",

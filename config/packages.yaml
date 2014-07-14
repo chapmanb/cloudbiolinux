@@ -160,7 +160,7 @@ programming:
     - pbuilder
     - unzip
   virtual:
-    - virtualbox-4.2
+    #- virtualbox-4.2
     - dkms
   util:
     - mc
@@ -175,10 +175,6 @@ programming:
     - aspell
     - dictionaries-common
     - libaspell-dev
-# Note that the following Cloudera hadoop installation is for test
-# purposes "inside the instance" only, Amazon already provides a
-# production-ready Elastic MapReduce platform:
-# http://aws.amazon.com/elasticmapreduce/
 distributed:
   all:
     - rabbitmq-server
@@ -193,13 +189,6 @@ distributed:
     - libmpich2-3
     - libmpich2-dev
     - mpich2
-hadoop:
-  - hadoop-0.20
-  - hadoop-pig
-  - hadoop-hive
-  - libhdfs0-dev
-  - hadoop-0.20-pipes
-  - hadoop-0.20-source
 amazon:
   - s3cmd
   - euca2ools
@@ -470,7 +459,6 @@ phylogeny_experimental:
     - paml        # should replace biolinux-paml
 phylogeny:
   all:
-    - phylip
     - phyml
     - mrbayes
     - njplot
@@ -483,10 +471,10 @@ phylogeny:
     #- bio-linux-happy # broken Depends: ia32-libs
     - bio-linux-mesquite
     - bio-linux-mrbayes
-    - bio-linux-paml
+    #- bio-linux-paml # Broken on 14.04
     - bio-linux-omegamap
     - bio-linux-qtlcart
-    - bio-linux-splitstree
+    #- bio-linux-splitstree # Broken on 14.04
     - bio-linux-treeview
   needs_64bit:
     - bio-linux-fasttree
