@@ -9,7 +9,7 @@ Usage:
     fab -H hostname -i private_key_file install_biolinux
 
 which will call into the 'install_biolinux' method below. See the README for
-more examples.
+more examples. hostname can be a named host in ~/.ssh/config
 
 Requires:
     Fabric http://docs.fabfile.org
@@ -67,6 +67,8 @@ def install_biolinux(target=None, flavor=None):
     _setup_logging(env)
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
+    if env.ssh_config_path and os.path.isfile(os.path.expanduser(env.ssh_config_path)):
+      env.use_ssh_config = True
     _configure_fabric_environment(env, flavor,
                                   ignore_distcheck=(target is not None
                                                     and target in ["libraries", "custom"]))
