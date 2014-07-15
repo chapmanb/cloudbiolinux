@@ -32,7 +32,7 @@ from bcbio.utils import chdir, safe_makedir, file_exists
 
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "74"
+ensembl_release = "75"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 # taxname:
