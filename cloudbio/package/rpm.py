@@ -16,8 +16,7 @@ def _yum_packages(to_install):
     pkg_config = get_config_file(env, package_file).base
     with settings(warn_only=True):
         env.safe_sudo("yum check-update")
-    if env.edition.short_name not in ["minimal"]:
-        env.safe_sudo("yum -y upgrade")
+    env.safe_sudo("yum -y upgrade")
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
     # At this point allow the Flavor to rewrite the package list

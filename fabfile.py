@@ -345,10 +345,7 @@ def _read_main_config():
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data.get('packages', [])
-<<<<<<< HEAD
-=======
     packages = env.flavor.rewrite_config_items("main_packages", packages)
->>>>>>> ecbc71ac75a63a4f09278ee96d5013a5a8ad1490
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
     custom_add = full_data.get("custom_additional")
