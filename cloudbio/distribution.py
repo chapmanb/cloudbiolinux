@@ -90,11 +90,6 @@ def _validate_target_distribution(dist, dist_name=None):
             tag2 = env.safe_run_output("cat /etc/issue")
             if tag2.lower().find(dist) == -1:
                 raise ValueError("Distribution does not match machine; are you using correct fabconfig for " + dist)
-        # if env.edition.short_name in ["minimal"]:
-            # "minimal editions don't actually change any of the apt
-            # source except adding biolinux, so won't cause this
-            # problem and don't need to match dist_name"
-        #    return
         if not dist_name:
             raise ValueError("Must specify a dist_name property when working with distribution %s" % dist)
         # Does this new method work with CentOS, do we need this.

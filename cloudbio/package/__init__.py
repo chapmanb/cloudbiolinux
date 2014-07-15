@@ -29,8 +29,7 @@ def _configure_and_install_native_packages(env, pkg_install):
     elif env.distribution in ["centos", "scientificlinux"]:
         _setup_yum_sources()
         _yum_packages(pkg_install)
-        if env.edition.short_name not in ["minimal"]:
-            _setup_yum_bashrc()
+        _setup_yum_bashrc()
     elif env.distribution == "arch":
         pass  # No package support for Arch yet
     elif env.distribution == "macosx":

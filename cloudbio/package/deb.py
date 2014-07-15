@@ -30,8 +30,6 @@ def _apt_packages(to_install=None, pkg_list=None):
         config_file = get_config_file(env, "packages.yaml")
         env.flavor.apt_upgrade_system(env=env)
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
-        # Allow editions and flavors to modify the package list
-        # packages = env.edition.rewrite_config_items("packages", packages)
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
         env.logger.info("Will install specific packages: {0}".format(pkg_list))

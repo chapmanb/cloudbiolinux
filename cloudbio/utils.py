@@ -9,7 +9,6 @@ from fabric.colors import yellow, red, green, magenta
 from fabric.api import settings, hide, cd, run
 from fabric.contrib.files import exists
 
-# from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.flavor import Flavor
 from cloudbio.flavor.config import get_config_file
@@ -90,11 +89,9 @@ def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None,
 
     _setup_flavor(env, flavor)
     fabricrc_loader(env)
-    # _setup_edition(env)
     # get parameters for distro, packages etc.
     _setup_distribution_environment(ignore_distcheck=ignore_distcheck)
     _create_local_paths(env)
-
 
 def _setup_flavor(env, flavor):
     """Setup a flavor, providing customization hooks to modify CloudBioLinux installs.
@@ -114,6 +111,14 @@ def _setup_flavor(env, flavor):
         assert os.path.exists(flavor_dir), \
             "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
         env.flavor_dir = flavor_dir
+        flavor_name = os.path.split(flavor_dir)[-1]
+        # Reinstantiate class if custom defined
+        import cloudbio.flavor
+        try:
+            env.flavor = getattr(cloudbio.flavor, flavor_name.capitalize())(env)
+        except AttributeError:
+            pass
+        env.flavor.name = flavor_name
         # Load python customizations to base configuration if present
         for ext in ["", "flavor"]:
             py_flavor = os.path.split(os.path.realpath(flavor_dir))[1] + ext
@@ -121,7 +126,8 @@ def _setup_flavor(env, flavor):
             if os.path.exists(flavor_custom_py):
                 sys.path.append(flavor_dir)
                 mod = __import__(py_flavor, fromlist=[py_flavor])
-    env.logger.info("This is a %s" % env.flavor.name)
+        env.logger.info(env.flavor)
+        env.logger.info("This is a %s flavor" % env.flavor.name)
 
 def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.

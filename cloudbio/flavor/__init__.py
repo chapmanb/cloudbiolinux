@@ -12,8 +12,7 @@ class Flavor:
     """Base class. Every flavor derives from this
     """
     def __init__(self, env):
-        self.name = "Base Flavor - no overrides"
-        self.short_name = None  # override this
+        self.name = "Base Flavor - no overrides" # should override this
         self.env = env
         self.check_distribution()
 
@@ -24,10 +23,6 @@ class Flavor:
         python, ruby, perl
         """
         return items
-
-    def post_install(self):
-        """Post installation hook"""
-        pass
 
     def check_distribution(self):
         """Ensure the distribution matches an expected type for this edition.
@@ -63,8 +58,19 @@ class Flavor:
     def apt_upgrade_system(self, env=None):
         """Upgrade system through apt - so this behaviour can be overridden
         """
-        sudo_cmd = env.safe_sudo if env else sudo
-        sudo_cmd("apt-get -y --force-yes upgrade")
+        env.safe_sudo("apt-get -y --force-yes upgrade")
+
+    def post_install(self):
+        """Add scripts for starting FreeNX and CloudMan.
+        """
+        pass
+
+class Minimal(Flavor):
+
+    def __init__(self, env):
+        Flavor.__init__(self,env)
+        self.name = "Minimal Flavor"
+        self.short_name = "minimal"
 
     def rewrite_config_items(self, name, items):
         """Generic hook to rewrite a list of configured items.
@@ -72,17 +78,9 @@ class Flavor:
         Can define custom dispatches based on name: packages, custom,
         python, ruby, perl
         """
-        to_add = ["galaxy", "galaxy_tools", "cloudman"]
-        for x in to_add:
-            if x not in items:
-                items.append(x)
         return items
 
     def post_install(self, pkg_install=None):
         """Add scripts for starting FreeNX and CloudMan.
         """
-        _freenx_scripts(self.env)
-        if pkg_install is not None and 'cloudman' in pkg_install:
-            _configure_cloudman(self.env)
-
-
+        pass
