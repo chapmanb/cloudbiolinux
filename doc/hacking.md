@@ -1,20 +1,20 @@
 # Hacking BioLinux tips and tricks
 
 The BioLinux tools allow building a full environment for Bioinformatics. The
-design allows for flexible targets (Editions) and specializations (Flavors).
+design allows for flexible targets (Flavors).
 
 VirtualBox + Vagrant make an ideal toying environment for building and testing
 targets. The BioLinux regression test system (in ./test/) uses that combo too.
 Please read the README and ./doc/vagrant documentation that come with the
 BioLinux source tree first (see http://github.com/chapmanb/cloudbiolinux).
 
-## Start with the Minimal edition
+## Start with the Minimal 
 
-The Minimal edition is the smallest common denominator of all Editions, as it
+Minimal is the smallest common denominator of all, as it
 installs the minimum of packages to bootstrap a full install. Once the
 vagrant box is up and running, Minimal is invoked from the desktop by
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/minimal
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/flavor/minimal
 
 where $source points to your biolinux source tree (replace 'target_hostname'
 with 'vagrant' when using that). In fact, the testing script in
@@ -31,7 +31,7 @@ and the actual run:
 
 The main.yaml file ascertains the major editors are included, as well remote
 access, version control, and the basic build system (gcc and friends). Note the
-Minimal edition overwrites the (apt) sources file to make sure there are no
+Minimal overwrites the (apt) sources file to make sure there are no
 conflicts with user settings.
 
 ## Adding install packages
@@ -40,7 +40,7 @@ To expand on the package list you can define your own main.yaml, and pass that
 in. In your main.yaml file add the meta-packages listed in
 config/packages.yaml. Invoke your new package list with
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=/path/to/myproject
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:flavor=/path/to/myproject
 
 where the `myproject` directory contains your main.yaml. It is that simple!
 
@@ -90,7 +90,7 @@ To extract the contained VirtualBox vmdk:
 
 Note: NYI
 
-BioLinux creates a (default, or edition based) list of package sources. These
+BioLinux creates a default list of package sources. These
 sources can be overridden by the Flavor.rewrite_apt_sources_list method - which
 should return a new list.
 
@@ -98,7 +98,7 @@ should return a new list.
 
 The primary way of adding new packages is by creating a new main.yaml file, as
 discussed above in ''Define a flavor''. In addition a flavor can define a
-method: BioLinux creates a (default, or edition based) list of packages. These
+method: BioLinux creates a list of packages. These
 sources can be overridden by the Flavor.rewrite_config_list method - which
 should return a new list.
 
@@ -110,7 +110,7 @@ filter existing meta packages.
 ## Flavor: rewrite Ruby gem, Perl CPAN, Python egg, R CRAN lists
 
 The function rewrite_config_list also allows rewriting package lists for Ruby,
-Python, R, Perl etc. The general idea is that the main Editions define the
+Python, R, Perl etc. The general idea is that they define the
 inclusion of the main languages, and pull in Bio* related packages. To override
 this behaviour use the rewrite functions, e.g.
 

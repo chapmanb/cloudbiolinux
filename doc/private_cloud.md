@@ -87,8 +87,8 @@ For example, to install the Minimal flavor on Debian stable on a VM
 running on IP 192.168.64.105:
 
        fab -f $source/fabfile.py -H biolinux@192.168.64.105 \
-       -c $source/contrib/minimal/fabricrc_debian.txt \
-       install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+       -c $source/contrib/flavor/minimal/fabricrc_debian.txt \
+       install_biolinux:packagelist=$source/contrib/flavor/minimal/main.yaml
 
 CloudBioLinux shows the following output. First it sets up the
 environment
@@ -109,7 +109,7 @@ environment
         cloudbiolinux INFO: Now, testing connection to host...
         cloudbiolinux INFO: Connection to host appears to work!
         cloudbiolinux DEBUG: Expand paths
-        cloudbiolinux INFO: packagelist=/home/biolinux/izip/git/opensource/debian/biolinux/contrib/minimal/main.yaml
+        cloudbiolinux INFO: packagelist=/home/biolinux/izip/git/opensource/debian/biolinux/contrib/flavor/minimal/main.yaml
         cloudbiolinux INFO: Meta-package information
         cloudbiolinux INFO: minimal,ruby
         cloudbiolinux INFO:
