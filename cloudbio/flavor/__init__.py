@@ -12,7 +12,8 @@ class Flavor:
     """Base class. Every flavor derives from this
     """
     def __init__(self, env):
-        self.name = "Base Flavor - no overrides" # should override this
+        self.name = "Base Flavor - no overrides"  # should override this
+        self.short_name = ""
         self.env = env
         self.check_distribution()
 
@@ -68,7 +69,7 @@ class Flavor:
 class Minimal(Flavor):
 
     def __init__(self, env):
-        Flavor.__init__(self,env)
+        Flavor.__init__(self, env)
         self.name = "Minimal Flavor"
         self.short_name = "minimal"
 
