@@ -123,6 +123,11 @@ hydra:
   homepage_uri: https://code.google.com/p/hydra-sv/
   name: hydra
   version: 0.5.3
+kraken:
+  description: kraken
+  homepage_uri: 'http://ccb.jhu.edu/software/kraken/'
+  name: kraken
+  version: 0.10.3-beta
 lastz:
   description: LASTZ sequence alignment program.
   homepage_uri: http://www.bx.psu.edu/miller_lab/dist/README.lastz-1.02.00/README.lastz-1.02.00a.html
