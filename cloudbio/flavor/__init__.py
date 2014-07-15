@@ -91,7 +91,6 @@ class Minimal(Flavor):
         Flavor.__init__(self,env)
         self.name = "Minimal Flavor"
         self.short_name = "minimal"
-        print "****HERE****"
 
     def rewrite_config_items(self, name, items):
         """Generic hook to rewrite a list of configured items.
@@ -99,7 +98,6 @@ class Minimal(Flavor):
         Can define custom dispatches based on name: packages, custom,
         python, ruby, perl
         """
-        print "****HERE****"
         return items
 
     def post_install(self, pkg_install=None):

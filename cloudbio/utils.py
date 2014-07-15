@@ -117,9 +117,7 @@ def _setup_flavor(env, flavor):
         flavor_name = os.path.split(flavor_dir)[-1]
         # Reinstantiate class
         import cloudbio.flavor
-        object = getattr(cloudbio.flavor, flavor_name.capitalize())()
-        print object
-        sys.exit(1)
+        object = getattr(cloudbio.flavor, flavor_name.capitalize())(env)
         env.flavor = object
         env.flavor.name = flavor_name
         # Load python customizations to base configuration if present

@@ -350,7 +350,6 @@ def _read_main_config():
     if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
-    sys.exit(1)
     return packages, sorted(libraries), custom_ignore, custom_add
 
 # ### Library specific installation code
