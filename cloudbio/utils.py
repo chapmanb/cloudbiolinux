@@ -114,6 +114,12 @@ def _setup_flavor(env, flavor):
         assert os.path.exists(flavor_dir), \
             "Did not find directory {0} for flavor {1}".format(flavor_dir, flavor)
         env.flavor_dir = flavor_dir
+        flavor_name = os.path.split(flavor_dir)[-1]
+        # Reinstantiate class
+        import cloudbio.flavor
+        object = getattr(cloudbio.flavor, flavor_name.capitalize())(env)
+        env.flavor = object
+        env.flavor.name = flavor_name
         # Load python customizations to base configuration if present
         for ext in ["", "flavor"]:
             py_flavor = os.path.split(os.path.realpath(flavor_dir))[1] + ext
@@ -121,7 +127,8 @@ def _setup_flavor(env, flavor):
             if os.path.exists(flavor_custom_py):
                 sys.path.append(flavor_dir)
                 mod = __import__(py_flavor, fromlist=[py_flavor])
-    env.logger.info("This is a %s" % env.flavor.name)
+        env.logger.info(env.flavor)
+        env.logger.info("This is a %s flavor" % env.flavor.name)
 
 def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.

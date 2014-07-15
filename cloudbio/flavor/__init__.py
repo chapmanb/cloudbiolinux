@@ -12,8 +12,7 @@ class Flavor:
     """Base class. Every flavor derives from this
     """
     def __init__(self, env):
-        self.name = "Base Flavor - no overrides"
-        self.short_name = None  # override this
+        self.name = "Base Flavor - no overrides" # should override this
         self.env = env
         self.check_distribution()
 
@@ -62,6 +61,26 @@ class Flavor:
         env.safe_sudo("apt-get -y --force-yes upgrade")
 
     def post_install(self):
+        """Add scripts for starting FreeNX and CloudMan.
+        """
+        pass
+
+class Minimal(Flavor):
+
+    def __init__(self, env):
+        Flavor.__init__(self,env)
+        self.name = "Minimal Flavor"
+        self.short_name = "minimal"
+
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        return items
+
+    def post_install(self, pkg_install=None):
         """Add scripts for starting FreeNX and CloudMan.
         """
         pass
