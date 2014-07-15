@@ -31,8 +31,8 @@ import cloudbio
 
 from cloudbio import libraries
 from cloudbio.utils import _setup_logging, _configure_fabric_environment
-from cloudbio.cloudman import _cleanup_ec2
-from cloudbio.cloudbiolinux import _cleanup_space
+from cloudbio.cloudman import _cleanup_ec2, _configure_cloudman
+from cloudbio.cloudbiolinux import _cleanup_space, _freenx_scripts
 from cloudbio.custom import shared
 from cloudbio.package.shared import _yaml_to_packages
 from cloudbio.package import brew
@@ -120,6 +120,10 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
         _do_library_installs(lib_install)
     if target is None or target == "post_install":
         env.flavor.post_install()
+        if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
+            _freenx_scripts(self.env)
+            if pkg_install is not None and 'cloudman' in pkg_install:
+                _configure_cloudman(self.env)
     if target is None or target == "cleanup":
         _cleanup_space(env)
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:

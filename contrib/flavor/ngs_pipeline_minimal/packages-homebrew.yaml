@@ -16,6 +16,7 @@ bio_nextgen:
     - biobambam
     - fastqc
     - qualimap
+    - kraken
     - sambamba
     - samblaster
     - seqtk==HEAD

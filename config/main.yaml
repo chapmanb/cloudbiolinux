@@ -34,7 +34,7 @@ packages:
   - bio_utils
   - phylogeny
 # Do not install by default to avoid errors with local installs
-# Injected in cloudbio/edition/base.CloudBioLinux for CBL editions
+# Injected by setting is_ec2_image in fabricrc.txt
 #  - galaxy
 #  - galaxy_tools
 #  - cloudman
