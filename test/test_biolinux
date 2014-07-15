@@ -105,7 +105,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
        cd ~/my_test_vms/
 
-     test Minimal edition - this will pull the remote box to local disk once
+     test Minimal flavor - this will pull the remote box to local disk once
 
        $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 

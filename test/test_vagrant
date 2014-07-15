@@ -101,7 +101,7 @@ if ARGV.index('-h') or ARGV.index('--help')
 
        cd ~/my_test_vms/
 
-     test Minimal edition - this will pull the remote box to local disk once
+     test Minimal - this will pull the remote box to local disk once
 
        $cloudbiolinux/test/test_vagrant Minimal
 
@@ -257,7 +257,7 @@ Dir.chdir(testname) do
     test_in_path(ssh,"gem")
     # Make sure Ruby 1.9.1 is in Minimal
     # test_for_match(ssh,"/usr/bin/ruby1.9.1 -v", "1.9")
-    # Run flavor/edition specific tests
+    # Run flavor specific tests
     eval(call_test+'(vagrant)') if call_test
     if test_for_completed_install(ssh,vagrant_hostname,box_name)
       print <<COMPLETE
