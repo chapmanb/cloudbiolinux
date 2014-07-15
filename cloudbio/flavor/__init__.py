@@ -13,7 +13,6 @@ class Flavor:
     """
     def __init__(self, env):
         self.name = "Base Flavor - no overrides" # should override this
-        self.short_name = None # should override this
         self.env = env
         self.check_distribution()
 
@@ -76,6 +75,31 @@ class Flavor:
         for x in to_add:
             if x not in items:
                 items.append(x)
+        return items
+
+    def post_install(self, pkg_install=None):
+        """Add scripts for starting FreeNX and CloudMan.
+        """
+        _freenx_scripts(self.env)
+        if pkg_install is not None and 'cloudman' in pkg_install:
+            _configure_cloudman(self.env)
+
+
+class Minimal(Flavor):
+
+    def __init__(self, env):
+        Flavor.__init__(self,env)
+        self.name = "Minimal Flavor"
+        self.short_name = "minimal"
+        print "****HERE****"
+
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        print "****HERE****"
         return items
 
     def post_install(self, pkg_install=None):

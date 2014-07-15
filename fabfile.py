@@ -341,7 +341,7 @@ def _read_main_config():
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data.get('packages', [])
-    packages = env.flavoflavorr.rewrite_config_items("main_packages", packages)
+    packages = env.flavor.rewrite_config_items("main_packages", packages)
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
     custom_add = full_data.get("custom_additional")
@@ -350,6 +350,7 @@ def _read_main_config():
     if custom_ignore is None: custom_ignore = []
     env.logger.info("Meta-package information from {2}\n- Packages: {0}\n- Libraries: "
             "{1}".format(",".join(packages), ",".join(libraries), yaml_file))
+    sys.exit(1)
     return packages, sorted(libraries), custom_ignore, custom_add
 
 # ### Library specific installation code
