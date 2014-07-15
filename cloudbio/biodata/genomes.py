@@ -588,7 +588,7 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None)
     full_ref_path = os.path.join(os.pardir, ref_file)
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
-        with lcd(dir_name):
+        with cd(dir_name):
             if pre:
                 full_ref_path = pre(full_ref_path)
             env.safe_run(command.format(ref_file=full_ref_path, index_name=index_name))

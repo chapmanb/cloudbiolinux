@@ -10,7 +10,6 @@ packages:
   - distributed
   - documentation
   - libraries
-  - hadoop
   - amazon
   - python
   - r

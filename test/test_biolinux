@@ -17,7 +17,8 @@
 #   ./test/test_biolinux --help
 #   ./test/test_biolinux --list
 #
-# See also the hacking documents in ./doc/
+# Easiest is to create a Host entry in ./ssh/config. See also the hacking
+# documents in ./doc/
 
 require 'rubygems'
 require 'yaml'
@@ -112,6 +113,10 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
        $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 
+     or, with a few more options
+
+       $cloudbiolinux/test/test_biolinux -p 2222 -u biolinux -i ~/.ssh/biolinux.pub localhost Minimal
+
   Available flavors are:
 
 USAGE
@@ -151,18 +156,19 @@ fab_opts += " -i #{$sshkey}" if $sshkey
 fab_opts += " -H #{$hostname}"
 fab_opts += ":#{$port}" if $port
 
+$stderr.print "Logging in with fab through ssh hostname <#{$hostname}>, port <#{$port}>, user <#{$user}>, passwd <#{$pwd}>\n"
+
 run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:flavor=#{packagelist}"
 
-# Net::SSH.start($hostname, $user, :password => $pwd, :keys => [$sshkey], :port => $port) do |ssh|
 Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   @ssh = ssh
   @prompt = $hostname
   @prompt = "img" if $hostname == '127.0.0.1'
   def exec cmd
-    print "#{@prompt}> ",cmd,"\n"
+    $stderr.print "#{@prompt}> ",cmd,"\n"
     @ssh.exec!(cmd)
   end
-  print "logged in!\n"
+  $stderr.print "logged in!\n"
   dpkg = exec("dpkg -l")
   File.open("dpkg.lst","w").write(dpkg)
   test_for_match(ssh,"/usr/bin/ruby -v", "ruby")

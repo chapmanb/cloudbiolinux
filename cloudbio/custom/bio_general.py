@@ -46,7 +46,8 @@ def install_emboss(env):
     """
     default_version = "6.6.0"
     version = env.get("tool_version", default_version)
-    url = "ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-%s.tar.gz" % version
+    url = "https://science-annex.org/pub/emboss/EMBOSS-%s.tar.gz" % version
+    #url = "ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-%s.tar.gz" % version
     _get_install(url, env, _configure_make)
 
 def install_pgdspider(env):

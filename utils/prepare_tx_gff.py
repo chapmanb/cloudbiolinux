@@ -32,7 +32,7 @@ from bcbio.utils import chdir, safe_makedir, file_exists
 
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "74"
+ensembl_release = "75"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 
 # taxname:
@@ -207,8 +207,8 @@ def main(org_build, gtf_file=None):
         prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
-        if os.path.exists(rnaseq_dir):
-            shutil.rmtree(rnaseq_dir)
+        if os.path.exists(rnaseq_dir) and os.path.islink(rnaseq_dir):
+            os.unlink(rnaseq_dir)
         os.symlink(out_dir, rnaseq_dir)
 
     tar_dirs = [out_dir]
