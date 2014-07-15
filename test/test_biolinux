@@ -173,7 +173,7 @@ Net::SSH.start($hostname, $user, ssh_opts) do |ssh|
   dpkg = exec("dpkg -l")
   File.open("dpkg.lst","w").write(dpkg)
   test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
-  # test_in_path(ssh,"gem")
+  test_in_path(ssh,"gem")
 
   # test for completed install
   # lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
