@@ -13,6 +13,7 @@ class Flavor:
     """
     def __init__(self, env):
         self.name = "Base Flavor - no overrides"
+        self.short_name = None  # override this
         self.env = env
         self.check_distribution()
 

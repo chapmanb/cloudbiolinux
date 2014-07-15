@@ -97,7 +97,7 @@ complete. Essentially with a running instance:
       ./test/test_biolinux -p 2222 -u biolinux -i ~/.ssh/biolinux 127.0.0.1
 
 (note the use of 127.0.0.1 over localhost - this is because of a bug
-in fabric - still true?).
+in fabric - is this still true?).
 
 # KVM tips
 
