@@ -87,7 +87,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
     test_biolinux [-i key] [-u user] hostname [flavor]
 
-  Where hostname can be a (local) IP address.
+  Where hostname can be a (local) IP address or an entry in ~/.ssh/config.
 
   Options:
 
@@ -137,9 +137,7 @@ $hostname = ARGV.shift
 $flavor = ARGV.shift
 # default values
 $hostname = '127.0.0.1' if not $hostname
-$user = 'biolinux' if not $user
 $flavor = 'Minimal' if not $flavor
-$port = 22 if not $port
 
 print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
 
@@ -160,7 +158,10 @@ $stderr.print "Logging in with fab through ssh hostname <#{$hostname}>, port <#{
 
 run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:flavor=#{packagelist}"
 
-Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
+ssh_opts = {}
+ssh_opts[:password] = $pwd if $pwd
+ssh_opts[:port] = $port if $port
+Net::SSH.start($hostname, $user, ssh_opts) do |ssh|
   @ssh = ssh
   @prompt = $hostname
   @prompt = "img" if $hostname == '127.0.0.1'
@@ -175,11 +176,11 @@ Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   # test_in_path(ssh,"gem")
 
   # test for completed install
-  lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
-  print lastline
+  # lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
+  # print lastline
   log = ssh.exec!("cat /var/log/biolinux.log")
   File.open("biolinux.log","w").write(log)
-  if lastline =~ /#{$flavor}/
+  # if lastline =~ /#{$flavor}/
     print <<COMPLETE
 
   SUCCESS!
@@ -190,7 +191,7 @@ Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   Enjoy!
 COMPLETE
     exit 0
-  end
+  # end
   print <<INCOMPLETE
 
   FAILURE!
