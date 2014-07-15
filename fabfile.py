@@ -73,6 +73,7 @@ def install_biolinux(target=None, flavor=None):
                                   ignore_distcheck=(target is not None
                                                     and target in ["libraries", "custom"]))
     env.logger.debug("Target is '%s'" % target)
+    env.logger.debug("Flavor is '%s'" % flavor)
     _perform_install(target, flavor)
     _print_time_stats("Config", "end", time_start)
     if hasattr(env, "keep_isolated") and env.keep_isolated:
@@ -340,7 +341,7 @@ def _read_main_config():
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
     packages = full_data.get('packages', [])
-    # packages = env.edition.rewrite_config_items("main_packages", packages)
+    packages = env.flavoflavorr.rewrite_config_items("main_packages", packages)
     libraries = full_data.get('libraries', [])
     custom_ignore = full_data.get('custom_ignore', [])
     custom_add = full_data.get("custom_additional")

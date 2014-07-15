@@ -8,9 +8,7 @@
 #  Updated by Pjotr Prins <pjotr.debian@thebird.nl>
 #
 
-## BioNode is Debian
-edition = minimal
-edition_version = 0.92
+edition_version = 0.93
 distribution = __auto__
 dist_name = __auto__
 nixpkgs = False

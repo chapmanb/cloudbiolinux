@@ -12,8 +12,8 @@ class Flavor:
     """Base class. Every flavor derives from this
     """
     def __init__(self, env):
-        self.name = "Base Flavor - no overrides"
-        self.short_name = None  # override this
+        self.name = "Base Flavor - no overrides" # should override this
+        self.short_name = None # should override this
         self.env = env
         self.check_distribution()
 

@@ -129,8 +129,7 @@ def _setup_env(env):
     if env.distribution in ["debian", "ubuntu"]:
         config_file = get_config_file(env, "packages.yaml")
         (packages, _) = _yaml_to_packages(config_file.base, 'cloudman')
-        # Allow editions and flavors to modify the package list
-        # packages = env.edition.rewrite_config_items("packages", packages)
+        # Allow flavors to modify the package list
         packages = env.flavor.rewrite_config_items("packages", packages)
         _setup_apt_automation()
         _apt_packages(pkg_list=packages)

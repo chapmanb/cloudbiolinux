@@ -121,7 +121,9 @@ def _setup_flavor(env, flavor):
             if os.path.exists(flavor_custom_py):
                 sys.path.append(flavor_dir)
                 mod = __import__(py_flavor, fromlist=[py_flavor])
-    env.logger.info("This is a %s" % env.flavor.name)
+        env.flavor.name = os.path.split(flavor_dir)[-1]
+        env.logger.info(env.flavor)
+        env.logger.info("This is a %s flavor" % env.flavor.name)
 
 def _parse_fabricrc(env):
     """Defaults from fabricrc.txt file; loaded if not specified at commandline.
