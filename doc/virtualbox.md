@@ -46,7 +46,7 @@ version of Linux, a BSD kernel, or for install less software (do you
 really need X/KDE/Gnome?), so you do not end up with an 8 GB VM, or for more
 software and/or data pre-intstalled on a VM. 
 
-The BioLinux setup is designed to be modular, to support multiple editions and
+The BioLinux setup is designed to be modular, to support multiple 
 flavors (see the main README for an explanation of terms).
 
 Start with a standard downloadable prepared Vagrant box. For example a Debian
@@ -89,7 +89,7 @@ vagrant host, using a minimal install target. E.g.
 
 and
 
-          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/minimal/main.yaml
 
 which uses the information from the local ./Vagrantfile. 
 
@@ -110,7 +110,7 @@ BioLinux minimal install has an unpacked size under 1Gb. E.g.
 Despite the fact that running fabfile.py is destructive, i.e. it overwrites the
 current install, it is reasonably safe as it mostly uses the underlying package
 management system and dependency resolution. Rerunning a BioLinux fabfile can
-be fast.  The minimal edition runs the second time in under 20 seconds on a
+be fast.  Minimal runs the second time in under 20 seconds on a
 basic laptop, as we do with a 'Minimal' install:
 
          ./test/test_vagrant --continue

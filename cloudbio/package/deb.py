@@ -20,18 +20,18 @@ def _apt_packages(to_install=None, pkg_list=None):
 
     :type pkg_list:  list
     :param pkg_list: An explicit list of packages to install. No other files,
-                     flavors, or editions are considered.
+                     flavors are considered.
     """
-    if env.edition.short_name not in ["minimal"]:
+    if env.flavor.short_name not in ["minimal"]:
         env.logger.info("Update the system")
         with settings(warn_only=True):
             env.safe_sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
-        env.edition.apt_upgrade_system(env=env)
+        env.flavor.apt_upgrade_system(env=env)
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
         # Allow editions and flavors to modify the package list
-        packages = env.edition.rewrite_config_items("packages", packages)
+        # packages = env.edition.rewrite_config_items("packages", packages)
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
         env.logger.info("Will install specific packages: {0}".format(pkg_list))
@@ -63,7 +63,7 @@ def _add_apt_gpg_keys():
             ("subkeys.pgp.net", "D018A4CE"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
-    standalone, keyserver = env.edition.rewrite_apt_keys(standalone, keyserver)
+    standalone, keyserver = env.flavor.rewrite_apt_keys(standalone, keyserver)
     for key in standalone:
         with settings(warn_only=True):
             env.safe_sudo("wget -q -O- %s | apt-key add -" % key)
@@ -116,7 +116,7 @@ def _setup_apt_automation():
             # https://bugs.launchpad.net/ubuntu/+source/gdm/+bug/1020770
             "debconf debconf/priority select critical"
             ]
-    package_info = env.edition.rewrite_apt_automation(package_info)
+    package_info = env.flavor.rewrite_apt_automation(package_info)
     cmd = ""
     for l in package_info:
         cmd += 'echo "%s" | /usr/bin/debconf-set-selections;' % l
@@ -138,12 +138,12 @@ def _setup_apt_sources():
         env.safe_sudo('apt-get update')
         env.safe_sudo('apt-get -y --force-yes install sudo curl')
 
-    env.logger.debug("_setup_apt_sources " + env.sources_file + " " + env.edition.name)
-    env.edition.check_packages_source()
-    comment = "# This file was modified for " + env.edition.name
+    env.logger.debug("_setup_apt_sources " + env.sources_file)
+    env.flavor.check_packages_source()
+    comment = "# This file was modified for " + env.flavor.name
     # Setup apt download policy (default is None)
     # (see also https://help.ubuntu.com/community/PinningHowto)
-    preferences = env.edition.rewrite_apt_preferences([])
+    preferences = env.flavor.rewrite_apt_preferences([])
     if len(preferences):
         # make sure it exists, and is empty
         env.safe_sudo("rm -f %s" % env.apt_preferences_file)
@@ -162,7 +162,7 @@ def _setup_apt_sources():
     # Add a comment
     if not env.safe_contains(env.sources_file, comment):
         env.safe_append(env.sources_file, comment, use_sudo=True)
-    for source in env.edition.rewrite_apt_sources_list(env.std_sources):
+    for source in env.flavor.rewrite_apt_sources_list(env.std_sources):
         env.logger.debug("Source %s" % source)
         if source.startswith("ppa:"):
             env.safe_sudo("apt-get install -y --force-yes python-software-properties")

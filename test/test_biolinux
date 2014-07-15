@@ -36,8 +36,8 @@ end
 CONFIG = <<EOCONFIG
 ---
 Minimal:
-  :fabricrc: contrib/minimal/fabricrc_debian.txt
-  :packagelist: contrib/minimal
+  :fabricrc: contrib/flavor/minimal/fabricrc_debian.txt
+  :packagelist: contrib/flavor/minimal
 Boinc:     
   # Boinc is a Minimal flavor for running Boinc clients
   :fabricrc:    contrib/flavor/boinc/fabricrc_debian.txt
@@ -77,7 +77,7 @@ if ARGV.index('--list')
   exit 0
 end
 
-if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
+if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
     Note this testing framework is under development, and is meant to
@@ -87,7 +87,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
     test_biolinux [-i key] [-u user] hostname [flavor]
 
-  Where hostname can be a (local) IP address.
+  Where hostname can be a (local) IP address or an entry in ~/.ssh/config.
 
   Options:
 
@@ -105,7 +105,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
 
        cd ~/my_test_vms/
 
-     test Minimal edition - this will pull the remote box to local disk once
+     test Minimal flavor - this will pull the remote box to local disk once
 
        $cloudbiolinux/test/test_biolinux -u biolinux 10.0.2.1 Minimal
 
@@ -120,7 +120,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
   Available flavors are:
 
 USAGE
-  list_boxes
+  list_boxes config
   exit 0
 end
 
@@ -133,13 +133,15 @@ OptionParser.new do |o|
   o.parse!
 end
 
-$hostname = ARGV.shift
-$flavor = ARGV.shift
+if ARGV.size == 0
+  $hostname = 'biolinux'
+else
+  $hostname = ARGV.shift
+  $flavor = ARGV.shift
+end
 # default values
 $hostname = '127.0.0.1' if not $hostname
-$user = 'biolinux' if not $user
 $flavor = 'Minimal' if not $flavor
-$port = 22 if not $port
 
 print "Testing #{$flavor} (#{$user}@#{$hostname})\n"
 
@@ -160,7 +162,10 @@ $stderr.print "Logging in with fab through ssh hostname <#{$hostname}>, port <#{
 
 run "fab #{fab_opts} -f #{srcpath}/fabfile.py -c #{fabricrc} install_biolinux:flavor=#{packagelist}"
 
-Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
+ssh_opts = {}
+ssh_opts[:password] = $pwd if $pwd
+ssh_opts[:port] = $port if $port
+Net::SSH.start($hostname, $user, ssh_opts) do |ssh|
   @ssh = ssh
   @prompt = $hostname
   @prompt = "img" if $hostname == '127.0.0.1'
@@ -172,14 +177,14 @@ Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   dpkg = exec("dpkg -l")
   File.open("dpkg.lst","w").write(dpkg)
   test_for_match(ssh,"/usr/bin/ruby -v", "ruby")
-  # test_in_path(ssh,"gem")
+  test_in_path(ssh,"gem")
 
   # test for completed install
-  lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
-  print lastline
+  # lastline = ssh.exec!("tail -1 /var/log/biolinux.log")
+  # print lastline
   log = ssh.exec!("cat /var/log/biolinux.log")
   File.open("biolinux.log","w").write(log)
-  if lastline =~ /#{$flavor}/
+  # if lastline =~ /#{$flavor}/
     print <<COMPLETE
 
   SUCCESS!
@@ -190,7 +195,7 @@ Net::SSH.start($hostname, $user, :password => $pwd, :port => $port) do |ssh|
   Enjoy!
 COMPLETE
     exit 0
-  end
+  # end
   print <<INCOMPLETE
 
   FAILURE!

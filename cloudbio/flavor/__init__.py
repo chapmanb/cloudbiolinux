@@ -13,7 +13,9 @@ class Flavor:
     """
     def __init__(self, env):
         self.name = "Base Flavor - no overrides"
+        self.short_name = None  # override this
         self.env = env
+        self.check_distribution()
 
     def rewrite_config_items(self, name, items):
         """Generic hook to rewrite a list of configured items.
@@ -26,3 +28,61 @@ class Flavor:
     def post_install(self):
         """Post installation hook"""
         pass
+
+    def check_distribution(self):
+        """Ensure the distribution matches an expected type for this edition.
+
+        Base supports multiple distributions.
+        """
+        pass
+
+    def check_packages_source(self):
+        """Override for check package definition file before updating
+        """
+        pass
+
+    def rewrite_apt_sources_list(self, sources):
+        """Allows editions to modify the sources list
+        """
+        return sources
+
+    def rewrite_apt_preferences(self, preferences):
+        """Allows editions to modify the apt preferences policy file
+        """
+        return preferences
+
+    def rewrite_apt_automation(self, package_info):
+        """Allows editions to modify the apt automation list
+        """
+        return package_info
+
+    def rewrite_apt_keys(self, standalone, keyserver):
+        """Allows editions to modify key list"""
+        return standalone, keyserver
+
+    def apt_upgrade_system(self, env=None):
+        """Upgrade system through apt - so this behaviour can be overridden
+        """
+        sudo_cmd = env.safe_sudo if env else sudo
+        sudo_cmd("apt-get -y --force-yes upgrade")
+
+    def rewrite_config_items(self, name, items):
+        """Generic hook to rewrite a list of configured items.
+
+        Can define custom dispatches based on name: packages, custom,
+        python, ruby, perl
+        """
+        to_add = ["galaxy", "galaxy_tools", "cloudman"]
+        for x in to_add:
+            if x not in items:
+                items.append(x)
+        return items
+
+    def post_install(self, pkg_install=None):
+        """Add scripts for starting FreeNX and CloudMan.
+        """
+        _freenx_scripts(self.env)
+        if pkg_install is not None and 'cloudman' in pkg_install:
+            _configure_cloudman(self.env)
+
+

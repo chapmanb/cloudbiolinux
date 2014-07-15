@@ -46,7 +46,7 @@ def _nix_packages(to_install):
         sudo("nix-channel --update")
         # Retrieve final package names
         (packages, _) = _yaml_to_packages(pkg_config_file, to_install)
-        packages = env.edition.rewrite_config_items("packages", packages)
+        # packages = env.edition.rewrite_config_items("packages", packages)
         packages = env.flavor.rewrite_config_items("packages", packages)
         for p in packages:
             sudo("nix-env -b -i %s" % p)

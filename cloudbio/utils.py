@@ -9,7 +9,7 @@ from fabric.colors import yellow, red, green, magenta
 from fabric.api import settings, hide, cd, run
 from fabric.contrib.files import exists
 
-from cloudbio.edition import _setup_edition
+# from cloudbio.edition import _setup_edition
 from cloudbio.distribution import _setup_distribution_environment
 from cloudbio.flavor import Flavor
 from cloudbio.flavor.config import get_config_file
@@ -77,7 +77,7 @@ def _update_biolinux_log(env, target, flavor):
         else:
             flavor = flavor.name
     logfn = "/var/log/biolinux.log"
-    info = "Target="+target+"; Edition="+env.edition.name+"; Flavor="+flavor
+    info = "Target="+target+"; Flavor="+flavor
     env.logger.info(info)
     if env.use_sudo:
         env.safe_sudo("date +\"%D %T - Updated "+info+"\" >> "+logfn)
@@ -90,7 +90,7 @@ def _configure_fabric_environment(env, flavor=None, fabricrc_loader=None,
 
     _setup_flavor(env, flavor)
     fabricrc_loader(env)
-    _setup_edition(env)
+    # _setup_edition(env)
     # get parameters for distro, packages etc.
     _setup_distribution_environment(ignore_distcheck=ignore_distcheck)
     _create_local_paths(env)
