@@ -89,7 +89,7 @@ vagrant host, using a minimal install target. E.g.
 
 and
 
-          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+          fab -f $source/fabfile.py -H vagrant  -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:packagelist=$source/contrib/flavor/minimal/main.yaml
 
 which uses the information from the local ./Vagrantfile. 
 

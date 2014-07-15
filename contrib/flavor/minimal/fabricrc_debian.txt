@@ -3,7 +3,7 @@
 # For example, to configure a minimal install with vagrant (for VirtualBox),
 # assuming you have a configured ./Vagrantfile
 #
-#  fab -H vagrant -f $source/fabfile.py -c  $source/contrib/minimal/fabricrc.txt install_biolinux:packagelist=$source/contrib/minimal/main.yaml
+#  fab -H vagrant -f $source/fabfile.py -c $source/contrib/flavor/minimal/fabricrc.txt install_biolinux:packagelist=$source/contrib/flavor/minimal/main.yaml
 #
 #  Updated by Pjotr Prins <pjotr.debian@thebird.nl>
 #

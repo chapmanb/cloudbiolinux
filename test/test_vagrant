@@ -23,8 +23,8 @@ BOX = {
         'Minimal' =>
            { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-minimal-0.91.box',
              :md5         => '64cdea1f76028971e53e2cd2f19a490a',
-             :fabricrc    => 'contrib/minimal/fabricrc_debian.txt',
-             :packagelist => 'contrib/minimal'
+             :fabricrc    => 'contrib/flavor/minimal/fabricrc_debian.txt',
+             :packagelist => 'contrib/flavor/minimal'
            },
         'Boinc' =>  # Boinc is a Minimal flavor for running Boinc clients
            { :url         => 'http://bio4.dnsalias.net/download/biolinux/biolinux-minimal-0.91.box',

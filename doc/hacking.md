@@ -14,7 +14,7 @@ Minimal is the smallest common denominator of all, as it
 installs the minimum of packages to bootstrap a full install. Once the
 vagrant box is up and running, Minimal is invoked from the desktop by
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/minimal
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/flavor/minimal
 
 where $source points to your biolinux source tree (replace 'target_hostname'
 with 'vagrant' when using that). In fact, the testing script in
@@ -40,7 +40,7 @@ To expand on the package list you can define your own main.yaml, and pass that
 in. In your main.yaml file add the meta-packages listed in
 config/packages.yaml. Invoke your new package list with
 
-          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/minimal/fabricrc_debian.txt install_biolinux:flavor=/path/to/myproject
+          fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/minimal/fabricrc_debian.txt install_biolinux:flavor=/path/to/myproject
 
 where the `myproject` directory contains your main.yaml. It is that simple!
 
