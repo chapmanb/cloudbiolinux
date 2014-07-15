@@ -36,8 +36,8 @@ end
 CONFIG = <<EOCONFIG
 ---
 Minimal:
-  :fabricrc: contrib/minimal/fabricrc_debian.txt
-  :packagelist: contrib/minimal
+  :fabricrc: contrib/flavor/minimal/fabricrc_debian.txt
+  :packagelist: contrib/flavor/minimal
 Boinc:     
   # Boinc is a Minimal flavor for running Boinc clients
   :fabricrc:    contrib/flavor/boinc/fabricrc_debian.txt
@@ -77,7 +77,7 @@ if ARGV.index('--list')
   exit 0
 end
 
-if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
+if ARGV.index('-h') or ARGV.index('--help')
   print <<USAGE
 
     Note this testing framework is under development, and is meant to
@@ -120,7 +120,7 @@ if ARGV.size == 0 or ARGV.index('-h') or ARGV.index('--help')
   Available flavors are:
 
 USAGE
-  list_boxes
+  list_boxes config
   exit 0
 end
 
@@ -133,8 +133,12 @@ OptionParser.new do |o|
   o.parse!
 end
 
-$hostname = ARGV.shift
-$flavor = ARGV.shift
+if ARGV.size == 0
+  $hostname = 'biolinux'
+else
+  $hostname = ARGV.shift
+  $flavor = ARGV.shift
+end
 # default values
 $hostname = '127.0.0.1' if not $hostname
 $flavor = 'Minimal' if not $flavor
