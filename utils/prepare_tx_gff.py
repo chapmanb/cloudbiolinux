@@ -212,6 +212,8 @@ def main(org_build, gtf_file=None):
         os.symlink(out_dir, rnaseq_dir)
 
     tar_dirs = [out_dir]
+    tarball = create_tarball(tar_dirs, org_build)
+
 
 def clean_gtf(gtf_file, org_build):
     """
@@ -246,12 +248,15 @@ def cleanup(work_dir, out_dir, org_build):
         pass
     shutil.move(work_dir, out_dir)
 
-def upload_to_s3(tar_dirs, org_build):
+def create_tarball(tar_dirs, org_build):
     str_tar_dirs = " ".join(os.path.relpath(d) for d in tar_dirs)
     tarball = "{org}-{dir}.tar.xz".format(org=org_build, dir=os.path.basename(tar_dirs[0]))
     if not os.path.exists(tarball):
         subprocess.check_call("tar -cvpf - {out_dir} | xz -zc - > {tarball}".format(
             out_dir=str_tar_dirs, tarball=tarball), shell=True)
+    return tarball
+
+def upload_to_s3(tarball):
     upload_script = os.path.join(os.path.dirname(__file__), "s3_multipart_upload.py")
     subprocess.check_call([sys.executable, upload_script, tarball, "biodata",
                            os.path.join("annotation", os.path.basename(tarball)),
