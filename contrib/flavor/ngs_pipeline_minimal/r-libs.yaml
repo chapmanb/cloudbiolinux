@@ -8,3 +8,4 @@ biocrepo: http://bioconductor.org/biocLite.R
 bioc:
  - cn.mops
  - rtracklayer
+ - DEXSeq
