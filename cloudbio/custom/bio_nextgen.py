@@ -343,28 +343,6 @@ def install_dwgsim(env):
     _get_install(url, env, _make_copy("ls -1 dwgsim dwgsim_eval scripts/dwgsim_pileup_eval.pl"),
                  post_unpack_fn=_get_samtools)
 
-@_if_not_installed("fastqc --version")
-def install_fastqc(env):
-    """A quality control tool for high throughput sequence data.
-    http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
-    """
-    version = "0.10.1"
-    url = "http://www.bioinformatics.bbsrc.ac.uk/projects/fastqc/" \
-          "fastqc_v%s.zip" % version
-    executable = "fastqc"
-    install_dir = _symlinked_java_version_dir("fastqc", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                out_file = shared._remote_fetch(env, url)
-                env.safe_run("unzip %s" % out_file)
-                with cd("FastQC"):
-                    env.safe_sudo("chmod a+rwx %s" % executable)
-                    env.safe_sudo("mv * %s" % install_dir)
-                env.safe_sudo("ln -s %s/%s %s/bin/%s" % (install_dir, executable,
-                                                         env.system_install, executable))
-
-
 @_if_not_installed("fastq_screen")
 def install_fastq_screen(env):
     """A screening application for high througput sequence data.

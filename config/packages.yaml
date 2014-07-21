@@ -335,7 +335,7 @@ bio_alignment:
   - probcons
   - wise
 bio_nextgen:
-  - bio-linux-fastqc
+  # - bio-linux-fastqc  # out of date with brew latest
   - fastx-toolkit
   - maq
   - plink
