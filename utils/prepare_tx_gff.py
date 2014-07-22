@@ -207,8 +207,11 @@ def main(org_build, gtf_file=None):
         prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
-        if os.path.exists(rnaseq_dir) and os.path.islink(rnaseq_dir):
-            os.unlink(rnaseq_dir)
+        if os.path.exists(rnaseq_dir):
+            if os.path.islink(rnaseq_dir):
+                os.unlink(rnaseq_dir)
+            else:
+                shutil.rmtree(rnaseq_dir)
         os.symlink(out_dir, rnaseq_dir)
 
     tar_dirs = [out_dir]
@@ -322,9 +325,6 @@ def make_miso_events(gtf, org_build):
     for f in gff_files:
         prefix = f.split(".")[0] + "_indexed"
         if not file_exists(prefix):
-            print prefix
-            print f
-            print cmd.format(**locals())
             subprocess.check_call(cmd.format(**locals()), shell=True)
 
 def prepare_tophat_index(gtf, org_build):
@@ -439,14 +439,35 @@ def prepare_rrna_gtf(gtf):
         return out_file
 
     db = _get_gtf_db(gtf)
+    biotype_lookup = _biotype_lookup_fn(gtf)
 
     with open(out_file, "w") as out_handle:
-        for g in db.all_features():
-            biotype = g.attributes.get("gene_biotype", None)
-            if biotype and biotype[0] in mask_biotype:
-                out_handle.write(str(g) + "\n")
-
+        for feature in db.all_features():
+            biotype = biotype_lookup(feature)
+            if biotype in mask_biotype:
+                out_handle.write(str(feature) + "\n")
     return out_file
+
+def _biotype_lookup_fn(gtf):
+    """
+    return a function that will look up the biotype of a feature
+    this checks for either gene_biotype or biotype being set or for the source
+    column to have biotype information
+    """
+    db = _get_gtf_db(gtf)
+    sources = set([feature.source for feature in db.all_features()])
+    gene_biotypes = set([feature.attributes.get("gene_biotype", [None])[0]
+                         for feature in db.all_features()])
+    biotypes = set([feature.attributes.get("biotype", [None])[0]
+                    for feature in db.all_features()])
+    if "protein_coding" in sources:
+        return lambda feature: feature.source
+    elif "protein_coding" in biotypes:
+        return lambda feature: feature.attributes.get("biotype", [None])[0]
+    elif "protein_coding" in gene_biotypes:
+        return lambda feature: feature.attributes.get("gene_biotype", [None])[0]
+    else:
+        return None
 
 def gtf_to_genepred(gtf):
     out_file = os.path.splitext(gtf)[0] + ".genePred"
