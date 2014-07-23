@@ -38,6 +38,7 @@ bio_nextgen:
     - rtg-tools
     - scalpel
     - snpeff
+    - vardict
     - vcflib
     - vep
     # - vcftools # Build problems with default libz on Ubuntu 12.04
