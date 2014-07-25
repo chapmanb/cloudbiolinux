@@ -12,11 +12,11 @@ from fabric.api import cd
 from cloudbio.custom import shared
 from cloudbio.fabutils import warn_only
 
-VERSIONS = {"rn5": "2014-05-02",
-            "GRCh37": "2014-05-02",
-            "hg19": "2014-05-02",
-            "mm10": "2014-05-02",
-            "canFam3": "2014-05-02"}
+VERSIONS = {"rn5": "2014-07-20",
+            "GRCh37": "2014-07-14",
+            "hg19": "2014-07-17",
+            "mm10": "2014-07-14",
+            "canFam3": "2014-07-20"}
 
 def download_transcripts(genomes, env):
     folder_name = "rnaseq"
