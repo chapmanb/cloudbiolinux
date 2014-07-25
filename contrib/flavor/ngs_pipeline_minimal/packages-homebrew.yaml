@@ -41,5 +41,6 @@ bio_nextgen:
     - vardict
     - vcflib
     - vep
+    - qsignature
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
