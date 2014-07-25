@@ -15,7 +15,6 @@ import os
 import operator
 import socket
 import subprocess
-from contextlib import contextmanager
 
 from fabric.api import *
 from fabric.contrib.files import *
@@ -202,31 +201,26 @@ class VectorBase(_DownloadHelper):
                 env.safe_run("gunzip -c %s >> %s" % (fn, genome_file))
         return genome_file, []
 
-
 class EnsemblGenome(_DownloadHelper):
     """Retrieve genome FASTA files from Ensembl.
 
-    ftp://ftp.ensemblgenomes.org/pub/plants/release-3/fasta/
-    arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR9.55.dna.toplevel.fa.gz
-    ftp://ftp.ensembl.org/pub/release-56/fasta/
-    caenorhabditis_elegans/dna/Caenorhabditis_elegans.WS200.56.dna.toplevel.fa.gz
+    ftp://ftp.ensemblgenomes.org/pub/plants/release-22/fasta/
+    arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.22.dna.toplevel.fa.gz
+    ftp://ftp.ensembl.org/pub/release-75/fasta/
+    caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.75.dna.toplevel.fa.gz
     """
-    def __init__(self, ensembl_section, release_number, release2, organism,
-            name, convert_to_ucsc=False, dl_name = None):
+    def __init__(self, ensembl_section, release, organism, name):
         _DownloadHelper.__init__(self)
         self.data_source = "Ensembl"
         if ensembl_section == "standard":
             url = "ftp://ftp.ensembl.org/pub/"
         else:
             url = "ftp://ftp.ensemblgenomes.org/pub/%s/" % ensembl_section
-        url += "release-%s/fasta/%s/dna/" % (release_number, organism.lower())
+        url += "release-%s/fasta/%s/dna/" % (release, organism.lower())
         self._url = url
-        release2 = ".%s" % release2 if release2 else ""
-        self._get_file = "%s.%s%s.dna.toplevel.fa.gz" % (organism, name,
-                release2)
+        self._get_file = "%s.%s.%s.dna.toplevel.fa.gz" % (organism, name, release)
         self._name = name
-        self.dl_name = dl_name if dl_name is not None else name
-        self._convert_to_ucsc = convert_to_ucsc
+        self.dl_name = name
 
     def download(self, seq_dir):
         genome_file = "%s.fa" % self._name
@@ -234,9 +228,6 @@ class EnsemblGenome(_DownloadHelper):
             shared._remote_fetch(env, "%s%s" % (self._url, self._get_file))
         if not self._exists(genome_file, seq_dir):
             env.safe_run("gunzip -c %s > %s" % (self._get_file, genome_file))
-        if self._convert_to_ucsc:
-            #run("sed s/ / /g %s" % genome_file)
-            raise NotImplementedError("Replace with chr")
         return genome_file, [self._get_file]
 
 class BroadGenome(_DownloadHelper):
@@ -279,11 +270,11 @@ GENOMES_SUPPORTED = [
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
-           ("Athaliana", "araTha_tair9", EnsemblGenome("plants", "6", "",
-               "Arabidopsis_thaliana", "TAIR9")),
+           ("Athaliana", "TAIR10", EnsemblGenome("plants", "20",
+                                                 "Arabidopsis_thaliana", "TAIR10")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
-           ("Celegans", "WS210", EnsemblGenome("standard", "60", "60",
-               "Caenorhabditis_elegans", "WS210")),
+           ("Celegans", "WBcel235", EnsemblGenome("standard", "75",
+                                                  "Caenorhabditis_elegans", "WBcel235")),
            ("Mtuberculosis_H37Rv", "mycoTube_H37RV", NCBIRest("mycoTube_H37RV",
                ["NC_000962"])),
            ("Msmegmatis", "92", NCBIRest("92", ["NC_008596.1"])),
