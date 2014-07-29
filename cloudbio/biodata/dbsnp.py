@@ -67,6 +67,7 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
     _download_repeats(gid)
     _download_dbnsfp(env, gid, manager.config)
     _download_ancestral(env, gid, manager.config)
+    _download_qsignature(env, gid, manager.config)
     # XXX Wait to get this by default until it is used more widely
     #_download_background_vcf(gid)
 
@@ -155,6 +156,33 @@ def _download_ancestral(env, gid, gconfig):
             outfile = os.path.basename(base_url) + ext
             if not env.safe_exists(outfile):
                 env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
+
+
+def _download_qsignature(env,gid,gconfig):
+    """Download qsignature position file to detect samples problems
+
+    :param env
+    :param gid: str genome id
+    :param gconfig: 
+
+    :returns: NULL
+    """
+    base_url = "http://downloads.sourceforge.net/project/adamajava/qsignature.tar.bz2"
+    if gid == "GRCh37":
+        outfile = "qsignature.vcf"
+        if not env.safe_exists(outfile):
+            zipfile = shared._remote_fetch(env, base_url , samedir=True)
+            outdir = "qsignature" 
+            env.safe_run("mkdir -p %s" % outdir)
+            env.safe_run("tar -jxf %s -C %s" % (zipfile, outdir))
+            env.safe_run("mv %s/qsignature_positions.txt %s" % (outdir, outfile))
+            env.safe_run("rm -rf %s" % outdir)
+            env.safe_run("rm -rf %s" % zipfile)
+    elif gid == "hg19":  # symlink to GRCh37 download        
+        outfile = os.path.basename(base_url) 
+        if not env.safe_exists(outfile):
+            env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))    
+
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.
