@@ -87,22 +87,15 @@ def write_brew_pkg_info(out_dir, tooldir):
         if not brew_cmd or not os.path.exists(brew_cmd):
             brew_cmd = "brew"
         try:
-            vout = subprocess.check_output([brew_cmd, "which"])
-            uses_which = True
-        except subprocess.CalledProcessError:
             vout = subprocess.check_output([brew_cmd, "list", "--versions"])
-            uses_which = False
         except OSError:  # brew not installed/used
             vout = ""
         out = {}
         for vstr in vout.split("\n"):
             if vstr.strip():
-                if uses_which:
-                    name, v = vstr.rstrip().split(": ")
-                else:
-                    parts = vstr.rstrip().split()
-                    name = parts[0]
-                    v = parts[-1]
+                parts = vstr.rstrip().split()
+                name = parts[0]
+                v = parts[-1]
                 out[name] = {"name": name, "version": v}
         with open(out_file, "w") as out_handle:
             yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)

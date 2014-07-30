@@ -1,5 +1,7 @@
 # Packages available in the Homebrew and Linuxbrew package manager
 ---
+minimal:
+  - cmake
 perl:
   - cpanminus
 bio_nextgen:
