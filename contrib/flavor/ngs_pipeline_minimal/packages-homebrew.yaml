@@ -25,7 +25,7 @@ bio_nextgen:
     - speedseq
     - staden_io_lib
     - oncofuse
-    - scythe
+    - sickle
   analysis:
     #- cufflinks
     - samtools
