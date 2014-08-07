@@ -1,15 +1,12 @@
 ---
 bio_nextgen:
   alignment:
-    - bowtie2
   utilities:
     - rnaseqc
-    - alientrimmer
     - featurecounts
   analysis:
     - cufflinks
     - picard
-    - tophat
   variant:
     - bcbio_variation
     - grabix

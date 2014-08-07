@@ -7,7 +7,7 @@ perl:
 bio_nextgen:
   alignment:
     - bwa
-#    - bowtie2       (2.2.0 doesn't work with Tophat, so use the source version for now)
+    - bowtie2 
     - novoalign
     - rna-star
   utilities:
@@ -31,7 +31,7 @@ bio_nextgen:
     - samtools
     - htslib
     - bcftools
-    #- tophat
+    - tophat
   variant:
     - freebayes
     - gatk-framework
