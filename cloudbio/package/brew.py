@@ -71,13 +71,13 @@ def _get_current_pkgs(env, brew_cmd):
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     """Install a specific brew package, handling versioning and existing packages.
     """
-    pkg, version = _get_pkg_and_version(pkg_str)
+    pkg, version, args = _get_pkg_version_args(pkg_str)
     if version:
-        _install_pkg_version(env, pkg, version, brew_cmd, ipkgs)
+        _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs)
     else:
-        _install_pkg_latest(env, pkg, brew_cmd, ipkgs)
+        _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs)
 
-def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
+def _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs):
     """Install a specific version of a package by retrieving from git history.
     https://gist.github.com/gcatlin/1847248
     Handles both global packages and those installed via specific taps.
@@ -85,7 +85,8 @@ def _install_pkg_version(env, pkg, version, brew_cmd, ipkgs):
     if ipkgs["current"].get(pkg.split("/")[-1]) == version:
         return
     if version == "HEAD":
-        env.safe_run("{brew_cmd} install --HEAD {pkg}".format(**locals()))
+        args = " ".join(args)
+        env.safe_run("{brew_cmd} install {args} --HEAD {pkg}".format(**locals()))
     else:
         raise ValueError("Cannot currently handle installing brew packages by version.")
         with _git_pkg_version(env, brew_cmd, pkg, version):
@@ -148,7 +149,7 @@ def _latest_pkg_version(env, brew_cmd, pkg):
             versions = version_str.split(",")
             return versions[0].split()[-1].strip()
 
-def _install_pkg_latest(env, pkg, brew_cmd, ipkgs, flags=""):
+def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.
     """
     short_pkg = pkg.split("/")[-1]
@@ -167,19 +168,27 @@ def _install_pkg_latest(env, pkg, brew_cmd, ipkgs, flags=""):
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
         compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
+        flags = " ".join(args)
         env.safe_run("%s && %s && %s install %s --env=inherit %s" % (compiler_setup, perl_setup,
                                                                      brew_cmd, flags, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
-def _get_pkg_and_version(pkg_str):
-    """Uses Python style package==0.1 version specifications.
+def _get_pkg_version_args(pkg_str):
+    """Uses Python style package==0.1 version specifications and args separated with ';'
     """
+    arg_parts = pkg_str.split(";")
+    if len(arg_parts) == 1:
+        args = []
+    else:
+        pkg_str = arg_parts[0]
+        args = arg_parts[1:]
     parts = pkg_str.split("==")
     if len(parts) == 1:
-        return parts[0], None
+        return parts[0], None, args
     else:
         assert len(parts) == 2
-        return parts
+        name, version = parts
+        return name, version, args
 
 def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
@@ -189,7 +198,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Upgrades any package dependencies
     """
     for dep in ["expat"]:
-        _install_pkg_latest(env, dep, brew_cmd, ipkgs)
+        _install_pkg_latest(env, dep, [], brew_cmd, ipkgs)
     # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
@@ -202,14 +211,14 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
-        _install_pkg_latest(env, "samtools", brew_cmd, ipkgs, "--without-bcftools")
+        _install_pkg_latest(env, "samtools", ["--without-bcftools"], brew_cmd, ipkgs)
     for dependency in ["htslib", "libmaus", "cmake"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
                   or dependency not in ipkgs["current"]):
-                _install_pkg_latest(env, dependency, brew_cmd, ipkgs)
+                _install_pkg_latest(env, dependency, [], brew_cmd, ipkgs)
     if "cpanminus" in packages:
-        _install_pkg_latest(env, "cpanminus", brew_cmd, ipkgs)
+        _install_pkg_latest(env, "cpanminus", [], brew_cmd, ipkgs)
         cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
         for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
                          "LWP::Simple", "LWP::Protocol::https", "Time::HiRes"]:
