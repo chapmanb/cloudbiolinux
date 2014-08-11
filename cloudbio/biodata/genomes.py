@@ -297,7 +297,7 @@ GENOMES_SUPPORTED = [
 
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "mosaik", "star"]
+                            "ucsc", "mosaik", "snap", "star"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -452,7 +452,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                         except KeyboardInterrupt:
                             raise
                         except:
-                            env.logger.exception("Genome preparation method {0} failed, trying next".format(method))
+                            env.logger.info("Genome preparation method {0} failed, trying next".format(method))
                     if not finished:
                         raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
@@ -666,7 +666,18 @@ def _index_star(ref_file):
     dir_name = os.path.join(ref_dir, os.pardir, "star")
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (dir_name, gtf_file))
-    return  _index_w_command(dir_name, cmd, ref_file)
+    return _index_w_command(dir_name, cmd, ref_file)
+
+def _index_snap(ref_file):
+    """Snap indexing is computationally expensive. Ask for all cores and need 64Gb of memory.
+    """
+    dir_name = "snap"
+    index_name = os.path.splitext(os.path.basename(ref_file))[0]
+    org_arg = "-hg19" if index_name in ["hg19", "GRCh37"] else ""
+    cmd = "snap index {ref_file} {dir_name} {org_arg}"
+    if not env.safe_exists(os.path.join(dir_name, "GenomeIndex")):
+        env.safe_run(cmd.format(**locals()))
+    return dir_name
 
 @_if_installed("MosaikJump")
 def _index_mosaik(ref_file):
@@ -853,5 +864,6 @@ INDEX_FNS = {
     "novoalign": _index_novoalign,
     "novoalign_cs": _index_novoalign_cs,
     "ucsc": _index_twobit,
-    "star": _index_star
+    "star": _index_star,
+    "snap": _index_snap,
     }
