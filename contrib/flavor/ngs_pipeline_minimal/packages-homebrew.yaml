@@ -10,7 +10,7 @@ bio_nextgen:
     - bowtie2 
     - novoalign
     - rna-star
-    - snap;--devel
+    - snap-aligner;--devel
     - tophat-binary
   utilities:
     - bamtools
