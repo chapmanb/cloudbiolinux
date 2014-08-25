@@ -1,11 +1,16 @@
 ---
 cranrepo: http://cran.fhcrc.org/
 cran:
+  - cghFLasso
   - ggplot2
   - gsalib
+  - matrixStats
   - snow
+cran-after-bioc:
+  - PSCBS
 biocrepo: http://bioconductor.org/biocLite.R
 bioc:
  - cn.mops
  - rtracklayer
  - DEXSeq
+ - DNAcopy
