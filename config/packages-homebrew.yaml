@@ -24,7 +24,7 @@ bio_nextgen:
     - bcftools
     #- tophat
   variant:
-    - delly
+    - delly;--with-binary
     - freebayes
     - glia
     - lumpy-sv

@@ -48,7 +48,6 @@ bio_nextgen:
     - grabix
     - mutect
     - tassel
-    - snpeff
     - stacks
     - varscan
   chip:

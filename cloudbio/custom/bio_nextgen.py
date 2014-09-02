@@ -458,7 +458,7 @@ def install_varscan(env):
     """Variant detection in massively parallel sequencing data
     http://varscan.sourceforge.net/
     """
-    version = "2.3.6"
+    version = "2.3.7"
     url = "http://downloads.sourceforge.net/project/varscan/VarScan.v%s.jar" % version
     install_dir = _symlinked_java_version_dir("varscan", version, env)
     if install_dir:
@@ -536,36 +536,6 @@ def install_pbgzip(env):
             install_dir = shared._get_bin_dir(env)
             env.safe_sudo("cp -f pbgzip %s" % (install_dir))
     _get_install(repository, env, _build, revision=revision)
-
-def install_snpeff(env):
-    """Variant annotation and effect prediction tool.
-    http://snpeff.sourceforge.net/
-    """
-    version = "3_6"
-    genomes = []
-    #genomes = ["GRCh37.74", "hg19", "GRCm38.74", "athalianaTair10"]
-    url = "http://downloads.sourceforge.net/project/snpeff/" \
-          "snpEff_v%s_core.zip" % version
-    genome_url_base = "http://downloads.sourceforge.net/project/snpeff/"\
-                      "databases/v%s/snpEff_v%s_%s.zip"
-    install_dir = _symlinked_java_version_dir("snpeff", version, env)
-    if install_dir:
-        with _make_tmp_dir() as work_dir:
-            with cd(work_dir):
-                dir_name = _fetch_and_unpack(url)
-                with cd(dir_name):
-                    env.safe_sudo("mv *.jar %s" % install_dir)
-                    env.safe_run("sed -i.bak -e 's/^data_dir.*=.*/data_dir = %s\/data/' %s" %
-                                 (install_dir.replace("/", "\/"), "snpEff.config"))
-                    env.safe_run("chmod a+r *.config")
-                    env.safe_sudo("mv *.config %s" % install_dir)
-                    data_dir = os.path.join(install_dir, "data")
-                    env.safe_sudo("mkdir %s" % data_dir)
-                    for org in genomes:
-                        if not env.safe_exists(os.path.join(data_dir, org)):
-                            gurl = genome_url_base % (version, version, org)
-                            _fetch_and_unpack(gurl, need_dir=False)
-                            env.safe_sudo("mv data/%s %s" % (org, data_dir))
 
 @_if_not_installed("bamtools")
 def install_bamtools(env):

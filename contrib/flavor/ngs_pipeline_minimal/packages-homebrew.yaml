@@ -10,8 +10,8 @@ bio_nextgen:
     - bowtie2 
     - novoalign
     - rna-star
+    - snap-aligner;--devel
     - tophat-binary
-#    - tophat  disabled for now, boost causes too many problems
   utilities:
     - bamtools
     - bedtools
@@ -34,6 +34,7 @@ bio_nextgen:
     - htslib
     - bcftools
   variant:
+    - delly;--with-binary
     - freebayes
     - gatk-framework
     - glia

@@ -66,3 +66,9 @@ def _make_install_script(out_file, config):
         lapply(bioc.pkgs, bioc.installer)
         """ % (", ".join('"%s"' % p for p in config['bioc']))
         env.safe_append(out_file, bioc_install)
+    if config.get("cran-after-bioc"):
+        std2_install = """
+        std2.pkgs <- c(%s)
+        lapply(std2.pkgs, std.installer)
+        """ % (", ".join('"%s"' % p for p in config['cran-after-bioc']))
+        env.safe_append(out_file, std2_install)
