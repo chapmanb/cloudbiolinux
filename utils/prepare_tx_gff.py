@@ -526,8 +526,11 @@ def _get_gtf_db(gtf):
 
 def _dexseq_preparation_path():
     PREP_FILE = "python_scripts/dexseq_prepare_annotation.py"
-    cmd = "Rscript -e 'find.package(\"DEXSeq\")'"
-    output = subprocess.check_output(cmd, shell=True)
+    try:
+        cmd = "Rscript -e 'find.package(\"DEXSeq\")'"
+        output = subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError:
+        return None
     for line in output.split("\n"):
         if line.startswith("["):
             dirname = line.split("[1]")[1].replace("\"", "").strip()
