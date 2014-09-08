@@ -10,7 +10,7 @@ bio_nextgen:
     - bowtie2 
     - novoalign
     - rna-star
-    - snap-aligner;--devel
+    - snap-aligner
     - tophat-binary
   utilities:
     - bamtools
@@ -30,7 +30,7 @@ bio_nextgen:
     - sickle
   analysis:
     #- cufflinks
-    - samtools
+    - samtools;--devel
     - htslib
     - bcftools
   variant:

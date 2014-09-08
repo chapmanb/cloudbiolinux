@@ -140,14 +140,18 @@ def _git_cmd_for_pkg_version(env, brew_cmd, pkg, version):
         raise ValueError("Did not find version %s for %s" % (version, pkg))
     return git_cmd
 
-def _latest_pkg_version(env, brew_cmd, pkg):
+def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
     """Retrieve the latest available version of a package.
     """
     for git_line in env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n"):
         if git_line.strip():
             _, version_str = git_line.split(":")
             versions = version_str.split(",")
-            return versions[0].split()[-1].strip()
+            if devel:
+                dev_strs = [x for x in versions if x.strip().startswith("devel")]
+                return dev_strs[0].split()[-1].strip()
+            else:
+                return versions[0].split()[-1].strip()
 
 def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.
@@ -159,7 +163,7 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
         remove_old = True
     elif pkg in ipkgs["current"] or short_pkg in ipkgs["current"]:
         do_install = False
-        pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
+        pkg_version = _latest_pkg_version(env, brew_cmd, pkg, devel="--devel" in args)
         if ipkgs["current"].get(pkg, ipkgs["current"][short_pkg]) != pkg_version:
             remove_old = True
             do_install = True
@@ -211,7 +215,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
-        _install_pkg_latest(env, "samtools", ["--without-bcftools"], brew_cmd, ipkgs)
+        _install_pkg_latest(env, "samtools", ["--devel"], brew_cmd, ipkgs)
     for dependency in ["htslib", "libmaus", "cmake"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
