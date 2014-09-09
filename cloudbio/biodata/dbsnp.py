@@ -119,7 +119,7 @@ def _download_dbnsfp(env, gid, gconfig):
     https://sites.google.com/site/jpopgen/dbNSFP
     https://github.com/ensembl-variation/VEP_plugins/blob/master/dbNSFP.pm
     """
-    version = "2.5"
+    version = "2.6"
     url = "http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFPv%s.zip" % version
     if gconfig.get("dbnsfp"):
         outfile = "dbNSFP_v%s.gz" % (version)
