@@ -72,7 +72,10 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
     #_download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
-    broad_fname = "{name}.{gid}.vcf{ext}".format(gid=gid, name=name, ext=ext)
+    # Broad bundle directories have uneven use of ".sites" in VCF files
+    # only present in hg19 for non-dbSNP resources
+    sites = ".sites" if gid == "hg19" and not name.startswith("dbsnp") else ""
+    broad_fname = "{name}.{gid}{sites}.vcf{ext}".format(gid=gid, name=name, sites=sites, ext=ext)
     fname = broad_fname.replace(".{0}".format(gid), "").replace(".sites", "") + ".gz"
     base_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
                "{bundle}/{gid}/{fname}.gz".format(
@@ -83,13 +86,10 @@ def _download_broad_bundle(gid, bundle_version, name, ext):
         env.safe_run("tabix -f -p vcf %s" % fname)
     # otherwise, download and bgzip and tabix index
     if not env.safe_exists(fname):
-        out_file = shared._remote_fetch(env, base_url, allow_fail=True)
-        if out_file:
-            env.safe_run("gunzip -c %s | bgzip -c > %s" % (out_file, fname))
-            env.safe_run("tabix -f -p vcf %s" % fname)
-            env.safe_run("rm -f %s" % out_file)
-        else:
-            env.logger.warn("dbSNP resources not available for %s" % gid)
+        out_file = shared._remote_fetch(env, base_url)
+        env.safe_run("gunzip -c %s | bgzip -c > %s" % (out_file, fname))
+        env.safe_run("tabix -f -p vcf %s" % fname)
+        env.safe_run("rm -f %s" % out_file)
     # clean up old files
     for ext in [".vcf", ".vcf.idx"]:
         if env.safe_exists(fname.replace(".vcf.gz", ext)):
