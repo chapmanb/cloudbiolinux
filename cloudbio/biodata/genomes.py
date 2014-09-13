@@ -102,7 +102,6 @@ class UCSCGenome(_DownloadHelper):
         file_handle.close()
         return file_names
 
-
     def download(self, seq_dir):
         zipped_file = None
         genome_file = "%s.fa" % self._name
@@ -208,15 +207,21 @@ class EnsemblGenome(_DownloadHelper):
     arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.22.dna.toplevel.fa.gz
     ftp://ftp.ensembl.org/pub/release-75/fasta/
     caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.75.dna.toplevel.fa.gz
+    ftp://ftp.ensemblgenomes.org/pub/bacteria/release-23/bacteria/fasta/
+    bacteria_17_collection/pseudomonas_aeruginosa_ucbpp_pa14/dna/
+    Pseudomonas_aeruginosa_ucbpp_pa14.GCA_000014625.1.23.dna.toplevel.fa.gz
     """
-    def __init__(self, ensembl_section, release, organism, name):
+    def __init__(self, ensembl_section, release, organism, name, subsection=None):
         _DownloadHelper.__init__(self)
         self.data_source = "Ensembl"
         if ensembl_section == "standard":
             url = "ftp://ftp.ensembl.org/pub/"
         else:
             url = "ftp://ftp.ensemblgenomes.org/pub/%s/" % ensembl_section
-        url += "release-%s/fasta/%s/dna/" % (release, organism.lower())
+        url += "release-%s/fasta/" % release
+        if subsection:
+            url += "%s/" % subsection
+        url += "%s/dna/" % organism.lower()
         self._url = url
         self._get_file = "%s.%s.%s.dna.toplevel.fa.gz" % (organism, name, release)
         self._name = name
@@ -278,7 +283,9 @@ GENOMES_SUPPORTED = [
            ("Mtuberculosis_H37Rv", "mycoTube_H37RV", NCBIRest("mycoTube_H37RV",
                ["NC_000962"])),
            ("Msmegmatis", "92", NCBIRest("92", ["NC_008596.1"])),
-           ("Paeruginosa_UCBPP-PA14", "386", NCBIRest("386", ["CP000438.1"])),
+           ("Paeruginosa_UCBPP-PA14", "pseudomonas_aeruginosa_ucbpp_pa14",
+            EnsemblGenome("bacteria", "23", "Pseudomonas_aeruginosa_ucbpp_pa14",
+                          "GCA_000014625.1", "bacteria_17_collection")),
            ("Ecoli", "eschColi_K12", NCBIRest("eschColi_K12", ["U00096.2"])),
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
            ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),

@@ -48,6 +48,8 @@ genomes:
     name: S cerevisiae (sacCer3)
   - dbkey: WBcel235
     name: C elegans (WBcel235)
+  - dbkey: pseudomonas_aeruginosa_ucbpp_pa14
+    name: Pseudomonas aeruginosa UCBPP-PA14
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
