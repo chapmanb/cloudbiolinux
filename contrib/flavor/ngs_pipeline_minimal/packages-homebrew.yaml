@@ -23,7 +23,7 @@ bio_nextgen:
     - kraken
     - sambamba
     - samblaster
-    - seqtk==HEAD
+    - seqtk
     - speedseq
     - staden_io_lib
     - oncofuse
@@ -40,6 +40,7 @@ bio_nextgen:
     - glia
     - hall-lab-sv-tools
     - lumpy-sv
+    - pindel
     - platypus-variant
     - rtg-tools
     - scalpel

@@ -26,10 +26,13 @@ bio_nextgen:
   variant:
     - delly;--with-binary
     - freebayes
+    - gatk-framework
     - glia
     - lumpy-sv
+    - pindel
     - platypus-variant
     - rtg-tools
+    - scalpel
     - snpeff
     - vardict
     - vcflib
