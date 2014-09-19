@@ -6,12 +6,14 @@ import contextlib
 from distutils.version import LooseVersion
 import os
 
-from cloudbio.custom import system
+from cloudbio.custom import system, shared
 from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import quiet, find_cmd
 from cloudbio.package.shared import _yaml_to_packages
 
 from fabric.api import cd, settings
+
+BOTTLE_URL = "https://s3.amazonaws.com/cloudbiolinux/brew_bottles/{pkg}-{version}.x86_64-linux.bottle.tar.gz"
 
 def install_packages(env, to_install=None, packages=None):
     """Install packages using the home brew package manager.
@@ -194,6 +196,25 @@ def _get_pkg_version_args(pkg_str):
         name, version = parts
         return name, version, args
 
+def _install_bottle(env, brew_cmd, pkg, ipkgs):
+    """Install Linux bottles for brew packages that can be tricky to build.
+    """
+    if env.distribution == "macosx":  # Only Linux bottles, build away on Mac
+        return
+    pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
+    install_version = ipkgs["current"].get(pkg)
+    if pkg_version == install_version:  # Up to date
+        return
+    url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
+    brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
+    brew_cellar = os.path.join(env.safe_run_output("%s --prefix" % brew_cmd), "Cellar")
+    bottle_file = shared._remote_fetch(env, url, out_file=os.path.join(brew_cachedir, os.path.basename(url)),
+                                       allow_fail=True, samedir=True)
+    if bottle_file:
+        with cd(brew_cellar):
+            env.safe_run("tar -xf %s" % bottle_file)
+        env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+
 def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
 
@@ -201,6 +222,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
+    for dep in ["cmake"]:
+        _install_bottle(env, brew_cmd, dep, ipkgs)
     for dep in ["expat"]:
         _install_pkg_latest(env, dep, [], brew_cmd, ipkgs)
     # if installing samtools, avoid bcftools conflicts

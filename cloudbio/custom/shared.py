@@ -172,7 +172,11 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
     if out_file is None:
         out_file = os.path.basename(url)
     if not env.safe_exists(out_file):
-        orig_dir = env.safe_run_output("pwd").strip()
+        if samedir and os.path.isabs(out_file):
+            orig_dir = os.path.dirname(out_file)
+            out_file = os.path.basename(out_file)
+        else:
+            orig_dir = env.safe_run_output("pwd").strip()
         temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL,
                                       str("file://%s/%s/%s" %
                                           (env.host, socket.gethostname(), out_file)))
@@ -188,6 +192,8 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
                     out_file = None
                 else:
                     raise IOError("Failure to retrieve remote file")
+        if samedir:
+            out_file = os.path.join(orig_dir, out_file)
     return out_file
 
 def _fetch_and_unpack(url, need_dir=True, dir_name=None, revision=None,
