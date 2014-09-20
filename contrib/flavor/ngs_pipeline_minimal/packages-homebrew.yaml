@@ -23,7 +23,7 @@ bio_nextgen:
     - kraken
     - sambamba
     - samblaster
-    - seqtk
+    - seqtk==HEAD
     - speedseq
     - staden_io_lib
     - oncofuse
@@ -34,6 +34,7 @@ bio_nextgen:
     - htslib
     - bcftools
   variant:
+    - bcbio-variation-recall
     - delly;--with-binary
     - freebayes
     - gatk-framework
