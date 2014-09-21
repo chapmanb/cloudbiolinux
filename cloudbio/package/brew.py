@@ -208,6 +208,8 @@ def _install_bottle(env, brew_cmd, pkg, ipkgs):
     url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
     brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
     brew_cellar = os.path.join(env.safe_run_output("%s --prefix" % brew_cmd), "Cellar")
+    with quiet():
+        env.safe_run("mkdir -p %s" % brew_cellar)
     bottle_file = shared._remote_fetch(env, url, out_file=os.path.join(brew_cachedir, os.path.basename(url)),
                                        allow_fail=True, samedir=True)
     if bottle_file:
