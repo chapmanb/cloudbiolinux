@@ -152,7 +152,7 @@ def get_python_pkg_info():
                     yield {"name": name.lower(), "version": version[1:-1]}
 
 def _resolve_latest_pkg(pkgs):
-    if len(pkgs) == 1:
+    if len(pkgs) == 1 or not yolk:
         return pkgs[0]
     else:
         latest_version = yolk.yolklib.Distributions().get_highest_installed(pkgs[0]["name"])
