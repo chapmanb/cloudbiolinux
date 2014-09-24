@@ -39,6 +39,7 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
                 _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
             elif gid in ["mm10", "canFam3"]:
                 _dbsnp_custom(env, gid)
+                _download_lcrs_custom(env, gid)
 
 def _dbsnp_custom(env, gid):
     """Retrieve resources for dbsnp builds from custom S3 biodata bucket.
@@ -157,8 +158,7 @@ def _download_ancestral(env, gid, gconfig):
             if not env.safe_exists(outfile):
                 env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
 
-
-def _download_qsignature(env,gid,gconfig):
+def _download_qsignature(env, gid, gconfig):
     """Download qsignature position file to detect samples problems
 
     :param env
@@ -171,17 +171,17 @@ def _download_qsignature(env,gid,gconfig):
     if gid == "GRCh37":
         outfile = "qsignature.vcf"
         if not env.safe_exists(outfile):
-            zipfile = shared._remote_fetch(env, base_url , samedir=True)
-            outdir = "qsignature" 
+            zipfile = shared._remote_fetch(env, base_url, samedir=True)
+            outdir = "qsignature"
             env.safe_run("mkdir -p %s" % outdir)
             env.safe_run("tar -jxf %s -C %s" % (zipfile, outdir))
             env.safe_run("mv %s/qsignature_positions.txt %s" % (outdir, outfile))
             env.safe_run("rm -rf %s" % outdir)
             env.safe_run("rm -rf %s" % zipfile)
-    elif gid == "hg19":  # symlink to GRCh37 download        
-        outfile = os.path.basename(base_url) 
+    elif gid == "hg19":  # symlink to GRCh37 download
+        outfile = os.path.basename(base_url)
         if not env.safe_exists(outfile):
-            env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))    
+            env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
 
 
 def _download_background_vcf(gid):
@@ -228,4 +228,19 @@ def _download_lcrs(gid):
             env.safe_run("zcat %s %s | bgzip -c > %s" % (orig_file, convert_cmd, out_file))
             return out_file
         shared._remote_fetch(env, lcr_url, fix_fn=_fix_chrom_names)
+        env.safe_run("tabix -p vcf -f %s" % out_file)
+
+def _download_lcrs_custom(env, gid):
+    """Retrieve low complexity regions from other sources.
+
+    mm10 from Brent Pedersen: http://figshare.com/articles/LCR_mm10_bed_gz/1180124
+    """
+    urls = {"mm10": "http://files.figshare.com/1688228/LCR_mm10.bed.gz"}
+    out_file = "LCR.bed.gz"
+    cur_url = urls.get(gid)
+    if cur_url and not env.safe_exists(out_file):
+        def _bgzip_file(env, orig_file):
+            env.safe_run("zcat %s | bgzip -c > %s" % (orig_file, out_file))
+            return out_file
+        shared._remote_fetch(env, cur_url, fix_fn=_bgzip_file)
         env.safe_run("tabix -p vcf -f %s" % out_file)
