@@ -23,7 +23,7 @@ bio_nextgen:
     - kraken
     - sambamba
     - samblaster
-    - seqtk==HEAD
+    - seqtk
     - speedseq
     - staden_io_lib
     - oncofuse

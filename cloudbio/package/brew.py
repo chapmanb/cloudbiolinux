@@ -88,7 +88,8 @@ def _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs):
         return
     if version == "HEAD":
         args = " ".join(args)
-        env.safe_run("{brew_cmd} install {args} --HEAD {pkg}".format(**locals()))
+        brew_install = _get_brew_install_cmd(brew_cmd, env)
+        env.safe_run("{brew_install} {args} --HEAD {pkg}".format(**locals()))
     else:
         raise ValueError("Cannot currently handle installing brew packages by version.")
         with _git_pkg_version(env, brew_cmd, pkg, version):
@@ -155,6 +156,11 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
             else:
                 return versions[0].split()[-1].strip()
 
+def _get_brew_install_cmd(brew_cmd, env):
+    perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
+    compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
+    return "%s && %s && %s install --env=inherit" % (compiler_setup, perl_setup, brew_cmd)
+
 def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.
     """
@@ -172,11 +178,8 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     if do_install:
         if remove_old:
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
-        perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
-        compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
         flags = " ".join(args)
-        env.safe_run("%s && %s && %s install %s --env=inherit %s" % (compiler_setup, perl_setup,
-                                                                     brew_cmd, flags, pkg))
+        env.safe_run("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env), flags, pkg))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_version_args(pkg_str):
