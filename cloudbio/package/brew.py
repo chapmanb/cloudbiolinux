@@ -240,7 +240,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
-        _install_pkg_latest(env, "samtools", ["--devel"], brew_cmd, ipkgs)
+        _install_pkg_latest(env, "samtools", [], brew_cmd, ipkgs)
     for dependency in ["htslib", "libmaus", "cmake"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]

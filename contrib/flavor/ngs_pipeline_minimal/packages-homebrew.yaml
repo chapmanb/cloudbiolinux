@@ -30,7 +30,7 @@ bio_nextgen:
     - sickle
   analysis:
     #- cufflinks
-    - samtools;--devel
+    - samtools
     - htslib
     - bcftools
   variant:

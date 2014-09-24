@@ -19,7 +19,7 @@ bio_nextgen:
     - staden_io_lib
   analysis:
     #- cufflinks
-    - samtools;--devel
+    - samtools
     - htslib
     - bcftools
     #- tophat
