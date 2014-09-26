@@ -547,12 +547,10 @@ def prepare_dexseq(gtf):
     dexseq_path = _dexseq_preparation_path()
     if not dexseq_path:
         return None
-    cmd = "python {dexseq_path} {gtf} {out_file}"
+    executable = sys.executable
+    cmd = "{executable} {dexseq_path} {gtf} {out_file}"
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
-
-# Rscript -e "find.package('DEXSeq')" -> [1] "/Volumes/Clotho/Users/rory/opt/lib/R/DEXSeq"
-# path/python_scripts/dexseq_prepare_annotation.py
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
