@@ -227,6 +227,8 @@ def clean_gtf(gtf_file, org_build):
     fa_names = get_fasta_names(org_build)
     with open(gtf_file) as in_gtf, open(temp_gtf, "w") as out_gtf:
         for line in in_gtf:
+            if line.startswith("#"):
+                continue
             if line.split()[0].strip() not in fa_names:
                 continue
             if "transcript_id" not in line:
