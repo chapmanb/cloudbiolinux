@@ -203,7 +203,8 @@ def main(org_build, gtf_file=None):
         prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
-        gtf_to_interval(rrna_gtf, org_build)
+        if rrna_gtf:
+            gtf_to_interval(rrna_gtf, org_build)
         prepare_tophat_index(gtf_file, org_build)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
@@ -442,7 +443,9 @@ def prepare_rrna_gtf(gtf):
 
     db = _get_gtf_db(gtf)
     biotype_lookup = _biotype_lookup_fn(gtf)
-
+    # if we can't find a biotype column, skip this
+    if not biotype_lookup:
+        return None
     with open(out_file, "w") as out_handle:
         for feature in db.all_features():
             biotype = biotype_lookup(feature)
