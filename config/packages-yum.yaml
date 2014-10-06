@@ -35,7 +35,6 @@ libraries:
   - ncurses-devel
   - libxml2-devel
   - zlib-devel
-  - netcdf-devel
 documentation:
 desktop:
   - gnome-panel
@@ -107,7 +106,6 @@ python:
   - python
   - python-devel
   - python-pip
-  - python-virtualenv
   - boost-python-devel
   - numpy
 ruby:
@@ -121,6 +119,7 @@ r:
   - libRmath-devel
 perl: 
   - perl
+  - perl-core
   - perl-ExtUtils-MakeMaker
   - perl-ExtUtils-AutoInstall
   - perl-ExtUtils-CBuilder
