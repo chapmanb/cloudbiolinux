@@ -545,7 +545,7 @@ def _dexseq_preparation_path():
     return None
 
 def prepare_dexseq(gtf):
-    out_file = os.path.splitext(gtf)[0] + ".dexseq.gff"
+    out_file = os.path.splitext(gtf)[0] + ".dexseq.gff3"
     if file_exists(out_file):
         return out_file
 
