@@ -144,17 +144,24 @@ def _git_cmd_for_pkg_version(env, brew_cmd, pkg, version):
     return git_cmd
 
 def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
-    """Retrieve the latest available version of a package.
+    """Retrieve the latest available version of a package and if it is linked.
     """
+    i = 0
+    version, is_linked = None, False
     for git_line in env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n"):
         if git_line.strip():
-            _, version_str = git_line.split(":")
-            versions = version_str.split(",")
-            if devel:
-                dev_strs = [x for x in versions if x.strip().startswith("devel")]
-                return dev_strs[0].split()[-1].strip()
-            else:
-                return versions[0].split()[-1].strip()
+            if i == 0:
+                _, version_str = git_line.split(":")
+                versions = version_str.split(",")
+                if devel:
+                    dev_strs = [x for x in versions if x.strip().startswith("devel")]
+                    version = dev_strs[0].split()[-1].strip()
+                else:
+                    version = versions[0].split()[-1].strip()
+            elif i == 2:
+                is_linked = git_line.strip().split()[-1] == "*"
+            i += 1
+    return version, is_linked
 
 def _get_brew_install_cmd(brew_cmd, env):
     perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
@@ -166,12 +173,13 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """
     short_pkg = pkg.split("/")[-1]
     do_install = True
+    is_linked = True
     remove_old = False
     if pkg in ipkgs["outdated"] or short_pkg in ipkgs["outdated"]:
         remove_old = True
     elif pkg in ipkgs["current"] or short_pkg in ipkgs["current"]:
         do_install = False
-        pkg_version = _latest_pkg_version(env, brew_cmd, pkg, devel="--devel" in args)
+        pkg_version, is_linked = _latest_pkg_version(env, brew_cmd, pkg, devel="--devel" in args)
         if ipkgs["current"].get(pkg, ipkgs["current"][short_pkg]) != pkg_version:
             remove_old = True
             do_install = True
@@ -180,6 +188,9 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         flags = " ".join(args)
         env.safe_run("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env), flags, pkg))
+        env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+    # installed but not linked
+    elif not is_linked:
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
 
 def _get_pkg_version_args(pkg_str):
@@ -204,9 +215,11 @@ def _install_bottle(env, brew_cmd, pkg, ipkgs):
     """
     if env.distribution == "macosx":  # Only Linux bottles, build away on Mac
         return
-    pkg_version = _latest_pkg_version(env, brew_cmd, pkg)
+    pkg_version, is_linked = _latest_pkg_version(env, brew_cmd, pkg)
     install_version = ipkgs["current"].get(pkg)
     if pkg_version == install_version:  # Up to date
+        if not is_linked:
+            env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
         return
     url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
     brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
