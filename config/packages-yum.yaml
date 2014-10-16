@@ -11,6 +11,7 @@ minimal:
     - gcc-c++
     - gcc-gfortran
     - make
+    - patch
   util:
     - screen
     - unzip
@@ -24,6 +25,7 @@ libraries:
   - atlas-devel
   - blas
   - blas-devel
+  - bzip2
   - bzip2-devel
   - freetype-devel
   - gsl-devel
