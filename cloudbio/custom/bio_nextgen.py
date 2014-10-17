@@ -312,19 +312,6 @@ def install_varianttools(env):
           "{ver}/variant_tools-{ver}-src.tar.gz".format(ver=version)
     _get_install(url, env, _python_make)
 
-@_if_not_installed("pseq")
-def install_plink_seq(env):
-    """A toolset for working with human genetic variation data.
-    http://atgu.mgh.harvard.edu/plinkseq/
-    """
-    version = "0.08"
-    url = "http://atgu.mgh.harvard.edu/plinkseq/dist/" \
-          "version-{v}/plinkseq-{v}-x86_64.tar.gz".format(v=version)
-    def _plink_copy(env):
-        for x in ["pseq"]:
-            env.safe_sudo("cp {0} {1}/bin".format(x, env.system_install))
-    _get_install(url, env, _plink_copy)
-
 @_if_not_installed("dwgsim")
 def install_dwgsim(env):
     """DWGSIM: simulating NGS data and evaluating mappings and variant calling.
