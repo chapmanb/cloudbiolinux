@@ -34,10 +34,12 @@ bio_nextgen:
     - rtg-tools
     - scalpel
     - snpeff
+    - theta2
     - vardict
     - vcflib
     - vcftools
     - vep
+    - wham
     - yaha
 distributed:
   - parallel
