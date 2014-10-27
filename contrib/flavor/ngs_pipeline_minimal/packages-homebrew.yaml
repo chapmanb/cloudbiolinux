@@ -2,6 +2,7 @@
 ---
 minimal:
   - cmake
+  - s3gof3r
 perl:
   - cpanminus
 bio_nextgen:
