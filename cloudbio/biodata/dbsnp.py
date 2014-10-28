@@ -120,13 +120,14 @@ def _download_dbnsfp(env, gid, gconfig):
     https://sites.google.com/site/jpopgen/dbNSFP
     https://github.com/ensembl-variation/VEP_plugins/blob/master/dbNSFP.pm
     """
-    version = "2.6"
-    url = "http://dbnsfp.houstonbioinformatics.org/dbNSFPzip/dbNSFPv%s.zip" % version
+    version = "2.7"
+    url = "https://onedrive.live.com/download?cid=0D359D171E382137&resid=D359D171E382137%2154223&authkey=AB1Uiv5lqr_VOKE"
+    dl_file = "dbNSFPv%s.zip" % version
     if gconfig.get("dbnsfp"):
         outfile = "dbNSFP_v%s.gz" % (version)
         if gid == "GRCh37":  # download and prepare bgzipped output file
             if not env.safe_exists(outfile):
-                zipfile = shared._remote_fetch(env, url, samedir=True)
+                zipfile = shared._remote_fetch(env, url, out_file=dl_file, samedir=True)
                 outdir = "dbNSFPv%s" % version
                 env.safe_run("mkdir -p %s" % outdir)
                 env.safe_run("unzip %s -d %s" % (zipfile, outdir))
