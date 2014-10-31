@@ -20,6 +20,7 @@ bio_nextgen:
     - libmaus
     - biobambam
     - fastqc
+    - grabix
     - qualimap
     - kraken
     - sambamba

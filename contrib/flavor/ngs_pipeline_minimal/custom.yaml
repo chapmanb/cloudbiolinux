@@ -9,7 +9,6 @@ bio_nextgen:
     - picard
   variant:
     - bcbio_variation
-    - grabix
     - mutect
     - varscan
   needs_64bit:
