@@ -17,7 +17,7 @@ def r_library_installer(config):
             # run the script and then get rid of it
             rscript = fabutils.find_cmd(env, "Rscript", "--version")
             if rscript:
-                env.safe_sudo("%s %s" % (rscript, out_file))
+                env.safe_run("%s %s" % (rscript, out_file))
             else:
                 env.logger.warn("Rscript not found; skipping install of R libraries.")
             env.safe_run("rm -f %s" % out_file)
@@ -28,6 +28,7 @@ def _make_install_script(out_file, config):
     env.safe_run("touch %s" % out_file)
     lib_loc = os.path.join(env.system_install, "lib", "R", "site-library")
     env.safe_sudo("mkdir -p %s" % lib_loc)
+    env.safe_sudo("chown -R %s %s" % (env.user, lib_loc))
     repo_info = """
     .libPaths(c("%s"))
     library(methods)
