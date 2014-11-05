@@ -12,7 +12,7 @@
 #    name    - descriptive name for the given genome (to be displayed in Galaxy, e.g., Hsapiens)
 #  Optional genome fields (corresponding to Galaxy's tool_data_table_conf.xml columns):
 #    formats, species, dbkey1, dbkey2, value, path, index
-#  Additional genome fields specific to data deployment: 
+#  Additional genome fields specific to data deployment:
 #    genome_indexes - list of tool indexes specific to the associated genome (overrides global 'genome_indexes')
 genomes:
   - dbkey: phix
@@ -23,6 +23,10 @@ genomes:
     rnaseq: true
   - dbkey: GRCh37
     name: Human (GRCh37)
+    dbsnp: true
+    rnaseq: true
+  - dbkey: mm9
+    name: Mouse (mm9)
     dbsnp: true
     rnaseq: true
   - dbkey: mm10
