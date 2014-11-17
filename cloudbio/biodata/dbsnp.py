@@ -125,7 +125,7 @@ def _download_dbnsfp(env, gid, gconfig):
     dl_file = "dbNSFPv%s.zip" % version
     if gconfig.get("dbnsfp"):
         outfile = "dbNSFP_v%s.gz" % (version)
-        if gid == "GRCh37":  # download and prepare bgzipped output file
+        if gid == "GRCh37" or (gid == "hg19" and not env.safe_exists("../../GRCh37")):
             if not env.safe_exists(outfile):
                 zipfile = shared._remote_fetch(env, url, out_file=dl_file, samedir=True)
                 outdir = "dbNSFPv%s" % version
@@ -148,7 +148,7 @@ def _download_ancestral(env, gid, gconfig):
     Used by LOFTEE VEP plugin: https://github.com/konradjk/loftee
     """
     base_url = "https://s3.amazonaws.com/bcbio_nextgen/human_ancestor.fa.gz"
-    if gid == "GRCh37":
+    if gid == "GRCh37" or (gid == "hg19" and not env.safe_exists("../../GRCh37")):
         for ext in ["", ".fai", ".gzi"]:
             outfile = os.path.basename(base_url) + ext
             if not env.safe_exists(outfile):
@@ -170,7 +170,7 @@ def _download_qsignature(env, gid, gconfig):
     """
     base_url = "http://downloads.sourceforge.net/project/adamajava/qsignature.tar.bz2"
     outfile = "qsignature.vcf"
-    if gid == "GRCh37":
+    if gid == "GRCh37" or (gid == "hg19" and not env.safe_exists("../../GRCh37")):
         if not env.safe_exists(outfile):
             zipfile = shared._remote_fetch(env, base_url, samedir=True)
             outdir = "qsignature"
@@ -182,7 +182,6 @@ def _download_qsignature(env, gid, gconfig):
     elif gid == "hg19":  # symlink to GRCh37 download
         if not env.safe_exists(outfile):
             env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
-
 
 def _download_background_vcf(gid):
     """Download background file of variant to use in calling.

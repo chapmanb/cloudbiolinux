@@ -46,8 +46,9 @@ minimal:
   util:
     - axel
     - gawk
-    - rsync
     - openssh-server
+    - pigz
+    - rsync
     - screen
     - unzip
     - less
