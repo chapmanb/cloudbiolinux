@@ -15,7 +15,7 @@ bio_nextgen:
     - fastqc
     - fastx_toolkit
     - qualimap
-    - sambamba
+    - sambamba-binary
     - staden_io_lib
   analysis:
     #- cufflinks

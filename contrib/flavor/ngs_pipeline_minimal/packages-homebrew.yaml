@@ -23,7 +23,7 @@ bio_nextgen:
     - grabix
     - qualimap
     - kraken
-    - sambamba
+    - sambamba-binary
     - samblaster
     - seqtk
     - speedseq

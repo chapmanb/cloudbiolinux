@@ -244,6 +244,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
         _install_bottle(env, brew_cmd, dep, ipkgs)
     for dep in ["expat"]:
         _install_pkg_latest(env, dep, [], brew_cmd, ipkgs)
+    for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
+        env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
     # if installing samtools, avoid bcftools conflicts
     if len([x for x in packages if x.find("samtools") >= 0]):
         with settings(warn_only=True):
