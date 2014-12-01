@@ -231,7 +231,7 @@ def clean_gtf(gtf_file, org_build):
             if line.startswith("#"):
                 continue
             # these are bugged in the gencode release
-            if "seleno" in line:
+            if "Selenocysteine" in line:
                 continue
             if line.split()[0].strip() not in fa_names:
                 continue
