@@ -230,6 +230,9 @@ def clean_gtf(gtf_file, org_build):
         for line in in_gtf:
             if line.startswith("#"):
                 continue
+            # these are bugged in the gencode release
+            if "seleno" in line:
+                continue
             if line.split()[0].strip() not in fa_names:
                 continue
             if "transcript_id" not in line:
@@ -294,7 +297,7 @@ def gtf_to_genepred(gtf):
     if file_exists(out_file):
         return out_file
 
-    cmd = "gtfToGenePred -allErrors -genePredExt {gtf} {out_file}"
+    cmd = "gtfToGenePred -allErrors -ignoreGroupsWithoutExons -genePredExt {gtf} {out_file}"
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
 
