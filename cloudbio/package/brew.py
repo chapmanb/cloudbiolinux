@@ -14,6 +14,7 @@ from cloudbio.package.shared import _yaml_to_packages
 from fabric.api import cd, settings
 
 BOTTLE_URL = "https://s3.amazonaws.com/cloudbiolinux/brew_bottles/{pkg}-{version}.x86_64-linux.bottle.tar.gz"
+BOTTLE_SUPPORTED = set(["isaac-aligner", "isaac-variant-caller"])
 
 def install_packages(env, to_install=None, packages=None):
     """Install packages using the home brew package manager.
@@ -76,6 +77,8 @@ def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     pkg, version, args = _get_pkg_version_args(pkg_str)
     if version:
         _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs)
+    elif pkg in BOTTLE_SUPPORTED:
+        _install_bottle(env, brew_cmd, pkg, ipkgs)
     else:
         _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs)
 
