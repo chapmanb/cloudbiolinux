@@ -19,6 +19,7 @@ bio_nextgen:
     - cramtools
     - libmaus
     - biobambam
+    - express
     - fastqc
     - grabix
     - qualimap
