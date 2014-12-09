@@ -10,7 +10,6 @@ bio_nextgen:
     - bamtools
     - bedtools
     - cramtools
-    - libmaus
     - biobambam
     - fastqc
     - fastx_toolkit

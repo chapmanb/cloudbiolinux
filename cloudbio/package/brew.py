@@ -77,7 +77,7 @@ def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     pkg, version, args = _get_pkg_version_args(pkg_str)
     if version:
         _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs)
-    elif pkg in BOTTLE_SUPPORTED:
+    elif pkg in BOTTLE_SUPPORTED and not env.distribution == "macosx":
         _install_bottle(env, brew_cmd, pkg, ipkgs)
     else:
         _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs)
@@ -262,7 +262,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", [], brew_cmd, ipkgs)
-    for dependency in ["htslib", "libmaus", "cmake"]:
+    for dependency in ["htslib", "cmake"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
                   or dependency not in ipkgs["current"]):
