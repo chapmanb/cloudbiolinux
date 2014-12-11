@@ -190,7 +190,10 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
         if remove_old:
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         flags = " ".join(args)
-        env.safe_run("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env), flags, pkg))
+        with settings(warn_only=True):
+            result = env.safe_run_output("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env), flags, pkg))
+            if result.failed and not result.find("Could not symlink") > 0:
+                raise ValueError("Failed to install brew formula: %s" % pkg)
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
     # installed but not linked
     elif not is_linked:

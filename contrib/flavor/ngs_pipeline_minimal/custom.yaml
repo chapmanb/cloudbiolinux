@@ -5,7 +5,6 @@ bio_nextgen:
     - rnaseqc
     - featurecounts
   analysis:
-    - cufflinks
     - picard
   variant:
     - bcbio_variation

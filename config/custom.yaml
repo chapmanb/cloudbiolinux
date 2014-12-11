@@ -25,7 +25,6 @@ bio_nextgen:
     - disambiguate
     - alientrimmer
   analysis:
-    - cufflinks
     # - echo # build problems on ubuntu 12.10
     - picard
     - shrec

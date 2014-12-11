@@ -17,7 +17,7 @@ bio_nextgen:
     - sambamba-binary
     - staden_io_lib
   analysis:
-    #- cufflinks
+    - cufflinks-binary
     - samtools
     - htslib
     - bcftools

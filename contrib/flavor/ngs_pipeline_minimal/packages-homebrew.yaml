@@ -31,7 +31,7 @@ bio_nextgen:
     - oncofuse
     - sickle
   analysis:
-    #- cufflinks
+    - cufflinks-binary
     - samtools
     - htslib
     - bcftools

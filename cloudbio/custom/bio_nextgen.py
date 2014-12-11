@@ -570,18 +570,6 @@ def install_tophat(env):
 
 install_tophat2 = install_tophat
 
-@_if_not_installed("cufflinks")
-def install_cufflinks(env):
-    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
-    http://cufflinks.cbcb.umd.edu/
-    """
-    default_version = "2.1.1"
-    version = env.get("tool_version", default_version)
-    url = "http://cufflinks.cbcb.umd.edu/downloads/" \
-          "cufflinks-%s.Linux_x86_64.tar.gz" % version
-    _get_install(url, env, _make_copy("find . -perm -100 -type f",
-                                      do_make=False))
-
 # --- Assembly
 
 @_if_not_installed("ABYSS")
