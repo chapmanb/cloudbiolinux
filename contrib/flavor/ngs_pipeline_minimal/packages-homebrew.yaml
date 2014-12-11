@@ -54,5 +54,6 @@ bio_nextgen:
     - vep
     - wham
     - qsignature
+    - qsnp
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt
