@@ -127,13 +127,14 @@ class UCSCGenome(_DownloadHelper):
                     result = self._split_multifasta(result[0])
                     env.safe_run("rm %s" % orig_result)
                 result = self._karyotype_sort(result)
-                result = [os.path.basename(x) for x in result]
                 env.safe_run("rm -f inputs.txt")
                 for fname in result:
                     with quiet():
                         env.safe_run("echo '%s' >> inputs.txt" % fname)
                 env.safe_run("cat `cat inputs.txt` > %s" % (tmp_file))
-                env.safe_run("rm -f *.fa")
+                for fname in result:
+                    with quiet():
+                        env.safe_run("rm -f %s" % fname)
                 env.safe_run("mv %s %s" % (tmp_file, genome_file))
                 zipped_file = os.path.join(prep_dir, zipped_file)
                 genome_file = os.path.join(prep_dir, genome_file)
