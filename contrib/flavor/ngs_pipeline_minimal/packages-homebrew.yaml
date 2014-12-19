@@ -18,7 +18,7 @@ bio_nextgen:
     - bedtools
     - cramtools
     - biobambam
-    - express
+    - express-binary
     - fastqc
     - grabix
     - qualimap
