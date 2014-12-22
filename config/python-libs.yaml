@@ -3,6 +3,7 @@
 # using easy install
 pypi:
   # infrastructure
+  - setuptools
   - amqplib
   - BeautifulSoup
   - fabric
