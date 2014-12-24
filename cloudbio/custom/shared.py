@@ -71,9 +71,12 @@ def _if_not_python_lib(library):
 
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
-                result = env.safe_run("%s -c 'import %s'" % (_python_cmd(env), library))
-            if result.failed:
+                errcount = int(env.safe_run_output("%s -c 'import %s' 2>&1 | grep -c ImportError | cat" % (_python_cmd(env), library)))
+                result = 0 if errcount >= 1 else 1
+            if result == 0:
                 return func(*args, **kwargs)
+            else:
+                return result
         return decorator
     return argcatcher
 

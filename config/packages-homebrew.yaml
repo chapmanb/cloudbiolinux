@@ -39,6 +39,6 @@ bio_nextgen:
     - vcftools
     - vep
     - wham
-    - yaha
+    # - yaha  The Principal Investigator has moved; the software does not download ATM
 distributed:
   - parallel

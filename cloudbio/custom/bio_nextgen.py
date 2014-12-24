@@ -747,8 +747,9 @@ def install_tassel(env):
     """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
     http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&/Itemid=119
     """
-    version = "4.0"
-    url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
+    version = "5"
+    build_id = "1140d3fceb75"
+    url = "https://bitbucket.org/tasseladmin/tassel-{0}-standalone/get/{1}.zip".format(version, build_id)
     executables = ["start_tassel.pl", "run_pipeline.pl"]
     install_dir = _symlinked_java_version_dir("tassel", version, env)
     if install_dir:
@@ -756,7 +757,7 @@ def install_tassel(env):
             with cd(work_dir):
                 dl_file = shared._remote_fetch(env, url)
                 env.safe_run("unzip %s" % dl_file)
-                with cd("tassel{0}_standalone".format(version)):
+                with cd("tasseladmin-tassel-{0}-standalone-{1}".format(version, build_id)):
                     for x in executables:
                         env.safe_sed(x, "^my \$top.*;",
                                      "use FindBin qw($RealBin); my $top = $RealBin;")

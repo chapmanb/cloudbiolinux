@@ -257,7 +257,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
         with settings(warn_only=True):
             def _has_prog(prog):
                 try:
-                    return int(env.safe_run_output("{brew_cmd} list samtools | grep -c {prog}".format(
+                    return int(env.safe_run_output("{brew_cmd} list samtools | grep -c {prog} | cat".format(
                         brew_cmd=brew_cmd, prog=prog)))
                 except ValueError:
                     return 0
