@@ -227,6 +227,8 @@ def _install_bottle(env, brew_cmd, pkg, ipkgs):
         if not is_linked:
             env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
         return
+    elif install_version:
+        env.safe_run("{brew_cmd} remove --force {pkg}".format(**locals()))
     url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
     brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
     brew_cellar = os.path.join(env.safe_run_output("%s --prefix" % brew_cmd), "Cellar")
@@ -265,7 +267,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
         _install_pkg_latest(env, "samtools", [], brew_cmd, ipkgs)
-    for dependency in ["htslib", "cmake"]:
+    for dependency in ["htslib"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
                   or dependency not in ipkgs["current"]):
