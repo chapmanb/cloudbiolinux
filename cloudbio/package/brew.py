@@ -183,7 +183,8 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     elif pkg in ipkgs["current"] or short_pkg in ipkgs["current"]:
         do_install = False
         pkg_version, is_linked = _latest_pkg_version(env, brew_cmd, pkg, devel="--devel" in args)
-        if ipkgs["current"].get(pkg, ipkgs["current"][short_pkg]) != pkg_version:
+        cur_version = ipkgs["current"].get(pkg, ipkgs["current"][short_pkg])
+        if cur_version != pkg_version and cur_version.split("_")[0] != pkg_version:
             remove_old = True
             do_install = True
     if do_install:
@@ -293,6 +294,7 @@ def _brew_cmd(env):
     """
     cmd = find_cmd(env, "brew", "--version")
     if cmd is None:
-        raise ValueError("Did not find working installation of Linuxbrew/Homebrew")
+        raise ValueError("Did not find working installation of Linuxbrew/Homebrew. "
+                         "Please check if you have ruby available.")
     else:
         return cmd
