@@ -42,6 +42,7 @@ bio_nextgen:
     - gatk-framework
     - glia
     - hall-lab-sv-tools
+    - lofreq
     - lumpy-sv
     - pindel
     - platypus-variant

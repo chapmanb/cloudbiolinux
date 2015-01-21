@@ -27,6 +27,7 @@ bio_nextgen:
     - freebayes
     - gatk-framework
     - glia
+    - lofreq
     - lumpy-sv
     - pindel
     - platypus-variant
