@@ -631,11 +631,11 @@ def install_ray(env):
 
 def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
-    http://trinityrnaseq.sourceforge.net/
+    http://trinityrnaseq.github.io/
     """
-    version = "r2012-10-05"
-    url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
-          "trinityrnaseq_%s.tgz" % version
+    version = "v2.0.2"
+    url = "https://github.com/trinityrnaseq/trinityrnaseq/archive/" \
+          "%s.tar.gz" % version
     def _remove_werror(env):
         env.safe_sed("trinity-plugins/jellyfish/Makefile.in", " -Werror", "")
     _get_install_local(url, env, _make_copy(),
