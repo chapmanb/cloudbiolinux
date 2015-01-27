@@ -195,7 +195,7 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
                     out_file = None
                 else:
                     raise IOError("Failure to retrieve remote file")
-        if samedir:
+        if samedir and out_file:
             out_file = os.path.join(orig_dir, out_file)
     return out_file
 
