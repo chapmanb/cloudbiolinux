@@ -284,6 +284,8 @@ def _determine_distribution(env):
         return "centos"
     elif output.find("amzn") >= 0:  # Amazon AMIs are Red-Hat based
         return "centos"
+    elif output.find("suse linux") >= 0:
+        return "centos"
     elif output.find("scientific linux") >= 0:
         return "scientificlinux"
     elif env.safe_exists("/etc/debian_version"):
