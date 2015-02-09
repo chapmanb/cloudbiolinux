@@ -17,8 +17,8 @@ bio_nextgen:
     - bamtools
     - bedtools
     - cramtools
-    - libmaus
     - biobambam
+    - express-binary
     - fastqc
     - grabix
     - qualimap
@@ -31,7 +31,7 @@ bio_nextgen:
     - oncofuse
     - sickle
   analysis:
-    #- cufflinks
+    - cufflinks-binary
     - samtools
     - htslib
     - bcftools
@@ -42,6 +42,7 @@ bio_nextgen:
     - gatk-framework
     - glia
     - hall-lab-sv-tools
+    - lofreq
     - lumpy-sv
     - pindel
     - platypus-variant
@@ -54,5 +55,6 @@ bio_nextgen:
     - vep
     - wham
     - qsignature
+    - qsnp
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt

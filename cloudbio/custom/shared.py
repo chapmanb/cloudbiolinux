@@ -71,9 +71,12 @@ def _if_not_python_lib(library):
 
         def decorator(*args, **kwargs):
             with settings(warn_only=True):
-                result = env.safe_run("%s -c 'import %s'" % (_python_cmd(env), library))
-            if result.failed:
+                errcount = int(env.safe_run_output("%s -c 'import %s' 2>&1 | grep -c ImportError | cat" % (_python_cmd(env), library)))
+                result = 0 if errcount >= 1 else 1
+            if result == 0:
                 return func(*args, **kwargs)
+            else:
+                return result
         return decorator
     return argcatcher
 
@@ -192,7 +195,7 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
                     out_file = None
                 else:
                     raise IOError("Failure to retrieve remote file")
-        if samedir:
+        if samedir and out_file:
             out_file = os.path.join(orig_dir, out_file)
     return out_file
 

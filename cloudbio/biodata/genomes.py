@@ -15,6 +15,7 @@ import os
 import operator
 import socket
 import subprocess
+from math import log
 
 from fabric.api import *
 from fabric.contrib.files import *
@@ -127,13 +128,14 @@ class UCSCGenome(_DownloadHelper):
                     result = self._split_multifasta(result[0])
                     env.safe_run("rm %s" % orig_result)
                 result = self._karyotype_sort(result)
-                result = [os.path.basename(x) for x in result]
                 env.safe_run("rm -f inputs.txt")
                 for fname in result:
                     with quiet():
                         env.safe_run("echo '%s' >> inputs.txt" % fname)
                 env.safe_run("cat `cat inputs.txt` > %s" % (tmp_file))
-                env.safe_run("rm -f *.fa")
+                for fname in result:
+                    with quiet():
+                        env.safe_run("rm -f %s" % fname)
                 env.safe_run("mv %s %s" % (tmp_file, genome_file))
                 zipped_file = os.path.join(prep_dir, zipped_file)
                 genome_file = os.path.join(prep_dir, genome_file)
@@ -670,9 +672,11 @@ def _index_star(ref_file):
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the STAR index." % (gtf_file)
         return None
+    GenomeLength = os.path.getsize(ref_file)
+    Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.join(ref_dir, os.pardir, "star")
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (dir_name, gtf_file))
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s --genomeSAindexNbases %s" % (dir_name, gtf_file, Nbases))
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_snap(ref_file):

@@ -10,7 +10,6 @@ bio_nextgen:
     - bamtools
     - bedtools
     - cramtools
-    - libmaus
     - biobambam
     - fastqc
     - fastx_toolkit
@@ -18,7 +17,7 @@ bio_nextgen:
     - sambamba-binary
     - staden_io_lib
   analysis:
-    #- cufflinks
+    - cufflinks-binary
     - samtools
     - htslib
     - bcftools
@@ -28,6 +27,7 @@ bio_nextgen:
     - freebayes
     - gatk-framework
     - glia
+    - lofreq
     - lumpy-sv
     - pindel
     - platypus-variant
@@ -40,6 +40,6 @@ bio_nextgen:
     - vcftools
     - vep
     - wham
-    - yaha
+    # - yaha  The Principal Investigator has moved; the software does not download ATM
 distributed:
   - parallel

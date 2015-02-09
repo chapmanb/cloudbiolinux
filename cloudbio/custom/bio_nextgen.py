@@ -570,18 +570,6 @@ def install_tophat(env):
 
 install_tophat2 = install_tophat
 
-@_if_not_installed("cufflinks")
-def install_cufflinks(env):
-    """Cufflinks assembles transcripts and tests for differential expression and regulation in RNA-Seq samples.
-    http://cufflinks.cbcb.umd.edu/
-    """
-    default_version = "2.1.1"
-    version = env.get("tool_version", default_version)
-    url = "http://cufflinks.cbcb.umd.edu/downloads/" \
-          "cufflinks-%s.Linux_x86_64.tar.gz" % version
-    _get_install(url, env, _make_copy("find . -perm -100 -type f",
-                                      do_make=False))
-
 # --- Assembly
 
 @_if_not_installed("ABYSS")
@@ -690,7 +678,7 @@ def install_bcbio_variation(env):
     """Toolkit to analyze genomic variation data with comparison and ensemble approaches.
     https://github.com/chapmanb/bcbio.variation
     """
-    version = "0.1.9"
+    version = "0.2.3"
     url = "https://github.com/chapmanb/bcbio.variation/releases/download/" \
           "v%s/bcbio.variation-%s-standalone.jar" % (version, version)
     install_dir = _symlinked_java_version_dir("bcbio_variation", version, env)
@@ -759,8 +747,9 @@ def install_tassel(env):
     """TASSEL: evaluate traits associations, evolutionary patterns, and linkage disequilibrium.
     http://www.maizegenetics.net/index.php?option=com_content&task=view&id=89&/Itemid=119
     """
-    version = "4.0"
-    url = "http://www.maizegenetics.net/tassel/tassel{0}_standalone.zip".format(version)
+    version = "5"
+    build_id = "1140d3fceb75"
+    url = "https://bitbucket.org/tasseladmin/tassel-{0}-standalone/get/{1}.zip".format(version, build_id)
     executables = ["start_tassel.pl", "run_pipeline.pl"]
     install_dir = _symlinked_java_version_dir("tassel", version, env)
     if install_dir:
@@ -768,7 +757,7 @@ def install_tassel(env):
             with cd(work_dir):
                 dl_file = shared._remote_fetch(env, url)
                 env.safe_run("unzip %s" % dl_file)
-                with cd("tassel{0}_standalone".format(version)):
+                with cd("tasseladmin-tassel-{0}-standalone-{1}".format(version, build_id)):
                     for x in executables:
                         env.safe_sed(x, "^my \$top.*;",
                                      "use FindBin qw($RealBin); my $top = $RealBin;")
