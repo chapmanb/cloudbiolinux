@@ -95,7 +95,22 @@ build_info = {
                     "Homo_sapiens.GRCh37." + ensembl_release),
     "canFam3": Build("canis_familiaris", None,
                      ucsc_ensembl_map_via_download,
-                     "Canis_familiaris.CanFam3.1." + ensembl_release)
+                     "Canis_familiaris.CanFam3.1." + ensembl_release),
+    "sacCer3": Build("saccharomyces_cerevisiae", None,
+                     ucsc_ensembl_map_via_download,
+                     "Saccharomyces_cerevisiae.R64-1-1." + ensembl_release),
+    "WBcel235": Build("caenorhabditis_elegans", None,
+                      ucsc_ensembl_map_via_download,
+                      "Caenorhabditis_elegans.WBcel235." + ensembl_release),
+    "dm3": Build("drosophila_melanogaster", None,
+                 ucsc_ensembl_map_via_download,
+                 "Drosophila_melanogaster.BDGP5." + ensembl_release),
+    "Zv9": Build("danio_rerio", None,
+                 ucsc_ensembl_map_via_download,
+                 "Danio_rerio.Zv9." + ensembl_release),
+    "xenTro3": Build("xenopus_tropicalis", None,
+                     ucsc_ensembl_map_via_download,
+                     "Xenopus_tropicalis.JGI_4.2." + ensembl_release),
 }
 
 ucsc_db = "genome-mysql.cse.ucsc.edu"
