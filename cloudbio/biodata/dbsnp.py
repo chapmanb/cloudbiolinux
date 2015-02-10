@@ -120,8 +120,8 @@ def _download_dbnsfp(env, gid, gconfig):
     https://sites.google.com/site/jpopgen/dbNSFP
     https://github.com/ensembl-variation/VEP_plugins/blob/master/dbNSFP.pm
     """
-    version = "2.8"
-    url = "https://onedrive.live.com/download?cid=0D359D171E382137&resid=D359D171E382137%2154761&authkey=AFm7prRqSLLLC9g"
+    version = "2.9"
+    url = "ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFPv2.9.zip"
     dl_file = "dbNSFPv%s.zip" % version
     if gconfig.get("dbnsfp"):
         outfile = "dbNSFP_v%s.gz" % (version)
