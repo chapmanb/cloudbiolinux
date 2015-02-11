@@ -32,7 +32,7 @@ bio_nextgen:
     - sickle
   analysis:
     - cufflinks-binary
-    - samtools
+    - samtools;--without-curses
     - htslib
     - bcftools
   variant:
