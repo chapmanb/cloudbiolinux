@@ -40,7 +40,7 @@ bio_nextgen:
     - delly;--with-binary
     - freebayes
     - gatk-framework
-    - glia
+    #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
     - lofreq
     - lumpy-sv

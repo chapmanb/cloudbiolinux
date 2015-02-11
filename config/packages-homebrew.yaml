@@ -26,7 +26,6 @@ bio_nextgen:
     - delly;--with-binary
     - freebayes
     - gatk-framework
-    - glia
     - lofreq
     - lumpy-sv
     - pindel
