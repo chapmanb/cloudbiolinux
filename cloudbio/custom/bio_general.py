@@ -15,7 +15,7 @@ def install_anaconda(env):
     """
     version = "2.0.0"
     outdir = os.path.join(env.system_install, "anaconda")
-    if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian", "arch"]:
+    if env.distribution in ["ubuntu", "centos", "scientificlinux", "debian", "arch", "suse"]:
         platform = "Linux"
     elif env.distribution in ["macosx"]:
         platform = "MacOSX"

@@ -46,6 +46,8 @@ def _setup_distribution_environment(ignore_distcheck=False):
         _setup_debian()
     elif env.distribution == "arch":
         pass  # No package support for Arch yet
+    elif env.distribution == "suse":
+        pass  # No package support for SUSE yet
     elif env.distribution == "macosx":
         _setup_macosx(env)
         ignore_distcheck = True
@@ -285,7 +287,9 @@ def _determine_distribution(env):
     elif output.find("amzn") >= 0:  # Amazon AMIs are Red-Hat based
         return "centos"
     elif output.find("suse linux") >= 0:
-        return "centos"
+        return "suse"
+    elif output.find("opensuse") >= 0:
+        return "suse"
     elif output.find("scientific linux") >= 0:
         return "scientificlinux"
     elif env.safe_exists("/etc/debian_version"):
