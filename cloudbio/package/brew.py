@@ -236,14 +236,17 @@ def _install_bottle(env, brew_cmd, pkg, ipkgs):
         if not is_linked:
             env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
         return True
-    elif install_version:
+    elif install_version or pkg in ipkgs["outdated"]:
         env.safe_run("{brew_cmd} remove --force {pkg}".format(**locals()))
     url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
     brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
     brew_cellar = os.path.join(env.safe_run_output("%s --prefix" % brew_cmd), "Cellar")
     with quiet():
         env.safe_run("mkdir -p %s" % brew_cellar)
-    bottle_file = shared._remote_fetch(env, url, out_file=os.path.join(brew_cachedir, os.path.basename(url)),
+    out_file = os.path.join(brew_cachedir, os.path.basename(url))
+    if env.safe_exists(out_file):
+        env.safe_run("rm -f %s" % out_file)
+    bottle_file = shared._remote_fetch(env, url, out_file=out_file,
                                        allow_fail=True, samedir=True)
     if bottle_file:
         with cd(brew_cellar):
