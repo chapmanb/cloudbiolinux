@@ -14,7 +14,7 @@ from cloudbio.package.shared import _yaml_to_packages
 from fabric.api import cd, settings
 
 BOTTLE_URL = "https://s3.amazonaws.com/cloudbiolinux/brew_bottles/{pkg}-{version}.x86_64-linux.bottle.tar.gz"
-BOTTLE_SUPPORTED = set(["isaac-aligner", "isaac-variant-caller"])
+BOTTLE_SUPPORTED = set(["isaac-aligner", "isaac-variant-caller", "cmake"])
 
 def install_packages(env, to_install=None, packages=None):
     """Install packages using the home brew package manager.
@@ -43,6 +43,8 @@ def install_packages(env, to_install=None, packages=None):
     ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
              "current": _get_current_pkgs(env, brew_cmd)}
     _install_brew_baseline(env, brew_cmd, ipkgs, packages)
+    ipkgs = {"outdated": set([x.strip() for x in env.safe_run_output("%s outdated" % brew_cmd).split()]),
+             "current": _get_current_pkgs(env, brew_cmd)}
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
 
@@ -75,11 +77,13 @@ def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     """Install a specific brew package, handling versioning and existing packages.
     """
     pkg, version, args = _get_pkg_version_args(pkg_str)
+    installed = False
     if version:
         _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs)
-    elif pkg in BOTTLE_SUPPORTED and not env.distribution == "macosx":
-        _install_bottle(env, brew_cmd, pkg, ipkgs)
-    else:
+        installed = True
+    if pkg in BOTTLE_SUPPORTED and not env.distribution == "macosx":
+        installed = _install_bottle(env, brew_cmd, pkg, ipkgs)
+    if not installed:
         _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs)
 
 def _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs):
@@ -91,7 +95,7 @@ def _install_pkg_version(env, pkg, args, version, brew_cmd, ipkgs):
         return
     if version == "HEAD":
         args = " ".join(args)
-        brew_install = _get_brew_install_cmd(brew_cmd, env)
+        brew_install = _get_brew_install_cmd(brew_cmd, env, pkg)
         env.safe_run("{brew_install} {args} --HEAD {pkg}".format(**locals()))
     else:
         raise ValueError("Cannot currently handle installing brew packages by version.")
@@ -166,10 +170,14 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
             i += 1
     return version, is_linked
 
-def _get_brew_install_cmd(brew_cmd, env):
+def _get_brew_install_cmd(brew_cmd, env, pkg):
     perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
     compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
-    return "%s && %s && %s install --env=inherit" % (compiler_setup, perl_setup, brew_cmd)
+    extra_args = ""
+    if pkg in ["cmake"]:
+        extra_args += "--without-docs"
+    return "%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd,
+                                                        extra_args)
 
 def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.
@@ -192,7 +200,7 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         flags = " ".join(args)
         with settings(warn_only=True):
-            result = env.safe_run_output("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env), flags, pkg))
+            result = env.safe_run_output("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env, pkg), flags, pkg))
             if result.failed and not result.find("Could not symlink") > 0:
                 raise ValueError("Failed to install brew formula: %s" % pkg)
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
@@ -221,26 +229,32 @@ def _install_bottle(env, brew_cmd, pkg, ipkgs):
     """Install Linux bottles for brew packages that can be tricky to build.
     """
     if env.distribution == "macosx":  # Only Linux bottles, build away on Mac
-        return
+        return False
     pkg_version, is_linked = _latest_pkg_version(env, brew_cmd, pkg)
     install_version = ipkgs["current"].get(pkg)
     if pkg_version == install_version:  # Up to date
         if not is_linked:
             env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
-        return
-    elif install_version:
+        return True
+    elif install_version or pkg in ipkgs["outdated"]:
         env.safe_run("{brew_cmd} remove --force {pkg}".format(**locals()))
     url = BOTTLE_URL.format(pkg=pkg, version=pkg_version)
     brew_cachedir = env.safe_run_output("%s --cache" % brew_cmd)
     brew_cellar = os.path.join(env.safe_run_output("%s --prefix" % brew_cmd), "Cellar")
     with quiet():
         env.safe_run("mkdir -p %s" % brew_cellar)
-    bottle_file = shared._remote_fetch(env, url, out_file=os.path.join(brew_cachedir, os.path.basename(url)),
+    out_file = os.path.join(brew_cachedir, os.path.basename(url))
+    if env.safe_exists(out_file):
+        env.safe_run("rm -f %s" % out_file)
+    bottle_file = shared._remote_fetch(env, url, out_file=out_file,
                                        allow_fail=True, samedir=True)
     if bottle_file:
         with cd(brew_cellar):
             env.safe_run("tar -xf %s" % bottle_file)
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+        return True
+    else:
+        return False
 
 def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
@@ -249,10 +263,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["cmake"]:
-        _install_bottle(env, brew_cmd, dep, ipkgs)
-    for dep in ["expat"]:
-        _install_pkg_latest(env, dep, [], brew_cmd, ipkgs)
+    for dep in ["expat", "cmake"]:
+        _install_pkg(env, dep, brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
     # if installing samtools, avoid bcftools conflicts
@@ -267,7 +279,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
             if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
                 env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
                 ipkgs["current"].pop("samtools", None)
-        _install_pkg_latest(env, "samtools", [], brew_cmd, ipkgs)
+        _install_pkg_latest(env, "samtools", ["--without-curses"], brew_cmd, ipkgs)
     for dependency in ["htslib"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]

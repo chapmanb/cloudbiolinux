@@ -15,6 +15,7 @@ import os
 import operator
 import socket
 import subprocess
+from math import log
 
 from fabric.api import *
 from fabric.contrib.files import *
@@ -291,7 +292,7 @@ GENOMES_SUPPORTED = [
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
            ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),
            ("Cfamiliaris_Dog", "canFam2", UCSCGenome("canFam2")),
-           ("Drerio_Zebrafish", "Zv9", UCSCGenome("danRer7")),
+           ("Drerio_Zebrafish", "Zv9", EnsemblGenome("standard", "78", "Danio_rerio", "Zv9")),
            ("Ecaballus_Horse", "equCab2", UCSCGenome("equCab2")),
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
@@ -671,9 +672,11 @@ def _index_star(ref_file):
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the STAR index." % (gtf_file)
         return None
+    GenomeLength = os.path.getsize(ref_file)
+    Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.join(ref_dir, os.pardir, "star")
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s" % (dir_name, gtf_file))
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s --genomeSAindexNbases %s" % (dir_name, gtf_file, Nbases))
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_snap(ref_file):

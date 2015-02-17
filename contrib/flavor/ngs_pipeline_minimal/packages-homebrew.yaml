@@ -11,7 +11,7 @@ bio_nextgen:
     - bowtie2 
     - novoalign
     - rna-star
-    - snap-aligner
+    # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
     - tophat-binary
   utilities:
     - bamtools
@@ -32,7 +32,7 @@ bio_nextgen:
     - sickle
   analysis:
     - cufflinks-binary
-    - samtools
+    - samtools;--without-curses
     - htslib
     - bcftools
   variant:
@@ -40,7 +40,7 @@ bio_nextgen:
     - delly;--with-binary
     - freebayes
     - gatk-framework
-    - glia
+    #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
     - lofreq
     - lumpy-sv
@@ -53,8 +53,8 @@ bio_nextgen:
     - vardict
     - vcflib
     - vep
-    - wham
+    - wham;--with-binary
     - qsignature
     - qsnp
     # - vcftools # Build problems with default libz on Ubuntu 12.04
-    - vt
+    - vt;--with-binary
