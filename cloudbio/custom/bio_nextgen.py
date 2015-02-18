@@ -631,15 +631,14 @@ def install_ray(env):
 
 def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
-    http://trinityrnaseq.sourceforge.net/
+    http://trinityrnaseq.github.io/
     """
-    version = "r2012-10-05"
-    url = "http://downloads.sourceforge.net/project/trinityrnaseq/" \
-          "trinityrnaseq_%s.tgz" % version
-    def _remove_werror(env):
-        env.safe_sed("trinity-plugins/jellyfish/Makefile.in", " -Werror", "")
+    version = "2.0.2"
+    url = "https://github.com/trinityrnaseq/trinityrnaseq/archive/" \
+          "v%s.tar.gz" % version
+    dir_name = "trinityrnaseq-%s" % version
     _get_install_local(url, env, _make_copy(),
-                       post_unpack_fn=_remove_werror)
+                       dir_name=dir_name)
 
 def install_cortex_var(env):
     """De novo genome assembly and variation analysis from sequence data.
