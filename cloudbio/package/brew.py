@@ -288,9 +288,9 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     if "cpanminus" in packages:
         _install_pkg_latest(env, "cpanminus", [], brew_cmd, ipkgs)
         cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
-        for perl_lib in ["Statistics::Descriptive", "Archive::Extract", "Archive::Zip", "Archive::Tar", "DBI",
-                         "LWP::Simple", "LWP::Protocol::https", "Time::HiRes", "IPC::Cmd",
-                         "Params::Check", "Module::Load::Conditional"]:
+        for perl_lib in ["Encode::Locale", "Statistics::Descriptive", "Archive::Extract", "Archive::Zip",
+                         "Archive::Tar", "DBI", "LWP::Simple", "LWP::Protocol::https", "Time::HiRes",
+                         "IPC::Cmd", "Params::Check", "Module::Load::Conditional"]:
             env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
     # Ensure paths we may have missed on install are accessible to regular user
     if env.use_sudo:
