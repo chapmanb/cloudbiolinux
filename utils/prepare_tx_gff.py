@@ -190,7 +190,7 @@ def prepare_gff_db(gff_file):
     if not os.path.exists(dbfn):
         db = gffutils.create_db(gff_file, dbfn=dbfn, keep_order=False,
                                 merge_strategy='merge', force=False,
-                                infer_gene_extent=False)
+                                infer_gene_extent=True)
     return dbfn
 
 # ## Main driver functions
