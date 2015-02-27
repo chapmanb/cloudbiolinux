@@ -1,0 +1,14 @@
+---
+# Flavor containing with minimal instructions to install tools for
+# running next-generation sequencing pipelines.
+packages:
+  - minimal
+  - libraries
+  - perl
+  - python
+  - java
+  - r
+  - ruby
+  - bio_nextgen
+libraries:
+  - python-libs
