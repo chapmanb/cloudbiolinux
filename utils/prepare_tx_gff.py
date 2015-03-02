@@ -439,13 +439,12 @@ def prepare_mask_gtf(gtf):
     out_file = os.path.join(os.path.dirname(gtf), "ref-transcripts-mask.gtf")
     if file_exists(out_file):
         return out_file
-
+    biotype_lookup = _biotype_lookup_fn(gtf)
     db = _get_gtf_db(gtf)
     with open(out_file, "w") as out_handle:
         for g in db.all_features():
-            biotype = g.attributes.get("gene_biotype", None)
-            if ((biotype and biotype[0] in mask_biotype) or
-               g.chrom in mask_chrom):
+            biotype = biotype_lookup(g)
+            if (biotype in mask_biotype) or (g.chrom in mask_chrom):
                 out_handle.write(str(g) + "\n")
     return out_file
 
