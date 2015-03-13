@@ -5,6 +5,7 @@ https://github.com/Homebrew/linuxbrew
 import contextlib
 from distutils.version import LooseVersion
 import os
+import sys
 
 from cloudbio.custom import system, shared
 from cloudbio.flavor.config import get_config_file
@@ -200,9 +201,13 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
             env.safe_run("{brew_cmd} remove --force {short_pkg}".format(**locals()))
         flags = " ".join(args)
         with settings(warn_only=True):
-            result = env.safe_run_output("%s %s %s" % (_get_brew_install_cmd(brew_cmd, env, pkg), flags, pkg))
+            cmd = "%s %s %s" % (_get_brew_install_cmd(brew_cmd, env, pkg), flags, pkg)
+            result = env.safe_run_output(cmd)
             if result.failed and not result.find("Could not symlink") > 0:
-                raise ValueError("Failed to install brew formula: %s" % pkg)
+                sys.tracebacklimit = 1
+                raise ValueError("Failed to install brew formula: %s\n" % pkg +
+                                 "To debug, please try re-running the install command with verbose output:\n" +
+                                 cmd.replace("brew install", "brew install -v"))
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
     # installed but not linked
     elif not is_linked:
