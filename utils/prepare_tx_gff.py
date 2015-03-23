@@ -189,8 +189,7 @@ def prepare_gff_db(gff_file):
     dbfn = gff_file + ".db"
     if not os.path.exists(dbfn):
         db = gffutils.create_db(gff_file, dbfn=dbfn, keep_order=False,
-                                merge_strategy='merge', force=False,
-                                infer_gene_extent=True)
+                                merge_strategy='merge', force=False)
     return dbfn
 
 # ## Main driver functions
@@ -403,7 +402,7 @@ def _create_dummy_fastq():
     read = ("@HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
             "GGNCTTTCCTGCTTCTATGTCTTGATCGCCTGTAGGCAGG\n"
             "+HWI-ST333_0178_FC:5:1101:1107:2112#ATCTCG/1\n"
-            "[[BS\\a`ceeagfhhhhhaefhcdfhcf`efeg[cg_b__\n")
+           "[[BS\\a`ceeagfhhhhhaefhcdfhcf`efeg[cg_b__\n")
     fn = "dummy.fq"
     with open(fn, "w") as out_handle:
         out_handle.write(read)
