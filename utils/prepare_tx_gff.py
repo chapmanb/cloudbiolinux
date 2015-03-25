@@ -214,6 +214,7 @@ def main(org_build, gtf_file=None):
         gtf_file = clean_gtf(gtf_file, org_build)
         db = prepare_gff_db(gtf_file)
         gtf_to_refflat(gtf_file)
+        gtf_to_bed(gtf_file)
         prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
@@ -328,8 +329,25 @@ def gtf_to_refflat(gtf):
 
     return out_file
 
-def make_miso_events(gtf, org_build):
+def gtf_to_bed(gtf):
+    db = _get_gtf_db(gtf)
+    out_file = os.path.splitext(gtf)[0] + ".bed"
+    if file_exists(out_file):
+        return out_file
+    with open(out_file, "w") as out_handle:
+        for feature in db.features_of_type('transcript'):
+            chrom = feature.chrom
+            start = feature.start
+            end = feature.end
+            attributes = feature.attributes.keys()
+            strand = feature.strand
+            name = (feature['gene_name'][0] if 'gene_name' in attributes else
+                    feature['gene_id'][0])
+            line = "\t".join(map(str, [chrom, start, end, name, ".", strand]))
+            out_handle.write(line + "\n")
+    return out_file
 
+def make_miso_events(gtf, org_build):
     genepred = gtf_to_genepred(gtf)
     genepred = genepred_to_UCSC_table(genepred)
     pred_dir = tempfile.mkdtemp()
