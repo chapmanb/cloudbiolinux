@@ -211,7 +211,6 @@ r:
   - r-base
   - r-base-core
   - r-base-dev
-  - r-base-html
 perl:
   - perl
   - libperl-dev

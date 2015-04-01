@@ -43,7 +43,7 @@ def _make_install_script(out_file, config):
     repo.installer <- function(repos, install.fn) {
       %s
       maybe.install <- function(pname) {
-        if (!(pname %%in%% installed.packages()))
+        if (!(is.element(pname, installed.packages()[,1])))
           install.fn(pname)
       }
     }

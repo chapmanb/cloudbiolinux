@@ -117,6 +117,8 @@ ruby:
 r:
   - R
   - R-core
+  - R-core-devel
+  - R-java
   - libRmath
   - libRmath-devel
 perl: 
