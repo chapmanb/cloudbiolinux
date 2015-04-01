@@ -34,6 +34,7 @@ from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
+import multiprocessing as mp
 
 # -- Configuration for genomes to download and prepare
 
@@ -622,7 +623,7 @@ def _index_bowtie2(ref_file):
 
 def _index_bwa(ref_file):
     dir_name = "bwa"
-    local_ref = os.path.split(ref_file)[-1]
+    local_ref = os.path.splitext(os.path.basename(ref_file))[0]
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
         with cd(dir_name):
@@ -674,9 +675,11 @@ def _index_star(ref_file):
         return None
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
-    dir_name = os.path.join(ref_dir, os.pardir, "star")
+    dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
+    cpu = mp.cpu_count()
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s --genomeSAindexNbases %s" % (dir_name, gtf_file, Nbases))
+           "--runThreadN %s "
+           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s --genomeSAindexNbases %s" % (dir_name, str(cpu), gtf_file, Nbases))
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_snap(ref_file):
