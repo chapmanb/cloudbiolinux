@@ -19,6 +19,7 @@ bio_nextgen:
   variant:
     - freebayes
     - gatk-framework
+    - metal-gwas
     - plink
     - snpeff
     - vcflib
