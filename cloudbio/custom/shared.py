@@ -30,9 +30,10 @@ def _if_not_installed(pname):
         def decorator(*args, **kwargs):
             if _galaxy_tool_install(args):
                 run_function = not _galaxy_tool_present(args)
+            elif isinstance(pname, list):
+                run_function = any([_executable_not_on_path(x) for x in pname])
             else:
                 run_function = _executable_not_on_path(pname)
-
             if run_function:
                 return func(*args, **kwargs)
         return decorator

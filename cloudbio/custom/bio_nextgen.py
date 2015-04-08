@@ -18,7 +18,7 @@ from cloudbio import libraries
 from cloudbio.flavor.config import get_config_file
 
 
-@_if_not_installed("twoBitToFa")
+@_if_not_installed(["twoBitToFa", "gtfToGenePred"])
 def install_ucsc_tools(env):
     """Useful executables from UCSC.
 
