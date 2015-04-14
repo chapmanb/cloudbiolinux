@@ -51,6 +51,7 @@ bio_nextgen:
     - snpeff
     - theta2
     - vardict
+    - vardict-java
     - vcflib
     - vep
     - wham;--with-binary
