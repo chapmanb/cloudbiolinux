@@ -123,11 +123,8 @@ r:
   - libRmath-devel
 perl: 
   - perl
+  - perl-devel
   - perl-core
-  - perl-ExtUtils-MakeMaker
-  - perl-ExtUtils-AutoInstall
-  - perl-ExtUtils-CBuilder
-  - perl-CPAN
 java:
   - ant
   - ant-junit
