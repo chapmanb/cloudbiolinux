@@ -7,7 +7,7 @@ recipe:
   full:
     recipe_type: bash
     recipe_cmds:
-      - >
+      - |
         mkdir variation
         wget -O variation/dbsnp.vcf.gz ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150218.vcf.gz
       - wget -O variation/dbsnp.vcf.gz.tbi ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150218.vcf.gz.tbi

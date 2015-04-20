@@ -71,6 +71,14 @@ def install_data_rsync(config_source=CONFIG_FILE):
     setup_environment()
     genomes.install_data_rsync(config_source)
 
+def install_data_ggd(recipe, organism):
+    """Install data using Get Genomics Data (GGD) recipes.
+    """
+    setup_environment()
+    from cloudbio.biodata import ggd, genomes
+    genome_dir = os.path.join(genomes._make_genome_dir(), organism)
+    ggd.install_recipe(genome_dir, recipe)
+
 def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.
     """
