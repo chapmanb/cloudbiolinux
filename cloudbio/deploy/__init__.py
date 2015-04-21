@@ -245,7 +245,7 @@ def setup_biodata(options):
         "rsync": install_data_rsync,
     }[genome_source]
     if genome_source == "default":
-        install_proc(options["genomes"], ["s3", "raw"])
+        install_proc(options["genomes"], ["ggd", "s3", "raw"])
     else:
         install_proc(options["genomes"])
 

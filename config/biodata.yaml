@@ -25,6 +25,9 @@ genomes:
     name: Human (GRCh37)
     dbsnp: true
     rnaseq: true
+  - dbkey: hg38-noalt
+    name: Human (hg38) without alternative alleles
+    dbsnp: 142
   - dbkey: mm9
     name: Mouse (mm9)
     dbsnp: true

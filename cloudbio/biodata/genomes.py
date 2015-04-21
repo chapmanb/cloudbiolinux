@@ -29,7 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import galaxy
+from cloudbio.biodata import galaxy, ggd
 from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
@@ -260,6 +260,12 @@ class BroadGenome(_DownloadHelper):
             env.safe_run("mv %s %s" % (self._target, org_file))
         return org_file, []
 
+class GGDGenome:
+    """Genome with download specified via a GGD recipe.
+    """
+    def __init__(self, name):
+        self._name = name
+
 BROAD_BUNDLE_VERSION = "2.8"
 DBSNP_VERSION = "138"
 
@@ -275,6 +281,8 @@ GENOMES_SUPPORTED = [
                                             "ucsc.hg19.fasta")),
            ("Hsapiens", "GRCh37", BroadGenome("GRCh37", BROAD_BUNDLE_VERSION,
                                               "human_g1k_v37.fasta", "b37")),
+           ("Hsapiens", "hg38", GGDGenome("hg38")),
+           ("Hsapiens", "hg38-noalt", GGDGenome("hg38-noalt")),
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
@@ -321,6 +329,7 @@ def install_data(config_source, approaches=None):
     """Main entry point for installing useful biological data.
     """
     PREP_FNS = {"s3": _download_s3_index,
+                "ggd": _install_with_ggd,
                 "raw": _prep_raw_index}
     if approaches is None: approaches = ["raw"]
     ready_approaches = []
@@ -707,6 +716,27 @@ def _index_mosaik(ref_file):
             env.safe_run(cmd)
     return _index_w_command(dir_name, cmd, ref_file,
                             post=create_jumpdb, ext=".dat")
+
+# -- Retrieve using GGD recipes
+
+def _install_with_ggd(env, manager, gid, idx):
+    assert env.hosts == ["localhost"], "GGD recipes only work for local runs"
+    recipe_dir = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                               os.pardir, os.pardir, "ggd-recipes"))
+    recipes = [idx]
+    if idx in ["seq"]:
+        if manager.config.get("dbsnp"):
+            recipes.append("dbsnp-%s" % manager.config["dbsnp"])
+        if manager.config.get("rnaseq"):
+            recipes.append("rnaseq")
+    done = False
+    for recipe in recipes:
+        recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
+        if os.path.exists(recipe_file):
+            ggd.install_recipe(env.cwd, recipe_file)
+            done = True
+    if not done:
+        raise NotImplementedError("GGD recipe not available for %s %s" % (gid, idx))
 
 # -- Genome upload and download to Amazon s3 buckets
 
