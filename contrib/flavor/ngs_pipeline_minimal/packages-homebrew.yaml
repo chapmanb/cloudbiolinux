@@ -21,6 +21,7 @@ bio_nextgen:
     - express-binary
     - fastqc
     - grabix
+    - picard-tools
     - qualimap
     - kraken
     - sambamba-binary

@@ -1,16 +1,16 @@
 # dbSNP
 ---
 attributes:
-  name: dbsnp
-  version: 20150218
+  name: dbsnp-142
+  version: 20150416
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         mkdir variation
-        wget -O variation/dbsnp.vcf.gz ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150218.vcf.gz
-      - wget -O variation/dbsnp.vcf.gz.tbi ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150218.vcf.gz.tbi
+        wget -c -O variation/dbsnp-142.vcf.gz ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150416.vcf.gz
+      - wget -c -O variation/dbsnp-142.vcf.gz.tbi ftp://ftp.ncbi.nlm.nih.gov/snp/organisms/human_9606/VCF/All_20150416.vcf.gz.tbi
     recipe_outfiles:
-      - variation/dbsnp.vcf.gz
-      - variation/dbsnp.vcf.gz.tbi
+      - variation/dbsnp-142.vcf.gz
+      - variation/dbsnp-142.vcf.gz.tbi

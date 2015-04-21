@@ -23,13 +23,16 @@ def install_recipe(base_dir, recipe_file):
     recipe = _read_recipe(recipe_file)
     if not version_uptodate(base_dir, recipe):
         with tx_tmpdir(base_dir) as tmpdir:
-            _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"])
+            with chdir(tmpdir):
+                _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"],
+                            recipe["recipe"]["full"]["recipe_type"])
             _move_files(tmpdir, base_dir, recipe["recipe"]["full"]["recipe_outfiles"])
         add_version(base_dir, recipe)
 
-def _run_recipe(work_dir, recipe_cmds):
+def _run_recipe(work_dir, recipe_cmds, recipe_type):
     """Create a bash script and run the recipe to download data.
     """
+    assert recipe_type == "bash", "Can only currently run bash recipes"
     run_file = os.path.join(work_dir, "ggd-run.sh")
     with open(run_file, "w") as out_handle:
         out_handle.write("#!/bin/bash\nset -eu -o pipefail\n")
@@ -42,6 +45,9 @@ def _move_files(tmp_dir, final_dir, out_files):
         final = os.path.join(final_dir, out_file)
         assert os.path.exists(orig), ("Did not find expected output file %s in %s" %
                                       (out_file, tmp_dir))
+        cur_dir = os.path.dirname(final)
+        if not os.path.exists(cur_dir):
+            os.makedirs(cur_dir)
         os.rename(orig, final)
 
 def _read_recipe(in_file):
