@@ -632,7 +632,7 @@ def _index_bowtie2(ref_file):
 
 def _index_bwa(ref_file):
     dir_name = "bwa"
-    local_ref = os.path.splitext(os.path.basename(ref_file))[0]
+    local_ref = os.path.split(ref_file)[-1]
     if not env.safe_exists(dir_name):
         env.safe_run("mkdir %s" % dir_name)
         with cd(dir_name):
