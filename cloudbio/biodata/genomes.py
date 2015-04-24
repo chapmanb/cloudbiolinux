@@ -725,10 +725,7 @@ def _install_with_ggd(env, manager, gid, idx):
                                                os.pardir, os.pardir, "ggd-recipes"))
     recipes = [idx]
     if idx in ["seq"]:
-        if manager.config.get("dbsnp"):
-            recipes.append("dbsnp-%s" % manager.config["dbsnp"])
-        if manager.config.get("rnaseq"):
-            recipes.append("rnaseq")
+        recipes.extend(manager.config.get("annotations", []))
     done = False
     for recipe in recipes:
         recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)

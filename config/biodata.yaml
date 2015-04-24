@@ -27,7 +27,7 @@ genomes:
     rnaseq: true
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
-    dbsnp: 142
+    annotations: [dbsnp-142, clinvar]
   - dbkey: mm9
     name: Mouse (mm9)
     dbsnp: true
