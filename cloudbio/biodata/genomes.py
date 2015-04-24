@@ -459,7 +459,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         org_dir = os.path.join(genome_dir, orgname, gid)
         if not env.safe_exists(org_dir):
             env.safe_run('mkdir -p %s' % org_dir)
-        for idx in genome_indexes:
+        for idx in genome_indexes + manager.config.get("annotations", []):
             with cd(org_dir):
                 if not env.safe_exists(idx):
                     finished = False
@@ -719,21 +719,15 @@ def _index_mosaik(ref_file):
 
 # -- Retrieve using GGD recipes
 
-def _install_with_ggd(env, manager, gid, idx):
+def _install_with_ggd(env, manager, gid, recipe):
     assert env.hosts == ["localhost"], "GGD recipes only work for local runs"
     recipe_dir = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                os.pardir, os.pardir, "ggd-recipes"))
-    recipes = [idx]
-    if idx in ["seq"]:
-        recipes.extend(manager.config.get("annotations", []))
-    done = False
-    for recipe in recipes:
-        recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
-        if os.path.exists(recipe_file):
-            ggd.install_recipe(env.cwd, recipe_file)
-            done = True
-    if not done:
-        raise NotImplementedError("GGD recipe not available for %s %s" % (gid, idx))
+    recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
+    if os.path.exists(recipe_file):
+        ggd.install_recipe(env.cwd, recipe_file)
+    else:
+        raise NotImplementedError("GGD recipe not available for %s %s" % (gid, recipe))
 
 # -- Genome upload and download to Amazon s3 buckets
 
