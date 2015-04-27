@@ -6,12 +6,14 @@ Usage, from within the main genome directory of your organism:
 
 requires these python packages which may not be installed
 ---------------------------------------------------------
-mysql-python (via conda)
-pandas (via conda)
+mysql-python
+gffutils
+requests
 
 requires a picard installation with a `picard` shell script, installed
 by homebrew-science and bcbio
 """
+import csv
 import os
 import sys
 import shutil
@@ -23,6 +25,7 @@ import glob
 from argparse import ArgumentParser
 
 import gffutils
+import requests
 
 try:
     import MySQLdb
@@ -42,25 +45,46 @@ build_subsets = {"hg38-noalt": "hg38"}
 ucsc_db = "genome-mysql.cse.ucsc.edu"
 ucsc_user = "genome"
 
-# taxname:
-# biomart_name: name of ensembl gene_id on biomart
-# ucsc_map:
-# fbase: the base filename for ensembl files using this genome
+# Chromosome name remappings thanks to Devon Ryan
+# https://github.com/dpryan79/ChromosomeMappings
+manual_remaps = {"hg38":
+                 "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt"}
 
-Build = collections.namedtuple("Build", ["taxname", "biomart_name",
-                                         "ucsc_map", "fbase"])
+def manual_ucsc_ensembl_map(org_build):
+    org_build = build_subsets.get(org_build, org_build)
+    requests.packages.urllib3.disable_warnings()
+    r = requests.get(manual_remaps[org_build], verify=False)
+    out = {}
+    for line in r.text.split("\n"):
+        try:
+            ensembl, ucsc = line.split()
+            out[ensembl] = ucsc
+        except ValueError:
+            pass
+    return out
 
 def ucsc_ensembl_map_via_download(org_build):
+    """Compare .dict files by md5, then length to compare two builds.
+    """
     ensembl_dict_file = get_ensembl_dict(org_build)
     ucsc_dict_file = get_ucsc_dict(org_build)
     ensembl_dict = parse_sequence_dict(ensembl_dict_file)
     ucsc_dict = parse_sequence_dict(ucsc_dict_file)
-    return ensembl_to_ucsc(ensembl_dict, ucsc_dict)
+    return ensembl_to_ucsc(ensembl_dict, ucsc_dict, org_build)
 
-def ensembl_to_ucsc(ensembl_dict, ucsc_dict):
+def ensembl_to_ucsc(ensembl_dict, ucsc_dict, org_build):
     name_map = {}
     for md5, name in ensembl_dict.items():
-        name_map[name] = ucsc_dict.get(md5, None)
+        if ucsc_dict.get("md5"):
+            name_map[name] = ucsc_dict["md5"]
+    map_file = "%s-map.csv" % (org_build)
+    with open(map_file, "w") as out_handle:
+        writer = csv.writer(out_handle)
+        writer.writerow(["ensembl", "ucsc"])
+        for md5, name in ensembl_dict.items():
+            ucsc = ucsc_dict.get(md5)
+            if ucsc is not None:
+                writer.writerow([name, ucsc])
     return name_map
 
 def ucsc_ensembl_map_via_query(org_build):
@@ -86,6 +110,13 @@ def ucsc_ensembl_map_via_query(org_build):
             ucsc_map[ensembl] = ucsc
     return ucsc_map
 
+# taxname:
+# biomart_name: name of ensembl gene_id on biomart
+# ucsc_map:
+# fbase: the base filename for ensembl files using this genome
+
+Build = collections.namedtuple("Build", ["taxname", "biomart_name",
+                                         "ucsc_map", "fbase"])
 
 build_info = {
     "hg19": Build("homo_sapiens", "hsapiens_gene_ensembl",
@@ -104,10 +135,10 @@ build_info = {
                  ucsc_ensembl_map_via_download,
                  "Rattus_norvegicus.Rnor_5.0." + ensembl_release),
     "hg38": Build("homo_sapiens", "hsapiens_gene_ensembl",
-                  ucsc_ensembl_map_via_download,
+                  manual_ucsc_ensembl_map,
                   "Homo_sapiens.GRCh38." + ensembl_release),
     "hg38-noalt": Build("homo_sapiens", "hsapiens_gene_ensembl",
-                        ucsc_ensembl_map_via_download,
+                        manual_ucsc_ensembl_map,
                         "Homo_sapiens.GRCh38." + ensembl_release),
     "canFam3": Build("canis_familiaris", None,
                      ucsc_ensembl_map_via_download,
@@ -132,13 +163,15 @@ build_info = {
 
 def parse_sequence_dict(fasta_dict):
     def _tuples_from_line(line):
-        name = line.split("\t")[1].split(":")[1]
-        md5 = line.split("\t")[4].split(":")[1]
-        return md5, name
+        attrs = {}
+        for tag, val in [x.split(":", 1) for x in line.strip().split("\t")[1:]]:
+            attrs[tag] = val
+        return attrs["SN"], attrs["LN"], attrs["M5"]
+    out = {}
     with open(fasta_dict) as dict_handle:
-        tuples = [_tuples_from_line(x) for x in dict_handle if "@SQ" in x]
-        md5_dict = {x[0]: x[1] for x in tuples}
-    return md5_dict
+        for name, length, md5 in [_tuples_from_line(x) for x in dict_handle if x.startswith("@SQ")]:
+            out[md5] = name
+    return out
 
 class SequenceDictParser(object):
 
@@ -159,9 +192,10 @@ class SequenceDictParser(object):
 def get_ensembl_dict(org_build):
     genome_dict = org_build + ".dict"
     if not os.path.exists(genome_dict):
-        genome = _download_ensembl_genome(org_build)
-        org_fa = org_build + ".fa"
-        shutil.move(genome, org_fa)
+        org_fa = org_build + ".fa.gz"
+        if not os.path.exists(org_fa):
+            genome = _download_ensembl_genome(org_build)
+            shutil.move(genome, org_fa)
         genome_dict = make_fasta_dict(org_fa)
     return genome_dict
 
@@ -174,24 +208,24 @@ def get_ucsc_dict(org_build):
 
 
 def make_fasta_dict(fasta_file):
-    dict_file = os.path.splitext(fasta_file)[0] + ".dict"
+    dict_file = os.path.splitext(fasta_file.replace(".fa.gz", ".fa"))[0] + ".dict"
     if not os.path.exists(dict_file):
-        subprocess.check_call("picard CreateSequenceDirectory R={fasta_file} "
+        subprocess.check_call("picard CreateSequenceDictionary R={fasta_file} "
                               "O={dict_file}".format(**locals()), shell=True)
     return dict_file
 
 
 def _download_ensembl_genome(org_build):
     build = build_info[org_build]
-    fname = build.fbase + ".dna_sm.toplevel.fa.gz"
+    # reference files do not use the ensembl_release version so split it off
+    fname = os.path.splitext(build.fbase)[0] + ".dna_sm.toplevel.fa.gz"
     dl_url = ("ftp://ftp.ensembl.org/pub/release-{release}/"
-                   "fasta/{taxname}/dna/{fname}").format(release=ensembl_release,
-                                                         taxname=build.taxname,
-                                                         fname=fname)
-    out_file = os.path.splitext(os.path.basename(dl_url))[0]
+              "fasta/{taxname}/dna/{fname}").format(release=ensembl_release,
+                                                    taxname=build.taxname,
+                                                    fname=fname)
+    out_file = os.path.basename(dl_url)
     if not os.path.exists(out_file):
-        subprocess.check_call(["wget", dl_url])
-        subprocess.check_call(["gunzip", os.path.basename(dl_url)])
+        subprocess.check_call(["wget", "-c", dl_url])
     return out_file
 
 def prepare_gff_db(gff_file):
@@ -537,7 +571,6 @@ def prepare_tx_gff(build, org_name):
     if build.ucsc_map:
         ucsc_name_map = build.ucsc_map(org_name)
         tx_gff = _remap_gff(ensembl_gff, ucsc_name_map)
-        raise NotImplementedError
         os.remove(ensembl_gff)
     else:
         tx_gff = "ref-transcripts.gtf"
@@ -548,6 +581,7 @@ def _remap_gff(base_gff, name_map):
     """Remap chromosome names to UCSC instead of Ensembl
     """
     out_file = "ref-transcripts.gtf"
+    wrote_missing = set([])
     if not os.path.exists(out_file):
         with open(out_file, "w") as out_handle, \
              open(base_gff) as in_handle:
@@ -556,8 +590,9 @@ def _remap_gff(base_gff, name_map):
                 ucsc_name = name_map.get(parts[0], None)
                 if ucsc_name:
                     out_handle.write("\t".join([ucsc_name] + parts[1:]))
-                else:
-                    print parts[0]
+                elif parts[0] not in wrote_missing and not line.startswith("#"):
+                    print "Missing", parts[0]
+                    wrote_missing.add(parts[0])
     return out_file
 
 def _download_ensembl_gff(build, org_name):
