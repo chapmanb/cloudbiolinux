@@ -9,6 +9,8 @@ requires these python packages which may not be installed
 mysql-python (via conda)
 pandas (via conda)
 
+requires a picard installation with a `picard` shell script, installed
+by homebrew-science and bcbio
 """
 import os
 import sys
@@ -32,8 +34,13 @@ from bcbio.utils import chdir, safe_makedir, file_exists
 
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "75"
+ensembl_release = "79"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
+supported_oldbuilds = {"GRCh37": "75", "hg19": "75"}
+build_subsets = {"hg38-noalt": "hg38"}
+
+ucsc_db = "genome-mysql.cse.ucsc.edu"
+ucsc_user = "genome"
 
 # taxname:
 # biomart_name: name of ensembl gene_id on biomart
@@ -59,6 +66,7 @@ def ensembl_to_ucsc(ensembl_dict, ucsc_dict):
 def ucsc_ensembl_map_via_query(org_build):
     """Retrieve UCSC to Ensembl name mappings from UCSC MySQL database.
     """
+    org_build = build_subsets.get(org_build, org_build)
     # if MySQLdb is not installed, figure it out via download
     if not MySQLdb:
         return ucsc_ensembl_map_via_download(org_build)
@@ -67,7 +75,9 @@ def ucsc_ensembl_map_via_query(org_build):
     cursor = db.cursor()
     cursor.execute("select * from ucscToEnsembl")
     ucsc_map = {}
-    for ucsc, ensembl in cursor.fetchall():
+    for fields in cursor.fetchall():
+        ucsc = fields[0]
+        ensembl = fields[-1]
         # workaround for GRCh37/hg19 additional haplotype contigs.
         # Coordinates differ between builds so do not include these regions.
         if org_build == "hg19" and "hap" in ucsc:
@@ -80,7 +90,10 @@ def ucsc_ensembl_map_via_query(org_build):
 build_info = {
     "hg19": Build("homo_sapiens", "hsapiens_gene_ensembl",
                   ucsc_ensembl_map_via_query,
-                  "Homo_sapiens.GRCh37." + ensembl_release),
+                  "Homo_sapiens.GRCh37." + supported_oldbuilds["GRCh37"]),
+    "GRCh37": Build("homo_sapiens", "hsapiens_gene_ensembl",
+                    None,
+                    "Homo_sapiens.GRCh37." + supported_oldbuilds["hg19"]),
     "mm9": Build("mus_musculus", "mmusculus_gene_ensembl",
                  ucsc_ensembl_map_via_query,
                  "Mus_musculus.NCBIM37.67"),
@@ -90,9 +103,12 @@ build_info = {
     "rn5": Build("rattus_norvegicus", None,
                  ucsc_ensembl_map_via_download,
                  "Rattus_norvegicus.Rnor_5.0." + ensembl_release),
-    "GRCh37": Build("homo_sapiens", "hsapiens_gene_ensembl",
-                    None,
-                    "Homo_sapiens.GRCh37." + ensembl_release),
+    "hg38": Build("homo_sapiens", "hsapiens_gene_ensembl",
+                  ucsc_ensembl_map_via_download,
+                  "Homo_sapiens.GRCh38." + ensembl_release),
+    "hg38-noalt": Build("homo_sapiens", "hsapiens_gene_ensembl",
+                        ucsc_ensembl_map_via_download,
+                        "Homo_sapiens.GRCh38." + ensembl_release),
     "canFam3": Build("canis_familiaris", None,
                      ucsc_ensembl_map_via_download,
                      "Canis_familiaris.CanFam3.1." + ensembl_release),
@@ -112,9 +128,6 @@ build_info = {
                      ucsc_ensembl_map_via_download,
                      "Xenopus_tropicalis.JGI_4.2." + ensembl_release),
 }
-
-ucsc_db = "genome-mysql.cse.ucsc.edu"
-ucsc_user = "genome"
 
 
 def parse_sequence_dict(fasta_dict):
@@ -163,8 +176,7 @@ def get_ucsc_dict(org_build):
 def make_fasta_dict(fasta_file):
     dict_file = os.path.splitext(fasta_file)[0] + ".dict"
     if not os.path.exists(dict_file):
-        picard_jar = os.path.join(PICARD_DIR, "CreateSequenceDictionary.jar")
-        subprocess.check_call("java -jar {picard_jar} R={fasta_file} "
+        subprocess.check_call("picard CreateSequenceDirectory R={fasta_file} "
                               "O={dict_file}".format(**locals()), shell=True)
     return dict_file
 
@@ -520,11 +532,12 @@ def gtf_to_genepred(gtf):
 def prepare_tx_gff(build, org_name):
     """Prepare UCSC ready transcript file given build information.
     """
-    ensembl_gff = _download_ensembl_gff(build)
+    ensembl_gff = _download_ensembl_gff(build, org_name)
     # if we need to do the name remapping
     if build.ucsc_map:
         ucsc_name_map = build.ucsc_map(org_name)
         tx_gff = _remap_gff(ensembl_gff, ucsc_name_map)
+        raise NotImplementedError
         os.remove(ensembl_gff)
     else:
         tx_gff = "ref-transcripts.gtf"
@@ -543,13 +556,16 @@ def _remap_gff(base_gff, name_map):
                 ucsc_name = name_map.get(parts[0], None)
                 if ucsc_name:
                     out_handle.write("\t".join([ucsc_name] + parts[1:]))
+                else:
+                    print parts[0]
     return out_file
 
-def _download_ensembl_gff(build):
+def _download_ensembl_gff(build, org_name):
     """Given build details, download and extract the relevant ensembl GFF.
     """
     fname = build.fbase + ".gtf.gz"
-    dl_url = "/".join([base_ftp, build.taxname, fname]).format(release=ensembl_release)
+    dl_url = "/".join([base_ftp, build.taxname, fname]).format(
+        release=supported_oldbuilds.get(org_name, ensembl_release))
     out_file = os.path.splitext(os.path.basename(dl_url))[0]
     if not os.path.exists(out_file):
         subprocess.check_call(["wget", dl_url])
@@ -597,10 +613,6 @@ if __name__ == "__main__":
     parser.add_argument("--gtf",
                         help="Optional GTF file (instead of downloading from Ensembl.",
                         default=None),
-    parser.add_argument("picard",
-                        help="Path to Picard")
     parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
-    global PICARD_DIR
-    PICARD_DIR = args.picard
     main(args.org_build, args.gtf)
