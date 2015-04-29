@@ -40,10 +40,11 @@ def _make_install_script(out_file, config):
     """ % (lib_loc, config["cranrepo"], config["biocrepo"])
     env.safe_append(out_file, repo_info)
     install_fn = """
-    repo.installer <- function(repos, install.fn) {
+    repo.installer <- function(repos, install.fn, pkg_name_fn) {
       %s
       maybe.install <- function(pname) {
-        if (!(is.element(pname, installed.packages()[,1])))
+        check_name <- ifelse(is.null(pkg_name_fn), pname, pkg_name_fn(pname))
+        if (!(is.element(check_name, installed.packages()[,1])))
           install.fn(pname)
       }
     }
@@ -57,14 +58,14 @@ def _make_install_script(out_file, config):
     env.safe_append(out_file, install_fn % update_str)
     std_install = """
     std.pkgs <- c(%s)
-    std.installer = repo.installer(cran.repos, install.packages)
+    std.installer = repo.installer(cran.repos, install.packages, NULL)
     lapply(std.pkgs, std.installer)
     """ % (", ".join('"%s"' % p for p in config['cran']))
     env.safe_append(out_file, std_install)
     if len(config.get("bioc", [])) > 0:
         bioc_install = """
         bioc.pkgs <- c(%s)
-        bioc.installer = repo.installer(biocinstallRepos(), biocLite)
+        bioc.installer = repo.installer(biocinstallRepos(), biocLite, NULL)
         lapply(bioc.pkgs, bioc.installer)
         """ % (", ".join('"%s"' % p for p in config['bioc']))
         env.safe_append(out_file, bioc_install)
@@ -74,3 +75,14 @@ def _make_install_script(out_file, config):
         lapply(std2.pkgs, std.installer)
         """ % (", ".join('"%s"' % p for p in config['cran-after-bioc']))
         env.safe_append(out_file, std2_install)
+    if config.get("github"):
+        dev_install = """
+        library(devtools)
+        github.pkgs <- c(%s)
+        get_pkg_name <- function(orig) {
+          unlist(strsplit(unlist(strsplit(orig, "/"))[2], "@"))[1]
+        }
+        github_installer = repo.installer(NULL, install_github, get_pkg_name)
+        lapply(github.pkgs, github_installer)
+        """ % (", ".join('"%s"' % p for p in config['github']))
+        env.safe_append(out_file, dev_install)
