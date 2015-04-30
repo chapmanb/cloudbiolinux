@@ -1,0 +1,6 @@
+---
+channels:
+  - https://conda.binstar.org/bcbio
+bio_nextgen:
+  - pyloh
+  - phylowgs

@@ -401,6 +401,8 @@ def _pip_cmd(env):
     raise ValueError("Could not find pip installer from: %s" % to_check)
 
 def _conda_cmd(env):
+    if hasattr(env, "conda_cmd") and env.conda_cmd:
+        return env.conda_cmd
     to_check = [os.path.join(env.system_install, "anaconda", "bin", "conda"), "conda"]
     for cmd in to_check:
         with quiet():
