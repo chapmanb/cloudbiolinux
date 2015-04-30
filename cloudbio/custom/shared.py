@@ -418,8 +418,11 @@ def _is_anaconda(env):
         conda = _conda_cmd(env)
         has_conda = conda and env.safe_run_output("%s -h" % conda).startswith("usage: conda")
     with quiet():
-        full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
-    in_anaconda_dir = "/anaconda/" in full_pip
+        try:
+            full_pip = env.safe_run_output("which %s" % _pip_cmd(env))
+        except ValueError:
+            full_pip = None
+    in_anaconda_dir = full_pip and full_pip.succeeded and "/anaconda/" in full_pip
     return has_conda or in_anaconda_dir
 
 def _python_make(env):
