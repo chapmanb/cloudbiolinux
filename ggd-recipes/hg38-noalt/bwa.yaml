@@ -1,4 +1,4 @@
-# pre-build bwa indices
+# pre-built bwa indices from NCBIs hg38 distribution with no alternative alleles
 ---
 attributes:
   name: bwa

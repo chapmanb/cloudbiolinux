@@ -71,7 +71,7 @@ class UCSCGenome(_DownloadHelper):
                 base = base[3:]
             parts = base.split("_")
             try:
-                parts[0] =  int(parts[0])
+                parts[0] = int(parts[0])
             except ValueError:
                 pass
             # unplaced at the very end
@@ -186,7 +186,7 @@ class VectorBase(_DownloadHelper):
         self._name = name
         self.data_source = "VectorBase"
         self._base_url = ("http://www.vectorbase.org/sites/default/files/ftp/"
-                     "downloads/")
+                          "downloads/")
         _base_file = ("{genus}-{species}-{strain}_{assembly}"
                       "_{release}.fa.gz")
         self._to_get = []
@@ -339,7 +339,7 @@ def install_data(config_source, approaches=None):
     # Append a potentially custom system install path to PATH so tools are found
     with path(os.path.join(env.system_install, 'bin')):
         genomes, genome_indexes, config = _get_genomes(config_source)
-        genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
+        genome_indexes = [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes] + genome_indexes
         _make_genome_directories(env, genomes)
         download_transcripts(genomes, env)
         _prep_genomes(env, genomes, genome_indexes, ready_approaches)
@@ -402,8 +402,8 @@ def _get_genomes(config_source):
             config = yaml.load(in_handle)
     genomes = []
     genomes_config = config["genomes"] or []
-    env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"\
-        .format(config_source, ', '.join(g.get('name', g["dbkey"]) for g in genomes_config)))
+    env.logger.info("List of genomes to get (from the config file at '{0}'): {1}"
+                    .format(config_source, ', '.join(g.get('name', g["dbkey"]) for g in genomes_config)))
     for g in genomes_config:
         ginfo = None
         for info in GENOMES_SUPPORTED:
@@ -415,6 +415,9 @@ def _get_genomes(config_source):
         manager.config = g
         genomes.append((name, gid, manager))
     indexes = config["genome_indexes"] or []
+    if "seq" in indexes:
+        indexes.remove("seq")
+        indexes.insert(0, "seq")
     return genomes, indexes, config
 
 # ## Decorators and context managers
@@ -487,8 +490,10 @@ def _get_ref_seq(env, manager):
     """Check for or retrieve the reference sequence.
     """
     seq_dir = os.path.join(env.cwd, "seq")
-    ref_file, base_zips = manager.download(seq_dir)
-    ref_file = _move_seq_files(ref_file, base_zips, seq_dir)
+    ref_file = os.path.join(seq_dir, "%s.fa" % manager._name)
+    if not env.safe_exists(ref_file):
+        ref_file, base_zips = manager.download(seq_dir)
+        ref_file = _move_seq_files(ref_file, base_zips, seq_dir)
     return ref_file
 
 def _prep_raw_index(env, manager, gid, idx):
