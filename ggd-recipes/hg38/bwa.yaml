@@ -15,7 +15,7 @@ recipe:
         base=GRCh38_full_analysis_set_plus_decoy_hla.fa
         new=hg38.fa
         mkdir -p bwa
-        for suffix in .bwt .amb .ann .pac .sa
+        for suffix in .bwt .amb .ann .pac .sa .alt
         do
           [[ -f bwa/$new$suffix ]] || wget -c -O bwa/$new$suffix $url/$base$suffix
         done
