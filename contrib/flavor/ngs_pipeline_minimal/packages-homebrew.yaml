@@ -8,6 +8,7 @@ perl:
 bio_nextgen:
   alignment:
     - bwa
+    - bwakit
     - bowtie2 
     - novoalign
     - rna-star
