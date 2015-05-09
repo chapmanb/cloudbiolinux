@@ -15,7 +15,7 @@ bio_nextgen:
     # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
     - tophat-binary
   utilities:
-    - bamtools
+    - bamtools-nodeps
     - bedtools
     - cramtools
     - biobambam
