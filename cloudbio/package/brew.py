@@ -48,6 +48,8 @@ def install_packages(env, to_install=None, packages=None):
              "current": _get_current_pkgs(env, brew_cmd)}
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
+    for pkg_str in ["pkg-config", "openssl", "curl", "cmake"]:
+        _safe_unlink_pkg(env, pkg_str, brew_cmd)
 
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
     """Revert any taps if we fail to update due to local changes.
@@ -73,6 +75,12 @@ def _get_current_pkgs(env, brew_cmd):
                     pkg = pkg[:-1]
                 out[pkg] = version
     return out
+
+def _safe_unlink_pkg(env, pkg_str, brew_cmd):
+    """Unlink packages which can cause issues with a Linux system.
+    """
+    with settings(warn_only=True):
+        env.safe_run("{brew_cmd} unlink {pkg_str}".format(**locals()))
 
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     """Install a specific brew package, handling versioning and existing packages.
@@ -176,9 +184,10 @@ def _get_brew_install_cmd(brew_cmd, env, pkg):
     compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
     extra_args = ""
     if pkg in ["cmake"]:
-        extra_args += "--without-docs"
-    return "%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd,
-                                                        extra_args)
+        extra_args += " --without-docs"
+    if pkg in ["lumpy-sv", "bamtools", "freebayes"]:
+        extra_args += " --ignore-dependencies"
+    return "%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, extra_args)
 
 def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.
@@ -268,7 +277,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["expat", "cmake"]:
+    for dep in ["expat", "cmake", "pkg-config"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))

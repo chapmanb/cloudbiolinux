@@ -2,6 +2,7 @@
 ---
 minimal:
   - cmake
+  - pkg-config
   - s3gof3r
 perl:
   - cpanminus
@@ -15,7 +16,7 @@ bio_nextgen:
     # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
     - tophat-binary
   utilities:
-    - bamtools-nodeps
+    - bamtools
     - bedtools
     - cramtools
     - biobambam
