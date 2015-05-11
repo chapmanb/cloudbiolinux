@@ -77,7 +77,8 @@ def install_data_ggd(recipe, organism):
     setup_environment()
     from cloudbio.biodata import ggd, genomes
     genome_dir = os.path.join(genomes._make_genome_dir(), organism)
-    ggd.install_recipe(genome_dir, recipe)
+    recipe_file = os.path.join(os.path.dirname(__file__), "ggd-recipes", organism, "%s.yaml" % recipe)
+    ggd.install_recipe(genome_dir, recipe_file)
 
 def upload_s3(config_source=CONFIG_FILE):
     """Upload prepared genome files by identifier to Amazon s3 buckets.

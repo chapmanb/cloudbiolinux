@@ -8,7 +8,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38
+        baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive/2015
         version=20150330
         mkdir -p variation
         wget -c -O variation/clinvar.vcf.gz $baseurl/clinvar_$version.vcf.gz
