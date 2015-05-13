@@ -228,16 +228,6 @@ def _download_ensembl_genome(org_build):
         subprocess.check_call(["wget", "-c", dl_url])
     return out_file
 
-def prepare_gff_db(gff_file):
-    """
-    make a database of a GTF file with gffutils
-    """
-    dbfn = gff_file + ".db"
-    if not os.path.exists(dbfn):
-        db = gffutils.create_db(gff_file, dbfn=dbfn, keep_order=False,
-                                merge_strategy='merge', force=False)
-    return dbfn
-
 # ## Main driver functions
 
 def main(org_build, gtf_file=None):
@@ -258,7 +248,7 @@ def main(org_build, gtf_file=None):
             gtf_file = work_gtf
 
         gtf_file = clean_gtf(gtf_file, org_build)
-        db = prepare_gff_db(gtf_file)
+        db = _get_gtf_db(gtf_file)
         gtf_to_refflat(gtf_file)
         gtf_to_bed(gtf_file)
         prepare_dexseq(gtf_file)
@@ -282,8 +272,10 @@ def main(org_build, gtf_file=None):
 
 def clean_gtf(gtf_file, org_build):
     """
-    remove transcripts that don't have a corresponding ID in the reference
-    also remove entries without both a gene_id and a transcript_id
+    remove transcripts that have the following properties
+    1) don't have a corresponding ID in the reference
+    2) are bugged in the gencode release (Selenocysteine)
+    3) are not associated with a gene (no gene_id field)
     """
     temp_gtf = tempfile.NamedTemporaryFile(suffix=".gtf").name
     fa_names = get_fasta_names(org_build)
@@ -296,9 +288,7 @@ def clean_gtf(gtf_file, org_build):
                 continue
             if line.split()[0].strip() not in fa_names:
                 continue
-            if "transcript_id" not in line:
-                continue
-            if "gene_id" not in line:
+            if 'gene_id' not in line:
                 continue
             out_gtf.write(line)
     shutil.move(temp_gtf, gtf_file)
@@ -607,11 +597,40 @@ def _download_ensembl_gff(build, org_name):
         subprocess.check_call(["gunzip", os.path.basename(dl_url)])
     return out_file
 
+def guess_infer_extent(gtf_file):
+    """
+    guess if we need to use the gene extent option when making a gffutils
+    database by making a tiny database of 1000 lines from the original
+    GTF and looking for all of the features
+    """
+    _, ext = os.path.splitext(gtf_file)
+    tmp_out = tempfile.NamedTemporaryFile(suffix=".gtf", delete=False).name
+    with open(tmp_out, "w") as out_handle:
+        count = 0
+        in_handle = open(gtf_file) if ext != ".gz" else gzip.open(gtf_file)
+        for line in in_handle:
+            if count > 1000:
+                break
+            out_handle.write(line)
+            count += 1
+        in_handle.close()
+    db = gffutils.create_db(tmp_out, dbfn=":memory:", infer_gene_extent=False)
+    os.remove(tmp_out)
+    features = [x for x in db.featuretypes()]
+    if "gene" in features and "transcript" in features:
+        return False
+    else:
+        return True
+
 def _get_gtf_db(gtf):
     db_file = gtf + ".db"
     if not file_exists(db_file):
-        gffutils.create_db(gtf, dbfn=db_file)
-
+        print "Creating gffutils database for %s." % (gtf)
+        infer_extent = guess_infer_extent(gtf)
+        if infer_extent:
+            print ("'transcript' and 'gene' entries not found, so inferring"
+                   "their extent. This can be very slow.")
+        gffutils.create_db(gtf, dbfn=db_file, infer_gene_extent=infer_extent)
     return gffutils.FeatureDB(db_file)
 
 def _dexseq_preparation_path():
