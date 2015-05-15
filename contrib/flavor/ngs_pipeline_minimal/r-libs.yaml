@@ -3,23 +3,19 @@ cranrepo: http://cran.fhcrc.org/
 cran:
   - cghFLasso
   - devtools
-  - grid
   - ggplot2
   - gsalib
   - matrixStats
-  - methods
-  - plotrix
-  - RColorBrewer
   - snow
 cran-after-bioc:
   - PSCBS
 biocrepo: http://bioconductor.org/biocLite.R
 bioc:
+ - BiocInstaller
+ - BubbleTree
  - cn.mops
- - rtracklayer
  - DEXSeq
  - DNAcopy
+ - GenomicRanges
  - IRanges
-github:
-  - genome/bmm@b49c57a
-  - chapmanb/sciClone@e8ed9d0
+ - rtracklayer

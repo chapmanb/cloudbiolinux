@@ -173,10 +173,11 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
                     dev_strs = [x for x in versions if x.strip().startswith("devel")]
                     version = dev_strs[0].split()[-1].strip()
                 else:
-                    version = versions[0].split()[-1].strip()
+                    version = versions[0].replace("(bottled)", "").split()[-1].strip()
             elif i == 2:
                 is_linked = git_line.strip().split()[-1] == "*"
-            i += 1
+            if not git_line.startswith("Conflicts with"):
+                i += 1
     return version, is_linked
 
 def _get_brew_install_cmd(brew_cmd, env, pkg):

@@ -15,5 +15,5 @@ def install_packages(env, to_install=None, packages=None):
         with open(config_file.base) as in_handle:
             channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         if len(packages) > 0:
-            for pkg in packages:
-                env.safe_run("{conda_bin} install -y {channels} {pkg}".format(**locals()))
+            pkgs_str = " ".join(packages)
+            env.safe_run("{conda_bin} install -y {channels} {pkgs_str}".format(**locals()))
