@@ -497,8 +497,8 @@ def install_grabix(env):
     """a wee tool for random access into BGZF files
     https://github.com/arq5x/grabix
     """
-    version = "0.1.5"
-    revision = "5542ecb0"
+    version = "0.1.6"
+    revision = "ba792bc872d38d3cb5a69b2de00e39a6ac367d69"
     try:
         uptodate = versioncheck.up_to_date(env, "grabix", version, stdout_flag="version:")
     # Old versions will not have any version information
