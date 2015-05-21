@@ -474,7 +474,11 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                         except KeyboardInterrupt:
                             raise
                         except:
-                            env.logger.info("Genome preparation method {0} failed, trying next".format(method))
+                            # Fail on incorrect GGD recipes
+                            if idx in manager.config["annotations"] and method == "ggd":
+                                raise
+                            else:
+                                env.logger.info("Genome preparation method {0} failed, trying next".format(method))
                     if not finished:
                         raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
