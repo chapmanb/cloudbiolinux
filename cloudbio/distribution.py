@@ -115,12 +115,9 @@ def _setup_ubuntu():
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates universe",
       "deb http://us.archive.ubuntu.com/ubuntu/ %s-updates multiverse",
       "deb http://archive.canonical.com/ubuntu %s partner",  # partner repositories
-      "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen",  # mongodb
       "deb http://cran.fhcrc.org/bin/linux/ubuntu %s/",  # lastest R versions
-      "deb http://archive.cloudera.com/debian maverick-cdh3 contrib",  # Hadoop
       "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
-      "deb http://ppa.launchpad.net/freenx-team/ppa/ubuntu precise main",  # Free-NX
-      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu precise main",  # Free-NX
+      "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu trusty main",  # Bio-Linux
       "deb [arch=amd64 trusted=yes] http://research.cs.wisc.edu/htcondor/debian/stable/ squeeze contrib"  # HTCondor
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
@@ -131,9 +128,8 @@ def _setup_debian():
     unstable_remap = {"sid": "squeeze"}
     shared_sources = _setup_deb_general()
     sources = [
-        "deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen",  # mongodb
         "deb http://cran.fhcrc.org/bin/linux/debian %s-cran/",  # lastest R versions
-        "deb http://archive.cloudera.com/debian lenny-cdh3 contrib"  # Hadoop
+        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux",  # Bio-Linux
         ] + shared_sources
     # fill in %s
     dist_name = unstable_remap.get(env.dist_name, env.dist_name)
@@ -162,7 +158,6 @@ def _setup_deb_general():
                 java_home = java_home.replace("/jre/bin/java", "")
         env.java_home = java_home
     shared_sources = [
-        "deb http://nebc.nerc.ac.uk/bio-linux/ unstable bio-linux",  # Bio-Linux
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib",  # virtualbox
     ]
     return shared_sources
