@@ -475,7 +475,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                             raise
                         except:
                             # Fail on incorrect GGD recipes
-                            if idx in manager.config["annotations"] and method == "ggd":
+                            if idx in manager.config.get("annotations", []) and method == "ggd":
                                 raise
                             else:
                                 env.logger.info("Genome preparation method {0} failed, trying next".format(method))
