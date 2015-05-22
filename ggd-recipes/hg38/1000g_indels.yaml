@@ -7,7 +7,7 @@
 ---
 attributes:
   name: 1000g_indels
-  version: 2.8_hg38_20150518
+  version: 2.8_hg38_20150522
 recipe:
   full:
     recipe_type: bash
