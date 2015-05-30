@@ -59,6 +59,6 @@ bio_nextgen:
     - vep
     - wham;--with-binary
     - qsignature
-    - qsnp
+    # - qsnp # Issues with download and reliability of qcmg site
     # - vcftools # Build problems with default libz on Ubuntu 12.04
     - vt;--with-binary
