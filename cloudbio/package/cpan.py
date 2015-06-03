@@ -68,5 +68,6 @@ def _install_from_url(env, cpanm_cmd, package):
                     dl_dir = os.path.join(dl_dir, args["build"])
                 with cd(dl_dir):
                     if args.get("depremove"):
-                        env.safe_run(r"""sed -i.bak -e "s/'%s' ="/#\1/g Makefile.PL""" % args["depremove"])
+                        for fname in ["Makefile.PL", "MYMETA.json", "MYMETA.yml"]:
+                            env.safe_run(r"""sed -i.bak -e '/^.*%s.*/s/^/#/' %s""" % (args["depremove"], fname))
                     env.safe_run("%s -i --notest --local-lib=%s ." % (cpanm_cmd, env.system_install))

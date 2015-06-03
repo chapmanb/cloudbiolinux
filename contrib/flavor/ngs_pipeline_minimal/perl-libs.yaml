@@ -13,6 +13,7 @@ cpan:
   - IPC::Cmd
   - Params::Check
   - Module::Load::Conditional
+  - File::ShareDir::Install
   # Sanger Cancer library dependencies
   - Bio::DB::Sam;--config lddlflags=-shared;SAMTOOLS={system_install}/share/samtools-0.1
   #- Sanger::CGP::Vcf==1.2.3==https://github.com/cancerit/cgpVcf/archive/v1.2.3.tar.gz
