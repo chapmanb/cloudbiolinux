@@ -226,7 +226,10 @@ class EnsemblGenome(_DownloadHelper):
             url += "%s/" % subsection
         url += "%s/dna/" % organism.lower()
         self._url = url
-        self._get_file = "%s.%s.%s.dna.toplevel.fa.gz" % (organism, name, release)
+        if ensembl_section == "standard":
+            self._get_file = "%s.%s.dna.toplevel.fa.gz" % (organism, name)
+        else:
+            self._get_file = "%s.%s.%s.dna.toplevel.fa.gz" % (organism, name, release)
         self._name = name
         self.dl_name = name
 
@@ -286,22 +289,22 @@ GENOMES_SUPPORTED = [
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
-           ("Athaliana", "TAIR10", EnsemblGenome("plants", "20",
+           ("Athaliana", "TAIR10", EnsemblGenome("plants", "26",
                                                  "Arabidopsis_thaliana", "TAIR10")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
-           ("Celegans", "WBcel235", EnsemblGenome("standard", "75",
+           ("Celegans", "WBcel235", EnsemblGenome("standard", "80",
                                                   "Caenorhabditis_elegans", "WBcel235")),
            ("Mtuberculosis_H37Rv", "mycoTube_H37RV", NCBIRest("mycoTube_H37RV",
                ["NC_000962"])),
            ("Msmegmatis", "92", NCBIRest("92", ["NC_008596.1"])),
            ("Paeruginosa_UCBPP-PA14", "pseudomonas_aeruginosa_ucbpp_pa14",
-            EnsemblGenome("bacteria", "23", "Pseudomonas_aeruginosa_ucbpp_pa14",
+            EnsemblGenome("bacteria", "26", "Pseudomonas_aeruginosa_ucbpp_pa14",
                           "GCA_000014625.1", "bacteria_17_collection")),
            ("Ecoli", "eschColi_K12", NCBIRest("eschColi_K12", ["U00096.2"])),
            ("Amellifera_Honeybee", "apiMel3", UCSCGenome("apiMel3")),
            ("Cfamiliaris_Dog", "canFam3", UCSCGenome("canFam3")),
            ("Cfamiliaris_Dog", "canFam2", UCSCGenome("canFam2")),
-           ("Drerio_Zebrafish", "Zv9", EnsemblGenome("standard", "78", "Danio_rerio", "Zv9")),
+           ("Drerio_Zebrafish", "Zv9", EnsemblGenome("standard", "80", "Danio_rerio", "Zv9")),
            ("Ecaballus_Horse", "equCab2", UCSCGenome("equCab2")),
            ("Fcatus_Cat", "felCat3", UCSCGenome("felCat3")),
            ("Ggallus_Chicken", "galGal3", UCSCGenome("galGal3")),
