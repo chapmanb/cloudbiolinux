@@ -36,6 +36,7 @@ bio_nextgen:
   analysis:
     - cufflinks-binary
     - samtools;--without-curses
+    - samtools-library-0.1
     - htslib
     - bcftools
   variant:
@@ -45,6 +46,7 @@ bio_nextgen:
     - gatk-framework
     #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
+    - impute2
     - lofreq
     - lumpy-sv
     - pindel

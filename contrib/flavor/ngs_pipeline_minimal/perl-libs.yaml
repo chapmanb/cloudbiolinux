@@ -1,0 +1,21 @@
+---
+cpan:
+  # VEP dependencies
+  - Encode::Locale
+  - Statistics::Descriptive
+  - Archive::Extract
+  - Archive::Zip
+  - Archive::Tar
+  - DBI
+  - LWP::Simple
+  - LWP::Protocol::https
+  - Time::HiRes
+  - IPC::Cmd
+  - Params::Check
+  - Module::Load::Conditional
+  # Sanger Cancer library dependencies
+  - Bio::DB::Sam;--config lddlflags=-shared;SAMTOOLS={system_install}/share/samtools-0.1
+  #- Sanger::CGP::Vcf==1.2.3==https://github.com/cancerit/cgpVcf/archive/v1.2.3.tar.gz
+  #- Sanger::CGP::AlleleCount==2.1.0==https://github.com/cancerit/alleleCount/archive/v2.1.0.tar.gz==build=perl
+  #- PCAP==1.8.1==https://github.com/ICGC-TCGA-PanCancer/PCAP-core/archive/v1.8.1.tar.gz==depremove=GD
+  #- Sanger::CGP::Battenberg==1.3.1==https://github.com/cancerit/cgpBattenberg/archive/1.3.1.tar.gz==build=perl

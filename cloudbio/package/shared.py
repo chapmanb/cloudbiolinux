@@ -4,7 +4,7 @@ import yaml
 from fabric.api import *
 from fabric.contrib.files import *
 
-def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
+def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=True):
     """Read a list of packages from a nested YAML configuration file.
     """
     env.logger.info("Reading %s" % yaml_file)
@@ -27,7 +27,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
         cur_key, cur_info = data.pop(0)
         if cur_info:
             if isinstance(cur_info, (list, tuple)):
-                packages.extend(_filter_subs_packages(cur_info, subs))
+                packages.extend(_filter_subs_packages(cur_info, subs, namesort))
                 for p in cur_info:
                     pkg_to_group[p] = cur_key
             elif isinstance(cur_info, dict):
@@ -46,7 +46,7 @@ def _yaml_to_packages(yaml_file, to_install, subs_yaml_file = None):
     env.logger.debug("Packages to install: {0}".format(",".join(packages)))
     return packages, pkg_to_group
 
-def _filter_subs_packages(initial, subs):
+def _filter_subs_packages(initial, subs, namesort=True):
     """Rename and filter package list with subsitutions; for similar systems.
     """
     final = []
@@ -57,4 +57,6 @@ def _filter_subs_packages(initial, subs):
             new_p = p
         if new_p:
             final.append(new_p)
-    return sorted(final)
+    if namesort:
+        final.sort()
+    return final

@@ -164,6 +164,9 @@ def _safe_dir_name(dir_name, need_dir=True):
             dirs = [x for x in dirs if "cannot access" not in x and "No such" not in x]
         if len(dirs) == 1 and dirs[0]:
             return dirs[0]
+    dirs = env.safe_run_output("find * -type d -maxdepth 0").split("\n")
+    if len(dirs) == 1 and dirs[0]:
+        return dirs[0]
     if need_dir:
         raise ValueError("Could not find directory %s" % dir_name)
 

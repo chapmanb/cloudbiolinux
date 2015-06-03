@@ -10,6 +10,7 @@ import sys
 from cloudbio.custom import system, shared
 from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import quiet, find_cmd
+from cloudbio.package import cpan
 from cloudbio.package.shared import _yaml_to_packages
 
 from fabric.api import cd, settings
@@ -54,8 +55,9 @@ def install_packages(env, to_install=None, packages=None):
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
     """Revert any taps if we fail to update due to local changes.
     """
-    with settings(warn_only=True):
-        out = env.safe_run("%s update" % brew_cmd)
+    with quiet():
+        with settings(warn_only=True):
+            out = env.safe_run("%s update" % brew_cmd)
     if out.failed:
         for repo in formula_repos:
             if repo in cur_taps:
@@ -302,11 +304,8 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
                 _install_pkg_latest(env, dependency, [], brew_cmd, ipkgs)
     if "cpanminus" in packages:
         _install_pkg_latest(env, "cpanminus", [], brew_cmd, ipkgs)
-        cpanm_cmd = os.path.join(os.path.dirname(brew_cmd), "cpanm")
-        for perl_lib in ["Encode::Locale", "Statistics::Descriptive", "Archive::Extract", "Archive::Zip",
-                         "Archive::Tar", "DBI", "LWP::Simple", "LWP::Protocol::https", "Time::HiRes",
-                         "IPC::Cmd", "Params::Check", "Module::Load::Conditional"]:
-            env.safe_run("%s -i --notest --local-lib=%s '%s'" % (cpanm_cmd, env.system_install, perl_lib))
+        _install_pkg_latest(env, "samtools-library-0.1", [], brew_cmd, ipkgs)
+        cpan.install_packages(env)
     # Ensure paths we may have missed on install are accessible to regular user
     if env.use_sudo:
         paths = ["share", "share/java"]
