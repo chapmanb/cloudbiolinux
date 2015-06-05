@@ -68,7 +68,7 @@ def install_biolinux(target=None, flavor=None):
     time_start = _print_time_stats("Config", "start")
     _check_fabric_version()
     if env.ssh_config_path and os.path.isfile(os.path.expanduser(env.ssh_config_path)):
-      env.use_ssh_config = True
+        env.use_ssh_config = True
     _configure_fabric_environment(env, flavor,
                                   ignore_distcheck=(target is not None
                                                     and target in ["libraries", "custom"]))

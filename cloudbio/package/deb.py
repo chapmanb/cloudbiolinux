@@ -22,13 +22,14 @@ def _apt_packages(to_install=None, pkg_list=None):
     :param pkg_list: An explicit list of packages to install. No other files,
                      flavors are considered.
     """
-    if env.flavor.short_name not in ["minimal"]:
+    if "minimal" not in env.flavor.short_name:
         env.logger.info("Update the system")
         with settings(warn_only=True):
             env.safe_sudo("apt-get update")
     if to_install is not None:
         config_file = get_config_file(env, "packages.yaml")
-        env.flavor.apt_upgrade_system(env=env)
+        if "minimal" not in env.flavor.name and "minimal" not in env.flavor.short_name:
+            env.flavor.apt_upgrade_system(env=env)
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
         packages = env.flavor.rewrite_config_items("packages", packages)
     elif pkg_list is not None:
