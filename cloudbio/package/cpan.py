@@ -2,7 +2,7 @@
 """
 import os
 
-from fabric.api import cd
+from fabric.api import cd, settings
 
 from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import find_cmd
@@ -57,9 +57,10 @@ def _install_from_url(env, cpanm_cmd, package):
     if len(parts) > 3:
         for key, value in (x.split("=") for x in parts[3:]):
             args[key] = value
-    cur_version = env.safe_run_output("export PERL5LIB=%s/lib/perl5:${PERL5LIB} && " % env.system_install +
-                                      """perl -le 'eval "require $ARGV[0]" and print $ARGV[0]->VERSION' %s"""
-                                      % package)
+    with settings(warn_only=True):
+        cur_version = env.safe_run_output("export PERL5LIB=%s/lib/perl5:${PERL5LIB} && " % env.system_install +
+                                          """perl -le 'eval "require $ARGV[0]" and print $ARGV[0]->VERSION' %s"""
+                                          % package)
     if cur_version != target_version:
         with cshared._make_tmp_dir() as work_dir:
             with cd(work_dir):

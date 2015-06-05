@@ -13,9 +13,13 @@ cpan:
   - IPC::Cmd
   - Params::Check
   - Module::Load::Conditional
+  - Archive::Tar
+  - File::Fetch
+  - File::ShareDir
   - File::ShareDir::Install
   # Sanger Cancer library dependencies
   - Bio::DB::Sam;--config lddlflags=-shared;SAMTOOLS={system_install}/share/samtools-0.1
+  - Vcf==0.953==https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
   #- Sanger::CGP::Vcf==1.2.3==https://github.com/cancerit/cgpVcf/archive/v1.2.3.tar.gz
   #- Sanger::CGP::AlleleCount==2.1.0==https://github.com/cancerit/alleleCount/archive/v2.1.0.tar.gz==build=perl
   #- PCAP==1.8.1==https://github.com/ICGC-TCGA-PanCancer/PCAP-core/archive/v1.8.1.tar.gz==depremove=GD
