@@ -82,7 +82,8 @@ def _safe_unlink_pkg(env, pkg_str, brew_cmd):
     """Unlink packages which can cause issues with a Linux system.
     """
     with settings(warn_only=True):
-        env.safe_run("{brew_cmd} unlink {pkg_str}".format(**locals()))
+        with quiet():
+            env.safe_run("{brew_cmd} unlink {pkg_str}".format(**locals()))
 
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     """Install a specific brew package, handling versioning and existing packages.

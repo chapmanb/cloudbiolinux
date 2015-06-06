@@ -41,6 +41,7 @@ bio_nextgen:
     - bcftools
   variant:
     - bcbio-variation-recall
+    - cancerit-allelecount
     - delly;--with-binary
     - freebayes
     - gatk-framework
