@@ -64,8 +64,7 @@ def _get_shell_exports(env):
     ldlib_path = os.path.join(env.system_install, "lib")
     return {"path": "export PATH=%s:$PATH" % bin_dir,
             "ld_library": "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path,
-            "perl": ("export PERL5LIB=%s/lib/perl5:${PERL5LIB}"
-                     % (env.system_install, env.system_install))}
+            "perl": "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install}
 
 def _print_shell_exports(env):
     """Print a set of exports to add to shell in isolated installations.
