@@ -49,8 +49,11 @@ def install_packages(env, to_install=None, packages=None):
              "current": _get_current_pkgs(env, brew_cmd)}
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
-    for pkg_str in ["pkg-config", "openssl", "curl", "cmake"]:
+    for pkg_str in ["pkg-config", "openssl", "cmake"]:
         _safe_unlink_pkg(env, pkg_str, brew_cmd)
+    for pkg_str in ["curl"]:
+        _safe_uninstall_pkg(env, pkg_str, brew_cmd)
+
 
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
     """Revert any taps if we fail to update due to local changes.
@@ -84,6 +87,13 @@ def _safe_unlink_pkg(env, pkg_str, brew_cmd):
     with settings(warn_only=True):
         with quiet():
             env.safe_run("{brew_cmd} unlink {pkg_str}".format(**locals()))
+
+def _safe_uninstall_pkg(env, pkg_str, brew_cmd):
+    """Uninstall packages which get pulled in even when unlinked by brew.
+    """
+    with settings(warn_only=True):
+        with quiet():
+            env.safe_run("{brew_cmd} uninstall {pkg_str}".format(**locals()))
 
 def _install_pkg(env, pkg_str, brew_cmd, ipkgs):
     """Install a specific brew package, handling versioning and existing packages.
@@ -167,7 +177,7 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
     """
     i = 0
     version, is_linked = None, False
-    for git_line in env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n"):
+    for i, git_line in enumerate(env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n")):
         if git_line.strip():
             if i == 0:
                 _, version_str = git_line.split(":")
@@ -177,10 +187,8 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
                     version = dev_strs[0].split()[-1].strip()
                 else:
                     version = versions[0].replace("(bottled)", "").split()[-1].strip()
-            elif i == 2:
+            elif git_line.find("Cellar/%s" % pkg) > 0 and git_line.find(" files,") > 0:
                 is_linked = git_line.strip().split()[-1] == "*"
-            if not git_line.startswith("Conflicts with"):
-                i += 1
     return version, is_linked
 
 def _get_brew_install_cmd(brew_cmd, env, pkg):

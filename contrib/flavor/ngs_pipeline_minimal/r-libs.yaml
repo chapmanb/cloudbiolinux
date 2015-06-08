@@ -7,6 +7,7 @@ cran:
   - gsalib
   - matrixStats
   - snow
+  - RColorBrewer
 cran-after-bioc:
   - PSCBS
 biocrepo: http://bioconductor.org/biocLite.R
