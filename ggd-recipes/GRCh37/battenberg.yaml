@@ -1,0 +1,26 @@
+# Battenberg CNV caller input data:
+# https://github.com/cancerit/cgpBattenberg
+---
+attributes:
+  name: battenberg
+  version: v3-20150610
+recipe:
+  full:
+    required:
+      - download_generate_bberg_ref_files.pl
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        proburl=https://github.com/cancerit/cgpBattenberg/raw/dev/perl/share/battenberg/probloci.txt.gz
+
+        mkdir -p battenberg
+        download_generate_bberg_ref_files.pl -o `pwd`/battenberg
+        # Change references to point to final directory
+        sed -i 's/txtmp\///g' impute/impute_info.txt
+
+        wget -c -O battenberg/probloci.txt.gz $proburl
+        gunzip battenberg/probloci.txt.gz
+    recipe_outfiles:
+      - battenberg/probloci.txt
+      - battenberg/1000genomesloci
+      - battengerg/impute

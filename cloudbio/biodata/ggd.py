@@ -22,12 +22,34 @@ def install_recipe(base_dir, recipe_file):
         os.makedirs(base_dir)
     recipe = _read_recipe(recipe_file)
     if not version_uptodate(base_dir, recipe):
-        with tx_tmpdir(base_dir) as tmpdir:
-            with chdir(tmpdir):
-                _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"],
-                            recipe["recipe"]["full"]["recipe_type"])
-            _move_files(tmpdir, base_dir, recipe["recipe"]["full"]["recipe_outfiles"])
-        add_version(base_dir, recipe)
+        if _has_required_programs(recipe["recipe"]["full"].get("required", [])):
+            with tx_tmpdir(base_dir) as tmpdir:
+                with chdir(tmpdir):
+                    print("Running GGD recipe: %s" % recipe["attributes"]["name"])
+                    _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"],
+                                recipe["recipe"]["full"]["recipe_type"])
+                _move_files(tmpdir, base_dir, recipe["recipe"]["full"]["recipe_outfiles"])
+            add_version(base_dir, recipe)
+
+def _has_required_programs(programs):
+    """Ensure the provided programs exist somewhere in the current PATH.
+
+    http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+    """
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    for p in programs:
+        found = False
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, p)
+            if is_exe(exe_file):
+                found = True
+                break
+        if not found:
+            return False
+    return True
 
 def _run_recipe(work_dir, recipe_cmds, recipe_type):
     """Create a bash script and run the recipe to download data.
