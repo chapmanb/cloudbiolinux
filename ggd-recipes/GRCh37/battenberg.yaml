@@ -12,15 +12,15 @@ recipe:
     recipe_cmds:
       - |
         proburl=https://github.com/cancerit/cgpBattenberg/raw/dev/perl/share/battenberg/probloci.txt.gz
-
+        impute_info=battenberg/impute/impute_info.txt
         mkdir -p battenberg
-        download_generate_bberg_ref_files.pl -o `pwd`/battenberg
+        [[ -f $impute_info ]] || download_generate_bberg_ref_files.pl -o `pwd`/battenberg
         # Change references to point to final directory
-        sed -i 's/txtmp\///g' impute/impute_info.txt
+        sed -i 's/txtmp\///g' $impute_info
 
         wget -c -O battenberg/probloci.txt.gz $proburl
         gunzip battenberg/probloci.txt.gz
     recipe_outfiles:
       - battenberg/probloci.txt
       - battenberg/1000genomesloci
-      - battengerg/impute
+      - battenberg/impute
