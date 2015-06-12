@@ -11,7 +11,7 @@ recipe:
     recipe_cmds:
       - |
         version=144
-        org=human_9606_b$version_GRCh38p2
+        org=human_9606_b${version}_GRCh38p2
         release=20150603
         url=ftp://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/All_$release.vcf.gz
         mkdir -p variation
