@@ -103,8 +103,6 @@ desktop:
     - firefox
     - evince
     - ubuntu-desktop
-    - cloudbl-desktop
-    - bio-linux-tutorials
     - xvfb
     - gdm
   # NX compatible window managers on Ubuntu 11.10+
@@ -300,43 +298,18 @@ boinc:
   - boinc-manager
 bio_general:
   - primer3
-  - bio-linux-catchall
-  # - bio-linux-emboss
-  - bio-linux-readseq
-  # - emboss # Broken on 13.10
-  # - emboss-data # Broken on 13.10
-  # - emboss-lib # broken on 13.10
-  # - jemboss # Broken on 13.10
   - ugene
 bio_search:
   - blast2
   - ncbi-tools-bin
-  - bio-linux-blast
-  - bio-linux-blixem
-  - bio-linux-fasta
-  - bio-linux-hmmer
-  - bio-linux-mspcrunch
-  - bio-linux-mview
-  # - bio-linux-nrdb # broken Depends: ia32-libs
   - cdbfasta
 bio_alignment:
-  # - bio-linux-clustal # Broken on 14.04
-  - bio-linux-dotter
-  #- bio-linux-jalview # Broken on 14.04
-  - bio-linux-mcl
-  - bio-linux-mummer
-  - bio-linux-pfaat
-  #- bio-linux-seaview # Broken on 14.04
-  - bio-linux-squint
-  - bio-linux-t-coffee
   - exonerate
   - mafft
   - muscle
-  - bio-linux-prank
   - probcons
   - wise
 bio_nextgen:
-  # - bio-linux-fastqc  # out of date with brew latest
   - fastx-toolkit
   - maq
   - plink
@@ -344,30 +317,10 @@ bio_nextgen:
   - tabix
   # - samtools # only on 0.18, prefer custom build
 bio_sequencing:
-  #- bio-linux-assembly-conversion-tools # broken Depends: bio-linux-staden
-  - bio-linux-cap3
-  #- bio-linux-dust  # broken on 14.04
-  #- bio-linux-lucy  # broken on 14.04
-  # - bio-linux-staden # broken Depends: ia32-libs
-  # - bio-linux-stars # broken Depends: bio-linux-staden
-  - bio-linux-tablet
-  # - mira-assembler # broken on ubuntu 13.04
 bio_annotation:
   - mcl
   - predictprotein
   - tigr-glimmer
-  - bio-linux-artemis
-  - bio-linux-big-blast
-  - bio-linux-cd-hit
-  # - bio-linux-estscan  # broken on ubuntu 14.04 (#163)
-  # - bio-linux-jprofilegrid # broken on 14.04
-  # - bio-linux-msatfinder # broken on 13.10
-#   - bio-linux-prot4est - broken, fix in progress
-  - bio-linux-rbs-finder
-  - bio-linux-transterm-hp
-  # - bio-linux-trnascan # Broken on 14.04
-  # - bio-linux-tetra # broken Depends: ia32-libs
-  # 500Mb of disk: - bio-linux-priam
 bio_markergenes:
   - bio-linux-ampliconnoise
   - bio-linux-jmotu
@@ -375,9 +328,6 @@ bio_markergenes:
   - bio-linux-rdp-classifier
   - bio-linux-qiime
 bio_microarray:
-  #- bio-linux-ocount # broken Depends: ia32-libs
-  - bio-linux-oligoarray
-  - bio-linux-oligoarrayaux
 bio_visualization:
   - rasmol
   # - bio-linux-clcsequenceviewer # Awaiting fix
@@ -442,12 +392,6 @@ bio_proteomics:
 bio_proteomics_wine:
   - wine
 bio_utils:
-  - bio-linux-genquery
-  - bio-linux-keyring
-  - bio-linux-bldp-files
-  - bio-linux-sampledata
-  - bio-linux-taxinspector
-  # - bio-linux-xcut # hash mismatch
 phylogeny_testing:
   # new packages in testing (Debian 'wheezy')
   all:
