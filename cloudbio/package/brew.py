@@ -177,7 +177,9 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
     """
     i = 0
     version, is_linked = None, False
-    for i, git_line in enumerate(env.safe_run_output("{brew_cmd} info {pkg}".format(**locals())).split("\n")):
+    with settings(warn_only=True):
+	info_str = env.safe_run_output("{brew_cmd} info {pkg}".format(**locals()))
+    for i, git_line in enumerate(info_str.split("\n")):
         if git_line.strip():
             if i == 0:
                 _, version_str = git_line.split(":")
