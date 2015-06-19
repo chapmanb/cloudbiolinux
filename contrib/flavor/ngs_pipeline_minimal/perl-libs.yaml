@@ -11,6 +11,7 @@ cpan:
   - LWP::Protocol::https
   - Time::HiRes
   - IPC::Cmd
+  - IPC::System::Simple
   - Params::Check
   - Module::Load::Conditional
   - Archive::Tar
