@@ -20,6 +20,14 @@ recipe:
 
         wget -c -O battenberg/probloci.txt.gz $proburl
         gunzip battenberg/probloci.txt.gz
+
+        # Convert chromosomes to hg19 names
+        sed -i "s/^\([0-9]\+\)\t/chr\1\t/g" battenberg/probloci.txt
+        sed -i "s/^X/chrX/g" battenberg/probloci.txt
+        sed -i "s/^\([0-9]\+\)\t/chr\1\t/g" $impute_info
+        sed -i "s/^X/chrX/g" $impute_info
+        sed -i "s/^\([0-9]\+\)\t/chr\1\t/g" battenberg/1000genomesloci/1000genomesloci2012_chr*
+        sed -i "s/^X/chrX/g" battenberg/1000genomesloci/1000genomesloci2012_chr23.txt
     recipe_outfiles:
       - battenberg/probloci.txt
       - battenberg/1000genomesloci
