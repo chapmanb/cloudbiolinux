@@ -6,6 +6,7 @@ cpan:
   - Archive::Extract
   - Archive::Zip
   - Archive::Tar
+  - Compress::Raw::Zlib
   - DBI
   - LWP::Simple
   - LWP::Protocol::https
