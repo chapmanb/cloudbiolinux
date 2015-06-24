@@ -251,32 +251,17 @@ Vagrant and VirtualBox
 Vagrant allows easy deploying and connecting to VirtualBox images. The
 setup is ideal for runnig CloudBioLinux on a desktop computer. Install
 `VirtualBox <https://www.virtualbox.org/>`_
-and `vagrant <http://vagrantup.com/>`_. Then add a pre-built CloudLinux
-VirtualBox images and start it up::
+and `vagrant <http://vagrantup.com/>`_.
 
-        vagrant box add biolinux_$VERSION https://s3.amazonaws.com/cloudbiolinux/biolinux_$VERSION.box
-        mkdir tmp/biolinux
-        cd tmp/biolinux
-        vagrant init biolinux_version
-
-(note with vagrant you need disk space - at least 3x the image size).
-The created ./Vagrantfile can be edited to get a full GUI, extra RAM,
-and a local IP address. Start and log into the image with::
-
-        vagrant up
-        vagrant ssh
-        sudo bash
+See `the VirtualBox and Vagrant documentation
+<https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md>`_ for
+details on creating a local virtual machine from scratch with CloudBioLinux.
 
 Through Vagrant additional facilities are available, such as a shared
 network drive. It is also possible to tweak the image (e.g. RAM/CPU
 settings, and getting the all important guest additions) by firing up
 virtualbox itself. For more information, see the
 documentation on the `Vagrant website <http://vagrantup.com/>`_.
-
-See `the VirtualBox and Vagrant
-documentation <https://github.com/chapmanb/cloudbiolinux/blob/master/doc/virtualbox.md>`_
-for details on creating a local virtual machine from scratch with
-CloudBioLinux.
 
 OpenStack/XEN/KVM/Eucalyptus private Cloud
 ------------------------------------------
