@@ -322,15 +322,13 @@ bio_annotation:
   - predictprotein
   - tigr-glimmer
 bio_markergenes:
-  - bio-linux-ampliconnoise
-  - bio-linux-jmotu
-  - bio-linux-mothur
-  - bio-linux-rdp-classifier
-  - bio-linux-qiime
+  - ampliconnoise
+  - mothur
+  - rdp-classifier
+  - qiime
 bio_microarray:
 bio_visualization:
   - rasmol
-  # - bio-linux-clcsequenceviewer # Awaiting fix
 bio_proteomics:
   all:
     # Required for protk
@@ -408,21 +406,9 @@ phylogeny:
     - mrbayes
     - njplot
     - tree-puzzle
-    #- bio-linux-arb # problematic install questions
-    - bio-linux-archaeopteryx
-    - bio-linux-cytoscape
-    - bio-linux-dendroscope
-    - bio-linux-fastdnaml
-    #- bio-linux-happy # broken Depends: ia32-libs
-    - bio-linux-mesquite
-    - bio-linux-mrbayes
-    #- bio-linux-paml # Broken on 14.04
-    - bio-linux-omegamap
-    - bio-linux-qtlcart
-    #- bio-linux-splitstree # Broken on 14.04
-    - bio-linux-treeview
+    - treeviewx
   needs_64bit:
-    - bio-linux-fasttree
+    - fasttree
 ## Package lists imported from mi-deployment.
 cloudman:
   all:
@@ -573,27 +559,3 @@ galaxyp:
      - libffi-dev
      - libsqlite3-dev
      - sqlite3
-
-# To do -- in Deb Med but not propogated
-# squizz
-# biomaj
-#
-# To Add -- need packages
-# from bioperl-max:
-#   hyphy
-#   bioperl-db
-#   more perl modules
-# from bio-linux:
-#   Celera Assembler
-#   lamarc - not available just now (22/6/10)
-#   peptidemapper
-#   pftools
-#   transterm
-# Others:
-#   mdust
-#   IGV
-#   trimpoly
-#   blast2go
-#   sputnik: microsattelites
-#   GenomeView
-
