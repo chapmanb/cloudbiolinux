@@ -104,7 +104,7 @@ def _get_versions(base_dir):
                 name, version = line.strip().split(",")
                 versions[name] = version
     return versions
-    
+
 def _get_version_file(base_dir):
     return os.path.join(base_dir, "versions.csv")
 
