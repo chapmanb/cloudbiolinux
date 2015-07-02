@@ -130,7 +130,7 @@ def _download_dbnsfp(env, gid, gconfig):
                 zipfile = shared._remote_fetch(env, url, out_file=dl_file, samedir=True)
                 outdir = "dbNSFPv%s" % version
                 env.safe_run("mkdir -p %s" % outdir)
-                env.safe_run("unzip %s -d %s" % (zipfile, outdir))
+                env.safe_run("7za x %s -y -o%s" % (zipfile, outdir))
                 env.safe_run("cat %s/dbNSFP*_variant.chr* | bgzip -c > %s" % (outdir, outfile))
                 env.safe_run("rm -f %s/* && rmdir %s" % (outdir, outdir))
                 env.safe_run("rm -f %s" % (zipfile))

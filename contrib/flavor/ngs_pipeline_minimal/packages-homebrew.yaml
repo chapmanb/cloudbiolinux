@@ -2,6 +2,7 @@
 ---
 minimal:
   - cmake
+  - p7zip
   - pkg-config
   - s3gof3r
 perl:
