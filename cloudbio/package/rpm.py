@@ -1,5 +1,6 @@
 """Automated installation on RPM systems with the yum package manager.
 """
+import itertools
 from fabric.api import *
 from fabric.contrib.files import *
 
@@ -15,14 +16,25 @@ def _yum_packages(to_install):
         package_file = "packages-yum.yaml"
     pkg_config = get_config_file(env, package_file).base
     with settings(warn_only=True):
+        env.safe_sudo("yum clean all")
+        env.safe_sudo("yum makecache")
         env.safe_sudo("yum check-update")
-    env.safe_sudo("yum -y upgrade")
     # Retrieve packages to get and install each of them
     (packages, _) = _yaml_to_packages(pkg_config, to_install)
     # At this point allow the Flavor to rewrite the package list
     packages = env.flavor.rewrite_config_items("packages", packages)
-    for package in packages:
-        env.safe_sudo("yum -y install %s" % package)
+    for package_group in _partition_all(20, packages):
+        env.safe_sudo("yum -y install %s" % " ".join(package_group))
+
+def _partition_all(n, it):
+    """http://stackoverflow.com/questions/5129102/python-equivalent-to-clojures-partition-all
+    """
+    it = iter(iterable)
+    while True:
+        chunk = list(itertools.islice(it, n))
+        if not chunk:
+            break
+        yield chunk
 
 def _setup_yum_bashrc():
     """Fix the user bashrc to update compilers.

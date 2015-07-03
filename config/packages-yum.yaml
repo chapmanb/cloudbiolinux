@@ -107,7 +107,6 @@ amazon:
 python:
   - python
   - python-devel
-  - python-pip
   - boost-python-devel
   - numpy
 ruby:
@@ -127,11 +126,8 @@ perl:
   - perl-core
 java:
   - ant
-  - ant-junit
-  - ant-nodeps
   - java-1.7.0-openjdk
   - java-1.7.0-openjdk-devel
-  - junit4
 erlang:
   - erlang
   # - erlang-devel  ## Not available, erlang seems to install quite a bit.
