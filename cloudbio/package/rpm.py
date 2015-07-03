@@ -16,6 +16,7 @@ def _yum_packages(to_install):
         package_file = "packages-yum.yaml"
     pkg_config = get_config_file(env, package_file).base
     with settings(warn_only=True):
+        env.safe_sudo("yum -y update")
         env.safe_sudo("yum clean all")
         env.safe_sudo("yum makecache")
         env.safe_sudo("yum check-update")
@@ -26,7 +27,7 @@ def _yum_packages(to_install):
     for package_group in _partition_all(20, packages):
         env.safe_sudo("yum -y install %s" % " ".join(package_group))
 
-def _partition_all(n, it):
+def _partition_all(n, iterable):
     """http://stackoverflow.com/questions/5129102/python-equivalent-to-clojures-partition-all
     """
     it = iter(iterable)
