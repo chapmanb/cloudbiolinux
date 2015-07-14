@@ -54,18 +54,40 @@ def install_packages(env, to_install=None, packages=None):
     for pkg_str in ["curl"]:
         _safe_uninstall_pkg(env, pkg_str, brew_cmd)
 
-
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
     """Revert any taps if we fail to update due to local changes.
     """
-    with quiet():
+    with _git_stash(env, brew_cmd):
+        with quiet():
+            with settings(warn_only=True):
+                out = env.safe_run("%s update" % brew_cmd)
+        if out.failed:
+            for repo in formula_repos:
+                if repo in cur_taps:
+                    env.safe_run("%s untap %s" % (brew_cmd, repo))
+            env.safe_run("%s update" % brew_cmd)
+
+@contextlib.contextmanager
+def _git_stash(env, brew_cmd):
+    """Perform a safe git stash around an update.
+
+    This circumvents brews internal stash approach which doesn't work on older versions
+    of git and is sensitive to missing config.emails.
+    """
+    brew_prefix = env.safe_run_output("{brew_cmd} --prefix".format(**locals()))
+    with cd(brew_prefix):
         with settings(warn_only=True):
-            out = env.safe_run("%s update" % brew_cmd)
-    if out.failed:
-        for repo in formula_repos:
-            if repo in cur_taps:
-                env.safe_run("%s untap %s" % (brew_cmd, repo))
-        env.safe_run("%s update" % brew_cmd)
+            check_diff = env.safe_run("git diff --quiet")
+    if check_diff.return_code > 0:
+        with cd(brew_prefix):
+            env.safe_run("git config user.email 'stash@brew.sh'")
+            env.safe_run("git stash --quiet")
+    try:
+        yield None
+    finally:
+        if check_diff.return_code > 0:
+            with cd(brew_prefix):
+                env.safe_run("git stash pop --quiet")
 
 def _get_current_pkgs(env, brew_cmd):
     out = {}
@@ -178,7 +200,7 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
     i = 0
     version, is_linked = None, False
     with settings(warn_only=True):
-	info_str = env.safe_run_output("{brew_cmd} info {pkg}".format(**locals()))
+        info_str = env.safe_run_output("{brew_cmd} info {pkg}".format(**locals()))
     for i, git_line in enumerate(info_str.split("\n")):
         if git_line.strip():
             if i == 0:
