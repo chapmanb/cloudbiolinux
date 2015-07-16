@@ -38,6 +38,7 @@ def install_packages(env, to_install=None, packages=None):
     formula_repos = ["homebrew/science", "chapmanb/cbl"]
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
     _safe_update(env, brew_cmd, formula_repos, current_taps)
+    current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
     for repo in formula_repos:
         if repo not in current_taps:
             env.safe_run("%s tap %s" % (brew_cmd, repo))
@@ -65,7 +66,12 @@ def _safe_update(env, brew_cmd, formula_repos, cur_taps):
             for repo in formula_repos:
                 if repo in cur_taps:
                     env.safe_run("%s untap %s" % (brew_cmd, repo))
-            env.safe_run("%s update" % brew_cmd)
+            with settings(warn_only=True):
+                out = env.safe_run("%s update" % brew_cmd)
+            if out.failed:
+                print("\n\nHomebrew update failed.")
+                print("You might need to upgrade git by installing inside bcbio with:")
+                print("'brew install git --env=inherit --ignore-dependences'\n\n")
 
 @contextlib.contextmanager
 def _git_stash(env, brew_cmd):
@@ -76,8 +82,9 @@ def _git_stash(env, brew_cmd):
     """
     brew_prefix = env.safe_run_output("{brew_cmd} --prefix".format(**locals()))
     with cd(brew_prefix):
-        with settings(warn_only=True):
-            check_diff = env.safe_run("git diff --quiet")
+        with quiet():
+            with settings(warn_only=True):
+                check_diff = env.safe_run("git diff --quiet")
     if check_diff.return_code > 0:
         with cd(brew_prefix):
             env.safe_run("git config user.email 'stash@brew.sh'")
