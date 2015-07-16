@@ -123,9 +123,9 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
     if target is None or target == "post_install":
         env.flavor.post_install()
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
-            _freenx_scripts(self.env)
+            _freenx_scripts(env)
             if pkg_install is not None and 'cloudman' in pkg_install:
-                _configure_cloudman(self.env)
+                _configure_cloudman(env)
     if target is None or target == "cleanup":
         _cleanup_space(env)
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
