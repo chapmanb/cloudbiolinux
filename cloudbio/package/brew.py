@@ -254,7 +254,8 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
         flags = " ".join(args)
         with settings(warn_only=True):
             cmd = "%s %s %s" % (_get_brew_install_cmd(brew_cmd, env, pkg), flags, pkg)
-            result = env.safe_run_output(cmd)
+            with _custom_unlink(env, brew_cmd, pkg):
+                result = env.safe_run_output(cmd)
             if result.failed and not result.find("Could not symlink") > 0:
                 sys.tracebacklimit = 1
                 raise ValueError("Failed to install brew formula: %s\n" % pkg +
@@ -264,6 +265,23 @@ def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     # installed but not linked
     elif not is_linked:
         env.safe_run("%s link --overwrite %s" % (brew_cmd, pkg))
+
+@contextlib.contextmanager
+def _custom_unlink(env, brew_cmd, pkg):
+    """Handle custom unlinking of packages that can break builds of others.
+
+    Does a temporary unlink and relink of packages while building.
+    """
+    unlinks = {"lumpy-sv": ["bamtools"]}
+    for upkg in unlinks.get(pkg, []):
+        _safe_unlink_pkg(env, upkg, brew_cmd)
+    try:
+        yield None
+    finally:
+        for upkg in unlinks.get(pkg, []):
+            with settings(warn_only=True):
+                with quiet():
+                    env.safe_run("%s link --overwrite %s" % (brew_cmd, upkg))
 
 def _get_pkg_version_args(pkg_str):
     """Uses Python style package==0.1 version specifications and args separated with ';'
