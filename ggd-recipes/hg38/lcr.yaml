@@ -1,0 +1,23 @@
+# Low complexity regions from supplemental data of Heng Li's work on
+# reducing variant calling artifacts:
+#
+# http://bioinformatics.oxfordjournals.org/content/30/20/2843
+# https://github.com/lh3/varcmp/tree/master/scripts
+#
+---
+attributes:
+  name: lcr
+  version: 2014-07-09
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=https://github.com/lh3/varcmp/raw/bb5b616526c5c3ecb46abfd9877e1bd6d50d1802/scripts/LCR-hs38.bed.gz
+        out=variation/LCR.bed.gz
+        mkdir -p variation
+        wget -O $out -c $url
+        tabix -f -p bed $out
+    recipe_outfiles:
+      - variation/LCR.bed.gz
+      - variation/LCR.bed.gz.tbi
