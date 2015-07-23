@@ -54,12 +54,13 @@ def _add_apt_gpg_keys():
     env.logger.info("Update GPG keys for repositories")
     standalone = [
         "http://archive.cloudera.com/debian/archive.key",
-        'http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc'
+        'http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc',
+        'https://www.postgresql.org/media/keys/ACCC4CF8.asc',
     ]
     keyserver = [
             ("keyserver.ubuntu.com", "7F0CEB10"),
             ("keyserver.ubuntu.com", "E084DAB9"),
-            ("subkeys.pgp.net", "D018A4CE"),
+            ("keyserver.ubuntu.com", "D018A4CE"),
             ("keyserver.ubuntu.com", "D67FC6EAE2A11821"),
         ]
     standalone, keyserver = env.flavor.rewrite_apt_keys(standalone, keyserver)

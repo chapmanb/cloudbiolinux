@@ -1,0 +1,16 @@
+---
+# NOTE: rabbitmq and postgres installed manually.
+packages:
+  - minimal
+  - libraries
+  - amazon
+  - python
+  - ruby
+  - perl
+  - java
+  - nginx
+  - supervisor
+  - coffeescript
+  - millstone
+libraries:
+  - python-libs
