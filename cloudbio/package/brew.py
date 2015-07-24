@@ -84,17 +84,23 @@ def _git_stash(env, brew_cmd):
     with cd(brew_prefix):
         with quiet():
             with settings(warn_only=True):
+                env.safe_run("git config user.email 'stash@brew.sh'")
                 check_diff = env.safe_run("git diff --quiet")
-    if check_diff.return_code > 0:
-        with cd(brew_prefix):
-            env.safe_run("git config user.email 'stash@brew.sh'")
-            env.safe_run("git stash --quiet")
-    try:
-        yield None
-    finally:
+                git_version = env.safe_run_output("git --version").strip().split()[-1]
+    if git_version and LooseVersion(git_version) < LooseVersion("2.0"):
         if check_diff.return_code > 0:
             with cd(brew_prefix):
-                env.safe_run("git stash pop --quiet")
+                with settings(warn_only=True):
+                    env.safe_run("git stash --quiet")
+        try:
+            yield None
+        finally:
+            if check_diff.return_code > 0:
+                with cd(brew_prefix):
+                    with settings(warn_only=True):
+                        env.safe_run("git stash pop --quiet")
+    else:
+        yield None
 
 def _get_current_pkgs(env, brew_cmd):
     out = {}
@@ -228,7 +234,7 @@ def _get_brew_install_cmd(brew_cmd, env, pkg):
     extra_args = ""
     if pkg in ["cmake"]:
         extra_args += " --without-docs"
-    if pkg in ["lumpy-sv", "bamtools", "freebayes"]:
+    if pkg in ["lumpy-sv", "bamtools", "freebayes", "git"]:
         extra_args += " --ignore-dependencies"
     return "%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, extra_args)
 
@@ -338,7 +344,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["expat", "cmake", "pkg-config"]:
+    for dep in ["expat", "cmake", "pkg-config", "git"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
