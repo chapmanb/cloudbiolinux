@@ -58,6 +58,8 @@ genomes:
     name: Arabidopsis thaliana (TAIR10)
   - dbkey: xenTro3
     name: X tropicalis (xenTro3)
+  - dbkey: GRCz10
+    name: Zebrafish (GRCz10)
   - dbkey: Zv9
     name: Zebrafish (Zv9)
   - dbkey: sacCer3
