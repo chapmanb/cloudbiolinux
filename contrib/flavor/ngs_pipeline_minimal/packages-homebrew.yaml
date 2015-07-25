@@ -51,6 +51,7 @@ bio_nextgen:
     - impute2
     - lofreq
     - lumpy-sv
+    - manta
     - pindel
     - platypus-variant
     - rtg-tools
