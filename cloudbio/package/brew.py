@@ -344,7 +344,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["expat", "cmake", "pkg-config", "git"]:
+    for dep in ["expat", "cmake", "pkg-config", "xz", "git"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
