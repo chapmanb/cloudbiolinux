@@ -559,3 +559,15 @@ galaxyp:
      - libffi-dev
      - libsqlite3-dev
      - sqlite3
+
+nginx:
+  - nginx
+
+rabbitmq:
+  - rabbitmq-server
+
+supervisor:
+  - supervisor
+
+coffeescript:
+  - coffeescript

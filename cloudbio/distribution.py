@@ -118,7 +118,17 @@ def _setup_ubuntu():
       "deb http://cran.fhcrc.org/bin/linux/ubuntu %s/",  # lastest R versions
       "deb http://archive.canonical.com/ubuntu %s partner",  # sun-java
       "deb http://ppa.launchpad.net/nebc/bio-linux/ubuntu trusty main",  # Bio-Linux
-      "deb [arch=amd64 trusted=yes] http://research.cs.wisc.edu/htcondor/debian/stable/ squeeze contrib"  # HTCondor
+      "deb [arch=amd64 trusted=yes] http://research.cs.wisc.edu/htcondor/debian/stable/ squeeze contrib",  # HTCondor
+
+      # HACK: Millstone requires postgresql-9.3, which has logrotate as a dep.
+      # However, the latest version of logrotate (>3.8) breaks another Millstone
+      # component rabbitmq-server, so we manually install an earlier version of
+      # logrotate 3.7.8-6ubuntu5 through the Millstone flavor post_install.
+      # Here, we add the following 2 sources to allow this.
+      #     * postgresql repo for postgresql-9.3.
+      #     * hard-coded precise repo for logrotate
+      "deb http://apt.postgresql.org/pub/repos/apt/ squeeze-pgdg main",
+      "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse",
     ] + shared_sources
     env.std_sources = _add_source_versions(env.dist_name, sources)
 
