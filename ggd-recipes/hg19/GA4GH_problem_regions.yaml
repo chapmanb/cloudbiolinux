@@ -9,7 +9,7 @@ recipe:
     recipe_cmds:
       - |
         outdir=GA4GH_problem_regions
-        baseurl=https://dl.dropboxusercontent.com/u/2822886/GA4GH_problem_regions.zip
+        baseurl=http://bcbio_nextgen.s3.amazonaws.com/GA4GH_problem_regions.zip
         mkdir -p GA4GH_problem_regions
         cd GA4GH_problem_regions
         wget -c -O GA4GH_problem_regions.zip $baseurl
