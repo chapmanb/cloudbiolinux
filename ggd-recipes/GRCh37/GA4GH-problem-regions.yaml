@@ -1,0 +1,37 @@
+# GA4GH problematic region files: https://drive.google.com/folderview?id=0B7Ao1qqJJDHQUjVIN3liUUZNWjg&usp=sharing#list
+---
+attributes:
+  name: GA4GH-problem-regions
+  version: 20150729
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        outdir=GA4GH_problem_regions
+        baseurl=https://dl.dropboxusercontent.com/u/2822886/GA4GH_problem_regions.zip
+        mkdir -p GA4GH_problem_regions
+        cd GA4GH_problem_regions
+        wget -c -O GA4GH_problem_regions.zip $baseurl
+        unzip GA4GH_problem_regions.zip
+        for file in *.bed
+        do
+          sed 's/^chr//g' $file > $file.tmp
+          mv $file.tmp $file
+        done
+    recipe_outfiles:
+      - GA4GH_problem_regions/README.md
+      - GA4GH_problem_regions/bad_promoter.bed
+      - GA4GH_problem_regions/gc15.bed
+      - GA4GH_problem_regions/gc15to20.bed
+      - GA4GH_problem_regions/gc20to25.bed
+      - GA4GH_problem_regions/gc25to30.bed
+      - GA4GH_problem_regions/gc65to70.bed
+      - GA4GH_problem_regions/gc70to75.bed
+      - GA4GH_problem_regions/gc75to80.bed
+      - GA4GH_problem_regions/gc80to85.bed
+      - GA4GH_problem_regions/gc85.bed
+      - GA4GH_problem_regions/heng_um75-hs37d5.bed
+      - GA4GH_problem_regions/low_complexity_51to200bp.bed
+      - GA4GH_problem_regions/low_complexity_gt200bp.bed
+      - GA4GH_problem_regions/self_chain.bed
