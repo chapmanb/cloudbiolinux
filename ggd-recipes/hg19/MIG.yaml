@@ -1,0 +1,17 @@
+# Medically Interpretable Genes, compiled by Personalis: http://www.genomemedicine.com/content/pdf/s13073-015-0197-4.pdf
+---
+attributes:
+  name: MIG
+  version: 20150730
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=http://bcbio_nextgen.s3.amazonaws.com/MIG.zip
+        mkdir -p prioritization
+        cd prioritization
+        wget -c -O MIG.zip $baseurl
+        unzip MIG.zip
+    recipe_outfiles:
+      - prioritization/MIG.bed
