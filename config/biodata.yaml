@@ -21,7 +21,7 @@ genomes:
     name: Human (hg19)
     dbsnp: true
     rnaseq: true
-    annotations: [battenberg, GA4GH_problem_regions, MIG]
+    annotations: [srnaseq, battenberg, GA4GH_problem_regions, MIG]
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
