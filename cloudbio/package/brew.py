@@ -231,12 +231,14 @@ def _latest_pkg_version(env, brew_cmd, pkg, devel=False):
 def _get_brew_install_cmd(brew_cmd, env, pkg):
     perl_setup = "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install
     compiler_setup = "export CC=${CC:-`which gcc`} && export CXX=${CXX:-`which g++`}"
+    shell_setup = "export SHELL=${SHELL:-/bin/bash}"
     extra_args = ""
     if pkg in ["cmake"]:
         extra_args += " --without-docs"
     if pkg in ["lumpy-sv", "bamtools", "freebayes", "git"]:
         extra_args += " --ignore-dependencies"
-    return "%s && %s && %s install --env=inherit %s" % (compiler_setup, perl_setup, brew_cmd, extra_args)
+    return "%s && %s && %s && %s install --env=inherit %s" % (compiler_setup, shell_setup, perl_setup,
+                                                              brew_cmd, extra_args)
 
 def _install_pkg_latest(env, pkg, args, brew_cmd, ipkgs):
     """Install the latest version of the given package.

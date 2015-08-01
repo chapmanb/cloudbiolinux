@@ -11,7 +11,7 @@ bio_nextgen:
   alignment:
     - bwa
     - bwakit
-    - bowtie2 
+    - bowtie2;--without-tbb
     - novoalign
     - rna-star
     # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
