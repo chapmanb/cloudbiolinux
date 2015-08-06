@@ -2,31 +2,30 @@
 ---
 attributes:
   name: GA4GH-problem-regions
-  version: 20150729
+  version: 20150805
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        outdir=GA4GH_problem_regions
         baseurl=http://bcbio_nextgen.s3.amazonaws.com/GA4GH_problem_regions.zip
-        mkdir -p GA4GH_problem_regions
-        cd GA4GH_problem_regions
+        mkdir -p coverage/problem_regions/GA4GH
+        cd coverage/problem_regions/GA4GH
         wget -c -O GA4GH_problem_regions.zip $baseurl
         unzip GA4GH_problem_regions.zip
     recipe_outfiles:
-      - GA4GH_problem_regions/README.md
-      - GA4GH_problem_regions/bad_promoter.bed
-      - GA4GH_problem_regions/gc15.bed
-      - GA4GH_problem_regions/gc15to20.bed
-      - GA4GH_problem_regions/gc20to25.bed
-      - GA4GH_problem_regions/gc25to30.bed
-      - GA4GH_problem_regions/gc65to70.bed
-      - GA4GH_problem_regions/gc70to75.bed
-      - GA4GH_problem_regions/gc75to80.bed
-      - GA4GH_problem_regions/gc80to85.bed
-      - GA4GH_problem_regions/gc85.bed
-      - GA4GH_problem_regions/heng_um75-hs37d5.bed
-      - GA4GH_problem_regions/low_complexity_51to200bp.bed
-      - GA4GH_problem_regions/low_complexity_gt200bp.bed
-      - GA4GH_problem_regions/self_chain.bed
+      - coverage/problem_regions/GA4GH/README.md
+      - coverage/problem_regions/GA4GH/bad_promoter.bed
+      - coverage/problem_regions/GA4GH/gc15.bed
+      - coverage/problem_regions/GA4GH/gc15to20.bed
+      - coverage/problem_regions/GA4GH/gc20to25.bed
+      - coverage/problem_regions/GA4GH/gc25to30.bed
+      - coverage/problem_regions/GA4GH/gc65to70.bed
+      - coverage/problem_regions/GA4GH/gc70to75.bed
+      - coverage/problem_regions/GA4GH/gc75to80.bed
+      - coverage/problem_regions/GA4GH/gc80to85.bed
+      - coverage/problem_regions/GA4GH/gc85.bed
+      - coverage/problem_regions/GA4GH/heng_um75-hs37d5.bed
+      - coverage/problem_regions/GA4GH/low_complexity_51to200bp.bed
+      - coverage/problem_regions/GA4GH/low_complexity_gt200bp.bed
+      - coverage/problem_regions/GA4GH/self_chain.bed
