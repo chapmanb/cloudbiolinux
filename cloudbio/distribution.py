@@ -281,7 +281,7 @@ def _determine_distribution(env):
     """
     with quiet():
         output = env.safe_run_output("cat /etc/*release").lower()
-    if output.find("distrib_id=ubuntu") >= 0:
+    if output.find("id=ubuntu") >= 0:
         return "ubuntu"
     elif output.find("centos release") >= 0:
         return "centos"
