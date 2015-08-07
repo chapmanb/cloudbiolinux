@@ -40,5 +40,7 @@ bio_nextgen:
     - vep
     - wham
     # - yaha  The Principal Investigator has moved; the software does not download ATM
+  integration:
+    - biointerchange
 distributed:
   - parallel
