@@ -43,6 +43,7 @@ bio_nextgen:
     - samtools-library-0.1
     - htslib
     - bcftools
+    - seqbuster
   variant:
     - bcbio-variation-recall
     - cancerit-allelecount
