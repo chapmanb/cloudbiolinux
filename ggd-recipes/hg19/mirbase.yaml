@@ -2,7 +2,7 @@
 ---
 attributes:
   name: sranseq
-  version: 20150803
+  version: 20150810
 recipe:
   full:
     recipe_type: bash
@@ -10,7 +10,7 @@ recipe:
       - |
         mkdir -p srnaseq
         cd srnaseq
-        wget -nc -O hsa.gff3 ftp://mirbase.org/pub/mirbase/20/genomes/hsa.gff3
+        wget -q -nc -O hsa.gff3 ftp://mirbase.org/pub/mirbase/20/genomes/hsa.gff3
         awk '$3=="miRNA"' hsa.gff3 | sed 's/=/ /g' > srna-transcripts.gtf
         wget -nc -O wgRna.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/wgRna.txt.gz
         zgrep -v 'hsa-' wgRna.txt.gz | awk '{print $2"\t.\tncrna\t"$3"\t"$4"\t.\t"$7"\t.\tname "$5";"}' >> srna-transcripts.gtf
@@ -23,7 +23,7 @@ recipe:
         # wget http://www.regulatoryrna.org/database/piRNA/download/archive/v1.0/bed/piR_hg19_v1.0.bed.gz
         # zcat piR_hg19_v1.0.bed.gz | awk '{print $1"\t.\tpiRNA\t"$2"\t"$3"\t.\t"$6"\t.\tname "$4";"}' >> srna-transcripts.gtf
         wget -nc -O hairpin.fa.gz ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz
-        zcat hairpin.fa.gz | awk '{if ($0~/>hsa/){name=$0}else{if (name!=0){print name"\n"$0; name=0}}}' | sed 's/U/T/g' > hairpin.fa
+        zcat hairpin.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
         wget -nc -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
         zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
     recipe_outfiles:
