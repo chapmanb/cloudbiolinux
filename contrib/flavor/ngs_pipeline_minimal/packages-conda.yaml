@@ -3,6 +3,7 @@ channels:
   - https://conda.binstar.org/bcbio
 bio_nextgen:
   - cnvkit
+  - hmmlearn
   - htseq
   - metasv
   - pyloh

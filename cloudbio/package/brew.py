@@ -123,6 +123,13 @@ def _safe_unlink_pkg(env, pkg_str, brew_cmd):
         with quiet():
             env.safe_run("{brew_cmd} unlink {pkg_str}".format(**locals()))
 
+def _safe_link_pkg(env, pkg_str, brew_cmd):
+    """Link packages required for builds, but not necessarily installed
+    """
+    with settings(warn_only=True):
+        with quiet():
+            env.safe_run("{brew_cmd} link --overwrite {pkg_str}".format(**locals()))
+
 def _safe_uninstall_pkg(env, pkg_str, brew_cmd):
     """Uninstall packages which get pulled in even when unlinked by brew.
     """
@@ -346,7 +353,9 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
-    for dep in ["expat", "pkg-config", "openssl", "cmake", "xz", "git"]:
+    for dep in ["openssl"]:
+        _safe_link_pkg(env, dep, brew_cmd)
+    for dep in ["expat", "pkg-config", "cmake", "xz", "git"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
