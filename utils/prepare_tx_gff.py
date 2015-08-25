@@ -34,6 +34,7 @@ except:
 
 
 from bcbio.utils import chdir, safe_makedir, file_exists
+from bcbio.rnaseq.gtf import gtf_to_fasta
 
 
 # ##  Version and retrieval details for Ensembl and UCSC
@@ -49,6 +50,22 @@ ucsc_user = "genome"
 # https://github.com/dpryan79/ChromosomeMappings
 manual_remaps = {"hg38":
                  "https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt"}
+
+def which(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+    return None
 
 def manual_ucsc_ensembl_map(org_build):
     org_build = build_subsets.get(org_build, org_build)
@@ -257,6 +274,8 @@ def main(org_build, gtf_file=None):
         if rrna_gtf:
             gtf_to_interval(rrna_gtf, org_build)
         prepare_tophat_index(gtf_file, org_build)
+        transcriptome_fasta = make_transcriptome_fasta(gtf_file, org_build)
+        prepare_kallisto_index(transcriptome_fasta, org_build)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
         if os.path.exists(rnaseq_dir):
@@ -269,6 +288,12 @@ def main(org_build, gtf_file=None):
     tar_dirs = [out_dir]
     tarball = create_tarball(tar_dirs, org_build)
 
+def make_transcriptome_fasta(gtf_file, org_build):
+    genome_fasta = get_genome_fasta(org_build)
+    base, _ = os.path.splitext(gtf_file)
+    out_file = os.path.join(base + ".fa")
+    out_file = gtf_to_fasta(gtf_file, genome_fasta, out_file=out_file)
+    return out_file
 
 def clean_gtf(gtf_file, org_build):
     """
@@ -293,6 +318,11 @@ def clean_gtf(gtf_file, org_build):
             out_gtf.write(line)
     shutil.move(temp_gtf, gtf_file)
     return gtf_file
+
+def get_genome_fasta(org_build):
+    fa_path = os.path.abspath(os.path.join(os.curdir, os.pardir, "seq",
+                                           org_build + ".fa"))
+    return fa_path
 
 def get_fasta_names(org_build):
     fa_dict = os.path.abspath(os.path.join(os.curdir, os.pardir, "seq", org_build + ".fa.fai"))
@@ -416,6 +446,17 @@ def prepare_tophat_index(gtf, org_build):
     shutil.rmtree(out_dir)
     os.remove(fastq)
 
+def prepare_kallisto_index(transcriptome_fasta, org_build):
+    kallisto = which("kallisto")
+    if not kallisto:
+        return None
+    base_dir = os.path.abspath(os.path.dirname(transcriptome_fasta))
+    kallisto_dir = os.path.join(base_dir, "kallisto")
+    safe_makedir(kallisto_dir)
+    kallisto_index = os.path.join(kallisto_dir, org_build)
+    cmd = ("kallisto index -i {kallisto_index} {transcriptome_fasta}")
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return kallisto_index
 
 def make_large_exons_gtf(gtf_file):
     """
