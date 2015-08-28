@@ -355,8 +355,15 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """
     for dep in ["openssl"]:
         _safe_link_pkg(env, dep, brew_cmd)
-    for dep in ["expat", "pkg-config", "cmake", "xz", "git"]:
+    for dep in ["expat", "pkg-config", "cmake", "xz"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
+    # check if we have an older git and need to install it from brew
+    git_version = None
+    with quiet():
+        with settings(warn_only=True):
+            git_version = env.safe_run_output("git --version").strip().split()[-1]
+    if git_version and LooseVersion(git_version) < LooseVersion("2.0"):
+        _install_pkg(env, "git", brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
     # if installing samtools, avoid bcftools conflicts

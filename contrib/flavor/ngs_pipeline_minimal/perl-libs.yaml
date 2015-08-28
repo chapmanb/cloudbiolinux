@@ -1,6 +1,7 @@
 ---
 cpan:
   # VEP dependencies
+  - parent
   - Encode::Locale
   - Statistics::Descriptive
   - Archive::Extract
