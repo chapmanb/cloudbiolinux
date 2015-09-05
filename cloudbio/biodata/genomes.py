@@ -320,7 +320,7 @@ GENOMES_SUPPORTED = [
 
 
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "mosaik", "snap", "star"]
+                            "ucsc", "mosaik", "snap", "star", "rtg"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -716,6 +716,18 @@ def _index_snap(ref_file):
         env.safe_run(cmd.format(**locals()))
     return dir_name
 
+def _index_rtg(ref_file):
+    """Perform indexing for use with Real Time Genomics tools.
+
+    https://github.com/RealTimeGenomics/rtg-tools
+    """
+    dir_name = "rtg"
+    index_name = "%s.sdf" % os.path.splitext(os.path.basename(ref_file))[0]
+    if not env.safe_exists(os.path.join(dir_name, index_name, "done")):
+        cmd = "rtg format -o {dir_name}/{index_name} {ref_file}"
+        env.safe_run(cmd.format(**locals()))
+    return dir_name
+
 @_if_installed("MosaikJump")
 def _index_mosaik(ref_file):
     hash_size = 15
@@ -915,4 +927,5 @@ INDEX_FNS = {
     "ucsc": _index_twobit,
     "star": _index_star,
     "snap": _index_snap,
+    "rtg": _index_rtg,
     }
