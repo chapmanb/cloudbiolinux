@@ -245,26 +245,46 @@ def _download_ensembl_genome(org_build):
         subprocess.check_call(["wget", "-c", dl_url])
     return out_file
 
+def write_version(build=None, gtf_file=None):
+    gtf_file = build.fbase if build else gtf_file
+    gtf_file = os.path.abspath(gtf_file)
+    version_file = "version.txt"
+    with open(version_file, "w") as out_handle:
+        out_handle.write("Created from: %s" % gtf_file)
+    return version_file
+
 # ## Main driver functions
 
-def main(org_build, gtf_file=None):
+def main(org_build, gtf_file, genome_fasta):
     build_dir = os.path.abspath(os.path.join(os.curdir, org_build))
     work_dir = os.path.join(build_dir, "tmpcbl")
+    safe_makedir(work_dir)
     out_dir = os.path.join(build_dir,
                            "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
-    safe_makedir(work_dir)
+    if genome_fasta:
+        genome_fasta = os.path.abspath(genome_fasta)
+        work_fasta = os.path.join(work_dir, os.path.basename(genome_fasta))
+        if not os.path.exists(work_fasta):
+            shutil.copy(genome_fasta, work_fasta)
+        genome_fasta = work_fasta
+    else:
+        genome_fasta = get_genome_fasta(org_build)
+
+    gtf_file = os.path.abspath(gtf_file) if gtf_file else gtf_file
+
     with chdir(work_dir):
         if not gtf_file:
+            write_version(build=build_info)
             build = build_info[org_build]
             gtf_file = prepare_tx_gff(build, org_build)
         else:
+            write_version(gtf_file=gtf_file)
             work_gtf = os.path.join(work_dir, "ref-transcripts.gtf")
             if not os.path.exists(work_gtf):
                 shutil.copy(gtf_file, work_gtf)
             gtf_file = work_gtf
-
-        gtf_file = clean_gtf(gtf_file, org_build)
+        gtf_file = clean_gtf(gtf_file, genome_fasta)
         db = _get_gtf_db(gtf_file)
         gtf_to_refflat(gtf_file)
         gtf_to_bed(gtf_file)
@@ -272,9 +292,9 @@ def main(org_build, gtf_file=None):
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
         if rrna_gtf:
-            gtf_to_interval(rrna_gtf, org_build)
-        prepare_tophat_index(gtf_file, org_build)
-        transcriptome_fasta = make_transcriptome_fasta(gtf_file, org_build)
+            gtf_to_interval(rrna_gtf, genome_fasta)
+        prepare_tophat_index(gtf_file, org_build, genome_fasta)
+        transcriptome_fasta = make_transcriptome_fasta(gtf_file, genome_fasta)
         prepare_kallisto_index(transcriptome_fasta, org_build)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
@@ -288,14 +308,13 @@ def main(org_build, gtf_file=None):
     tar_dirs = [out_dir]
     tarball = create_tarball(tar_dirs, org_build)
 
-def make_transcriptome_fasta(gtf_file, org_build):
-    genome_fasta = get_genome_fasta(org_build)
+def make_transcriptome_fasta(gtf_file, genome_fasta):
     base, _ = os.path.splitext(gtf_file)
     out_file = os.path.join(base + ".fa")
     out_file = gtf_to_fasta(gtf_file, genome_fasta, out_file=out_file)
     return out_file
 
-def clean_gtf(gtf_file, org_build):
+def clean_gtf(gtf_file, genome_fasta):
     """
     remove transcripts that have the following properties
     1) don't have a corresponding ID in the reference
@@ -303,7 +322,7 @@ def clean_gtf(gtf_file, org_build):
     3) are not associated with a gene (no gene_id field)
     """
     temp_gtf = tempfile.NamedTemporaryFile(suffix=".gtf").name
-    fa_names = get_fasta_names(org_build)
+    fa_names = get_fasta_names(genome_fasta)
     with open(gtf_file) as in_gtf, open(temp_gtf, "w") as out_gtf:
         for line in in_gtf:
             if line.startswith("#"):
@@ -324,8 +343,10 @@ def get_genome_fasta(org_build):
                                            org_build + ".fa"))
     return fa_path
 
-def get_fasta_names(org_build):
-    fa_dict = os.path.abspath(os.path.join(os.curdir, os.pardir, "seq", org_build + ".fa.fai"))
+def get_fasta_names(genome_fasta):
+    fa_dict = genome_fasta + ".fai"
+    if not os.path.exists(fa_dict):
+        subprocess.check_call("samtools faidx %s" % genome_fasta, shell=True)
     with open(fa_dict) as in_handle:
         return [line.split("\t")[0] for line in in_handle]
     return seqs
@@ -431,12 +452,21 @@ def make_miso_events(gtf, org_build):
         if not file_exists(prefix):
             subprocess.check_call(cmd.format(**locals()), shell=True)
 
-def prepare_tophat_index(gtf, org_build):
+def prepare_bowtie_index(genome_fasta, bowtie_dir):
+    if os.path.exists(bowtie_dir + ".1.bt2"):
+        return bowtie_dir
+    safe_makedir(bowtie_dir)
+    cmd = "bowtie2-build {genome_fasta} {bowtie_dir}"
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return bowtie_dir
+
+def prepare_tophat_index(gtf, org_build, genome_fasta):
     tophat_dir = os.path.abspath(os.path.join(os.path.dirname(gtf), "tophat",
                                               org_build + "_transcriptome"))
     bowtie_dir = os.path.abspath(os.path.join(os.path.dirname(gtf),
                                               os.path.pardir, "bowtie2",
                                               org_build))
+    bowtie_dir = prepare_bowtie_index(genome_fasta, bowtie_dir)
     out_dir = tempfile.mkdtemp()
     fastq = _create_dummy_fastq()
     cmd = ("tophat --transcriptome-index {tophat_dir} -G {gtf} "
@@ -457,6 +487,18 @@ def prepare_kallisto_index(transcriptome_fasta, org_build):
     cmd = ("kallisto index -i {kallisto_index} {transcriptome_fasta}")
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return kallisto_index
+
+def prepare_sailfish_index(transcriptome_fasta, org_build):
+    sailfish = which("sailfish")
+    if not sailfish:
+        return None
+    base_dir = os.path.abspath(os.path.dirname(transcriptome_fasta))
+    sailfish_dir = os.path.join(base_dir, "sailfish")
+    safe_makedir(sailfish_dir)
+    sailfish_index = os.path.join(sailfish_dir, org_build)
+    cmd = ("sailfish index -t {sailfish_index} -o {sailfish_index}")
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return sailfish_index
 
 def make_large_exons_gtf(gtf_file):
     """
@@ -503,8 +545,8 @@ def _create_dummy_fastq():
         out_handle.write(read)
     return fn
 
-def gtf_to_interval(gtf, build):
-    fa_dict = get_ucsc_dict(build)
+def gtf_to_interval(gtf, genome_fasta):
+    fa_dict = make_fasta_dict(genome_fasta)
     db = _get_gtf_db(gtf)
     out_file = os.path.splitext(gtf)[0] + ".interval_list"
     if file_exists(out_file):
@@ -706,8 +748,11 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
                             "organism.")
     parser.add_argument("--gtf",
-                        help="Optional GTF file (instead of downloading from Ensembl.",
+                        help="Optional GTF file (instead of downloading from Ensembl)",
+                        default=None),
+    parser.add_argument("--fasta",
+                        help="Optional genomic FASTA file (instead of downloading from Ensembl)",
                         default=None),
     parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
-    main(args.org_build, args.gtf)
+    main(args.org_build, args.gtf, args.fasta)
