@@ -87,7 +87,7 @@ def _git_stash(env, brew_cmd):
                 env.safe_run("git config user.email 'stash@brew.sh'")
                 check_diff = env.safe_run("git diff --quiet")
                 git_version = env.safe_run_output("git --version").strip().split()[-1]
-    if git_version and LooseVersion(git_version) < LooseVersion("2.0"):
+    if git_version and LooseVersion(git_version) < LooseVersion("1.7"):
         if check_diff.return_code > 0:
             with cd(brew_prefix):
                 with settings(warn_only=True):
@@ -362,7 +362,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     with quiet():
         with settings(warn_only=True):
             git_version = env.safe_run_output("git --version").strip().split()[-1]
-    if git_version and LooseVersion(git_version) < LooseVersion("2.0"):
+    if git_version and LooseVersion(git_version) < LooseVersion("1.7"):
         _install_pkg(env, "git", brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
