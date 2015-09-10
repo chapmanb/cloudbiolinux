@@ -2,6 +2,7 @@
 cranrepo: http://cran.fhcrc.org/
 cran:
   - cghFLasso
+  - colorspace
   - devtools
   - ggplot2
   - gsalib
@@ -13,13 +14,17 @@ cran-after-bioc:
 biocrepo: http://bioconductor.org/biocLite.R
 bioc:
  - BiocInstaller
- - BubbleTree
+ - BiocStyle
+ - biovizBase
  - cn.mops
  - DEXSeq
  - DNAcopy
  - GenomicRanges
  - IRanges
+ - limma
  - rtracklayer
+github:
+  - Bioconductor-mirror/BubbleTree@7194a5b;1.99.1
 #github:
 #  - genome/bmm@b49c57a
 #  - chapmanb/sciClone@e8ed9d0

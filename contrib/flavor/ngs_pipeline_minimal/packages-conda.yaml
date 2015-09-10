@@ -1,6 +1,7 @@
 ---
 channels:
-  - https://conda.binstar.org/bcbio
+  - https://conda.anaconda.org/bcbio
+  - https://conda.anaconda.org/r
 bio_nextgen:
   - cnvkit
   - hmmlearn
@@ -9,4 +10,6 @@ bio_nextgen:
   - pyloh
   - phylowgs
   - pytabix
+  - r
+  - r-rgl
   - svtyper
