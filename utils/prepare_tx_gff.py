@@ -262,18 +262,17 @@ def main(org_build, gtf_file, genome_fasta):
     out_dir = os.path.join(build_dir,
                            "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
     tophat_dir = os.path.join(out_dir, "tophat")
-    if genome_fasta:
-        genome_fasta = os.path.abspath(genome_fasta)
-        work_fasta = os.path.join(work_dir, os.path.basename(genome_fasta))
-        if not os.path.exists(work_fasta):
-            shutil.copy(genome_fasta, work_fasta)
-        genome_fasta = work_fasta
-    else:
-        genome_fasta = get_genome_fasta(org_build)
-
     gtf_file = os.path.abspath(gtf_file) if gtf_file else gtf_file
 
     with chdir(work_dir):
+        if genome_fasta:
+            genome_fasta = os.path.abspath(genome_fasta)
+            work_fasta = os.path.join(work_dir, os.path.basename(genome_fasta))
+            if not os.path.exists(work_fasta):
+                shutil.copy(genome_fasta, work_fasta)
+            genome_fasta = work_fasta
+        else:
+            genome_fasta = get_genome_fasta(org_build)
         if not gtf_file:
             write_version(build=build_info)
             build = build_info[org_build]
