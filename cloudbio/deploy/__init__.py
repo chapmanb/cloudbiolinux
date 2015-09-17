@@ -190,7 +190,9 @@ def _setup_cloudbiolinux(options):
         _setup_cloudbiolinux_fabric_properties(env, options)
 
     flavor = get_main_options_string(options, "flavor", DEFAULT_CLOUDBIOLINUX_FLAVOR)
-    _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader)
+    need_distcheck = options.get("fabricrc_overrides", {}).get("use_sudo")
+    _configure_fabric_environment(env, flavor, fabricrc_loader=fabricrc_loader,
+                                  ignore_distcheck=not need_distcheck)
     _setup_image_user_data(env, options)
 
 
