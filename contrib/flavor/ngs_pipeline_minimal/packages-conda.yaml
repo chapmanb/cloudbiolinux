@@ -11,9 +11,10 @@ bio_nextgen:
   - phylowgs
   - pytabix
   - r
-  - r-curl
   - r-devtools
   - r-rcpp
-  - r-stringi
+  - r-rcurl
   - r-rgl
+  - r-rsqlite 
+  - r-stringi
   - svtyper

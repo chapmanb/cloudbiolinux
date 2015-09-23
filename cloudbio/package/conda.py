@@ -6,6 +6,8 @@ from cloudbio.custom import shared
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 
+from fabric.api import settings
+
 def install_packages(env, to_install=None, packages=None):
     if shared._is_anaconda(env):
         conda_bin = shared._conda_cmd(env)
@@ -20,3 +22,9 @@ def install_packages(env, to_install=None, packages=None):
         if len(packages) > 0:
             pkgs_str = " ".join(packages)
             env.safe_run("{conda_bin} install -y {channels} {pkgs_str}".format(**locals()))
+        # remove packages that can cause failures
+        # curl https://github.com/ContinuumIO/anaconda-issues/issues/72
+        problem_packages = ["curl"]
+        pkgs_str = " ".join(problem_packages)
+        with settings(warn_only=True):
+            env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
