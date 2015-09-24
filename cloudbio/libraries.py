@@ -57,7 +57,7 @@ def _make_install_script(out_file, config):
            pinfo <- pkg_name_fn(pname)
            ipkgs <- installed.packages()[,3][pinfo["pkg"]]
            if (is.na(ipkgs[pinfo["pkg"]]) || pinfo["version"] != ipkgs[pinfo["pkg"]])
-             install.fn(pinfo["pname"])
+             try(install.fn(pinfo["pname"]))
         }
         else if (!(is.element(pname, installed.packages()[,1])))
            install.fn(pname)
