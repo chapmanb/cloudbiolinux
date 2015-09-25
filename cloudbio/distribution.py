@@ -291,7 +291,8 @@ def _determine_distribution(env):
         return "centos"
     elif output.find("fedora release") >= 0:
         return "centos"
-    elif output.find("amzn") >= 0:  # Amazon AMIs are Red-Hat based
+    # Amazon AMIs are Red-Hat based
+    elif output.find("amzn") >= 0 or output.find("amazon") >= 0:
         return "centos"
     elif output.find("suse linux") >= 0:
         return "suse"
@@ -307,4 +308,4 @@ def _determine_distribution(env):
     elif env.safe_exists("/System/Library/CoreServices/SystemVersion.plist"):
         return "macosx"
     else:
-        raise Exception("Attempt to automatically determine Linux distribution of target machine failed, please manually specify distribution in fabricrc.txt")
+        raise Exception("Attempt to automatically determine Linux distribution of target machine failed:\n%s" % output)
