@@ -21,7 +21,6 @@ bio_nextgen:
     - spades-binary
   utilities:
     - bamtools
-    - bedtools
     - cramtools
     - biobambam
     - express-binary

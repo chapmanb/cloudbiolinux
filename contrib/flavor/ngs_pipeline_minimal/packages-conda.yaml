@@ -2,7 +2,9 @@
 channels:
   - https://conda.anaconda.org/bcbio
   - https://conda.anaconda.org/r
+  - https://conda.anaconda.org/bioconda
 bio_nextgen:
+  - bedtools=2.24.0
   - cnvkit
   - hmmlearn
   - htseq
