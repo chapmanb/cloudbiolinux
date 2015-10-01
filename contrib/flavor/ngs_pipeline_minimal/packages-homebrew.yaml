@@ -1,5 +1,8 @@
 # Packages available in the Homebrew and Linuxbrew package manager
 ---
+to_remove:
+  - bamtools
+  - bedtools
 minimal:
   - cmake
   - p7zip
@@ -20,7 +23,6 @@ bio_nextgen:
     - age-metasv
     - spades-binary
   utilities:
-    - bamtools
     - cramtools
     - biobambam
     - express-binary

@@ -3,15 +3,21 @@ channels:
   - https://conda.anaconda.org/bcbio
   - https://conda.anaconda.org/r
   - https://conda.anaconda.org/bioconda
+minimal:
 bio_nextgen:
+  - bamtools
   - bedtools=2.24.0
   - cnvkit
+  - cutadapt
   - hmmlearn
   - htseq
   - metasv
   - pyloh
   - phylowgs
   - pytabix
+  - pythonpy
+  - svtyper
+r:
   - r
   - r-devtools
   - r-rcpp
@@ -19,4 +25,3 @@ bio_nextgen:
   - r-rgl
   - r-rsqlite 
   - r-stringi
-  - svtyper

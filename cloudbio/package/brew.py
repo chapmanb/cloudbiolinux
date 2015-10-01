@@ -7,6 +7,8 @@ from distutils.version import LooseVersion
 import os
 import sys
 
+import yaml
+
 from cloudbio.custom import system, shared
 from cloudbio.flavor.config import get_config_file
 from cloudbio.fabutils import quiet, find_cmd
@@ -52,7 +54,9 @@ def install_packages(env, to_install=None, packages=None):
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
     for pkg_str in ["pkg-config", "openssl", "cmake"]:
         _safe_unlink_pkg(env, pkg_str, brew_cmd)
-    for pkg_str in ["curl"]:
+    with open(config_file.base) as in_handle:
+        to_remove = yaml.load(in_handle).get("to_remove", [])
+    for pkg_str in ["curl"] + to_remove:
         _safe_uninstall_pkg(env, pkg_str, brew_cmd)
 
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
