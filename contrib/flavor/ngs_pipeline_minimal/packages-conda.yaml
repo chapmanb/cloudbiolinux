@@ -9,6 +9,7 @@ bio_nextgen:
   - bedtools=2.24.0
   - cnvkit
   - cutadapt
+  - freebayes
   - hmmlearn
   - htseq
   - metasv
@@ -17,6 +18,7 @@ bio_nextgen:
   - pytabix
   - pythonpy
   - svtyper
+  - wham
 r:
   - r
   - r-devtools

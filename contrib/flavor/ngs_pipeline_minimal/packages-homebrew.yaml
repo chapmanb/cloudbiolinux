@@ -3,6 +3,8 @@
 to_remove:
   - bamtools
   - bedtools
+  - freebayes
+  - wham
 minimal:
   - cmake
   - p7zip
@@ -49,7 +51,6 @@ bio_nextgen:
     - bcbio-variation-recall
     - cancerit-allelecount
     - delly;--with-binary
-    - freebayes
     - gatk-framework
     #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
@@ -67,7 +68,6 @@ bio_nextgen:
     - vardict-java
     - vcflib
     - vep
-    - wham;--with-binary
     - qsignature
     # - qsnp # Issues with download and reliability of qcmg site
     # - vcftools # Build problems with default libz on Ubuntu 12.04
