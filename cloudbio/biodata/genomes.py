@@ -751,7 +751,6 @@ def _install_with_ggd(env, manager, gid, recipe):
     recipe_dir = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                os.pardir, os.pardir, "ggd-recipes"))
     recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
-    print recipe_file
     if os.path.exists(recipe_file):
         ggd.install_recipe(env.cwd, recipe_file)
     else:

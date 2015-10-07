@@ -9,14 +9,14 @@
 # https://github.com/hbc/giab_remap_38
 ---
 attributes:
-  name: dream-syn4
+  name: dream-syn4-crossmap
   version: 2014-08-09
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        dir=validation/dream-syn4
+        dir=validation/dream-syn4-crossmap
         orig=synthetic_challenge_set4_tumour_25pctmasked_truth-crossmap-hg38
         mkdir -p $dir
         wget -c https://s3.amazonaws.com/bcbio_nextgen/dream/synthetic_challenge_set4_tumour_25pctmasked_truth-crossmap-hg38.tar.gz
@@ -28,9 +28,9 @@ recipe:
         cp ${orig}_sv_DUP.bed $dir/truth_DUP.bed
         cp ${orig}_sv_INV.bed $dir/truth_INV.bed
     recipe_outfiles:
-      - validation/dream-syn4/truth_small_variants.vcf.gz
-      - validation/dream-syn4/truth_small_variants.vcf.gz.tbi
-      - validation/dream-syn4/truth_regions.bed
-      - validation/dream-syn4/truth_DEL.bed
-      - validation/dream-syn4/truth_DUP.bed
-      - validation/dream-syn4/truth_INV.bed
+      - validation/dream-syn4-crossmap/truth_small_variants.vcf.gz
+      - validation/dream-syn4-crossmap/truth_small_variants.vcf.gz.tbi
+      - validation/dream-syn4-crossmap/truth_regions.bed
+      - validation/dream-syn4-crossmap/truth_DEL.bed
+      - validation/dream-syn4-crossmap/truth_DUP.bed
+      - validation/dream-syn4-crossmap/truth_INV.bed
