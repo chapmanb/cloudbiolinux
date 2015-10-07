@@ -1,0 +1,19 @@
+# Truth sets from Genome in a Bottle for NA12878 -- http://genomeinabottle.org/
+---
+attributes:
+  name: platinum-genome-NA12878
+  version: v8_0_1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/platinum-genome-NA12878
+        mkdir -p $dir
+        wget -c -O $dir/truth_small_variants.vcf.gz ftp://platgene_ro:@ussd-ftp.illumina.com/hg19/8.0.1/NA12878/NA12878.vcf.gz
+        wget -c -O $dir/truth_small_variants.vcf.gz.tbi ftp://platgene_ro:@ussd-ftp.illumina.com/hg19/8.0.1/NA12878/NA12878.vcf.gz.tbi
+        wget -c -O - ftp://platgene_ro:@ussd-ftp.illumina.com/hg19/8.0.1/NA12878/ConfidentRegions.bed.gz | gunzip -c > $dir/truth_regions.bed
+    recipe_outfiles:
+      - validation/platinum-genome-NA12878/truth_small_variants.vcf.gz
+      - validation/platinum-genome-NA12878/truth_small_variants.vcf.gz.tbi
+      - validation/platinum-genome-NA12878/truth_regions.bed

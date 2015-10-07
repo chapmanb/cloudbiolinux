@@ -1,0 +1,35 @@
+# Truth sets from the DREAM genomic challenge 3
+# https://www.synapse.org/#!Synapse:syn312572/wiki/62018
+#
+# Originally retrieved from https://www.synapse.org/#!Synapse:syn2177211
+# and prepared with this script:
+# https://github.com/chapmanb/bcbio-nextgen/blob/master/scripts/utils/format_dream_truthset.py
+---
+attributes:
+  name: dream-syn3
+  version: 2014-08-04
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/dream-syn3
+        orig=synthetic_challenge_set3_tumor_20pctmasked_truth
+        mkdir -p $dir
+        wget https://s3.amazonaws.com/bcbio_nextgen/dream/synthetic_challenge_set3_tumor_20pctmasked_truth.tar.gz
+        tar -xzvpf synthetic_challenge_set3_tumor_20pctmasked_truth.tar.gz
+        cp ${orig}.vcf.gz $dir/truth_small_variants.vcf.gz
+        cp ${orig}.vcf.gz.tbi $dir/truth_small_variants.vcf.gz.tbi
+        cp ${orig}_regions.bed $dir/truth_regions.bed
+        cp ${orig}_sv_DEL.bed $dir/truth_DEL.bed 
+        cp ${orig}_sv_DUP.bed $dir/truth_DUP.bed
+        cp ${orig}_sv_INS.bed $dir/truth_INS.bed
+        cp ${orig}_sv_INV.bed $dir/truth_INV.bed
+    recipe_outfiles:
+      - validation/dream-syn3/truth_small_variants.vcf.gz
+      - validation/dream-syn3/truth_small_variants.vcf.gz.tbi
+      - validation/dream-syn3/truth_regions.bed
+      - validation/dream-syn3/truth_DEL.bed
+      - validation/dream-syn3/truth_DUP.bed
+      - validation/dream-syn3/truth_INS.bed
+      - validation/dream-syn3/truth_INV.bed
