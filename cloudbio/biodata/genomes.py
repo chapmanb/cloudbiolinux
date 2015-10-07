@@ -467,7 +467,8 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         org_dir = os.path.join(genome_dir, orgname, gid)
         if not env.safe_exists(org_dir):
             env.safe_run('mkdir -p %s' % org_dir)
-        for idx in genome_indexes + manager.config.get("annotations", []):
+        ggd_recipes = manager.config.get("annotations", []) + manager.config.get("validation", [])
+        for idx in genome_indexes + ggd_recipes:
             with cd(org_dir):
                 if not env.safe_exists(idx):
                     finished = False
@@ -480,7 +481,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                             raise
                         except:
                             # Fail on incorrect GGD recipes
-                            if idx in manager.config.get("annotations", []) and method == "ggd":
+                            if idx in ggd_recipes and method == "ggd":
                                 raise
                             else:
                                 env.logger.info("Genome preparation method {0} failed, trying next".format(method))
@@ -750,6 +751,7 @@ def _install_with_ggd(env, manager, gid, recipe):
     recipe_dir = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                os.pardir, os.pardir, "ggd-recipes"))
     recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
+    print recipe_file
     if os.path.exists(recipe_file):
         ggd.install_recipe(env.cwd, recipe_file)
     else:
