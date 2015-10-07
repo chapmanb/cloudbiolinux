@@ -1,0 +1,36 @@
+# Truth sets from the DREAM genomic challenge 4
+# https://www.synapse.org/#!Synapse:syn312572/wiki/62018
+#
+# Originally retrieved from https://www.synapse.org/#!Synapse:syn2177211
+# and prepared with this script:
+# https://github.com/chapmanb/bcbio-nextgen/blob/master/scripts/utils/format_dream_truthset.py
+#
+# Converted to hg38 coordinates with CrossMap:
+# https://github.com/hbc/giab_remap_38
+---
+attributes:
+  name: dream-syn4
+  version: 2014-08-09
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/dream-syn4
+        orig=synthetic_challenge_set4_tumour_25pctmasked_truth-crossmap-hg38
+        mkdir -p $dir
+        wget -c https://s3.amazonaws.com/bcbio_nextgen/dream/synthetic_challenge_set4_tumour_25pctmasked_truth-crossmap-hg38.tar.gz
+        tar -xzvpf ${orig}.tar.gz
+        cp ${orig}.vcf.gz $dir/truth_small_variants.vcf.gz
+        cp ${orig}.vcf.gz.tbi $dir/truth_small_variants.vcf.gz.tbi
+        cp ${orig}_regions.bed $dir/truth_regions.bed
+        cp ${orig}_sv_DEL.bed $dir/truth_DEL.bed 
+        cp ${orig}_sv_DUP.bed $dir/truth_DUP.bed
+        cp ${orig}_sv_INV.bed $dir/truth_INV.bed
+    recipe_outfiles:
+      - validation/dream-syn4/truth_small_variants.vcf.gz
+      - validation/dream-syn4/truth_small_variants.vcf.gz.tbi
+      - validation/dream-syn4/truth_regions.bed
+      - validation/dream-syn4/truth_DEL.bed
+      - validation/dream-syn4/truth_DUP.bed
+      - validation/dream-syn4/truth_INV.bed
