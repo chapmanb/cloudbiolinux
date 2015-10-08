@@ -45,6 +45,7 @@ genomes:
     name: Mouse (mm10)
     dbsnp: true
     rnaseq: true
+    annotation: [mirbase]
   - dbkey: rn5
     name: Rat (rn5)
     rnaseq: true
