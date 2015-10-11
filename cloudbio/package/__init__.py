@@ -52,26 +52,19 @@ def _connect_native_packages(env, pkg_install, lib_install):
     if bin_dir not in path and env.safe_exists(env.shell_config):
         if not env.safe_contains(env.shell_config, exports["path"]):
             env.safe_append(env.shell_config, exports["path"])
-    if not env.safe_contains(env.shell_config, exports["ld_library"]):
-        env.safe_append(env.shell_config, exports["ld_library"])
-    if not env.safe_contains(env.shell_config, exports["perl"]):
-        env.safe_append(env.shell_config, exports["perl"])
     if "python" in pkg_install and "python" in lib_install:
         _create_local_virtualenv(env.system_install)
 
 def _get_shell_exports(env):
     bin_dir = os.path.join(env.system_install, "bin")
-    ldlib_path = os.path.join(env.system_install, "lib")
-    return {"path": "export PATH=%s:$PATH" % bin_dir,
-            "ld_library": "export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH" % ldlib_path,
-            "perl": "export PERL5LIB=%s/lib/perl5:${PERL5LIB}" % env.system_install}
+    return {"path": "export PATH=%s:$PATH" % bin_dir}
 
 def _print_shell_exports(env):
     """Print a set of exports to add to shell in isolated installations.
     """
     exports = _get_shell_exports(env)
     print "\nIsolated installation: add the following to your shell to include installed files:"
-    for e in ["path", "ld_library", "perl"]:
+    for e in ["path"]:
         print exports[e]
 
 def _create_local_virtualenv(target_dir):
