@@ -17,6 +17,7 @@ bio_nextgen:
   - phylowgs
   - pytabix
   - pythonpy
+  - scalpel
   - svtyper
   - wham
 r:

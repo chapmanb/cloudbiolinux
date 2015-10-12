@@ -359,7 +359,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """
     for dep in ["openssl"]:
         _safe_link_pkg(env, dep, brew_cmd)
-    for dep in ["expat", "pkg-config", "cmake", "xz"]:
+    for dep in ["expat", "pkg-config", "xz"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     # check if we have an older git and need to install it from brew
     git_version = None

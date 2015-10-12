@@ -4,9 +4,9 @@ to_remove:
   - bamtools
   - bedtools
   - freebayes
+  - scalpel
   - wham
 minimal:
-  - cmake
   - p7zip
   - pkg-config
   - s3gof3r
@@ -61,7 +61,6 @@ bio_nextgen:
     - pindel
     - platypus-variant
     - rtg-tools
-    - scalpel
     - snpeff
     - theta2
     - vardict
