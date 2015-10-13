@@ -7,11 +7,12 @@ work with the default Linux kernel. A running 64-bit Linux kernel can run both
 box...
 
 Together with the BioLinux fabric environment, any KMV VM can be
-bootstrapped. Here we start from a bare Debian/Ubuntu/Mint installation. With
-Debian you can install from a fresh download of
-[stable](http://www.debian.org/releases/stable/) version burning it on a CDROM.
-The default install will do on, say, a 6GB partition - so the rest can be used
-for LVM partitioning. Select ssh and the standard system utilities.
+bootstrapped. Here we start from a bare Debian/Ubuntu
+installation. With Debian you can install from a fresh download of
+[stable](http://www.debian.org/releases/stable/) version burning it on
+a CDROM.  The default install will do on, say, a 10GB partition - so
+the rest can be used for LVM partitioning. Select ssh and the standard
+system utilities.
 
 # Install KVM
 
@@ -26,35 +27,40 @@ and add your user to the kvm group. E.g.
 
 For non-Debian systems see, for example, [OpenSuse](http://doc.opensuse.org/documentation/html/openSUSE/opensuse-kvm/cha.kvm.requires.html).
 
-Note that not all machines support virtualization, and if they do you may need
-to switch it on in the BIOS (especially true on older hardware). Check for CPU support with:
+Note that not all machines support virtualization, and if they do you
+may need to switch it on in the BIOS (especially true on older
+hardware). Check for CPU support with:
 
     egrep --color '(vmx|svm)' /proc/cpuinfo
 
-Also note that on older Linux installations may need a kernel upgrade. Start KVM
-with
+Also note that some older Linux installations may need a kernel
+upgrade. Start KVM with
 
     /etc/init.d/qemu-kvm start
 
+or with later versions
+
+    /etc/init.d/qemu-system-x86 start
+
 # Create a bare VM
 
-Download a live installation image file. For example fetch a standard or network image from
+Download a live installation image file. For example fetch a standard
+or network image from [[http://www.debian.org/][Debian]].
 
-      http://cdimage.debian.org/cdimage/release/7.5.0/amd64/iso-cd/
+Reserve space on the disk partition - this should be enough for a
+Debian install and updates.
 
-Next reserve space on the disk partition 
-
-      qemu-img create hda.img -opreallocation=metadata -ocluster_size=2M -f qcow2 4G
+      qemu-img create hda.img -opreallocation=metadata -ocluster_size=2M -f qcow2 10G
 
 (settings suggested by Red Hat) and fire up the VM
 
       kvm debian-live-$(VER).img -hda hda.img -curses -no-reboot -serial pty
 
-The CloudBioLinux integration test system does something similar, starting from
-the smaller net install of Debian Linux:
+Alternatively use the netinstall. The CloudBioLinux integration test
+system does something similar, starting from the smaller net install
+of Debian Linux:
 
-      wget http://cdimage.debian.org/debian-cd/6.0.3/amd64/iso-cd/debian-6.0.3-amd64-netinst.iso
-      qemu-system-x86_64 -cdrom debian-6.0.3-amd64-netinst.iso -hda hda.img
+      qemu-system-x86_64 -enable-kvm -cdrom debian-$(VER)-amd64-netinst.iso -hda hda.img
 
 hit ESC and optionally type 'install fb=false' to disable the frame buffer.
 Fire up the installer. Note that the file system of the installer can be slow,
