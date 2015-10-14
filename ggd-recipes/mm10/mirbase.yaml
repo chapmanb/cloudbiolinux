@@ -2,7 +2,7 @@
 ---
 attributes:
   name: sranseq
-  version: 20151008
+  version: 20151014
 recipe:
   full:
     recipe_type: bash
@@ -11,9 +11,9 @@ recipe:
         mkdir -p srnaseq
         cd srnaseq
         wget -q -nc http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/wgEncodeGencodeBasicVM4.txt.gz
-        zcat  wgEncodeGencodeBasicVM4.txt.gz | awk '{print $3"\t.\tencode\t"$5"\t"$6"\t.\t"$4"\t.\tname "$13";"}' | awk '$5-$4 < 500' > srna-transcripts.gtf
+        zcat  wgEncodeGencodeBasicVM4.txt.gz | awk '{print $3"\t.\tencode\t"$5+1"\t"$6"\t.\t"$4"\t.\tname "$13";"}' | awk '$5-$4 < 500' > srna-transcripts.gtf
         wget -q -nc http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/tRNAs.txt.gz
-        zcat tRNAs.txt.gz | awk '{print $2"\t.\ttRNA\t"$3"\t"$4"\t.\t"$7"\t.\tname "$5";"}' >> srna-transcripts.gtf
+        zcat tRNAs.txt.gz | awk '{print $2"\t.\ttRNA\t"$3+1"\t"$4"\t.\t"$7"\t.\tname "$5";"}' >> srna-transcripts.gtf
         wget -q -nc http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/rmsk.txt.gz
         zcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' >> srna-transcripts.gtf
         wget -nc -q ftp://mirbase.org/pub/mirbase/20/genomes/mmu.gff3
