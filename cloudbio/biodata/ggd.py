@@ -57,7 +57,7 @@ def _run_recipe(work_dir, recipe_cmds, recipe_type):
     assert recipe_type == "bash", "Can only currently run bash recipes"
     run_file = os.path.join(work_dir, "ggd-run.sh")
     with open(run_file, "w") as out_handle:
-        out_handle.write("#!/bin/bash\nset -eu -o pipefail\n")
+        out_handle.write("#!/bin/bash\nset -eu -o pipefail\nexport PATH=%s/bin:$PATH\n" % env.system_install)
         out_handle.write("\n".join(recipe_cmds))
     subprocess.check_output(["bash", run_file])
 
