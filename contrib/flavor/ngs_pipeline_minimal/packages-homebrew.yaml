@@ -19,7 +19,6 @@ bio_nextgen:
     - bwakit
     - bowtie2;--without-tbb
     - novoalign
-    - rna-star
     # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
     - tophat-binary
   assembly:

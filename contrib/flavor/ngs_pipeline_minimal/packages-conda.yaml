@@ -24,6 +24,7 @@ bio_nextgen:
   - subread
   - svtyper
   - wham
+  - star
 r:
   - r
   - r-devtools
