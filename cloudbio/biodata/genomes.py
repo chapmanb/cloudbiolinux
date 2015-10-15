@@ -692,18 +692,14 @@ def _index_sam(ref_file):
     return ref_file
 
 def _index_star(ref_file):
-    (ref_dir, local_file) = os.path.split(ref_file)
-    gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
-    if not os.path.exists(gtf_file):
-        print "%s not found, skipping creating the STAR index." % (gtf_file)
-        return None
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
     cpu = mp.cpu_count()
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
-           "--runMode genomeGenerate --sjdbOverhang 99 --sjdbGTFfile %s --genomeSAindexNbases %s" % (dir_name, str(cpu), gtf_file, Nbases))
+           "--runMode genomeGenerate "
+           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases))
     return _index_w_command(dir_name, cmd, ref_file)
 
 def _index_snap(ref_file):
