@@ -691,7 +691,9 @@ def _index_sam(ref_file):
     galaxy.index_picard(ref_file)
     return ref_file
 
+@_if_installed("STAR")
 def _index_star(ref_file):
+    (ref_dir, local_file) = os.path.split(ref_file)
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
@@ -700,7 +702,21 @@ def _index_star(ref_file):
            "--runThreadN %s "
            "--runMode genomeGenerate "
            "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases))
-    return _index_w_command(dir_name, cmd, ref_file)
+    if not env.safe_exists(os.path.join(dir_name, "SA")):
+        _index_w_command(dir_name, cmd, ref_file)
+    return dir_name
+
+@_if_installed("hisat2-build")
+def _index_hisat2(ref_file):
+    (ref_dir, local_file) = os.path.split(ref_file)
+    build = os.path.splitext(os.path.basename(ref_file))[0]
+    dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
+    index_prefix = os.path.join(dir_name, build)
+    cpu = mp.cpu_count()
+    cmd = ("hisat2-build {ref_file} {index_prefix}".format(**locals()))
+    if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
+        _index_w_command(dir_name, cmd, ref_file)
+    return dir_name
 
 def _index_snap(ref_file):
     """Snap indexing is computationally expensive. Ask for all cores and need 64Gb of memory.
@@ -925,4 +941,5 @@ INDEX_FNS = {
     "star": _index_star,
     "snap": _index_snap,
     "rtg": _index_rtg,
+    "hisat2": _index_hisat2
     }
