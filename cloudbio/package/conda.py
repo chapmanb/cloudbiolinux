@@ -27,9 +27,9 @@ def install_packages(env, to_install=None, packages=None):
             pkgs_str = " ".join(packages)
             env.safe_run("{conda_bin} install -y {channels} {pkgs_str}".format(**locals()))
             for package in packages:
-                _symlink_bin(package, env, conda_info, conda_bin)
+                _link_bin(package, env, conda_info, conda_bin)
         for pkg in ["python", "conda", "pip"]:
-            _symlink_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
+            _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
         # remove packages that can cause failures
         # curl https://github.com/ContinuumIO/anaconda-issues/issues/72
         problem_packages = ["curl"]
@@ -37,11 +37,15 @@ def install_packages(env, to_install=None, packages=None):
         with settings(warn_only=True):
             env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
 
-def _symlink_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
-    """Symlink files installed in the bin directory into install directory.
+def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
+    """Link files installed in the bin directory into the install directory.
+
+    This is imperfect but we're trying not to require injecting everything in the anaconda
+    directory into a user's path.
     """
     package = package.split("=")[0]
     final_bindir = os.path.join(env.system_install, "bin")
+    base_bindir = os.path.dirname(conda_bin)
     for pkg_subdir in json.loads(env.safe_run_output("{conda_bin} list --json -f {package}".format(**locals()))):
         for pkg_dir in conda_info["pkgs_dirs"]:
             pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
@@ -50,21 +54,29 @@ def _symlink_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
                     with quiet():
                         files = env.safe_run_output("ls -1 {pkg_bindir}".format(**locals())).split()
                 for fname in files:
-                    _do_symlink(os.path.join(pkg_bindir, fname),
-                                os.path.join(final_bindir, "%s%s" % (prefix, fname)))
+                    # symlink to the original file in the /anaconda/bin directory
+                    # this could be a hard or soft link
+                    base_fname = os.path.join(base_bindir, fname)
+                    if os.path.exists(base_fname) and os.path.lexists(base_fname):
+                        _do_link(base_fname,
+                                 os.path.join(final_bindir, "%s%s" % (prefix, fname)))
 
-def _do_symlink(orig_file, final_file):
-    """Perform a symlink of the original file into the final location, removing exists.
+def _do_link(orig_file, final_file):
+    """Perform a soft link of the original file into the final location.
+
+    We need the symlink to point to /anaconda/bin directory, not the real location
+    in the pkgs directory so conda can resolve LD_LIBRARY_PATH and the interpreters.
     """
-    needs_symlink = True
+    needs_link = True
     # working symlink, check if already in the right place or remove it
     if os.path.exists(final_file):
-        if os.path.realpath(final_file) == os.path.realpath(orig_file):
-            needs_symlink = False
+        if (os.path.realpath(final_file) == os.path.realpath(orig_file) and
+              orig_file == os.path.normpath(os.path.join(os.path.dirname(final_file), os.readlink(final_file)))):
+            needs_link = False
         else:
             os.remove(final_file)
     # broken symlink
     elif os.path.lexists(final_file):
         os.unlink(final_file)
-    if needs_symlink:
+    if needs_link:
         os.symlink(os.path.relpath(orig_file, os.path.dirname(final_file)), final_file)

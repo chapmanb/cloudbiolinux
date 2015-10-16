@@ -7,9 +7,11 @@ minimal:
 bio_nextgen:
   - bamtools
   - bedtools=2.24.0
+  - bio-vcf
   - cnvkit
   - cutadapt
   - freebayes
+  - grabix
   - hmmlearn
   - htseq
   - metasv
@@ -17,7 +19,9 @@ bio_nextgen:
   - phylowgs
   - pytabix
   - pythonpy
+  - sailfish
   - scalpel
+  - subread
   - svtyper
   - wham
 r:

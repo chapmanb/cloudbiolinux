@@ -3,7 +3,6 @@ bio_nextgen:
   alignment:
   utilities:
     - rnaseqc
-    - featurecounts
   analysis:
     - picard
   variant:

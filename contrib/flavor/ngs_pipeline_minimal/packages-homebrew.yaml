@@ -4,6 +4,7 @@ to_remove:
   - bamtools
   - bedtools
   - freebayes
+  - grabix
   - scalpel
   - wham
 minimal:
@@ -29,7 +30,6 @@ bio_nextgen:
     - biobambam
     - express-binary
     - fastqc
-    - grabix
     - picard-tools
     - qualimap
     - kraken
