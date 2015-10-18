@@ -13,18 +13,21 @@ bio_nextgen:
   - freebayes
   - grabix
   - hmmlearn
+  - hisat2
   - htseq
   - metasv
+  - moreutils
   - pyloh
   - phylowgs
   - pytabix
   - pythonpy
   - sailfish
   - scalpel
+  - star
   - subread
   - svtyper
   - wham
-  - star
+  - varscan
 r:
   - r
   - r-devtools
