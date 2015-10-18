@@ -35,7 +35,7 @@ except:
 
 from bcbio.utils import chdir, safe_makedir, file_exists
 from bcbio.rnaseq.gtf import gtf_to_fasta
-
+from bcbio.distributed.transaction import file_transaction
 
 # ##  Version and retrieval details for Ensembl and UCSC
 ensembl_release = "79"
@@ -205,7 +205,6 @@ class SequenceDictParser(object):
         md5 = line.split("\t")[4].split(":")[1]
         return md5, name
 
-
 def get_ensembl_dict(org_build):
     genome_dict = org_build + ".dict"
     if not os.path.exists(genome_dict):
@@ -223,14 +222,12 @@ def get_ucsc_dict(org_build):
         fa_dict = make_fasta_dict(fa_file)
     return fa_dict
 
-
 def make_fasta_dict(fasta_file):
     dict_file = os.path.splitext(fasta_file.replace(".fa.gz", ".fa"))[0] + ".dict"
     if not os.path.exists(dict_file):
         subprocess.check_call("picard CreateSequenceDictionary R={fasta_file} "
                               "O={dict_file}".format(**locals()), shell=True)
     return dict_file
-
 
 def _download_ensembl_genome(org_build):
     build = build_info[org_build]
@@ -295,6 +292,7 @@ def main(org_build, gtf_file, genome_fasta):
         prepare_tophat_index(gtf_file, org_build, genome_fasta)
         transcriptome_fasta = make_transcriptome_fasta(gtf_file, genome_fasta)
         prepare_kallisto_index(transcriptome_fasta, org_build)
+        make_hisat2_splicesites(gtf_file)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
         if os.path.exists(rnaseq_dir):
@@ -306,6 +304,19 @@ def main(org_build, gtf_file, genome_fasta):
 
     tar_dirs = [out_dir]
     tarball = create_tarball(tar_dirs, org_build)
+
+def make_hisat2_splicesites(gtf_file):
+    base, _ = os.path.splitext(gtf_file)
+    out_file = os.path.join(base + "-splicesites.txt")
+    hisat2_script = os.path.join(os.path.dirname(sys.executable),
+                                 "extract_splice_sites.py")
+    cmd = "{hisat2_script} {gtf_file} > {out_file}"
+    if file_exists(out_file):
+        return out_file
+    if not file_exists(hisat2_script):
+        return None
+    subprocess.check_call(cmd.format(**locals()), shell=True)
+    return out_file
 
 def make_transcriptome_fasta(gtf_file, genome_fasta):
     base, _ = os.path.splitext(gtf_file)
