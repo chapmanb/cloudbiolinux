@@ -24,6 +24,7 @@ bio_nextgen:
   - sailfish
   - scalpel
   - star
+  - stringtie
   - subread
   - svtyper
   - wham
