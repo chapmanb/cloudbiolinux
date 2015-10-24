@@ -601,15 +601,6 @@ def _biotype_lookup_fn(gtf):
     else:
         return None
 
-def gtf_to_genepred(gtf):
-    out_file = os.path.splitext(gtf)[0] + ".genePred"
-    if file_exists(out_file):
-        return out_file
-
-    cmd = "gtfToGenePred -allErrors -genePredExt {gtf} {out_file}"
-    subprocess.check_call(cmd.format(**locals()), shell=True)
-    return out_file
-
 def prepare_tx_gff(build, org_name):
     """Prepare UCSC ready transcript file given build information.
     """
