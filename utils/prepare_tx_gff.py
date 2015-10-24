@@ -280,8 +280,9 @@ def main(org_build, gtf_file, genome_fasta):
             if not os.path.exists(work_gtf):
                 shutil.copy(gtf_file, work_gtf)
             gtf_file = work_gtf
-        gtf_file = clean_gtf(gtf_file, genome_fasta)
         db = _get_gtf_db(gtf_file)
+        os.remove(gtf_file)
+        gtf_file = db_to_gtf(db, gtf_file)
         gtf_to_refflat(gtf_file)
         gtf_to_bed(gtf_file)
         prepare_dexseq(gtf_file)
@@ -328,7 +329,7 @@ def clean_gtf(gtf_file, genome_fasta):
     """
     remove transcripts that have the following properties
     1) don't have a corresponding ID in the reference
-    2) are bugged in the gencode release (Selenocysteine)
+    2) gencode Selenocysteine features which break many downstream tools
     3) are not associated with a gene (no gene_id field)
     """
     temp_gtf = tempfile.NamedTemporaryFile(suffix=".gtf").name
@@ -337,7 +338,7 @@ def clean_gtf(gtf_file, genome_fasta):
         for line in in_gtf:
             if line.startswith("#"):
                 continue
-            # these are bugged in the gencode release
+            # these cause problems with downstream tools and we don't use them
             if "Selenocysteine" in line:
                 continue
             if line.split()[0].strip() not in fa_names:
@@ -408,7 +409,6 @@ def gtf_to_genepred(gtf):
     out_file = os.path.splitext(gtf)[0] + ".genePred"
     if file_exists(out_file):
         return out_file
-
     cmd = "gtfToGenePred -allErrors -ignoreGroupsWithoutExons -genePredExt {gtf} {out_file}"
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file
@@ -442,6 +442,15 @@ def gtf_to_bed(gtf):
                     feature['gene_id'][0])
             line = "\t".join(map(str, [chrom, start, end, name, ".", strand]))
             out_handle.write(line + "\n")
+    return out_file
+
+def db_to_gtf(db, out_file):
+    if file_exists(out_file):
+        return out_file
+    print "Writing out merged GTF file to %s." % out_file
+    with open(out_file, "w") as out_handle:
+        for feature in db.all_features():
+            out_handle.write(str(feature) + "\n")
     return out_file
 
 def make_miso_events(gtf, org_build):
@@ -645,12 +654,7 @@ def _download_ensembl_gff(build, org_name):
         subprocess.check_call(["gunzip", os.path.basename(dl_url)])
     return out_file
 
-def guess_infer_extent(gtf_file):
-    """
-    guess if we need to use the gene extent option when making a gffutils
-    database by making a tiny database of 1000 lines from the original
-    GTF and looking for all of the features
-    """
+def _create_tiny_gffutils_db(gtf_file):
     _, ext = os.path.splitext(gtf_file)
     tmp_out = tempfile.NamedTemporaryFile(suffix=".gtf", delete=False).name
     with open(tmp_out, "w") as out_handle:
@@ -662,23 +666,79 @@ def guess_infer_extent(gtf_file):
             out_handle.write(line)
             count += 1
         in_handle.close()
-    db = gffutils.create_db(tmp_out, dbfn=":memory:", infer_gene_extent=False)
+    db = gffutils.create_db(tmp_out, dbfn=":memory:",
+                            disable_infer_genes=True,
+                            disable_infer_transcripts=True)
     os.remove(tmp_out)
+    return db
+
+
+def subfeature_handler(f):
+    """
+    Given a gffutils.Feature object (which does not yet have its ID assigned),
+    figure out what its ID should be.
+    This is intended to be used for CDS, UTR, start_codon, and stop_codon
+    features in the Ensembl release 81 GTF files.  I figured a reasonable
+    unique ID would consist of the parent transcript and the feature type,
+    followed by an autoincrementing number.
+    See https://pythonhosted.org/gffutils/database-ids.html#id-spec for
+    details and other options.
+    Grabbed from Ryan Dale: https://www.biostars.org/p/152517/
+    """
+    return ''.join(
+        ['autoincrement:',
+         f.attributes['transcript_id'][0],
+         '_',
+         f.featuretype])
+
+def guess_disable_infer_extent(gtf_file):
+    """
+    guess if we need to use disable the infer gene or transcript extent option
+    when making a gffutils database by making a tiny database of 1000 lines
+    from the original GTF and looking for all of the features
+    """
+    db = _create_tiny_gffutils_db(gtf_file)
     features = [x for x in db.featuretypes()]
-    if "gene" in features and "transcript" in features:
-        return False
-    else:
-        return True
+    disable_infer_transcript = "transcript" in features
+    disable_infer_gene = "gene" in features
+    return disable_infer_transcript, disable_infer_gene
+
+def guess_id_spec(gtf_file):
+    """
+    guess at the id spec in a GTF file by examining the first 1000 lines
+    assigns unique ids to features that may not have them
+    """
+    db = _create_tiny_gffutils_db(gtf_file)
+    id_spec = {}
+    attributes = set()
+    for f in db.all_features():
+        attributes.update(f.attributes)
+    if "gene_id" in attributes:
+        id_spec["gene"] = "gene_id"
+        attributes.remove("gene_id")
+    if "transcript_id" in attributes:
+        id_spec["transcript"] = "transcript_id"
+        attributes.remove("transcript_id")
+    # for attribute in attributes:
+    #     id_spec[attribute] = subfeature_handler
+    return id_spec
 
 def _get_gtf_db(gtf):
     db_file = gtf + ".db"
     if not file_exists(db_file):
         print "Creating gffutils database for %s." % (gtf)
-        infer_extent = guess_infer_extent(gtf)
-        if infer_extent:
-            print ("'transcript' and 'gene' entries not found, so inferring"
+        disable_infer_transcripts, disable_infer_genes = guess_disable_infer_extent(gtf)
+        if not disable_infer_transcripts or not disable_infer_genes:
+            print ("'transcript' or 'gene' entries not found, so inferring"
                    "their extent. This can be very slow.")
-        gffutils.create_db(gtf, dbfn=db_file, infer_gene_extent=infer_extent)
+        id_spec = guess_id_spec(gtf)
+        gffutils.create_db(gtf, dbfn=db_file,
+                           disable_infer_genes=disable_infer_genes,
+                           disable_infer_transcripts=disable_infer_transcripts,
+                           id_spec=id_spec,
+                           merge_strategy="create_unique",
+                           keep_order=True,
+                           verbose=True)
     return gffutils.FeatureDB(db_file)
 
 def _dexseq_preparation_path():
