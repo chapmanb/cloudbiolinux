@@ -713,7 +713,7 @@ def _index_hisat2(ref_file):
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
     index_prefix = os.path.join(dir_name, build)
     cpu = mp.cpu_count()
-    cmd = ("hisat2-build {ref_file} {index_prefix}".format(**locals()))
+    cmd = ("hisat2-build -p {cpu} {ref_file} {index_prefix}".format(**locals()))
     if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name
