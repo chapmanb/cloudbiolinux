@@ -1,12 +1,12 @@
 ---
 channels:
-  - https://conda.anaconda.org/bcbio
-  - https://conda.anaconda.org/r
-  - https://conda.anaconda.org/bioconda
+  - bioconda
 minimal:
 bio_nextgen:
   - bamtools
+  - bcftools
   - bedtools=2.24.0
+  - bwa
   - bio-vcf
   - cnvkit
   - cutadapt
@@ -17,11 +17,13 @@ bio_nextgen:
   - htseq
   - metasv
   - moreutils
+  - parallel
   - pyloh
   - phylowgs
   - pytabix
   - pythonpy
   - sailfish
+  - samtools
   - scalpel
   - star
   - stringtie

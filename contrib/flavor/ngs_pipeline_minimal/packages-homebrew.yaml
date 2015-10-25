@@ -2,9 +2,12 @@
 ---
 to_remove:
   - bamtools
+  - bcftools
   - bedtools
+  - bwa
   - freebayes
   - grabix
+  - samtools
   - scalpel
   - wham
 minimal:
@@ -15,7 +18,6 @@ perl:
   - cpanminus
 bio_nextgen:
   alignment:
-    - bwa
     - bwakit
     - bowtie2;--without-tbb
     - novoalign
@@ -41,10 +43,8 @@ bio_nextgen:
     - sickle
   analysis:
     - cufflinks-binary
-    - samtools;--without-curses
     - samtools-library-0.1
     - htslib
-    - bcftools
     - seqbuster
   variant:
     - bcbio-variation-recall
