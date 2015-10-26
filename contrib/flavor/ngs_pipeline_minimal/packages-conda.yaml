@@ -1,6 +1,8 @@
 ---
 channels:
+  - bcbio
   - bioconda
+  - r
 minimal:
 bio_nextgen:
   - bamtools
