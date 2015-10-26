@@ -354,7 +354,6 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """Install baseline brew components not handled by dependency system.
 
     - Installation of required Perl libraries.
-    - Ensures installed samtools does not overlap with bcftools
     - Upgrades any package dependencies
     """
     for dep in ["openssl"]:
@@ -370,19 +369,6 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
         _install_pkg(env, "git", brew_cmd, ipkgs)
     for dep in ["sambamba"]:  # Avoid conflict with homebrew-science sambamba
         env.safe_run("{brew_cmd} remove --force {dep}".format(**locals()))
-    # if installing samtools, avoid bcftools conflicts
-    if len([x for x in packages if x.find("samtools") >= 0]):
-        with settings(warn_only=True):
-            def _has_prog(prog):
-                try:
-                    return int(env.safe_run_output("{brew_cmd} list samtools | grep -c {prog} | cat".format(
-                        brew_cmd=brew_cmd, prog=prog)))
-                except ValueError:
-                    return 0
-            if any(_has_prog(p) for p in ["bctools", "vcfutils.pl"]):
-                env.safe_run("{brew_cmd} uninstall {pkg}".format(brew_cmd=brew_cmd, pkg="samtools"))
-                ipkgs["current"].pop("samtools", None)
-        _install_pkg_latest(env, "samtools", ["--without-curses"], brew_cmd, ipkgs)
     for dependency in ["htslib"]:
         if dependency in packages:
             if (dependency in ipkgs["outdated"] or "chapmanb/cbl/%s" % dependency in ipkgs["outdated"]
