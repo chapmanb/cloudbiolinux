@@ -1,0 +1,20 @@
+---
+attributes:
+  name: ancestral
+  version: 20151027
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/bcbio_nextgen/human_ancestor.fa.gz
+        mkdir -p variations
+        cd variations
+        wget -c $baseurl
+        wget -c $baseurl.fai
+        wget -c $baseurl.gzi
+    recipe_outfiles:
+        - variations/human_ancestor.fa.gz
+        - variations/human_ancestor.fa.gz.fai
+        - variations/human_ancestor.fa.gz.gzi
+ 
