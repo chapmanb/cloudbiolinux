@@ -252,8 +252,9 @@ def write_version(build=None, gtf_file=None):
 
 # ## Main driver functions
 
-def main(org_build, gtf_file, genome_fasta):
-    build_dir = os.path.abspath(os.path.join(os.curdir, org_build))
+def main(org_build, gtf_file, genome_fasta, genome_dir):
+    genome_dir = genome_dir if genome_dir else os.curdir
+    build_dir = os.path.abspath(os.path.join(genome_dir, org_build))
     work_dir = os.path.join(build_dir, "tmpcbl")
     safe_makedir(work_dir)
     out_dir = os.path.join(build_dir,
@@ -261,14 +262,15 @@ def main(org_build, gtf_file, genome_fasta):
     tophat_dir = os.path.join(out_dir, "tophat")
     gtf_file = os.path.abspath(gtf_file) if gtf_file else gtf_file
 
+    if genome_fasta:
+        genome_fasta = os.path.abspath(genome_fasta)
+        work_fasta = os.path.join(work_dir, os.path.basename(genome_fasta))
+        if not os.path.exists(work_fasta):
+            shutil.copy(genome_fasta, work_fasta)
+        genome_fasta = work_fasta
+
     with chdir(work_dir):
-        if genome_fasta:
-            genome_fasta = os.path.abspath(genome_fasta)
-            work_fasta = os.path.join(work_dir, os.path.basename(genome_fasta))
-            if not os.path.exists(work_fasta):
-                shutil.copy(genome_fasta, work_fasta)
-            genome_fasta = work_fasta
-        else:
+        if not genome_fasta:
             genome_fasta = get_genome_fasta(org_build)
         if not gtf_file:
             write_version(build=build_info)
@@ -371,7 +373,7 @@ def cleanup(work_dir, out_dir, org_build):
     shutil.move(work_dir, out_dir)
 
 def create_tarball(tar_dirs, org_build):
-    str_tar_dirs = " ".join(os.path.relpath(d) for d in tar_dirs)
+    str_tar_dirs = " ".join(tar_dirs)
     tarball = "{org}-{dir}.tar.xz".format(org=org_build, dir=os.path.basename(tar_dirs[0]))
     if not os.path.exists(tarball):
         subprocess.check_call("tar -cvpf - {out_dir} | xz -zc - > {tarball}".format(
@@ -778,6 +780,15 @@ if __name__ == "__main__":
     parser.add_argument("--fasta",
                         help="Optional genomic FASTA file (instead of downloading from Ensembl)",
                         default=None),
+    parser.add_argument("--genome-dir",
+                        help=("Optional location of the root genome directory. "
+                              "For example --genome-dir=/foo will install the files "
+                              "for a Hsapiens hg19 genome to /foo/Hsapiens/hg19."))
+    parser.add_argument("organism", help="Short name of organism (for example Hsapiens)")
     parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
-    main(args.org_build, args.gtf, args.fasta)
+    if args.genome_dir:
+        genome_dir = os.path.join(args.genome_dir, args.organism)
+    else:
+        genome_dir = os.curdir
+    main(args.org_build, args.gtf, args.fasta, genome_dir)
