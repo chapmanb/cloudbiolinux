@@ -61,16 +61,23 @@ def _run_recipe(work_dir, recipe_cmds, recipe_type):
         out_handle.write("\n".join(recipe_cmds))
     subprocess.check_output(["bash", run_file])
 
-def _move_files(tmp_dir, final_dir, out_files):
-    for out_file in out_files:
-        orig = os.path.join(tmp_dir, out_file)
-        final = os.path.join(final_dir, out_file)
-        assert os.path.exists(orig), ("Did not find expected output file %s in %s" %
-                                      (out_file, tmp_dir))
-        cur_dir = os.path.dirname(final)
-        if not os.path.exists(cur_dir):
-            os.makedirs(cur_dir)
-        os.rename(orig, final)
+def _move_files(tmp_dir, final_dir, targets):
+    for target in targets:
+        if os.path.isdir(os.path.join(tmp_dir, target)):
+            out_files = [os.path.join(target, f) for f in os.listdir(os.path.join(tmp_dir, target))]
+        else:
+            out_files = [target]
+        for out_file in out_files:
+            orig = os.path.join(tmp_dir, out_file)
+            final = os.path.join(final_dir, out_file)
+            assert os.path.exists(orig), ("Did not find expected output file %s in %s" %
+                                          (out_file, tmp_dir))
+            cur_dir = os.path.dirname(final)
+            if not os.path.exists(cur_dir):
+                os.makedirs(cur_dir)
+            if os.path.exists(final):
+                os.remove(final)
+            shutil.move(orig, final)
 
 def _read_recipe(in_file):
     in_file = os.path.abspath(os.path.expanduser(in_file))
