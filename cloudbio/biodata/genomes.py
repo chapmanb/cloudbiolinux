@@ -470,7 +470,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         ggd_recipes = manager.config.get("annotations", []) + manager.config.get("validation", [])
         for idx in genome_indexes + ggd_recipes:
             with cd(org_dir):
-                if not env.safe_exists(idx):
+                if idx in ggd_recipes or not env.safe_exists(idx):
                     finished = False
                     for method, retrieve_fn in retrieve_fns:
                         try:
