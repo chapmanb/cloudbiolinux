@@ -2,7 +2,7 @@
 ---
 attributes:
   name: GA4GH-problem-regions
-  version: 20151027
+  version: 20151028
 recipe:
   full:
     recipe_type: bash
@@ -20,7 +20,7 @@ recipe:
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
         wget -O - https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv | grep -v ^chr > $repeats/sv_repeat_telomere_centromere.bed
-        wget -O - https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz | gunzip -c | bgzip -c > $repeats/LCR.bed.gz
+        wget -O - https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz | gunzip -c | grep -v ^GL | grep -v ^NC | grep -v ^hs | sed 's/^/chr/' | bgzip -c > $repeats/LCR.bed.gz
         tabix -p vcf -f $repeats/LCR.bed.gz
     recipe_outfiles:
       - coverage/problem_regions/GA4GH/README.md
