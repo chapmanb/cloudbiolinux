@@ -39,7 +39,6 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
                 _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
             elif gid in ["mm10", "canFam3"]:
                 _dbsnp_custom(env, gid)
-                _download_lcrs_custom(env, gid)
 
 def _dbsnp_custom(env, gid):
     """Retrieve resources for dbsnp builds from custom S3 biodata bucket.
@@ -65,12 +64,9 @@ def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
         for ext in [""]:
             _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
     _download_cosmic(gid)
-    _download_repeats(gid)
     _download_dbnsfp(env, gid, manager.config)
     _download_ancestral(env, gid, manager.config)
     _download_qsignature(env, gid, manager.config)
-    # XXX Wait to get this by default until it is used more widely
-    #_download_background_vcf(gid)
 
 def _download_broad_bundle(gid, bundle_version, name, ext):
     # Broad bundle directories have uneven use of ".sites" in VCF files
@@ -182,64 +178,3 @@ def _download_qsignature(env, gid, gconfig):
     elif gid == "hg19":  # symlink to GRCh37 download
         if not env.safe_exists(outfile):
             env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
-
-def _download_background_vcf(gid):
-    """Download background file of variant to use in calling.
-    """
-    base_url = "https://s3.amazonaws.com/biodata/variants"
-    base_name = "background-diversity-1000g.vcf"
-    if gid in ["GRCh37"] and not env.safe_exists("{0}.gz".format(base_name)):
-        for ext in ["gz", "gz.tbi"]:
-            shared._remote_fetch(env, "{0}/{1}.{2}".format(base_url, base_name, ext))
-
-def _download_repeats(gid):
-    _download_sv_repeats(gid)
-    _download_lcrs(gid)
-
-def _download_sv_repeats(gid):
-    """Retrieve telomere and centromere exclusion regions for structural variant calling.
-    From Delly: https://github.com/tobiasrausch/delly
-    """
-    mere_url = "https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv"
-    out_file = "sv_repeat_telomere_centromere.bed"
-    if not env.safe_exists(out_file):
-        def _select_by_gid(env, orig_file):
-            if gid == "hg19":
-                env.safe_run("grep ^chr %s > %s" % (orig_file, out_file))
-            else:
-                assert gid == "GRCh37"
-                env.safe_run("grep -v ^chr %s > %s" % (orig_file, out_file))
-            return out_file
-        shared._remote_fetch(env, mere_url, fix_fn=_select_by_gid)
-
-def _download_lcrs(gid):
-    """Retrieve low complexity regions from Heng Li's variant analysis paper.
-    """
-    lcr_url = "https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz"
-    out_file = "LCR.bed.gz"
-    if not env.safe_exists(out_file):
-        def _fix_chrom_names(env, orig_file):
-            if gid == "hg19":
-                convert_cmd = "| grep -v ^GL | grep -v ^NC | grep -v ^hs | sed 's/^/chr/'"
-            else:
-                assert gid == "GRCh37"
-                convert_cmd = ""
-            env.safe_run("zcat %s %s | bgzip -c > %s" % (orig_file, convert_cmd, out_file))
-            return out_file
-        shared._remote_fetch(env, lcr_url, fix_fn=_fix_chrom_names)
-        env.safe_run("tabix -p vcf -f %s" % out_file)
-
-def _download_lcrs_custom(env, gid):
-    """Retrieve low complexity regions from other sources.
-
-    mm10 from Brent Pedersen: http://figshare.com/articles/LCR_mm10_bed_gz/1180124
-    """
-    urls = {"mm10": "http://files.figshare.com/1688228/LCR_mm10.bed.gz"}
-    out_file = "LCR.bed.gz"
-    cur_url = urls.get(gid)
-    if cur_url and not env.safe_exists(out_file):
-        def _bgzip_file(env, orig_file):
-            env.safe_run("zcat %s | bgzip -c > %s" % (orig_file, out_file))
-            return out_file
-        shared._remote_fetch(env, cur_url, fix_fn=_bgzip_file)
-        env.safe_run("tabix -p vcf -f %s" % out_file)

@@ -1,0 +1,18 @@
+# Problematic genomic regions for annotations and improving variant call comparisons
+# mm10 LCRs from Brent Pedersen: http://figshare.com/articles/LCR_mm10_bed_gz/1180124
+---
+attributes:
+  name: problem_regions
+  version: 20151028
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        repeats=coverage/problem_regions/repeats
+        mkdir -p $repeats
+        wget -O - http://files.figshare.com/1688228/LCR_mm10.bed.gz | gunzip -c | bgzip -c > $repeats/LCR.bed.gz
+        tabix -p vcf -f $repeats/LCR.bed.gz
+    recipe_outfiles:
+      - coverage/problem_regions/repeats/LCR.bed.gz
+      - coverage/problem_regions/repeats/LCR.bed.gz.tbi
