@@ -141,7 +141,7 @@ def get_python_pkg_info():
                    "description": md.get("Summary", ""),
                    "homepage_uri": md.get("Home-page", "")}
     else:
-        base_dir = os.path.dirname(sys.executable)
+        base_dir = os.path.dirname(os.path.realpath(sys.executable))
         if os.path.exists(os.path.join(base_dir, "conda")):
             for line in subprocess.check_output([os.path.join(base_dir, "conda"), "list"]).split("\n"):
                 if line.strip() and not line.startswith("#"):
