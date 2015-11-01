@@ -6,6 +6,7 @@ import functools
 import os
 import socket
 from string import Template
+import sys
 import tempfile
 from tempfile import NamedTemporaryFile
 import urllib
@@ -406,7 +407,10 @@ def _pip_cmd(env):
 def _conda_cmd(env):
     if hasattr(env, "conda_cmd") and env.conda_cmd:
         return env.conda_cmd
-    to_check = [os.path.join(env.system_install, "anaconda", "bin", "conda"), "conda"]
+    to_check = []
+    if env.hosts == ["localhost"]:
+        to_check.append(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "conda"))
+    to_check.extend([os.path.join(env.system_install, "anaconda", "bin", "conda"), "conda"])
     for cmd in to_check:
         with quiet():
             test = env.safe_run("%s --version" % cmd)

@@ -96,6 +96,8 @@ def write_brew_pkg_info(out_dir, tooldir):
                 parts = vstr.rstrip().split()
                 name = parts[0]
                 v = parts[-1]
+                # remove any revisions from the version
+                v = v.rsplit("_", 1)[0]
                 out[name] = {"name": name, "version": v}
         with open(out_file, "w") as out_handle:
             yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)

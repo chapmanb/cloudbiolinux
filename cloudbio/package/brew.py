@@ -37,7 +37,7 @@ def install_packages(env, to_install=None, packages=None):
         return
     system.install_homebrew(env)
     brew_cmd = _brew_cmd(env)
-    formula_repos = ["homebrew/science", "chapmanb/cbl"]
+    formula_repos = ["homebrew/science", "chapmanb/cbl", "homebrew/dupes"]
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
     _safe_update(env, brew_cmd, formula_repos, current_taps)
     current_taps = set([x.strip() for x in env.safe_run_output("%s tap" % brew_cmd).split()])
@@ -52,7 +52,7 @@ def install_packages(env, to_install=None, packages=None):
              "current": _get_current_pkgs(env, brew_cmd)}
     for pkg_str in packages:
         _install_pkg(env, pkg_str, brew_cmd, ipkgs)
-    for pkg_str in ["pkg-config", "openssl", "cmake"]:
+    for pkg_str in ["pkg-config", "openssl", "cmake", "unzip"]:
         _safe_unlink_pkg(env, pkg_str, brew_cmd)
     with open(config_file.base) as in_handle:
         to_remove = yaml.load(in_handle).get("to_remove", [])
@@ -358,7 +358,7 @@ def _install_brew_baseline(env, brew_cmd, ipkgs, packages):
     """
     for dep in ["openssl"]:
         _safe_link_pkg(env, dep, brew_cmd)
-    for dep in ["expat", "pkg-config", "xz"]:
+    for dep in ["expat", "pkg-config", "xz", "unzip"]:
         _install_pkg(env, dep, brew_cmd, ipkgs)
     # check if we have an older git and need to install it from brew
     git_version = None
