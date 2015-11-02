@@ -446,12 +446,19 @@ def gtf_to_bed(gtf):
             out_handle.write(line + "\n")
     return out_file
 
+def _is_selenocysteine(feature):
+    if feature.featuretype == "Selenocysteine":
+        return True
+    return False
+
 def db_to_gtf(db, out_file):
     if file_exists(out_file):
         return out_file
     print "Writing out merged GTF file to %s." % out_file
     with open(out_file, "w") as out_handle:
         for feature in db.all_features():
+            if _is_selenocysteine(feature):
+                continue
             out_handle.write(str(feature) + "\n")
     return out_file
 
