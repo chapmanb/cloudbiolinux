@@ -9,10 +9,13 @@ bio_nextgen:
   - bcbio-prioritize
   - bcftools
   - bedtools=2.24.0
+  - bowtie2
   - bwa
   - bio-vcf
   - cnvkit
+  - cufflinks
   - cutadapt
+  - fastqc
   - freebayes
   - grabix
   - hmmlearn
@@ -20,7 +23,9 @@ bio_nextgen:
   - htseq
   - metasv
   - moreutils
+  - optitype
   - parallel
+  - pbgzip
   - pyloh
   - phylowgs
   - pytabix
@@ -29,10 +34,12 @@ bio_nextgen:
   - samtools
   - simple_sv_annotation
   - scalpel
+  - seqtk
   - star
   - stringtie
   - subread
   - svtyper
+  - tophat
   - wham
   - varscan
   - vawk

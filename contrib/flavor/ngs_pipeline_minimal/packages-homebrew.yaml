@@ -4,11 +4,16 @@ to_remove:
   - bamtools
   - bcftools
   - bedtools
+  - bowtie2
   - bwa
+  - cufflinks-binary
+  - fastqc
   - freebayes
   - grabix
   - samtools
+  - tophat-binary
   - scalpel
+  - seqtk
   - wham
 minimal:
   - p7zip
@@ -19,10 +24,8 @@ perl:
 bio_nextgen:
   alignment:
     - bwakit
-    - bowtie2;--without-tbb
     - novoalign
     # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
-    - tophat-binary
   assembly:
     - age-metasv
     - spades-binary
@@ -30,19 +33,16 @@ bio_nextgen:
     - cramtools
     - biobambam
     - express-binary
-    - fastqc
     - picard-tools
     - qualimap
     - kraken
     - sambamba-binary
     - samblaster
-    - seqtk
     - speedseq
     - staden_io_lib
     - oncofuse
     - sickle
   analysis:
-    - cufflinks-binary
     - samtools-library-0.1
     - htslib
     - seqbuster
