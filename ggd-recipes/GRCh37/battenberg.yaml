@@ -18,7 +18,7 @@ recipe:
         # Change references to point to final directory
         sed -i 's/txtmp\///g' $impute_info
 
-        wget -c -O battenberg/probloci.txt.gz $proburl
+        wget --no-check-certificate -c -O battenberg/probloci.txt.gz $proburl
         gunzip battenberg/probloci.txt.gz
     recipe_outfiles:
       - battenberg/probloci.txt

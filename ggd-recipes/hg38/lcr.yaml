@@ -16,7 +16,7 @@ recipe:
         url=https://github.com/lh3/varcmp/raw/bb5b616526c5c3ecb46abfd9877e1bd6d50d1802/scripts/LCR-hs38.bed.gz
         out=variation/LCR.bed.gz
         mkdir -p variation
-        wget -O $out -c $url
+        wget --no-check-certificate -O $out -c $url
         tabix -f -p bed $out
     recipe_outfiles:
       - variation/LCR.bed.gz
