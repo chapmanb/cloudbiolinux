@@ -10,6 +10,8 @@ to_remove:
   - fastqc
   - freebayes
   - grabix
+  - lumpy-sv
+  - samblaster
   - samtools
   - tophat-binary
   - scalpel
@@ -37,7 +39,6 @@ bio_nextgen:
     - qualimap
     - kraken
     - sambamba-binary
-    - samblaster
     - speedseq
     - staden_io_lib
     - oncofuse
@@ -55,7 +56,6 @@ bio_nextgen:
     - hall-lab-sv-tools
     - impute2
     - lofreq
-    - lumpy-sv
     - manta
     - pindel
     - platypus-variant

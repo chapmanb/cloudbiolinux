@@ -21,6 +21,7 @@ bio_nextgen:
   - hmmlearn
   - hisat2
   - htseq
+  - lumpy-sv
   - metasv
   - moreutils
   - optitype
@@ -31,6 +32,7 @@ bio_nextgen:
   - pytabix
   - pythonpy
   - sailfish
+  - samblaster
   - samtools
   - simple_sv_annotation
   - scalpel

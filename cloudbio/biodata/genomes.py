@@ -737,7 +737,8 @@ def _index_rtg(ref_file):
     dir_name = "rtg"
     index_name = "%s.sdf" % os.path.splitext(os.path.basename(ref_file))[0]
     if not env.safe_exists(os.path.join(dir_name, index_name, "done")):
-        cmd = "rtg format -o {dir_name}/{index_name} {ref_file}"
+        cmd = ("export RTG_JAVA_OPTS='-Xms1g' export RTG_MEM=2g && "
+               "rtg format -o {dir_name}/{index_name} {ref_file}")
         env.safe_run(cmd.format(**locals()))
     return dir_name
 
