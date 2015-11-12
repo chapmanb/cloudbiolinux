@@ -21,13 +21,13 @@ genomes:
     name: Human (hg19)
     dbsnp: true
     rnaseq: true
-    annotations: [mirbase, battenberg, GA4GH_problem_regions, MIG]
+    annotations: [mirbase, battenberg, GA4GH_problem_regions, MIG, prioritize]
     validation: [giab-NA12878, platinum-genome-NA12878]
   - dbkey: GRCh37
     name: Human (GRCh37)
     dbsnp: true
     rnaseq: true
-    annotations: [battenberg, GA4GH_problem_regions, MIG]
+    annotations: [battenberg, GA4GH_problem_regions, MIG, prioritize]
     validation: [giab-NA12878, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full

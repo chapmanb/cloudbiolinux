@@ -1,0 +1,28 @@
+# Regions for prioritization:
+# cancer
+#  - civic -- known cancer genes from the CIViC database
+#  - az300 -- list of 300 cancer genes of interest from AstraZeneca Oncology
+#  - az300-with-fusion -- az300 list plus known interacting fusions
+#      from FusionCatcher https://github.com/ndaniel/fusioncatcher/blob/master/bin/generate_known.py#L102
+---
+attributes:
+  name: prioritize
+  version: 20151111
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg19-20151111.tar.gz
+        outdir=coverage/prioritize
+        mkdir -p $outdir
+        cd $outdir
+        wget -c -O cancer.tar.gz $baseurl
+        tar -xzvpf cancer.tar.gz
+    recipe_outfiles:
+      - coverage/prioritize/cancer/az300.bed.gz
+      - coverage/prioritize/cancer/az300.bed.gz.tbi
+      - coverage/prioritize/cancer/az300-with-fusion.bed.gz
+      - coverage/prioritize/cancer/az300-with-fusion.bed.gz.tbi
+      - coverage/prioritize/cancer/civic-2015-11-04.bed.gz
+      - coverage/prioritize/cancer/civic-2015-11-04.bed.gz.tbi
