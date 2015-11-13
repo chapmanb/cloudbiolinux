@@ -127,7 +127,8 @@ def _perform_install(target=None, flavor=None, more_custom_add=None):
             if pkg_install is not None and 'cloudman' in pkg_install:
                 _configure_cloudman(env)
     if target is None or target == "cleanup":
-        _cleanup_space(env)
+        if env.use_sudo:
+            _cleanup_space(env)
         if "is_ec2_image" in env and env.is_ec2_image.upper() in ["TRUE", "YES"]:
             _cleanup_ec2(env)
 

@@ -9,10 +9,13 @@ to_remove:
   - cufflinks-binary
   - fastqc
   - freebayes
+  - gatk-framework
   - grabix
   - lumpy-sv
+  - sambamba-binary
   - samblaster
   - samtools
+  - snpeff
   - tophat-binary
   - scalpel
   - seqtk
@@ -38,7 +41,6 @@ bio_nextgen:
     - picard-tools
     - qualimap
     - kraken
-    - sambamba-binary
     - speedseq
     - staden_io_lib
     - oncofuse
@@ -51,7 +53,6 @@ bio_nextgen:
     - bcbio-variation-recall
     - cancerit-allelecount
     - delly;--with-binary
-    - gatk-framework
     #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
     - impute2
@@ -60,7 +61,6 @@ bio_nextgen:
     - pindel
     - platypus-variant
     - rtg-tools
-    - snpeff
     - theta2
     - vardict
     - vardict-java

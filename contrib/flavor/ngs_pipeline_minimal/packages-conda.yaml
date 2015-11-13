@@ -17,6 +17,7 @@ bio_nextgen:
   - cutadapt
   - fastqc
   - freebayes
+  - gatk-framework
   - grabix
   - hmmlearn
   - hisat2
@@ -32,11 +33,13 @@ bio_nextgen:
   - pytabix
   - pythonpy
   - sailfish
+  - sambamba
   - samblaster
   - samtools
   - simple_sv_annotation
   - scalpel
   - seqtk
+  - snpeff
   - star
   - stringtie
   - subread
