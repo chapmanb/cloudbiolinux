@@ -20,6 +20,7 @@ to_remove:
   - scalpel
   - seqtk
   - wham
+  - vt
 minimal:
   - p7zip
   - pkg-config
@@ -69,4 +70,3 @@ bio_nextgen:
     - qsignature
     # - qsnp # Issues with download and reliability of qcmg site
     # - vcftools # Build problems with default libz on Ubuntu 12.04
-    - vt;--with-binary
