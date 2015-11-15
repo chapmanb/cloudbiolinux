@@ -2,7 +2,7 @@
 ---
 attributes:
   name: sranseq
-  version: 20150810
+  version: 20151106
 recipe:
   full:
     recipe_type: bash
@@ -24,9 +24,12 @@ recipe:
         # zcat piR_hg19_v1.0.bed.gz | awk '{print $1"\t.\tpiRNA\t"$2"\t"$3"\t.\t"$6"\t.\tname "$4";"}' >> srna-transcripts.gtf
         wget -q -N -c -O hairpin.fa.gz ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz
         zcat hairpin.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
+        wget -q -N -c -O mature.fa.gz ftp://mirbase.org/pub/mirbase/21/mature.fa.gz
+        zcat mature.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
         wget -q -N -c -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
         zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
     recipe_outfiles:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
+        - srnaseq/mature.fa
         - srnaseq/miRNA.str
