@@ -1,0 +1,21 @@
+# Regions for prioritization:
+# cancer
+#  - civic -- known cancer genes from the CIViC database
+---
+attributes:
+  name: prioritize
+  version: 20151116
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg38-20151116.tar.gz
+        outdir=coverage/prioritize
+        mkdir -p $outdir
+        cd $outdir
+        wget -c -O cancer.tar.gz $baseurl
+        tar -xzvpf cancer.tar.gz
+    recipe_outfiles:
+      - coverage/prioritize/cancer/civic-2015-11-16.bed.gz
+      - coverage/prioritize/cancer/civic-2015-11-16.bed.gz.tbi

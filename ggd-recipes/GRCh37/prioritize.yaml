@@ -7,13 +7,13 @@
 ---
 attributes:
   name: prioritize
-  version: 20151111
+  version: 20151116
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-GRCh37-20151111.tar.gz
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-GRCh37-20151116.tar.gz
         outdir=coverage/prioritize
         mkdir -p $outdir
         cd $outdir

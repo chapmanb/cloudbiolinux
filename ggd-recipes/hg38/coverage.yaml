@@ -11,7 +11,7 @@
 ---
 attributes:
   name: coverage
-  version: 2015-11-16
+  version: 2015-11-17
 recipe:
   full:
     recipe_type: bash
@@ -19,7 +19,8 @@ recipe:
       - |
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
-        wget --no-check-certificate -O - https://raw.githubusercontent.com/tobiasrausch/delly/master/excludeTemplates/human.hg38.excl.tsv | grep -E '^chr|HLA' > $repeats/sv_repeat_telomere_centromere.bed
+        url=https://gist.githubusercontent.com/chapmanb/4c40f961b3ac0a4a22fd/raw/2025f3912a477edc597e61d911bd1044dc943440/sv_repeat_telomere_centromere.bed
+        wget --no-check-certificate -O - $url > $repeats/sv_repeat_telomere_centromere.bed
         url=https://github.com/lh3/varcmp/raw/bb5b616526c5c3ecb46abfd9877e1bd6d50d1802/scripts/LCR-hs38.bed.gz
         out=$repeats/LCR.bed.gz
         wget --no-check-certificate -O $out -c $url

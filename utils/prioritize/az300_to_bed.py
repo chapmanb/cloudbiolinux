@@ -83,7 +83,7 @@ def write_from_remap_names(targets, ref_dir, genome, out_handle, in_file):
 
 def write_from_gene_info(targets, genome, out_handle):
     missing = []
-    for target in sorted(list(read_targets(in_file))):
+    for target in sorted(targets):
         symbols, pos = get_gene_info(target)
         if pos:
             assert isinstance(pos, (list, tuple))
