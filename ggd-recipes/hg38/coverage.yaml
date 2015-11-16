@@ -1,0 +1,30 @@
+# Problematic and other coverage regions of interest
+#
+# Low complexity regions from supplemental data of Heng Li's work on
+# reducing variant calling artifacts:
+#
+# http://bioinformatics.oxfordjournals.org/content/30/20/2843
+# https://github.com/lh3/varcmp/tree/master/scripts
+#
+# Centromere and other exclusion regions for SV calling from:
+# https://github.com/tobiasrausch/delly/blob/master/excludeTemplates/human.hg38.excl.tsv
+---
+attributes:
+  name: coverage
+  version: 2015-11-16
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        repeats=coverage/problem_regions/repeats
+        mkdir -p $repeats
+        wget --no-check-certificate -O - https://raw.githubusercontent.com/tobiasrausch/delly/master/excludeTemplates/human.hg38.excl.tsv | grep -E '^chr|HLA' > $repeats/sv_repeat_telomere_centromere.bed
+        url=https://github.com/lh3/varcmp/raw/bb5b616526c5c3ecb46abfd9877e1bd6d50d1802/scripts/LCR-hs38.bed.gz
+        out=$repeats/LCR.bed.gz
+        wget --no-check-certificate -O $out -c $url
+        tabix -f -p bed $out
+    recipe_outfiles:
+      - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
+      - coverage/problem_regions/repeats/LCR.bed.gz
+      - coverage/problem_regions/repeats/LCR.bed.gz.tbi

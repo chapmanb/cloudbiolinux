@@ -31,12 +31,12 @@ genomes:
     validation: [giab-NA12878, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
-    annotations: [dbsnp, clinvar, mills_indels, 1000g_snps, 1000g_indels, 1000g_omni_snps, hapmap_snps, lcr]
+    annotations: [dbsnp, clinvar, mills_indels, 1000g_snps, 1000g_indels, 1000g_omni_snps, hapmap_snps, coverage]
     validation: [platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
-                 dream-syn4-crossmap]
+                 dream-syn4-crossmap, dream-syn3-crossmap]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
-    annotations: [dbsnp, clinvar, mills_indels, 1000g_snps, 1000g_indels, 1000g_omni_snps, hapmap_snps, lcr]
+    annotations: [dbsnp, clinvar, mills_indels, 1000g_snps, 1000g_indels, 1000g_omni_snps, hapmap_snps, coverage]
   - dbkey: mm9
     name: Mouse (mm9)
     dbsnp: true
