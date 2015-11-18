@@ -1,7 +1,7 @@
 ---
 attributes:
   name: dbsnp
-  version: 20151027
+  version: 20151118
 recipe:
   full:
     recipe_type: bash
@@ -11,10 +11,10 @@ recipe:
         mkdir -p variations
         cd variations
         wget -c -N $baseurl
-        gunzip -c dbsnp_138.b37.vcf.gz | bgzip -c > dbsnp_128.vcf.gz
-        tabix -f -p vcf dbsnp_128.vcf.gz
+        gunzip -c dbsnp_138.b37.vcf.gz | bgzip -c > dbsnp_138.vcf.gz
+        tabix -f -p vcf dbsnp_138.vcf.gz
         rm -rf dbsnp_138.b37.vcf.gz
     recipe_outfiles:
-      - variations/dbsnp_128.vcf.gz
-      - variations/dbsnp_128.vcf.gz.tbi
+      - variations/dbsnp_138.vcf.gz
+      - variations/dbsnp_138.vcf.gz.tbi
  
