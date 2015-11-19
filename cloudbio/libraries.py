@@ -100,7 +100,10 @@ def _make_install_script(out_file, config):
             version=unlist(strsplit(orig, ";"))[2],
             pname=unlist(strsplit(orig, ";"))[1])
         }
-        github_installer = repo.installer(NULL, install_github, get_pkg_name)
+        gh_install <- function(name) {
+          install_github(name, upgrade_dependencies=FALSE)
+        }
+        github_installer = repo.installer(NULL, gh_install, get_pkg_name)
         lapply(github.pkgs, github_installer)
         """ % (", ".join('"%s"' % p for p in config['github']))
         env.safe_append(out_file, dev_install)

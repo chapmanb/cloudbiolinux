@@ -53,9 +53,28 @@ bio_nextgen:
   - vt
 r:
   - r
+  - r-rcolorbrewer
+  - r-colorspace
   - r-devtools
+  - r-dplyr
+  - r-locfit
+  - r-magrittr
   - r-rcpp
+  - r-rcpparmadillo
   - r-rcurl
+  - r-e1071
   - r-rgl
-  - r-rsqlite 
+  - r-plyr
+  - r-rsqlite
+  - r-snow
   - r-stringi
+  - r-xtable
+  - bioconductor-annotate
+  - bioconductor-biocinstaller
+  - bioconductor-biostrings
+  - bioconductor-biovizbase
+  - bioconductor-deseq2
+  - bioconductor-genomicranges
+  - bioconductor-iranges
+  - bioconductor-limma
+  - bioconductor-rtracklayer
