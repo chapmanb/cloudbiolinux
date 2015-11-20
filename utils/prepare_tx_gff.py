@@ -282,6 +282,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir):
             if not os.path.exists(work_gtf):
                 shutil.copy(gtf_file, work_gtf)
             gtf_file = work_gtf
+        gtf_file = clean_gtf(gtf_file, genome_fasta)
         db = _get_gtf_db(gtf_file)
         os.remove(gtf_file)
         gtf_file = db_to_gtf(db, gtf_file)
