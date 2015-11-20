@@ -2,7 +2,7 @@
 ---
 attributes:
   name: sranseq
-  version: 20151106
+  version: 20151120
 recipe:
   full:
     recipe_type: bash
@@ -28,8 +28,10 @@ recipe:
         zcat mature.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
         wget -q -N -c -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
         zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
+        wget -q -N -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/hg19_mature_and_pre.fa
     recipe_outfiles:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
         - srnaseq/mature.fa
         - srnaseq/miRNA.str
+        - srnaseq/trna_mature_pre.fa
