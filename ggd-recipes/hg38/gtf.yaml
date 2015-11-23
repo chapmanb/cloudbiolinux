@@ -1,5 +1,5 @@
 # Ensembl GTF file distributed by Ensembl for hg38
-# Cleans GTF file by converting chromosome names to standard names 
+# Cleans GTF file by converting chromosome names to standard names
 # Uses https://github.com/dpryan79/ChromosomeMappings to remap the chromosome names
 ---
 attributes:
@@ -14,7 +14,7 @@ recipe:
         mkdir -p rnaseq
         remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
         wget -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
-        wget -qO- $url | gunzip | sed -f remap.sed > rnaseq/hg38.gtf
+        wget -qO- $url | gunzip | sed -f remap.sed | grep -v "*_*_alt" > rnaseq/hg38.gtf
         rm remap.sed
     recipe_outfiles:
     - rnaseq/hg38.gtf
