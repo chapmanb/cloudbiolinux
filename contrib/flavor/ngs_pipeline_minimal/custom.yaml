@@ -8,5 +8,3 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - mutect
-  needs_64bit:
-    - ucsc_tools

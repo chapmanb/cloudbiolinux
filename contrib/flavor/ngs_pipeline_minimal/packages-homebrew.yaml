@@ -1,9 +1,11 @@
 # Packages available in the Homebrew and Linuxbrew package manager
 ---
+# Migrated to use conda/bioconda builds
 to_remove:
   - bamtools
   - bcftools
   - bedtools
+  - biobambam
   - bowtie2
   - bwa
   - cufflinks-binary
@@ -12,6 +14,7 @@ to_remove:
   - gatk-framework
   - grabix
   - lumpy-sv
+  - manta
   - sambamba-binary
   - samblaster
   - samtools
@@ -20,6 +23,9 @@ to_remove:
   - scalpel
   - seqtk
   - wham
+  - vardict
+  - vardict-java
+  - vcflib
   - vt
 minimal:
   - p7zip
@@ -37,12 +43,10 @@ bio_nextgen:
     - spades-binary
   utilities:
     - cramtools
-    - biobambam
     - express-binary
     - picard-tools
     - qualimap
     - kraken
-    - speedseq
     - staden_io_lib
     - oncofuse
     - sickle
@@ -58,14 +62,10 @@ bio_nextgen:
     - hall-lab-sv-tools
     - impute2
     - lofreq
-    - manta
     - pindel
     - platypus-variant
     - rtg-tools
     - theta2
-    - vardict
-    - vardict-java
-    - vcflib
     - vep
     - qsignature
     # - qsnp # Issues with download and reliability of qcmg site
