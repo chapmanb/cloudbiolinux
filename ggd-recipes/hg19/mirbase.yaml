@@ -1,7 +1,7 @@
 # small RNA seq annotation from different sources
 ---
 attributes:
-  name: sranseq
+  name: srnaseq
   version: 20151120
 recipe:
   full:
