@@ -9,6 +9,7 @@ bio_nextgen:
   - bcbio-prioritize
   - bcftools
   - bedtools=2.24.0
+  - biobambam
   - bowtie2
   - bwa
   - bio-vcf
@@ -16,7 +17,7 @@ bio_nextgen:
   - cufflinks
   - cutadapt
   - fastqc
-  - freebayes
+  - freebayes=0.9.21.26
   - gatk-framework
   - glpk
   - grabix
@@ -24,6 +25,7 @@ bio_nextgen:
   - hisat2
   - htseq
   - lumpy-sv
+  - manta
   - metasv
   - moreutils
   - optitype
@@ -47,9 +49,25 @@ bio_nextgen:
   - subread
   - svtyper
   - tophat
+  - ucsc-bedtobigbed
+  - ucsc-bigbedinfo
+  - ucsc-bigbedsummary
+  - ucsc-bigbedtobed
+  - ucsc-bedgraphtobigwig
+  - ucsc-bigwiginfo
+  - ucsc-bigwigsummary
+  - ucsc-bigwigtobedgraph
+  - ucsc-bigwigtowig
+  - ucsc-fatotwobit
+  - ucsc-gtftogenepred
+  - ucsc-liftover
+  - ucsc-wigtobigwig
   - wham
+  - vardict
+  - vardict-java
   - varscan
   - vawk
+  - vcflib
   - vt
 r:
   - r

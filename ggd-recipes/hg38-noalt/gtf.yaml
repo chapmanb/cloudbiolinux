@@ -10,9 +10,9 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://ftp.ensembl.org/pub/release-82/gtf/homo_sapiens/Homo_sapiens.GRCh38.82.chr_patch_hapl_scaff.gtf.gz
+	url=ftp://ftp.ensembl.org/pub/release-78/gtf/homo_sapiens/Homo_sapiens.GRCh38.78.gtf.gz
         mkdir -p rnaseq
-        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2gencode.txt
+        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
         wget -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         wget -qO- $url | gunzip | sed -f remap.sed > rnaseq/hg38-noalt.gtf
         rm remap.sed
