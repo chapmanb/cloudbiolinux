@@ -1,6 +1,6 @@
 #!/bin/bash
 set -eu -o pipefail
-version=20151116
+version=20151125
 civicv=2015-11-04
 civicv38=2015-11-16
 
@@ -21,6 +21,8 @@ cat AZ300-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 
 tabix -f -p bed hg19/cancer/az300.bed.gz
 cat AZ300-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > GRCh37/cancer/az300.bed.gz
 tabix -f -p bed GRCh37/cancer/az300.bed.gz
+cat AZ300-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az300.bed.gz
+tabix -f -p bed hg38/cancer/az300.bed.gz
 
 # az300 with fusions
 cat AZ300_with_known-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az300-with-fusion.bed.gz

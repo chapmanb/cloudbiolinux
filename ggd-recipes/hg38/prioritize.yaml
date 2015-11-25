@@ -4,18 +4,20 @@
 ---
 attributes:
   name: prioritize
-  version: 20151116
+  version: 20151125
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg38-20151116.tar.gz
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg38-20151125.tar.gz
         outdir=coverage/prioritize
         mkdir -p $outdir
         cd $outdir
         wget -c -O cancer.tar.gz $baseurl
         tar -xzvpf cancer.tar.gz
     recipe_outfiles:
+      - coverage/prioritize/cancer/az300.bed.gz
+      - coverage/prioritize/cancer/az300.bed.gz.tbi
       - coverage/prioritize/cancer/civic-2015-11-16.bed.gz
       - coverage/prioritize/cancer/civic-2015-11-16.bed.gz.tbi

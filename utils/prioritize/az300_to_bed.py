@@ -96,7 +96,7 @@ def write_from_gene_info(targets, genome, out_handle):
             missing.append(target)
     return missing
 
-for genome in ["hg19", "GRCh37"]:
+for genome in ["hg19", "GRCh37", "hg38"]:
     out_file = "%s-%s.bed" % (os.path.splitext(in_file)[0], genome)
     with open(out_file, "w") as out_handle:
         targets = read_targets(in_file)
