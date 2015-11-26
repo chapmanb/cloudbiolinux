@@ -31,10 +31,12 @@ bio_nextgen:
   - optitype
   - parallel
   - pbgzip
+  - picard
   - pyloh
   - phylowgs
   - pytabix
   - pythonpy
+  - qualimap
   - razers3
   - sailfish
   - sambamba

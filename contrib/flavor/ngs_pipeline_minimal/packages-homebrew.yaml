@@ -15,6 +15,8 @@ to_remove:
   - grabix
   - lumpy-sv
   - manta
+  - picard-tools
+  - qualimap
   - sambamba-binary
   - samblaster
   - samtools
@@ -44,8 +46,6 @@ bio_nextgen:
   utilities:
     - cramtools
     - express-binary
-    - picard-tools
-    - qualimap
     - kraken
     - staden_io_lib
     - oncofuse
