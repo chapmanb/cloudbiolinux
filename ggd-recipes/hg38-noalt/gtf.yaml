@@ -4,7 +4,7 @@
 ---
 attributes:
   name: gtf
-  version: 82
+  version: 78
 recipe:
   full:
     recipe_type: bash
