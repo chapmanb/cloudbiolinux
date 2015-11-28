@@ -17,7 +17,7 @@ bioc:
  - DEXSeq
  - DNAcopy
 github:
-  - Bioconductor-mirror/BubbleTree@c000917a;2.1.2
+  - Bioconductor-mirror/BubbleTree@6a85d81;2.1.4
 #github:
 #  - genome/bmm@b49c57a
 #  - chapmanb/sciClone@e8ed9d0
