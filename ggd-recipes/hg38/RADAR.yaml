@@ -1,0 +1,36 @@
+# RADAR RNA editing events: (http://www.stanford.edu/~gokulr/database/Human_AG_all_hg19_v2.txt)
+# installs a BED file of the RADAR events, preconverted to hg38
+# how this file was created:
+#
+# 1. Download the hg19 RADAR file and converted to BED format.
+# url=http://www.stanford.edu/~gokulr/database/Human_AG_all_hg19_v2.txt
+# mkdir -p editing
+# cd editing
+# wget -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position  position/start  end/" > RADAR-hg19.bed
+# cd ../
+# 2. Convert RADAR BED file to BED3 format.
+# cut -f1,2,3 RADAR-hg19.bed > RADAR-hg19.tmp.bed
+# 3. Get the Crossmap hg19 to hg38 chain file:
+# wget http://hgdownload.soe.ucsc.edu/goldenPath/hg19/liftOver/hg19ToHg38.over.chain.gz
+# 4. Run Crossmap:
+# Crossmap.py bed hg19ToHg38.over.chain.gz RADAR-hg19.tmp.bed > conversions.bed
+# 5. Merge original RADAR file with the Crossmap output
+# wget https://raw.githubusercontent.com/roryk/seqscripts/master/radar-convert-annotations.py
+# python radar-convert-annotations.py RADAR-hg19.bed conversions.bed RADAR-hg38.bed.gz
+
+---
+attributes:
+  name: RADAR-hg38
+  version: 1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=https://biodata.s3.amazonaws.com/annotation/RADAR-hg38.bed.gz
+        mkdir -p editing
+        cd editing
+      	wget -qO- $url > RADAR-hg38.bed.gz
+       	cd ../
+    recipe_outfiles:
+      - editing/RADAR-hg38.bed.gz
