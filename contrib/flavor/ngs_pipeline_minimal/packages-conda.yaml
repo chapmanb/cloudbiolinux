@@ -51,6 +51,7 @@ bio_nextgen:
   - subread
   - svtyper
   - tophat
+  - tdrmapper
   - ucsc-bedtobigbed
   - ucsc-bigbedinfo
   - ucsc-bigbedsummary
