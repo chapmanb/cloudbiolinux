@@ -13,7 +13,7 @@ from cloudbio.custom import shared
 from cloudbio.fabutils import warn_only
 
 VERSIONS = {"rn5": "2014-07-20",
-            "GRCh37": "2014-07-14",
+            "GRCh37": "2015-12-01",
             "hg19": "2014-07-17",
             "hg38-noalt": "2015-11-22",
             "hg38": "2015-11-24",
