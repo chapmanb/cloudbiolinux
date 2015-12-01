@@ -46,6 +46,10 @@ def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
     package = package.split("=")[0]
     final_bindir = os.path.join(env.system_install, "bin")
     base_bindir = os.path.dirname(conda_bin)
+    # resolve any symlinks in the final and base heirarchies
+    with quiet():
+        final_bindir = env.safe_run_output("cd %s && pwd -P" % final_bindir)
+        base_bindir = env.safe_run_output("cd %s && pwd -P" % base_bindir)
     for pkg_subdir in json.loads(env.safe_run_output("{conda_bin} list --json -f {package}".format(**locals()))):
         for pkg_dir in conda_info["pkgs_dirs"]:
             pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
