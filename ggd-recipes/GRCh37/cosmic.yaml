@@ -10,8 +10,8 @@ recipe:
         baseurl=https://s3.amazonaws.com/biodata/variants/cosmic-v68-GRCh37.vcf.gz
         mkdir -p variations
         cd variations
-        wget -c -N $baseurl
-        wget -c -N $baseurl.tbi
+        wget --no-check-certificate -c -N $baseurl
+        wget --no-check-certificate -c -N $baseurl.tbi
     recipe_outfiles:
         - variations/cosmic-v68-GRCh37.vcf.gz
         - variations/cosmic-v68-GRCh37.vcf.gz.tbi

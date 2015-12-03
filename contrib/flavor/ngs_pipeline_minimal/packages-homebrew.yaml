@@ -2,27 +2,39 @@
 ---
 # Migrated to use conda/bioconda builds
 to_remove:
+  - age-metasv
   - bamtools
+  - bcbio-variation-recall
   - bcftools
   - bedtools
   - biobambam
   - bowtie2
   - bwa
+  - bwakit
+  - cramtools
   - cufflinks-binary
   - fastqc
   - freebayes
   - gatk-framework
   - grabix
+  - htslib
+  - impute2
   - lumpy-sv
   - manta
+  - p7zip
   - picard-tools
+  - pindel
+  - platypus-variant
   - qualimap
   - sambamba-binary
   - samblaster
   - samtools
   - snpeff
+  - spades-binary
+  - theta2
   - tophat-binary
   - scalpel
+  - seqbuster
   - seqtk
   - wham
   - vardict
@@ -30,43 +42,31 @@ to_remove:
   - vcflib
   - vt
 minimal:
-  - p7zip
-  - pkg-config
   - s3gof3r
 perl:
   - cpanminus
 bio_nextgen:
   alignment:
-    - bwakit
     - novoalign
-    # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
   assembly:
-    - age-metasv
-    - spades-binary
   utilities:
-    - cramtools
-    - express-binary
     - kraken
-    - staden_io_lib
+    - staden_io_lib # Migrate to samtools indexing and remove
     - oncofuse
     - sickle
   analysis:
     - samtools-library-0.1
-    - htslib
-    - seqbuster
   variant:
-    - bcbio-variation-recall
     - cancerit-allelecount
     - delly;--with-binary
-    #- glia  # Needs updates to fsom
     - hall-lab-sv-tools
-    - impute2
     - lofreq
-    - pindel
-    - platypus-variant
     - rtg-tools
-    - theta2
     - vep
     - qsignature
-    # - qsnp # Issues with download and reliability of qcmg site
-    # - vcftools # Build problems with default libz on Ubuntu 12.04
+old-unused:
+  # - express-binary # No longer used with Sailfish
+  # - glia  # Needs updates to fsom
+  # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
+  # - qsnp # Issues with download and reliability of qcmg site
+  # - vcftools # Build problems with default libz on Ubuntu 12.04

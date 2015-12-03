@@ -10,9 +10,9 @@ recipe:
         baseurl=https://s3.amazonaws.com/bcbio_nextgen/human_ancestor.fa.gz
         mkdir -p variations
         cd variations
-        wget -c $baseurl
-        wget -c $baseurl.fai
-        wget -c $baseurl.gzi
+        wget --no-check-certificate -c $baseurl
+        wget --no-check-certificate -c $baseurl.fai
+        wget --no-check-certificate -c $baseurl.gzi
     recipe_outfiles:
         - variations/human_ancestor.fa.gz
         - variations/human_ancestor.fa.gz.fai

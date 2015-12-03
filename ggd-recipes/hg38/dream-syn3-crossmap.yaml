@@ -19,7 +19,7 @@ recipe:
         dir=validation/dream-syn3-crossmap
         orig=synthetic_challenge_set3_tumor_20pctmasked_truth-crossmap-hg38
         mkdir -p $dir
-        wget -c https://s3.amazonaws.com/bcbio_nextgen/dream/$orig.tar.gz
+        wget --no-check-certificate -c https://s3.amazonaws.com/bcbio_nextgen/dream/$orig.tar.gz
         tar -xzvpf ${orig}.tar.gz
         cp $orig/${orig}.vcf.gz $dir/truth_small_variants.vcf.gz
         cp $orig/${orig}.vcf.gz.tbi $dir/truth_small_variants.vcf.gz.tbi

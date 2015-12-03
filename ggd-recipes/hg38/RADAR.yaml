@@ -30,7 +30,7 @@ recipe:
         url=https://biodata.s3.amazonaws.com/annotation/RADAR-hg38.bed.gz
         mkdir -p editing
         cd editing
-      	wget -qO- $url > RADAR-hg38.bed.gz
+      	wget --no-check-certificate -qO- $url > RADAR-hg38.bed.gz
        	cd ../
     recipe_outfiles:
       - editing/RADAR-hg38.bed.gz

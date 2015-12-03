@@ -11,12 +11,12 @@ recipe:
         baseurl=http://bcbio_nextgen.s3.amazonaws.com/GA4GH_problem_regions.zip
         mkdir -p coverage/problem_regions/GA4GH
         cd coverage/problem_regions/GA4GH
-        wget -c -O GA4GH_problem_regions.zip $baseurl
+        wget --no-check-certificate -c -O GA4GH_problem_regions.zip $baseurl
         unzip -o GA4GH_problem_regions.zip
         cd ../../..
         encode=coverage/problem_regions/ENCODE
         mkdir -p $encode
-        wget -O - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeDacMapabilityConsensusExcludable.bed.gz | gunzip -c > $encode/wgEncodeDacMapabilityConsensusExcludable.bed
+        wget --no-check-certificate -O - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeDacMapabilityConsensusExcludable.bed.gz | gunzip -c > $encode/wgEncodeDacMapabilityConsensusExcludable.bed
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
         wget --no-check-certificate -O - https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv | grep ^chr > $repeats/sv_repeat_telomere_centromere.bed

@@ -14,9 +14,9 @@ recipe:
       - |
         dir=validation/giab-NA12878-remap
         mkdir -p $dir
-        wget -c -O $dir/truth_small_variants.vcf.gz https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap.vcf.gz
-        wget -c -O $dir/truth_small_variants.vcf.gz.tbi https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap.vcf.gz.tbi
-        wget -c -O - https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap-regions.bed | grep -v ^chrM > $dir/truth_regions.bed
+        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap.vcf.gz
+        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz.tbi https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap.vcf.gz.tbi
+        wget --no-check-certificate -c -O - https://biodata.s3.amazonaws.com/giab_hg38_remap/GiaB_v2_19-38_remap-regions.bed | grep -v ^chrM > $dir/truth_regions.bed
     recipe_outfiles:
       - validation/giab-NA12878-remap/truth_small_variants.vcf.gz
       - validation/giab-NA12878-remap/truth_small_variants.vcf.gz.tbi

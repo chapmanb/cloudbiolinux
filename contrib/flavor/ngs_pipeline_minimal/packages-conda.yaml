@@ -4,16 +4,21 @@ channels:
   - bioconda
   - r
 minimal:
+  - p7zip
 bio_nextgen:
+  - age-metasv
   - bamtools
   - bcbio-prioritize
+  - bcbio-variation-recall
   - bcftools
   - bedtools=2.24.0
   - biobambam
   - bowtie2
   - bwa
+  - bwakit
   - bio-vcf
   - cnvkit
+  - cramtools
   - cufflinks
   - cutadapt
   - fastqc
@@ -32,6 +37,8 @@ bio_nextgen:
   - parallel
   - pbgzip
   - picard
+  - pindel
+  - platypus-variant
   - pyloh
   - phylowgs
   - pytabix
@@ -44,12 +51,15 @@ bio_nextgen:
   - samtools
   - simple_sv_annotation
   - scalpel
+  - seqbuster
   - seqtk
+  - spades
   - snpeff
   - star
   - stringtie
   - subread
   - svtyper
+  - theta2
   - tophat
   - tdrmapper
   - ucsc-bedtobigbed
