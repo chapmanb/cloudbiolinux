@@ -4,6 +4,5 @@
 # define the steps for downloading, building, and installing the package.
 bio_nextgen:
   - vep
-  - gemini
 java:
   - leinengin

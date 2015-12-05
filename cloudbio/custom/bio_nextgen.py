@@ -278,30 +278,6 @@ def install_samtools(env):
             env.safe_sudo("cp -f %s %s" % (fname.rstrip("\r"), install_dir))
     _get_install(url, env, _safe_ncurses_make)
 
-def install_gemini(env):
-    """A lightweight db framework for disease and population genetics.
-    https://github.com/arq5x/gemini
-    """
-    version = "0.7.0"
-    if versioncheck.up_to_date(env, "gemini -v", version, stdout_flag="gemini"):
-        return
-    elif not shared._executable_not_on_path("gemini -v"):
-        env.safe_run("gemini update")
-    else:
-        iurl = "https://raw.github.com/arq5x/gemini/master/gemini/scripts/gemini_install.py"
-        data_dir = os.path.join(env.system_install,
-                                "local" if env.system_install.find("/local") == -1 else "",
-                                "share", "gemini")
-        with _make_tmp_dir(ext="-gemini") as work_dir:
-            with cd(work_dir):
-                if env.safe_exists(os.path.basename(iurl)):
-                    env.safe_run("rm -f %s" % os.path.basename(iurl))
-                installer = shared._remote_fetch(env, iurl)
-                env.safe_run("%s %s %s %s %s" %
-                             (_python_cmd(env), installer, "" if env.use_sudo else "--nosudo",
-                              env.system_install, data_dir))
-                env.safe_run("rm -f gemini_install.py")
-
 @_if_not_installed("vtools")
 def install_varianttools(env):
     """Annotation, selection, and analysis of variants in the context of next-gen sequencing analysis.
