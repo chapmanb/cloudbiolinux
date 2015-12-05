@@ -297,7 +297,7 @@ def install_gemini(env):
                 if env.safe_exists(os.path.basename(iurl)):
                     env.safe_run("rm -f %s" % os.path.basename(iurl))
                 installer = shared._remote_fetch(env, iurl)
-                env.safe_run("%s %s %s %s %s" %
+                env.safe_sudo("%s %s %s %s %s" %
                              (_python_cmd(env), installer, "" if env.use_sudo else "--nosudo",
                               env.system_install, data_dir))
                 env.safe_run("rm -f gemini_install.py")
