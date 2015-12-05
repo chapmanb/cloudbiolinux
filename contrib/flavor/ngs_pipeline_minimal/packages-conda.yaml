@@ -24,15 +24,18 @@ bio_nextgen:
   - fastqc
   - freebayes=0.9.21.26
   - gatk-framework
+  - gemini
   - glpk
   - grabix
   - hmmlearn
   - hisat2
   - htseq
+  - lofreq
   - lumpy-sv
   - manta
   - metasv
   - moreutils
+  - novoalign
   - optitype
   - parallel
   - pbgzip
