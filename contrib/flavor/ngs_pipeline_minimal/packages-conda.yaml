@@ -4,6 +4,7 @@ channels:
   - bioconda
   - r
 minimal:
+  - s3gof3r
   - p7zip
 bio_nextgen:
   - age-metasv
@@ -17,6 +18,7 @@ bio_nextgen:
   - bwa
   - bwakit
   - bio-vcf
+  - cancerit-allelecount
   - cnvkit
   - cramtools
   - cufflinks
@@ -29,6 +31,7 @@ bio_nextgen:
   - grabix
   - hmmlearn
   - hisat2
+  - htslib
   - htseq
   - lofreq
   - lumpy-sv
@@ -36,6 +39,7 @@ bio_nextgen:
   - metasv
   - moreutils
   - novoalign
+  - oncofuse
   - optitype
   - parallel
   - pbgzip
@@ -56,6 +60,7 @@ bio_nextgen:
   - scalpel
   - seqbuster
   - seqtk
+  - sickle-trim
   - spades
   - snpeff
   - star
