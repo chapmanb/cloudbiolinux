@@ -1,5 +1,7 @@
 ---
 cpan:
+  # mirdeep2
+  - PDF::API2
   # VEP dependencies
   - parent
   - Encode::Locale
