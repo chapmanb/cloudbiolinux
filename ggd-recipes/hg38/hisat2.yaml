@@ -1,0 +1,27 @@
+# hisat2 (v2.0.1) reference with Ensembl release 78 exon and splicesite annotations
+# Derived from NCBI set with HLA and decoy alternative alleles
+# ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
+# README.md has an in depth description of how this was created
+---
+attributes:
+  name: hisat2
+  version: 12-07-2015
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=https://s3.amazonaws.com/biodata/genomes/hg38-hisat2-12-07-2015.tar.xz
+        wget -qO- $url > hg38-hisat2-tar.xz
+        tar zxvf hg38-hisat2-tar.xz
+        rm hg38-hisat2-tar.xz
+    recipe_outfiles:
+      -hisat2/hg38.1.ht2
+      -hisat2/hg38.2.ht2
+      -hisat2/hg38.3.ht2
+      -hisat2/hg38.4.ht2
+      -hisat2/hg38.5.ht2
+      -hisat2/hg38.6.ht2
+      -hisat2/hg38.7.ht2
+      -hisat2/hg38.8.ht2
+      -hisat2/README.md
