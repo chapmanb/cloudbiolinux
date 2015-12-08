@@ -89,6 +89,7 @@ bio_nextgen:
   - varscan
   - vawk
   - vcflib
+  - viennarna
   - vt
 r:
   - r
