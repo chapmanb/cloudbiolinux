@@ -724,7 +724,11 @@ def _index_hisat2(ref_file):
         with open(exons_file, "w") as out_handle:
             exons_cmd = ["extract_exons.py", gtf_file]
             subprocess.check_call(exons_cmd, stdout=out_handle)
-        cmd += "--exon {exons_file} "
+        splicesites_file = index_prefix + ".splicesites"
+        with open(splicesites_file, "w") as out_handle:
+            splicesites_cmd = ["extract_splice_sites.py", gtf_file]
+            subprocess.check_call(splicesites_cmd, stdout=out_handle)
+        cmd += "--exon {exons_file} --ss {splicesites_file} "
     cmd += "{ref_file} {index_prefix}"
     cmd = cmd.format(**locals())
     if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
