@@ -21,6 +21,7 @@ bio_nextgen:
   - cancerit-allelecount
   - cnvkit
   - cramtools
+  - crossmap
   - cufflinks
   - cutadapt
   - fastqc
@@ -91,6 +92,23 @@ bio_nextgen:
   - vcflib
   - viennarna
   - vt
+perl:
+  - perl-app-cpanminus
+  - perl-archive-extract
+  - perl-archive-zip
+  - perl-bio-db-sam
+  - perl-cgi
+  - perl-dbi
+  - perl-encode-locale
+  - perl-file-fetch
+  - perl-file-sharedir
+  - perl-file-sharedir-install
+  - perl-ipc-system-simple
+  - perl-lwp-simple
+  - perl-lwp-protocol-https
+  - perl-statistics-descriptive
+  - perl-time-hires
+  - perl-vcftools-vcf
 r:
   - r
   - r-rcolorbrewer
