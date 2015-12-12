@@ -18,6 +18,7 @@ to_remove:
   - freebayes
   - gatk-framework
   - grabix
+  - hall-lab-sv-tools
   - htslib
   - impute2
   - lofreq
@@ -39,6 +40,8 @@ to_remove:
   - spades-binary
   - theta2
   - tophat-binary
+  - qsignature
+  - rtg-tools
   - scalpel
   - seqbuster
   - seqtk
@@ -47,10 +50,10 @@ to_remove:
   - vardict
   - vardict-java
   - vcflib
+  - vep
   - vt
 minimal:
 perl:
-  - cpanminus
 bio_nextgen:
   alignment:
   assembly:
@@ -59,10 +62,6 @@ bio_nextgen:
   analysis:
   variant:
     - delly;--with-binary
-    - hall-lab-sv-tools
-    - rtg-tools
-    - vep
-    - qsignature
 old-unused:
   # - staden_io_lib # Migrated to samtools indexing
   # - express-binary # No longer used with Sailfish

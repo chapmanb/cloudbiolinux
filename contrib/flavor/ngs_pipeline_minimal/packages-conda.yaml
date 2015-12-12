@@ -30,6 +30,7 @@ bio_nextgen:
   - gemini
   - glpk
   - grabix
+  - hall-lab-svtools
   - hmmlearn
   - hisat2
   - htslib
@@ -38,6 +39,7 @@ bio_nextgen:
   - lumpy-sv
   - manta
   - metasv
+  - mirdeep2
   - moreutils
   - novoalign
   - oncofuse
@@ -51,8 +53,10 @@ bio_nextgen:
   - phylowgs
   - pytabix
   - pythonpy
+  - qsignature
   - qualimap
   - razers3
+  - rtg-tools
   - sailfish
   - sambamba
   - samblaster
@@ -87,6 +91,7 @@ bio_nextgen:
   - wham
   - vardict
   - vardict-java
+  - variant-effect-predictor
   - varscan
   - vawk
   - vcflib
