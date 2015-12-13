@@ -11,6 +11,7 @@ bio_nextgen:
   - bamtools
   - bcbio-prioritize
   - bcbio-variation-recall
+  - bcbreport
   - bcftools
   - bedtools=2.24.0
   - biobambam
@@ -24,6 +25,7 @@ bio_nextgen:
   - crossmap
   - cufflinks
   - cutadapt
+  - delly
   - fastqc
   - freebayes=0.9.21.26
   - gatk-framework
@@ -35,6 +37,7 @@ bio_nextgen:
   - hisat2
   - htslib
   - htseq
+  - kraken
   - lofreq
   - lumpy-sv
   - manta

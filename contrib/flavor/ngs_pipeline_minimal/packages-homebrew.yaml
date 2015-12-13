@@ -14,6 +14,7 @@ to_remove:
   - cancerit-allelecount
   - cramtools
   - cufflinks-binary
+  - delly
   - fastqc
   - freebayes
   - gatk-framework
@@ -21,6 +22,7 @@ to_remove:
   - hall-lab-sv-tools
   - htslib
   - impute2
+  - kraken
   - lofreq
   - lumpy-sv
   - manta
@@ -55,13 +57,6 @@ to_remove:
 minimal:
 perl:
 bio_nextgen:
-  alignment:
-  assembly:
-  utilities:
-    - kraken
-  analysis:
-  variant:
-    - delly;--with-binary
 old-unused:
   # - staden_io_lib # Migrated to samtools indexing
   # - express-binary # No longer used with Sailfish

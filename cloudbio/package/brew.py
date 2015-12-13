@@ -34,6 +34,7 @@ def install_packages(env, to_install=None, packages=None):
         (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
     # if we have no packages to install, do not try to install or update brew
     if len(packages) == 0:
+        _remove_old(env, config_file.base)
         return
     system.install_homebrew(env)
     brew_cmd = _brew_cmd(env)
@@ -58,6 +59,17 @@ def install_packages(env, to_install=None, packages=None):
         to_remove = yaml.load(in_handle).get("to_remove", [])
     for pkg_str in ["curl"] + to_remove:
         _safe_uninstall_pkg(env, pkg_str, brew_cmd)
+
+def _remove_old(env, config_file):
+    """Temporary approach to remove an old brew install migrated to conda packages.
+    """
+    brew_cmd = os.path.join(env.system_install, "bin", "brew")
+    if env.safe_exists(brew_cmd):
+        baseline = ["pkg-config", "openssl", "cmake", "unzip", "curl"]
+        with open(config_file) as in_handle:
+            to_remove = yaml.load(in_handle).get("to_remove", [])
+        for pkg_str in baseline + to_remove:
+            _safe_uninstall_pkg(env, pkg_str, brew_cmd)
 
 def _safe_update(env, brew_cmd, formula_repos, cur_taps):
     """Revert any taps if we fail to update due to local changes.
