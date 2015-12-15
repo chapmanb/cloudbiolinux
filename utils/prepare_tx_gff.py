@@ -569,6 +569,9 @@ def prepare_mask_gtf(gtf):
     if file_exists(out_file):
         return out_file
     biotype_lookup = _biotype_lookup_fn(gtf)
+    # if we can't find a biotype column, skip this
+    if not biotype_lookup:
+        return None
     db = _get_gtf_db(gtf)
     with open(out_file, "w") as out_handle:
         for g in db.all_features():
@@ -729,8 +732,6 @@ def guess_id_spec(gtf_file):
     if "transcript_id" in attributes:
         id_spec["transcript"] = "transcript_id"
         attributes.remove("transcript_id")
-    # for attribute in attributes:
-    #     id_spec[attribute] = subfeature_handler
     return id_spec
 
 def _get_gtf_db(gtf):
