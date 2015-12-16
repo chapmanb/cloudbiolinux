@@ -34,7 +34,6 @@ from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
-import multiprocessing as mp
 
 # -- Configuration for genomes to download and prepare
 
@@ -697,7 +696,10 @@ def _index_star(ref_file):
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
-    cpu = mp.cpu_count()
+    try:
+        cpu = env.cores
+    except:
+        cpu = 1
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
            "--runMode genomeGenerate "
@@ -715,7 +717,10 @@ def _index_hisat2(ref_file):
     if not env.safe_exists(dir_name):
         env.safe_run('mkdir -p %s' % dir_name)
     index_prefix = os.path.join(dir_name, build)
-    cpu = mp.cpu_count()
+    try:
+        cpu = env.cores
+    except:
+        cpu = 1
     cmd = "hisat2-build -p {cpu} "
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the exons file." % (gtf_file)

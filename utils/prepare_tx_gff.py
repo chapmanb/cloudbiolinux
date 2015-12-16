@@ -252,7 +252,7 @@ def write_version(build=None, gtf_file=None):
 
 # ## Main driver functions
 
-def main(org_build, gtf_file, genome_fasta, genome_dir):
+def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
     genome_dir = genome_dir if genome_dir else os.curdir
     build_dir = os.path.abspath(os.path.join(genome_dir, org_build))
     work_dir = os.path.join(build_dir, "tmpcbl")
@@ -783,6 +783,8 @@ def prepare_dexseq(gtf):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
                             "organism.")
+    parser.add_argument("-c", "--cores", default=1,
+                        help="number of cores to use")
     parser.add_argument("--gtf",
                         help="Optional GTF file (instead of downloading from Ensembl)",
                         default=None),
@@ -800,4 +802,4 @@ if __name__ == "__main__":
         genome_dir = os.path.join(args.genome_dir, args.organism)
     else:
         genome_dir = os.curdir
-    main(args.org_build, args.gtf, args.fasta, genome_dir)
+    main(args.org_build, args.gtf, args.fasta, genome_dir, args.cores)
