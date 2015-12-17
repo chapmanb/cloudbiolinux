@@ -10,6 +10,7 @@ bio_nextgen:
   - age-metasv
   - bamtools
   - bcbio-prioritize
+  - bcbio-rnaseq
   - bcbio-variation-recall
   - bcbreport
   - bcftools
