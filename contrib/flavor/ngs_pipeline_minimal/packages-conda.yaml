@@ -134,8 +134,10 @@ r:
   - r-rgl
   - r-plyr
   - r-rsqlite
+  - r-sleuth
   - r-snow
   - r-stringi
+  - r-wasabi
   - r-xtable
   - bioconductor-annotate
   - bioconductor-biocinstaller
