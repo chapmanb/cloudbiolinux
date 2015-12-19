@@ -4,8 +4,9 @@ channels:
   - bioconda
   - r
 minimal:
-  - s3gof3r
+  - awscli
   - p7zip
+  - s3gof3r
 bio_nextgen:
   - age-metasv
   - bamtools
@@ -22,6 +23,7 @@ bio_nextgen:
   - bio-vcf
   - cancerit-allelecount
   - cnvkit
+  - cpat
   - cramtools
   - crossmap
   - cufflinks
