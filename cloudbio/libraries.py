@@ -46,8 +46,9 @@ def _make_install_script(out_file, config):
     cran.repos <- getOption("repos")
     cran.repos["CRAN" ] <- "%s"
     options(repos=cran.repos)
-    source("%s")
-    """ % (lib_loc, config["cranrepo"], config["biocrepo"])
+    """ % (lib_loc, config["cranrepo"])
+    if config.get("biocrepo"):
+        repo_info += """\nsource("%s")\n""" % config["biocrepo"]
     env.safe_append(out_file, repo_info)
     install_fn = """
     repo.installer <- function(repos, install.fn, pkg_name_fn) {
@@ -78,7 +79,7 @@ def _make_install_script(out_file, config):
     lapply(std.pkgs, std.installer)
     """ % (", ".join('"%s"' % p for p in config['cran']))
     env.safe_append(out_file, std_install)
-    if len(config.get("bioc", [])) > 0:
+    if len(config.get("bioc") or []) > 0:
         bioc_install = """
         bioc.pkgs <- c(%s)
         bioc.installer = repo.installer(biocinstallRepos(), biocLite, NULL)

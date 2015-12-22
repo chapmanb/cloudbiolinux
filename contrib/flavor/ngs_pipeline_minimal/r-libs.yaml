@@ -1,34 +1,13 @@
 ---
 cranrepo: http://cran.fhcrc.org/
 cran:
-  - devtools
-  - cghFLasso
-  - ggplot2
-  - gsalib
-  - gtools
-  - matrixStats
   - rainbow
-  - WriteXLS
-  - reshape
-  - plyr
-  - dplyr
-  - knitr
-  - gplots
-  - GGally
-  - ggdendro
-  - gridExtra
-  - pheatmap
 cran-after-bioc:
   - PSCBS
-biocrepo: http://bioconductor.org/biocLite.R
+#biocrepo: http://bioconductor.org/biocLite.R
 bioc:
- - BiocStyle
- - cn.mops
- - DEXSeq
- - DNAcopy
 github:
   - Bioconductor-mirror/BubbleTree@6a85d81;2.1.4
-  - hbc/CHBUtils@ae6e08e;0.1
   - lpantano/DEGreport@b8a5e15;1.5.0
 #github:
 #  - genome/bmm@b49c57a
