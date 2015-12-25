@@ -73,12 +73,13 @@ def _make_install_script(out_file, config):
     else:
         update_str = "\n"
     env.safe_append(out_file, install_fn % update_str)
-    std_install = """
-    std.pkgs <- c(%s)
-    std.installer = repo.installer(cran.repos, install.packages, NULL)
-    lapply(std.pkgs, std.installer)
-    """ % (", ".join('"%s"' % p for p in config['cran']))
-    env.safe_append(out_file, std_install)
+    if len(config.get("cran") or []) > 0:
+        std_install = """
+        std.pkgs <- c(%s)
+        std.installer = repo.installer(cran.repos, install.packages, NULL)
+        lapply(std.pkgs, std.installer)
+        """ % (", ".join('"%s"' % p for p in config['cran']))
+        env.safe_append(out_file, std_install)
     if len(config.get("bioc") or []) > 0:
         bioc_install = """
         bioc.pkgs <- c(%s)

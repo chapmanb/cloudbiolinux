@@ -123,44 +123,36 @@ perl:
   - perl-vcftools-vcf
 r:
   - r
-  - r-r.cache
-  - r-future
+  - r-e1071
+  - r-gtools
+  - r-magrittr
+  - r-rcolorbrewer
+  - r-rainbow
+  - r-writexls
   - r-cghflasso
   - r-chbutils
-  - r-rcolorbrewer
-  - r-colorspace
   - r-devtools
   - r-dplyr
-  - r-locfit
   - r-knitr
-  - r-magrittr
-  - r-rcpp
-  - r-rcpparmadillo
-  - r-rcurl
-  - r-e1071
   - r-ggdendro
   - r-ggplot2
   - r-gplots
   - r-gsalib
-  - r-gtools
-  - r-matrixstats
   - r-pheatmap
   - r-plyr
-  - r-rgl
+  - r-pscbs
   - r-rsqlite
   - r-sleuth
   - r-snow
-  - r-statmod
   - r-stringi
   - r-wasabi
-  - r-writexls
-  - r-xtable
   - bioconductor-annotate
   - bioconductor-biocinstaller
   - bioconductor-biocstyle
   - bioconductor-biostrings
   - bioconductor-biovizbase
   - bioconductor-cn.mops
+  - bioconductor-degreport
   - bioconductor-deseq2
   - bioconductor-dexseq
   - bioconductor-dnacopy
