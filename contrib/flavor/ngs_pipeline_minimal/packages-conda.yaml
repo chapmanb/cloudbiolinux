@@ -126,6 +126,7 @@ r:
   - r-e1071
   - r-gtools
   - r-magrittr
+  - r-rmarkdown
   - r-rcolorbrewer
   - r-rainbow
   - r-writexls
