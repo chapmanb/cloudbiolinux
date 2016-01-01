@@ -9,28 +9,29 @@ from cloudbio.custom import shared
 def r_library_installer(config):
     """Install R libraries using CRAN and Bioconductor.
     """
-    with shared._make_tmp_dir() as tmp_dir:
-        with cd(tmp_dir):
-            # Create an Rscript file with install details.
-            out_file = os.path.join(tmp_dir, "install_packages.R")
-            _make_install_script(out_file, config)
-            # run the script and then get rid of it
-            # try using either
-            rlib_installed = False
-            rscripts = []
-            conda_bin = shared._conda_cmd(env)
-            if conda_bin:
-                rscripts.append(fabutils.find_cmd(env, os.path.join(os.path.dirname(conda_bin), "Rscript"),
-                                                  "--version"))
-            rscripts.append(fabutils.find_cmd(env, "Rscript", "--version"))
-            for rscript in rscripts:
-                if rscript:
-                    env.safe_run("%s %s" % (rscript, out_file))
-                    rlib_installed = True
-                    break
-            if not rlib_installed:
-                env.logger.warn("Rscript not found; skipping install of R libraries.")
-            env.safe_run("rm -f %s" % out_file)
+    if config.get("cran") or config.get("bioc") or config.get("github"):
+        with shared._make_tmp_dir() as tmp_dir:
+            with cd(tmp_dir):
+                # Create an Rscript file with install details.
+                out_file = os.path.join(tmp_dir, "install_packages.R")
+                _make_install_script(out_file, config)
+                # run the script and then get rid of it
+                # try using either
+                rlib_installed = False
+                rscripts = []
+                conda_bin = shared._conda_cmd(env)
+                if conda_bin:
+                    rscripts.append(fabutils.find_cmd(env, os.path.join(os.path.dirname(conda_bin), "Rscript"),
+                                                    "--version"))
+                rscripts.append(fabutils.find_cmd(env, "Rscript", "--version"))
+                for rscript in rscripts:
+                    if rscript:
+                        env.safe_run("%s %s" % (rscript, out_file))
+                        rlib_installed = True
+                        break
+                if not rlib_installed:
+                    env.logger.warn("Rscript not found; skipping install of R libraries.")
+                env.safe_run("rm -f %s" % out_file)
 
 def _make_install_script(out_file, config):
     if env.safe_exists(out_file):

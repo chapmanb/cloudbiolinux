@@ -53,11 +53,11 @@ bio_nextgen:
   - optitype
   - parallel
   - pbgzip
+  - phylowgs
   - picard
   - pindel
   - platypus-variant
   - pyloh
-  - phylowgs
   - pytabix
   - pythonpy
   - qsignature
@@ -123,13 +123,6 @@ perl:
   - perl-vcftools-vcf
 r:
   - r
-  - r-e1071
-  - r-gtools
-  - r-magrittr
-  - r-rmarkdown
-  - r-rcolorbrewer
-  - r-rainbow
-  - r-writexls
   - r-cghflasso
   - r-chbutils
   - r-devtools
@@ -142,6 +135,7 @@ r:
   - r-pheatmap
   - r-plyr
   - r-pscbs
+  - r-rmarkdown
   - r-rsqlite
   - r-sleuth
   - r-snow
@@ -152,6 +146,7 @@ r:
   - bioconductor-biocstyle
   - bioconductor-biostrings
   - bioconductor-biovizbase
+  - bioconductor-bubbletree
   - bioconductor-cn.mops
   - bioconductor-degreport
   - bioconductor-deseq2

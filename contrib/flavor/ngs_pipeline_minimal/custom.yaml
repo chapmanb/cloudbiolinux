@@ -2,8 +2,8 @@
 bio_nextgen:
   alignment:
   utilities:
-    - rnaseqc
   analysis:
+    # Drop custom Picard after next bcbio release
     - picard
   variant:
     - bcbio_variation
