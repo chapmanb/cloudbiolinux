@@ -318,8 +318,9 @@ GENOMES_SUPPORTED = [
                                                "AgamP3", ["CHROMOSOMES"])),]
 
 
-GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "mosaik", "snap", "star", "rtg"]
+GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign",
+                            "novoalign-cs", "ucsc", "mosaik", "snap", "star",
+                            "rtg", "hisat2"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
