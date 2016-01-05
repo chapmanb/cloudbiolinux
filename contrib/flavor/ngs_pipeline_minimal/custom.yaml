@@ -1,9 +1,9 @@
 ---
+# Remove remaining custom packages after next bcbio release
 bio_nextgen:
   alignment:
   utilities:
   analysis:
-    # Drop custom Picard after next bcbio release
     - picard
   variant:
     - bcbio_variation

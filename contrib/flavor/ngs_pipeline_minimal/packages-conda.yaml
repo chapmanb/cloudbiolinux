@@ -12,6 +12,7 @@ bio_nextgen:
   - bamtools
   - bcbio-prioritize
   - bcbio-rnaseq
+  - bcbio-variation
   - bcbio-variation-recall
   - bcbreport
   - bcftools
