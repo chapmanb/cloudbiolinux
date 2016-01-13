@@ -1,6 +1,5 @@
 ---
 channels:
-  - bcbio
   - bioconda
   - r
 minimal:
@@ -99,6 +98,7 @@ bio_nextgen:
   - wham
   - vardict
   - vardict-java
+  - variantbam
   - variant-effect-predictor
   - varscan
   - vawk
