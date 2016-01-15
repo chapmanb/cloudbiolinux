@@ -291,7 +291,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
         prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
-        if rrna_gtf:
+        if file_exists(rrna_gtf):
             gtf_to_interval(rrna_gtf, genome_fasta)
         prepare_tophat_index(gtf_file, org_build, genome_fasta)
         transcriptome_fasta = make_transcriptome_fasta(gtf_file, genome_fasta)
