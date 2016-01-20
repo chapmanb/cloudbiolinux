@@ -316,8 +316,6 @@ GENOMES_SUPPORTED = [
            ("Agambiae", "AgamP3", VectorBase("AgamP3", "Anopheles",
                                                "gambiae", "PEST",
                                                "AgamP3", ["CHROMOSOMES"])),]
-
-
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign",
                             "novoalign-cs", "ucsc", "mosaik", "snap", "star",
                             "rtg", "hisat2"]
@@ -697,14 +695,20 @@ def _index_star(ref_file):
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
+    # if there is a large number of contigs, scale nbits down
+    # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
+    cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
+    nrefs = float(subprocess.check_output(cmd, shell=True))
+    nbits = int(round(min(18, log(GenomeLength/nrefs, 2))))
     try:
         cpu = env.cores
     except:
         cpu = 1
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
+           "--genomeChrBinNbits %s "
            "--runMode genomeGenerate "
-           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases))
+           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases, nbits))
     if not env.safe_exists(os.path.join(dir_name, "SA")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name
