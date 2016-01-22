@@ -288,6 +288,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
         gtf_file = db_to_gtf(db, gtf_file)
         gtf_to_refflat(gtf_file)
         gtf_to_bed(gtf_file)
+        prepare_tx2gene(gtf_file)
         prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
@@ -600,6 +601,21 @@ def prepare_rrna_gtf(gtf):
             biotype = biotype_lookup(feature)
             if biotype in mask_biotype:
                 out_handle.write(str(feature) + "\n")
+    return out_file
+
+def prepare_tx2gene(gtf):
+    """
+    prepare a file mapping transcripts to genes
+    """
+    db = _get_gtf_db(gtf)
+    out_file = os.path.join(os.path.dirname(gtf), "tx2gene.csv")
+    if file_exists(out_file):
+        return out_file
+    with open(out_file, "w") as out_handle:
+        for transcript in db.features_of_type('transcript'):
+            gene_id = transcript['gene_id'][0]
+            transcript_id = transcript['transcript_id'][0]
+            out_handle.write(",".join([transcript_id, gene_id]) + "\n")
     return out_file
 
 def _biotype_lookup_fn(gtf):
