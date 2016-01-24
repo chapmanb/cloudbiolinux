@@ -1,8 +1,8 @@
 ---
+# Remove remaining custom packages after next bcbio release
 bio_nextgen:
   alignment:
   utilities:
-    - rnaseqc
   analysis:
     - picard
   variant:

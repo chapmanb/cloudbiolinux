@@ -1,28 +1,33 @@
 ---
 cpan:
-  # VEP dependencies
-  - parent
-  - Encode::Locale
-  - Statistics::Descriptive
-  - Archive::Extract
-  - Archive::Zip
-  - Archive::Tar
-  - Compress::Raw::Zlib
-  - DBI
-  - LWP::Simple
-  - LWP::Protocol::https
-  - Time::HiRes
-  - IPC::Cmd
-  - IPC::System::Simple
-  - Params::Check
-  - Module::Load::Conditional
-  - Archive::Tar
-  - File::Fetch
-  - File::ShareDir
-  - File::ShareDir::Install
-  # Sanger Cancer library dependencies
-  - Bio::DB::Sam;--config lddlflags=-shared;SAMTOOLS={system_install}/share/samtools-0.1
-  - Vcf==0.953==https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
+  # mirdeep2
+  # - PDF::API2
+  # ## VEP dependencies
+  # don't need with conda perl
+  # - parent
+  # - Archive::Tar
+  # - Module::Load::Conditional
+  # - IPC::Cmd
+  # - Params::Check
+  # ## Migrated to conda
+  # - Encode::Locale
+  # - Archive::Extract
+  # - Archive::Zip
+  # - Statistics::Descriptive
+  # - Compress::Raw::Zlib
+  # - DBI
+  # - LWP::Simple
+  # - LWP::Protocol::https
+  # - File::Fetch
+  # - File::ShareDir
+  # - File::ShareDir::Install
+  # - Time::HiRes
+  # - IPC::System::Simple
+  # ## Sanger Cancer library dependencies
+  # - Bio::DB::Sam;--config lddlflags=-shared;SAMTOOLS={system_install}/share/samtools-0.1
+  # - Vcf==0.953==https://github.com/chapmanb/vcftools-cpan/archive/v0.953.tar.gz
+
+  # Sanger Cancer library dependencies -- to migrate
   #- Sanger::CGP::Vcf==1.2.3==https://github.com/cancerit/cgpVcf/archive/v1.2.3.tar.gz
   #- Sanger::CGP::AlleleCount==2.1.0==https://github.com/cancerit/alleleCount/archive/v2.1.0.tar.gz==build=perl
   #- PCAP==1.8.1==https://github.com/ICGC-TCGA-PanCancer/PCAP-core/archive/v1.8.1.tar.gz==depremove=GD

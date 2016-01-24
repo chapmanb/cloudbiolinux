@@ -1,15 +1,19 @@
 ---
 channels:
-  - bcbio
   - bioconda
   - r
 minimal:
+  - awscli
   - p7zip
+  - s3gof3r
 bio_nextgen:
   - age-metasv
   - bamtools
   - bcbio-prioritize
+  - bcbio-rnaseq
+  - bcbio-variation
   - bcbio-variation-recall
+  - bcbreport
   - bcftools
   - bedtools=2.24.0
   - biobambam
@@ -17,34 +21,49 @@ bio_nextgen:
   - bwa
   - bwakit
   - bio-vcf
+  - cancerit-allelecount
   - cnvkit
+  - cpat
   - cramtools
+  - crossmap
   - cufflinks
   - cutadapt
+  - delly
   - fastqc
   - freebayes=0.9.21.26
   - gatk-framework
+  - gemini
   - glpk
   - grabix
+  - hall-lab-svtools
   - hmmlearn
   - hisat2
+  - htslib
   - htseq
+  - kraken
+  - lofreq
   - lumpy-sv
+  - macs2
   - manta
   - metasv
+  - mirdeep2
   - moreutils
+  - novoalign
+  - oncofuse
   - optitype
   - parallel
   - pbgzip
+  - phylowgs
   - picard
   - pindel
   - platypus-variant
   - pyloh
-  - phylowgs
   - pytabix
   - pythonpy
+  - qsignature
   - qualimap
   - razers3
+  - rtg-tools
   - sailfish
   - sambamba
   - samblaster
@@ -53,6 +72,7 @@ bio_nextgen:
   - scalpel
   - seqbuster
   - seqtk
+  - sickle-trim
   - spades
   - snpeff
   - star
@@ -78,33 +98,61 @@ bio_nextgen:
   - wham
   - vardict
   - vardict-java
+  - variantbam
+  - variant-effect-predictor
   - varscan
   - vawk
   - vcflib
+  - viennarna
   - vt
+perl:
+  - perl-app-cpanminus
+  - perl-archive-extract
+  - perl-archive-zip
+  - perl-bio-db-sam
+  - perl-cgi
+  - perl-dbi
+  - perl-encode-locale
+  - perl-file-fetch
+  - perl-file-sharedir
+  - perl-file-sharedir-install
+  - perl-ipc-system-simple
+  - perl-lwp-simple
+  - perl-lwp-protocol-https
+  - perl-statistics-descriptive
+  - perl-time-hires
+  - perl-vcftools-vcf
 r:
   - r
-  - r-rcolorbrewer
-  - r-colorspace
+  - r-cghflasso
+  - r-chbutils
   - r-devtools
   - r-dplyr
-  - r-locfit
-  - r-magrittr
-  - r-rcpp
-  - r-rcpparmadillo
-  - r-rcurl
-  - r-e1071
-  - r-rgl
+  - r-knitr
+  - r-ggdendro
+  - r-ggplot2
+  - r-gplots
+  - r-gsalib
+  - r-pheatmap
   - r-plyr
+  - r-pscbs
+  - r-rmarkdown
   - r-rsqlite
+  - r-sleuth
   - r-snow
   - r-stringi
-  - r-xtable
+  - r-wasabi
   - bioconductor-annotate
   - bioconductor-biocinstaller
+  - bioconductor-biocstyle
   - bioconductor-biostrings
   - bioconductor-biovizbase
+  - bioconductor-bubbletree
+  - bioconductor-cn.mops
+  - bioconductor-degreport
   - bioconductor-deseq2
+  - bioconductor-dexseq
+  - bioconductor-dnacopy
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma

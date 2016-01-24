@@ -11,60 +11,54 @@ to_remove:
   - bowtie2
   - bwa
   - bwakit
+  - cancerit-allelecount
   - cramtools
   - cufflinks-binary
+  - delly
   - fastqc
   - freebayes
   - gatk-framework
   - grabix
+  - hall-lab-sv-tools
   - htslib
   - impute2
+  - kraken
+  - lofreq
   - lumpy-sv
   - manta
+  - novoalign
+  - oncofuse
   - p7zip
   - picard-tools
   - pindel
   - platypus-variant
   - qualimap
   - sambamba-binary
+  - samtools-library-0.1
   - samblaster
   - samtools
+  - sickle
   - snpeff
   - spades-binary
   - theta2
   - tophat-binary
+  - qsignature
+  - rtg-tools
   - scalpel
   - seqbuster
   - seqtk
+  - staden_io_lib
   - wham
   - vardict
   - vardict-java
   - vcflib
+  - vep
   - vt
 minimal:
-  - s3gof3r
 perl:
-  - cpanminus
 bio_nextgen:
-  alignment:
-    - novoalign
-  assembly:
-  utilities:
-    - kraken
-    - staden_io_lib # Migrate to samtools indexing and remove
-    - oncofuse
-    - sickle
-  analysis:
-    - samtools-library-0.1
-  variant:
-    - cancerit-allelecount
-    - delly;--with-binary
-    - hall-lab-sv-tools
-    - lofreq
-    - rtg-tools
-    - vep
-    - qsignature
 old-unused:
+  # - staden_io_lib # Migrated to samtools indexing
   # - express-binary # No longer used with Sailfish
   # - glia  # Needs updates to fsom
   # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc

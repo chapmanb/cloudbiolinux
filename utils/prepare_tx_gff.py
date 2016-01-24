@@ -252,7 +252,7 @@ def write_version(build=None, gtf_file=None):
 
 # ## Main driver functions
 
-def main(org_build, gtf_file, genome_fasta, genome_dir):
+def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
     genome_dir = genome_dir if genome_dir else os.curdir
     build_dir = os.path.abspath(os.path.join(genome_dir, org_build))
     work_dir = os.path.join(build_dir, "tmpcbl")
@@ -288,10 +288,11 @@ def main(org_build, gtf_file, genome_fasta, genome_dir):
         gtf_file = db_to_gtf(db, gtf_file)
         gtf_to_refflat(gtf_file)
         gtf_to_bed(gtf_file)
+        prepare_tx2gene(gtf_file)
         prepare_dexseq(gtf_file)
         mask_gff = prepare_mask_gtf(gtf_file)
         rrna_gtf = prepare_rrna_gtf(gtf_file)
-        if rrna_gtf:
+        if file_exists(rrna_gtf):
             gtf_to_interval(rrna_gtf, genome_fasta)
         prepare_tophat_index(gtf_file, org_build, genome_fasta)
         transcriptome_fasta = make_transcriptome_fasta(gtf_file, genome_fasta)
@@ -569,6 +570,9 @@ def prepare_mask_gtf(gtf):
     if file_exists(out_file):
         return out_file
     biotype_lookup = _biotype_lookup_fn(gtf)
+    # if we can't find a biotype column, skip this
+    if not biotype_lookup:
+        return None
     db = _get_gtf_db(gtf)
     with open(out_file, "w") as out_handle:
         for g in db.all_features():
@@ -597,6 +601,21 @@ def prepare_rrna_gtf(gtf):
             biotype = biotype_lookup(feature)
             if biotype in mask_biotype:
                 out_handle.write(str(feature) + "\n")
+    return out_file
+
+def prepare_tx2gene(gtf):
+    """
+    prepare a file mapping transcripts to genes
+    """
+    db = _get_gtf_db(gtf)
+    out_file = os.path.join(os.path.dirname(gtf), "tx2gene.csv")
+    if file_exists(out_file):
+        return out_file
+    with open(out_file, "w") as out_handle:
+        for transcript in db.features_of_type('transcript'):
+            gene_id = transcript['gene_id'][0]
+            transcript_id = transcript['transcript_id'][0]
+            out_handle.write(",".join([transcript_id, gene_id]) + "\n")
     return out_file
 
 def _biotype_lookup_fn(gtf):
@@ -729,8 +748,6 @@ def guess_id_spec(gtf_file):
     if "transcript_id" in attributes:
         id_spec["transcript"] = "transcript_id"
         attributes.remove("transcript_id")
-    # for attribute in attributes:
-    #     id_spec[attribute] = subfeature_handler
     return id_spec
 
 def _get_gtf_db(gtf):
@@ -782,6 +799,8 @@ def prepare_dexseq(gtf):
 if __name__ == "__main__":
     parser = ArgumentParser(description="Prepare the transcriptome files for an "
                             "organism.")
+    parser.add_argument("-c", "--cores", default=1,
+                        help="number of cores to use")
     parser.add_argument("--gtf",
                         help="Optional GTF file (instead of downloading from Ensembl)",
                         default=None),
@@ -799,4 +818,4 @@ if __name__ == "__main__":
         genome_dir = os.path.join(args.genome_dir, args.organism)
     else:
         genome_dir = os.curdir
-    main(args.org_build, args.gtf, args.fasta, genome_dir)
+    main(args.org_build, args.gtf, args.fasta, genome_dir, args.cores)

@@ -34,7 +34,6 @@ from cloudbio.biodata.dbsnp import download_dbsnp
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
-import multiprocessing as mp
 
 # -- Configuration for genomes to download and prepare
 
@@ -317,10 +316,9 @@ GENOMES_SUPPORTED = [
            ("Agambiae", "AgamP3", VectorBase("AgamP3", "Anopheles",
                                                "gambiae", "PEST",
                                                "AgamP3", ["CHROMOSOMES"])),]
-
-
-GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign", "novoalign-cs",
-                            "ucsc", "mosaik", "snap", "star", "rtg"]
+GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign",
+                            "novoalign-cs", "ucsc", "mosaik", "snap", "star",
+                            "rtg", "hisat2"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -697,23 +695,52 @@ def _index_star(ref_file):
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2)/2 - 2), 0))
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
-    cpu = mp.cpu_count()
+    # if there is a large number of contigs, scale nbits down
+    # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
+    cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
+    nrefs = float(subprocess.check_output(cmd, shell=True))
+    nbits = int(round(min(18, log(GenomeLength/nrefs, 2))))
+    try:
+        cpu = env.cores
+    except:
+        cpu = 1
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
+           "--genomeChrBinNbits %s "
            "--runMode genomeGenerate "
-           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases))
+           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases, nbits))
     if not env.safe_exists(os.path.join(dir_name, "SA")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name
 
 @_if_installed("hisat2-build")
 def _index_hisat2(ref_file):
-    (ref_dir, local_file) = os.path.split(ref_file)
     build = os.path.splitext(os.path.basename(ref_file))[0]
+    (ref_dir, local_file) = os.path.split(ref_file)
+    gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
+    if not env.safe_exists(dir_name):
+        env.safe_run('mkdir -p %s' % dir_name)
     index_prefix = os.path.join(dir_name, build)
-    cpu = mp.cpu_count()
-    cmd = ("hisat2-build -p {cpu} {ref_file} {index_prefix}".format(**locals()))
+    try:
+        cpu = env.cores
+    except:
+        cpu = 1
+    cmd = "hisat2-build -p {cpu} "
+    if not os.path.exists(gtf_file):
+        print "%s not found, skipping creating the exons file." % (gtf_file)
+    else:
+        exons_file = index_prefix + ".exons"
+        with open(exons_file, "w") as out_handle:
+            exons_cmd = ["extract_exons.py", gtf_file]
+            subprocess.check_call(exons_cmd, stdout=out_handle)
+        splicesites_file = index_prefix + ".splicesites"
+        with open(splicesites_file, "w") as out_handle:
+            splicesites_cmd = ["extract_splice_sites.py", gtf_file]
+            subprocess.check_call(splicesites_cmd, stdout=out_handle)
+        cmd += "--exon {exons_file} --ss {splicesites_file} "
+    cmd += "{ref_file} {index_prefix}"
+    cmd = cmd.format(**locals())
     if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name

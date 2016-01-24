@@ -9,28 +9,29 @@ from cloudbio.custom import shared
 def r_library_installer(config):
     """Install R libraries using CRAN and Bioconductor.
     """
-    with shared._make_tmp_dir() as tmp_dir:
-        with cd(tmp_dir):
-            # Create an Rscript file with install details.
-            out_file = os.path.join(tmp_dir, "install_packages.R")
-            _make_install_script(out_file, config)
-            # run the script and then get rid of it
-            # try using either
-            rlib_installed = False
-            rscripts = []
-            conda_bin = shared._conda_cmd(env)
-            if conda_bin:
-                rscripts.append(fabutils.find_cmd(env, os.path.join(os.path.dirname(conda_bin), "Rscript"),
-                                                  "--version"))
-            rscripts.append(fabutils.find_cmd(env, "Rscript", "--version"))
-            for rscript in rscripts:
-                if rscript:
-                    env.safe_run("%s %s" % (rscript, out_file))
-                    rlib_installed = True
-                    break
-            if not rlib_installed:
-                env.logger.warn("Rscript not found; skipping install of R libraries.")
-            env.safe_run("rm -f %s" % out_file)
+    if config.get("cran") or config.get("bioc") or config.get("github"):
+        with shared._make_tmp_dir() as tmp_dir:
+            with cd(tmp_dir):
+                # Create an Rscript file with install details.
+                out_file = os.path.join(tmp_dir, "install_packages.R")
+                _make_install_script(out_file, config)
+                # run the script and then get rid of it
+                # try using either
+                rlib_installed = False
+                rscripts = []
+                conda_bin = shared._conda_cmd(env)
+                if conda_bin:
+                    rscripts.append(fabutils.find_cmd(env, os.path.join(os.path.dirname(conda_bin), "Rscript"),
+                                                    "--version"))
+                rscripts.append(fabutils.find_cmd(env, "Rscript", "--version"))
+                for rscript in rscripts:
+                    if rscript:
+                        env.safe_run("%s %s" % (rscript, out_file))
+                        rlib_installed = True
+                        break
+                if not rlib_installed:
+                    env.logger.warn("Rscript not found; skipping install of R libraries.")
+                env.safe_run("rm -f %s" % out_file)
 
 def _make_install_script(out_file, config):
     if env.safe_exists(out_file):
@@ -46,8 +47,9 @@ def _make_install_script(out_file, config):
     cran.repos <- getOption("repos")
     cran.repos["CRAN" ] <- "%s"
     options(repos=cran.repos)
-    source("%s")
-    """ % (lib_loc, config["cranrepo"], config["biocrepo"])
+    """ % (lib_loc, config["cranrepo"])
+    if config.get("biocrepo"):
+        repo_info += """\nsource("%s")\n""" % config["biocrepo"]
     env.safe_append(out_file, repo_info)
     install_fn = """
     repo.installer <- function(repos, install.fn, pkg_name_fn) {
@@ -72,13 +74,14 @@ def _make_install_script(out_file, config):
     else:
         update_str = "\n"
     env.safe_append(out_file, install_fn % update_str)
-    std_install = """
-    std.pkgs <- c(%s)
-    std.installer = repo.installer(cran.repos, install.packages, NULL)
-    lapply(std.pkgs, std.installer)
-    """ % (", ".join('"%s"' % p for p in config['cran']))
-    env.safe_append(out_file, std_install)
-    if len(config.get("bioc", [])) > 0:
+    if len(config.get("cran") or []) > 0:
+        std_install = """
+        std.pkgs <- c(%s)
+        std.installer = repo.installer(cran.repos, install.packages, NULL)
+        lapply(std.pkgs, std.installer)
+        """ % (", ".join('"%s"' % p for p in config['cran']))
+        env.safe_append(out_file, std_install)
+    if len(config.get("bioc") or []) > 0:
         bioc_install = """
         bioc.pkgs <- c(%s)
         bioc.installer = repo.installer(biocinstallRepos(), biocLite, NULL)

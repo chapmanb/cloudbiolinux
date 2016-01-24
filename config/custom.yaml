@@ -43,7 +43,6 @@ bio_nextgen:
   variant:
     - bcbio_variation
     - crisp
-    - gemini
     - grabix
     - mutect
     - tassel

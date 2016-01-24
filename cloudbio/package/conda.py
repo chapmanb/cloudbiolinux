@@ -32,7 +32,7 @@ def install_packages(env, to_install=None, packages=None):
             _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
         # remove packages we want the system to supply
         # curl https://github.com/ContinuumIO/anaconda-issues/issues/72
-        system_packages = ["curl", "java-jdk"]
+        system_packages = ["curl"]
         pkgs_str = " ".join(system_packages)
         with settings(warn_only=True):
             env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
