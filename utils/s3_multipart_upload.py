@@ -9,6 +9,10 @@ This parallelizes the task over available cores using multiprocessing.
 It checks for an up to date version of the file remotely, skipping transfer
 if found.
 
+Note: by default this will look for your default AWS Access Key ID and AWS Secret Access Key
+ you setup via 'aws configure'.  You can store additional profiles using 
+ 'aws configure --profile <some_profile_name>'
+
 Usage:
   s3_multipart_upload.py <file_to_transfer> <bucket_name> [<s3_key_name>]
     if <s3_key_name> is not specified, the filename will be used.
