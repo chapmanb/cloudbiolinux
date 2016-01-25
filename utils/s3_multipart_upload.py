@@ -16,6 +16,7 @@ Usage:
     --norr -- Do not use reduced redundancy storage.
     --public -- Make uploaded files public.
     --cores=n -- Number of cores to use for upload
+    --profile -- The alternate AWS profile to use for your keys located in ~/.aws/config
 
     Files are stored at cheaper reduced redundancy storage by default.
 """
@@ -33,10 +34,13 @@ import rfc822
 import boto
 
 def main(transfer_file, bucket_name, s3_key_name=None, use_rr=True,
-         make_public=True, cores=None):
+         make_public=True, cores=None, profile=None):
     if s3_key_name is None:
         s3_key_name = os.path.basename(transfer_file)
-    conn = boto.connect_s3()
+    if profile is None:
+		conn = boto.connect_s3()
+    else:
+		conn = boto.connect_s3(profile_name=profile)
     bucket = conn.lookup(bucket_name)
     if bucket is None:
         bucket = conn.create_bucket(bucket_name)
@@ -154,10 +158,11 @@ if __name__ == "__main__":
                       action="store_true", default=False)
     parser.add_option("-c", "--cores", dest="cores",
                       default=multiprocessing.cpu_count())
+    parser.add_option("--profile", dest="profile")
     (options, args) = parser.parse_args()
     if len(args) < 2:
         print __doc__
         sys.exit()
     kwargs = dict(use_rr=options.use_rr, make_public=options.make_public,
-                  cores=int(options.cores))
+                  cores=int(options.cores), profile=options.profile)
     main(*args, **kwargs)
