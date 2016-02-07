@@ -53,6 +53,7 @@ bio_nextgen:
   - optitype
   - parallel
   - pbgzip
+  - perl-sanger-cgp-battenberg
   - phylowgs
   - picard
   - pindel
