@@ -23,6 +23,12 @@ def install_packages(env, to_install=None, packages=None):
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
+        # Transition change -- ensure installed perl is perl-threaded
+        system_packages = ["perl", "perl-threaded"]
+        pkgs_str = " ".join(system_packages)
+        with settings(warn_only=True):
+            env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
+        # install our customized packages
         if len(packages) > 0:
             pkgs_str = " ".join(packages)
             env.safe_run("{conda_bin} install -y {channels} {pkgs_str}".format(**locals()))
