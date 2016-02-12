@@ -138,6 +138,7 @@ r:
   - r-pheatmap
   - r-plyr
   - r-pscbs
+  - r-reshape
   - r-rmarkdown
   - r-rsqlite
   - r-sleuth
