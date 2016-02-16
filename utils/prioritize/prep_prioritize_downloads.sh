@@ -1,17 +1,24 @@
 #!/bin/bash
 set -eu -o pipefail
-version=20151125
-civicv=2015-11-04
-civicv38=2015-11-16
+version=20160215
+civicv=2016-02-15
+civicv38=2016-02-15
 
 mkdir -p hg19/cancer
 mkdir -p GRCh37/cancer
 mkdir -p hg38/cancer
 
+# prep work to do
+# bcbio-prioritize create-civic -b GRCh37
+# bcbio-prioritize create-civic -b GRCh38
+# python az300_to_bed.py AZ300.txt
+# python az300_to_bed.py AZ300_with_known.txt
+# python az300_to_bed.py az-cancer-panel.txt
+
 # CIViC
-zcat civic-$civicv.bed.gz | sort -V | bgzip -c > GRCh37/cancer/civic-$civicv.bed.gz
+zcat civic-GRCh37-$civicv.bed.gz | sort -V | bgzip -c > GRCh37/cancer/civic-$civicv.bed.gz
 tabix -f -p bed GRCh37/cancer/civic-$civicv.bed.gz
-zcat civic-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg19/cancer/civic-$civicv.bed.gz
+zcat civic-GRCh37-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg19/cancer/civic-$civicv.bed.gz
 tabix -f -p bed hg19/cancer/civic-$civicv.bed.gz
 zcat civic-GRCh38-$civicv38.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg38/cancer/civic-$civicv38.bed.gz
 tabix -f -p bed hg38/cancer/civic-$civicv38.bed.gz
@@ -29,6 +36,16 @@ cat AZ300_with_known-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools mer
 tabix -f -p bed hg19/cancer/az300-with-fusion.bed.gz
 cat AZ300_with_known-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > GRCh37/cancer/az300-with-fusion.bed.gz
 tabix -f -p bed GRCh37/cancer/az300-with-fusion.bed.gz
+cat AZ300_with_known-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az300-with-fusion.bed.gz
+tabix -f -p bed hg38/cancer/az300-with-fusion.bed.gz
+
+# az-cancer-panel
+cat az-cancer-panel-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az-cancer-panel.bed.gz
+tabix -f -p bed hg19/cancer/az-cancer-panel.bed.gz
+cat az-cancer-panel-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > GRCh37/cancer/az-cancer-panel.bed.gz
+tabix -f -p bed GRCh37/cancer/az-cancer-panel.bed.gz
+cat az-cancer-panel-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az-cancer-panel.bed.gz
+tabix -f -p bed hg38/cancer/az-cancer-panel.bed.gz
 
 # tar up downloads
 cd hg19

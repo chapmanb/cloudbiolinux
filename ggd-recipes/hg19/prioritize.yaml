@@ -4,16 +4,17 @@
 #  - az300 -- list of 300 cancer genes of interest from AstraZeneca Oncology
 #  - az300-with-fusion -- az300 list plus known interacting fusions
 #      from FusionCatcher https://github.com/ndaniel/fusioncatcher/blob/master/bin/generate_known.py#L102
+#  - az-cancer-panel -- az300 genes plus additional useful panel genes
 ---
 attributes:
   name: prioritize
-  version: 20151116
+  version: 20160215
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg19-20151116.tar.gz
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg19-20160215.tar.gz
         outdir=coverage/prioritize
         mkdir -p $outdir
         cd $outdir
@@ -24,5 +25,7 @@ recipe:
       - coverage/prioritize/cancer/az300.bed.gz.tbi
       - coverage/prioritize/cancer/az300-with-fusion.bed.gz
       - coverage/prioritize/cancer/az300-with-fusion.bed.gz.tbi
-      - coverage/prioritize/cancer/civic-2015-11-04.bed.gz
-      - coverage/prioritize/cancer/civic-2015-11-04.bed.gz.tbi
+      - coverage/prioritize/cancer/az-cancer-panel.bed.gz
+      - coverage/prioritize/cancer/az-cancer-panel.bed.gz.tbi
+      - coverage/prioritize/cancer/civic-2016-02-15.bed.gz
+      - coverage/prioritize/cancer/civic-2016-02-15.bed.gz.tbi
