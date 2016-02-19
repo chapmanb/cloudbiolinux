@@ -1,20 +1,18 @@
 ---
 attributes:
   name: hapmap
-  version: 20151027
+  version: 3.3
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/2.8/b37/hapmap_3.3.b37.vcf.gz
-        mkdir -p variations
-        cd variations
-        wget -c -N $baseurl
-        gunzip -c hapmap_3.3.b37.vcf.gz | bgzip -c > hapmap_3.3.vcf.gz
-        tabix -f -p vcf  hapmap_3.3.vcf.gz
-        rm -rf hapmap_3.3.b37.vcf.gz
+        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/b37/hapmap_3.3.b37.vcf.gz
+        mkdir -p variation
+        cd variation
+        wget -O - $baseurl | gunzip -c | bgzip -c > hapmap_3.3.vcf.gz
+        tabix -f -p vcf hapmap_3.3.vcf.gz
     recipe_outfiles:
-      - variations/hapmap_3.3.vcf.gz
-      - variations/hapmap_3.3.vcf.gz.tbi
+      - variation/hapmap_3.3.vcf.gz
+      - variation/hapmap_3.3.vcf.gz.tbi
  

@@ -1,20 +1,18 @@
 ---
 attributes:
   name: dbsnp
-  version: 20151118
+  version: 138
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/2.8/b37/dbsnp_138.b37.vcf.gz
-        mkdir -p variations
-        cd variations
-        wget -c -N $baseurl
-        gunzip -c dbsnp_138.b37.vcf.gz | bgzip -c > dbsnp_138.vcf.gz
+        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/b37/dbsnp_138.b37.vcf.gz
+        mkdir -p variation
+        cd variation
+        wget -O - $baseurl | gunzip -c | bgzip -c > dbsnp_138.vcf.gz
         tabix -f -p vcf dbsnp_138.vcf.gz
-        rm -rf dbsnp_138.b37.vcf.gz
     recipe_outfiles:
-      - variations/dbsnp_138.vcf.gz
-      - variations/dbsnp_138.vcf.gz.tbi
+      - variation/dbsnp_138.vcf.gz
+      - variation/dbsnp_138.vcf.gz.tbi
  

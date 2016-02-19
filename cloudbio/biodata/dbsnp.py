@@ -35,22 +35,8 @@ def download_dbsnp(genomes, bundle_version, dbsnp_version):
         if not env.safe_exists(vrn_dir):
             env.safe_run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
-            if gid in ["GRCh37", "hg19"]:
+            if gid in ["hg19"]:
                 _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
-            elif gid in ["mm10", "canFam3"]:
-                _dbsnp_custom(env, gid)
-
-def _dbsnp_custom(env, gid):
-    """Retrieve resources for dbsnp builds from custom S3 biodata bucket.
-    """
-    remote_dir = "https://s3.amazonaws.com/biodata/variants/"
-    files = {"mm10": ["mm10-dbSNP-2013-09-12.vcf.gz"],
-             "canFam3": ["canFam3-dbSNP-2014-05-10.vcf.gz"]}
-    for f in files[gid]:
-        for ext in ["", ".tbi"]:
-            fname = f + ext
-            if not env.safe_exists(fname):
-                shared._remote_fetch(env, "%s%s" % (remote_dir, fname))
 
 def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
     """Retrieve resources for human variant analysis from Broad resource bundles.

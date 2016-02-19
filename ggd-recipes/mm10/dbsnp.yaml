@@ -1,0 +1,18 @@
+---
+attributes:
+  name: dbsnp
+  version: 20130912
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/biodata/variants/mm10-dbSNP-2013-09-12.vcf.gz
+        mkdir -p variation
+        cd variation
+        wget -c -N $baseurl
+        wget -c -N $baseurl.tbi
+    recipe_outfiles:
+      - variation/mm10-dbSNP-2013-09-12.vcf.gz
+      - variation/mm10-dbSNP-2013-09-12.vcf.gz.tbi
+ 

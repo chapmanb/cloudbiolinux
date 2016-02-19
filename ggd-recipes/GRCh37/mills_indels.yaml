@@ -1,0 +1,19 @@
+---
+attributes:
+  name: mills_indels
+  version: 2.8
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz
+        mkdir -p variation
+        cd variation
+        wget -c -N $baseurl
+        gunzip -c Mills_and_1000G_gold_standard.indels.b37.vcf.gz | bgzip -c > Mills_and_1000G_gold_standard.indels.vcf.gz
+        tabix -f -p vcf Mills_and_1000G_gold_standard.indels.vcf.gz
+    recipe_outfiles:
+      - variation/Mills_and_1000G_gold_standard.indels.vcf.gz
+      - variation/Mills_and_1000G_gold_standard.indels.vcf.gz.tbi
+ 

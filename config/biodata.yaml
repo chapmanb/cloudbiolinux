@@ -22,12 +22,14 @@ genomes:
     dbsnp: true
     rnaseq: true
     annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize]
+    # battenberg
     validation: [giab-NA12878, platinum-genome-NA12878]
   - dbkey: GRCh37
     name: Human (GRCh37)
-    dbsnp: true
     rnaseq: true
-    annotations: [GA4GH_problem_regions, MIG, prioritize]
+    annotations: [GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
+                  mills_indels, cosmic, ancestral, qsignature]
+    # battenberg, dbnsfp
     validation: [giab-NA12878, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
@@ -42,13 +44,11 @@ genomes:
     rnaseq: true
   - dbkey: mm9
     name: Mouse (mm9)
-    dbsnp: true
     rnaseq: true
   - dbkey: mm10
     name: Mouse (mm10)
-    dbsnp: true
     rnaseq: true
-    annotations: [mirbase, problem_regions]
+    annotations: [dbsnp, mirbase, problem_regions]
   - dbkey: rn5
     name: Rat (rn5)
     rnaseq: true
@@ -56,7 +56,7 @@ genomes:
     name: Rat (rn6)
   - dbkey: canFam3
     name: Dog (canFam3)
-    dbsnp: true
+    annotations: [dbsnp]
     rnaseq: true
   - dbkey: galGal4
     name: Chicken (galGal4)
@@ -80,11 +80,8 @@ genomes:
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
 genome_indexes:
-  - bowtie2
   - bwa
-  - novoalign
-  - ucsc
 
 # Additional data targets
-install_liftover: true
+install_liftover: false
 install_uniref: false
