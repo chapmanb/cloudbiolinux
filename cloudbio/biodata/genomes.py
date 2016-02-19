@@ -699,7 +699,7 @@ def _index_star(ref_file):
     # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
     nrefs = float(subprocess.check_output(cmd, shell=True))
-    nbits = int(round(min(18, log(GenomeLength/nrefs, 2))))
+    nbits = int(round(min(14, log(GenomeLength/nrefs, 2))))
     try:
         cpu = env.cores
     except:
