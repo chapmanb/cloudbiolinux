@@ -29,8 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import galaxy, ggd
-from cloudbio.biodata.dbsnp import download_dbsnp
+from cloudbio.biodata import dbsnp, galaxy, ggd
 from cloudbio.biodata.rnaseq import download_transcripts
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
@@ -269,7 +268,6 @@ class GGDGenome:
         self._name = name
 
 BROAD_BUNDLE_VERSION = "2.8"
-DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
@@ -386,7 +384,7 @@ def upload_s3(config_source):
 
 
 def _install_additional_data(genomes, genome_indexes, config):
-    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    dbsnp.download_dbnsfp(genomes)
     for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):

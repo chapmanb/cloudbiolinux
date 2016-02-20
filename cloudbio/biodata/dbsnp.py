@@ -24,76 +24,19 @@ from fabric.contrib.files import cd
 
 from cloudbio.custom import shared
 
-def download_dbsnp(genomes, bundle_version, dbsnp_version):
-    """Download and install dbSNP variation data for supplied genomes.
+def download_dbnsfp(genomes):
+    """Back compatible download target for dbNSFP, to be moved to GGD recipes.
     """
     folder_name = "variation"
     genome_dir = os.path.join(env.data_files, "genomes")
+    gids = set(["hg19", "GRCh37"])
     for (orgname, gid, manager) in ((o, g, m) for (o, g, m) in genomes
-                                    if m.config.get("dbsnp", False)):
+                                    if g in gids and m.config.get("dbnsfp")):
         vrn_dir = os.path.join(genome_dir, orgname, gid, folder_name)
         if not env.safe_exists(vrn_dir):
             env.safe_run('mkdir -p %s' % vrn_dir)
         with cd(vrn_dir):
-            if gid in ["hg19"]:
-                _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version)
-
-def _dbsnp_human(env, gid, manager, bundle_version, dbsnp_version):
-    """Retrieve resources for human variant analysis from Broad resource bundles.
-    """
-    to_download = ["dbsnp_{ver}".format(ver=dbsnp_version),
-                   "hapmap_3.3",
-                   "1000G_omni2.5",
-                   "1000G_phase1.snps.high_confidence",
-                   "Mills_and_1000G_gold_standard.indels"]
-    for dl_name in to_download:
-        for ext in [""]:
-            _download_broad_bundle(manager.dl_name, bundle_version, dl_name, ext)
-    _download_cosmic(gid)
-    _download_dbnsfp(env, gid, manager.config)
-    _download_ancestral(env, gid, manager.config)
-    _download_qsignature(env, gid, manager.config)
-
-def _download_broad_bundle(gid, bundle_version, name, ext):
-    # Broad bundle directories have uneven use of ".sites" in VCF files
-    # only present in hg19 for non-dbSNP resources
-    sites = ".sites" if gid == "hg19" and not name.startswith("dbsnp") else ""
-    broad_fname = "{name}.{gid}{sites}.vcf{ext}".format(gid=gid, name=name, sites=sites, ext=ext)
-    fname = broad_fname.replace(".{0}".format(gid), "").replace(".sites", "") + ".gz"
-    base_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
-               "{bundle}/{gid}/{fname}.gz".format(
-                   bundle=bundle_version, fname=broad_fname, gid=gid)
-    # compress and prepare existing uncompressed versions
-    if env.safe_exists(fname.replace(".vcf.gz", ".vcf")):
-        env.safe_run("bgzip %s" % fname.replace(".vcf.gz", ".vcf"))
-        env.safe_run("tabix -f -p vcf %s" % fname)
-    # otherwise, download and bgzip and tabix index
-    if not env.safe_exists(fname):
-        out_file = shared._remote_fetch(env, base_url)
-        env.safe_run("gunzip -c %s | bgzip -c > %s" % (out_file, fname))
-        env.safe_run("tabix -f -p vcf %s" % fname)
-        env.safe_run("rm -f %s" % out_file)
-    # clean up old files
-    for ext in [".vcf", ".vcf.idx"]:
-        if env.safe_exists(fname.replace(".vcf.gz", ext)):
-            env.safe_run("rm -f %s" % (fname.replace(".vcf.gz", ext)))
-    return fname
-
-def _download_cosmic(gid):
-    """Prepared versions of COSMIC, pre-sorted and indexed.
-    utils/prepare_cosmic.py handles the work of creating the VCFs from standard
-    COSMIC resources.
-    """
-    base_url = "https://s3.amazonaws.com/biodata/variants"
-    version = "v68"
-    supported = ["hg19", "GRCh37"]
-    if gid in supported:
-        url = "%s/cosmic-%s-%s.vcf.gz" % (base_url, version, gid)
-        fname = os.path.basename(url)
-        if not env.safe_exists(fname):
-            shared._remote_fetch(env, url)
-        if not env.safe_exists(fname + ".tbi"):
-            shared._remote_fetch(env, url + ".tbi")
+            _download_dbnsfp(env, gid, manager.config)
 
 def _download_dbnsfp(env, gid, gconfig):
     """Download and prepare dbNSFP functional prediction resources if configured.
@@ -123,44 +66,3 @@ def _download_dbnsfp(env, gid, gconfig):
                 env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
             if not env.safe_exists(outfile + ".tbi"):
                 env.safe_run("ln -sf ../../GRCh37/variation/%s.tbi %s.tbi" % (outfile, outfile))
-
-def _download_ancestral(env, gid, gconfig):
-    """Download ancestral genome sequence for loss of function evaluation.
-
-    Used by LOFTEE VEP plugin: https://github.com/konradjk/loftee
-    """
-    base_url = "https://s3.amazonaws.com/bcbio_nextgen/human_ancestor.fa.gz"
-    if gid == "GRCh37" or (gid == "hg19" and not env.safe_exists("../../GRCh37")):
-        for ext in ["", ".fai", ".gzi"]:
-            outfile = os.path.basename(base_url) + ext
-            if not env.safe_exists(outfile):
-                shared._remote_fetch(env, base_url + ext, samedir=True)
-    elif gid == "hg19":  # symlink to GRCh37 download
-        for ext in ["", ".fai", ".gzi"]:
-            outfile = os.path.basename(base_url) + ext
-            if not env.safe_exists(outfile):
-                env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))
-
-def _download_qsignature(env, gid, gconfig):
-    """Download qsignature position file to detect samples problems
-
-    :param env
-    :param gid: str genome id
-    :param gconfig: 
-
-    :returns: NULL
-    """
-    base_url = "http://downloads.sourceforge.net/project/adamajava/qsignature.tar.bz2"
-    outfile = "qsignature.vcf"
-    if gid == "GRCh37" or (gid == "hg19" and not env.safe_exists("../../GRCh37")):
-        if not env.safe_exists(outfile):
-            zipfile = shared._remote_fetch(env, base_url, samedir=True)
-            outdir = "qsignature"
-            env.safe_run("mkdir -p %s" % outdir)
-            env.safe_run("tar -jxf %s -C %s" % (zipfile, outdir))
-            env.safe_run("mv %s/qsignature_positions.txt %s" % (outdir, outfile))
-            env.safe_run("rm -rf %s" % outdir)
-            env.safe_run("rm -rf %s" % zipfile)
-    elif gid == "hg19":  # symlink to GRCh37 download
-        if not env.safe_exists(outfile):
-            env.safe_run("ln -sf ../../GRCh37/variation/%s %s" % (outfile, outfile))

@@ -1,0 +1,18 @@
+---
+attributes:
+  name: hapmap
+  version: 3.3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/hg19/hapmap_3.3.hg19.sites.vcf.gz
+        mkdir -p variation
+        cd variation
+        wget -O - $baseurl | gunzip -c | bgzip -c > hapmap_3.3.vcf.gz
+        tabix -f -p vcf hapmap_3.3.vcf.gz
+    recipe_outfiles:
+      - variation/hapmap_3.3.vcf.gz
+      - variation/hapmap_3.3.vcf.gz.tbi
+ 
