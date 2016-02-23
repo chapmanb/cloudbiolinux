@@ -29,8 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import dbsnp, galaxy, ggd
-from cloudbio.biodata.rnaseq import download_transcripts
+from cloudbio.biodata import dbsnp, galaxy, ggd, rnaseq
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
 
@@ -342,8 +341,9 @@ def install_data(config_source, approaches=None):
         genomes, genome_indexes, config = _get_genomes(config_source)
         genome_indexes = [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes] + genome_indexes
         _make_genome_directories(env, genomes)
-        download_transcripts(genomes, env)
+        rnaseq.cleanup(genomes, env)
         _prep_genomes(env, genomes, genome_indexes, ready_approaches)
+        rnaseq.finalize(genomes, env)
         _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_s3(config_source):
@@ -353,8 +353,9 @@ def install_data_s3(config_source):
     genomes, genome_indexes, config = _get_genomes(config_source)
     genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
     _make_genome_directories(env, genomes)
-    download_transcripts(genomes, env)
+    rnaseq.cleanup(genomes, env)
     _download_genomes(genomes, genome_indexes)
+    rnaseq.finalize(genomes, env)
     _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_rsync(config_source):
