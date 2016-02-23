@@ -695,9 +695,11 @@ def _index_star(ref_file):
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
     # if there is a large number of contigs, scale nbits down
     # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
+    # if there is a small genome, scale nbits down
+    # https://groups.google.com/forum/#!topic/rna-star/9g8Uoe1Igho
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
     nrefs = float(subprocess.check_output(cmd, shell=True))
-    nbits = int(round(min(14, log(GenomeLength/nrefs, 2))))
+    nbits = int(round(min(14, log(GenomeLength/nrefs, 2), log(GenomeLength, 2)/2 - 1)))
     try:
         cpu = env.cores
     except:
