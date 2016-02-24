@@ -130,6 +130,7 @@ r:
   - r-chbutils
   - r-devtools
   - r-dplyr
+  - r-dt
   - r-knitr
   - r-ggdendro
   - r-ggplot2
