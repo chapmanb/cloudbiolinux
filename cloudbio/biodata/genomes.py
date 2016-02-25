@@ -747,12 +747,12 @@ def _index_hisat2(ref_file):
     return dir_name
 
 def _index_snap(ref_file):
-    """Snap indexing is computationally expensive. Ask for all cores and need 64Gb of memory.
+    """Snap indexing is computationally expensive. Requests all cores and 64Gb of memory.
     """
     dir_name = "snap"
     index_name = os.path.splitext(os.path.basename(ref_file))[0]
     org_arg = "-hg19" if index_name in ["hg19", "GRCh37"] else ""
-    cmd = "snap index {ref_file} {dir_name} -bSpace {org_arg}"
+    cmd = "snap-aligner index {ref_file} {dir_name} -bSpace {org_arg}"
     if not env.safe_exists(os.path.join(dir_name, "GenomeIndex")):
         env.safe_run(cmd.format(**locals()))
     return dir_name
