@@ -119,7 +119,7 @@ def index_picard(ref_file):
     """
     index_file = "%s.dict" % os.path.splitext(ref_file)[0]
     if not env.safe_exists(index_file):
-        env.safe_run("picard -Xms500m -Xmx1g -jar CreateSequenceDictionary REFERENCE={ref} OUTPUT={out}"
+        env.safe_run("picard -Xms500m -Xmx1g CreateSequenceDictionary REFERENCE={ref} OUTPUT={out}"
                      .format(ref=ref_file, out=index_file))
     return index_file
 
