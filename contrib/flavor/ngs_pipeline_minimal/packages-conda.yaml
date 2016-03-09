@@ -30,7 +30,7 @@ bio_nextgen:
   - cutadapt
   - delly
   - fastqc
-  - freebayes=0.9.21.26
+  - freebayes=1.0.2
   - gatk-framework
   - gemini
   - glpk

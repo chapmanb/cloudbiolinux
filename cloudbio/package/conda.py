@@ -23,11 +23,6 @@ def install_packages(env, to_install=None, packages=None):
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
-        # Transition change -- ensure installed perl is perl-threaded
-        system_packages = ["perl", "perl-threaded"]
-        pkgs_str = " ".join(system_packages)
-        with settings(warn_only=True):
-            env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
         # install our customized packages
         if len(packages) > 0:
             pkgs_str = " ".join(packages)
@@ -36,12 +31,6 @@ def install_packages(env, to_install=None, packages=None):
                 _link_bin(package, env, conda_info, conda_bin)
         for pkg in ["python", "conda", "pip"]:
             _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
-        # remove packages we want the system to supply
-        # curl https://github.com/ContinuumIO/anaconda-issues/issues/72
-        system_packages = ["curl"]
-        pkgs_str = " ".join(system_packages)
-        with settings(warn_only=True):
-            env.safe_run("{conda_bin} uninstall -y {pkgs_str}".format(**locals()))
 
 def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
     """Link files installed in the bin directory into the install directory.
