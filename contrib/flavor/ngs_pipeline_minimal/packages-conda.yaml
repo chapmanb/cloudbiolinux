@@ -49,6 +49,7 @@ bio_nextgen:
   - metasv
   - mirdeep2
   - moreutils
+  - multiqc
   - novoalign
   - oncofuse
   - optitype
