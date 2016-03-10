@@ -31,7 +31,7 @@ def install_packages(env, to_install=None, packages=None):
                 _link_bin(package, env, conda_info, conda_bin)
         # work around ncurses issues -- we don't always get the R version
         # https://github.com/bioconda/bioconda-recipes/issues/637
-        env.safe_run("{conda_bin} update -c r ncurses".format(**locals()))
+        env.safe_run("{conda_bin} update -y -c r ncurses".format(**locals()))
         for pkg in ["python", "conda", "pip"]:
             _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
 
