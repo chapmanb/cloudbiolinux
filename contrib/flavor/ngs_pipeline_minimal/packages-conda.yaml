@@ -65,9 +65,11 @@ bio_nextgen:
   - pythonpy
   - qsignature
   - qualimap
+  - rapmap
   - razers3
   - rtg-tools
   - sailfish
+  - salmon
   - sambamba
   - samblaster
   - samtools
