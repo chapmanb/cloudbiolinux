@@ -2,6 +2,7 @@
 channels:
   - bioconda
   - r
+  - conda-forge
 minimal:
   - awscli
   - p7zip
@@ -53,6 +54,7 @@ bio_nextgen:
   - novoalign
   - oncofuse
   - optitype
+  - pandoc
   - parallel
   - pbgzip
   - perl-sanger-cgp-battenberg
