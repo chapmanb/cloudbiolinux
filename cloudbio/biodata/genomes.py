@@ -733,11 +733,11 @@ def _index_hisat2(ref_file):
     else:
         exons_file = index_prefix + ".exons"
         with open(exons_file, "w") as out_handle:
-            exons_cmd = ["extract_exons.py", gtf_file]
+            exons_cmd = ["hisat2_extract_exons.py", gtf_file]
             subprocess.check_call(exons_cmd, stdout=out_handle)
         splicesites_file = index_prefix + ".splicesites"
         with open(splicesites_file, "w") as out_handle:
-            splicesites_cmd = ["extract_splice_sites.py", gtf_file]
+            splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
             subprocess.check_call(splicesites_cmd, stdout=out_handle)
         cmd += "--exon {exons_file} --ss {splicesites_file} "
     cmd += "{ref_file} {index_prefix}"
