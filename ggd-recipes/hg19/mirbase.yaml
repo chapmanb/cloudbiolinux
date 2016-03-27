@@ -2,7 +2,7 @@
 ---
 attributes:
   name: srnaseq
-  version: 20151130
+  version: 20160224
 recipe:
   full:
     recipe_type: bash
@@ -30,6 +30,10 @@ recipe:
         zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
         wget  --no-check-certificate -q -N -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/hg19_mature_and_pre.fa
         wget --no-check-certificate -q -N -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip Rfam_for_miRDeep.fa.gz
+        # targetscan analysis
+        wget --no-check-certificate -q -N -c -O Summary_Counts.txt.zip http://www.targetscan.org/vert_70/vert_70_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
+        wget --no-check-certificate -q -N -c -O miR_Family_Info.txt.zip http://www.targetscan.org/vert_70/vert_70_data_download/miR_Family_Info.txt.zip && unzip miR_Family_Info.txt.zip
+        wget --no-check-certificate -q -N -c ftp://mirbase.org/pub/mirbase/21/database_files/mirna_mature.txt.gz
     recipe_outfiles:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
@@ -37,3 +41,6 @@ recipe:
         - srnaseq/miRNA.str
         - srnaseq/trna_mature_pre.fa
         - srnaseq/Rfam_for_miRDeep.fa
+        - srnaseq/Summary_Counts.all_predictions.txt
+        - srnaseq/miR_Family_Info.txt
+        - srnaseq/mirna_mature.txt.gz

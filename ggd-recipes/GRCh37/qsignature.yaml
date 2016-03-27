@@ -1,18 +1,18 @@
 ---
 attributes:
   name: qsignature
-  version: 20151027
+  version: 20140703
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         baseurl=http://downloads.sourceforge.net/project/adamajava/qsignature.tar.bz2
-        mkdir -p variations
-        cd variations
+        mkdir -p variation
+        cd variation
         wget -N -c $baseurl
         tar -xjf qsignature.tar.bz2 qsignature_positions.txt
         mv qsignature_positions.txt qsignature.vcf
     recipe_outfiles:
-        - variations/qsignature.vcf
+        - variation/qsignature.vcf
  

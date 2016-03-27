@@ -2,6 +2,7 @@
 channels:
   - bioconda
   - r
+  - conda-forge
 minimal:
   - awscli
   - p7zip
@@ -30,7 +31,7 @@ bio_nextgen:
   - cutadapt
   - delly
   - fastqc
-  - freebayes=0.9.21.26
+  - freebayes=1.0.2
   - gatk-framework
   - gemini
   - glpk
@@ -40,6 +41,7 @@ bio_nextgen:
   - hisat2
   - htslib
   - htseq
+  - impute2
   - kraken
   - lofreq
   - lumpy-sv
@@ -48,11 +50,14 @@ bio_nextgen:
   - metasv
   - mirdeep2
   - moreutils
+  - multiqc
   - novoalign
   - oncofuse
   - optitype
+  - pandoc
   - parallel
   - pbgzip
+  - perl-sanger-cgp-battenberg
   - phylowgs
   - picard
   - pindel
@@ -62,9 +67,11 @@ bio_nextgen:
   - pythonpy
   - qsignature
   - qualimap
+  - rapmap
   - razers3
   - rtg-tools
   - sailfish
+  - salmon
   - sambamba
   - samblaster
   - samtools
@@ -74,6 +81,7 @@ bio_nextgen:
   - seqtk
   - sickle-trim
   - spades
+  - snap-aligner
   - snpeff
   - star
   - stringtie
@@ -128,6 +136,7 @@ r:
   - r-chbutils
   - r-devtools
   - r-dplyr
+  - r-dt
   - r-knitr
   - r-ggdendro
   - r-ggplot2
@@ -136,6 +145,7 @@ r:
   - r-pheatmap
   - r-plyr
   - r-pscbs
+  - r-reshape
   - r-rmarkdown
   - r-rsqlite
   - r-sleuth

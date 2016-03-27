@@ -61,6 +61,5 @@ old-unused:
   # - staden_io_lib # Migrated to samtools indexing
   # - express-binary # No longer used with Sailfish
   # - glia  # Needs updates to fsom
-  # - snap-aligner # Needs sync with homebrew-cbl/homebrew-science and compile on older gcc
   # - qsnp # Issues with download and reliability of qcmg site
   # - vcftools # Build problems with default libz on Ubuntu 12.04

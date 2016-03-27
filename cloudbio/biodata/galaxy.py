@@ -118,18 +118,9 @@ def index_picard(ref_file):
     """Provide a Picard style dict index file for a reference genome.
     """
     index_file = "%s.dict" % os.path.splitext(ref_file)[0]
-    dirs_to_try = ["%s/share/java/picard" % env.system_install,
-                   getattr(env, "picard_home", None)]
-    picard_jar = None
-    for dname in dirs_to_try:
-        if dname:
-            test_jar = os.path.join(dname, "CreateSequenceDictionary.jar")
-            if env.safe_exists(test_jar):
-                picard_jar = test_jar
-                break
-    if picard_jar and not env.safe_exists(index_file):
-        env.safe_run("java -Xms500m -Xmx1g -jar {jar} REFERENCE={ref} OUTPUT={out}".format(
-            jar=picard_jar, ref=ref_file, out=index_file))
+    if not env.safe_exists(index_file):
+        env.safe_run("picard -Xms500m -Xmx1g CreateSequenceDictionary REFERENCE={ref} OUTPUT={out}"
+                     .format(ref=ref_file, out=index_file))
     return index_file
 
 def _finalize_index_seq(fname):

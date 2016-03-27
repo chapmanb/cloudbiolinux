@@ -29,9 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import galaxy, ggd
-from cloudbio.biodata.dbsnp import download_dbsnp
-from cloudbio.biodata.rnaseq import download_transcripts
+from cloudbio.biodata import dbsnp, galaxy, ggd, rnaseq
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
 
@@ -269,7 +267,6 @@ class GGDGenome:
         self._name = name
 
 BROAD_BUNDLE_VERSION = "2.8"
-DBSNP_VERSION = "138"
 
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
@@ -344,8 +341,9 @@ def install_data(config_source, approaches=None):
         genomes, genome_indexes, config = _get_genomes(config_source)
         genome_indexes = [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes] + genome_indexes
         _make_genome_directories(env, genomes)
-        download_transcripts(genomes, env)
+        rnaseq.cleanup(genomes, env)
         _prep_genomes(env, genomes, genome_indexes, ready_approaches)
+        rnaseq.finalize(genomes, env)
         _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_s3(config_source):
@@ -355,8 +353,9 @@ def install_data_s3(config_source):
     genomes, genome_indexes, config = _get_genomes(config_source)
     genome_indexes += [x for x in DEFAULT_GENOME_INDEXES if x not in genome_indexes]
     _make_genome_directories(env, genomes)
-    download_transcripts(genomes, env)
+    rnaseq.cleanup(genomes, env)
     _download_genomes(genomes, genome_indexes)
+    rnaseq.finalize(genomes, env)
     _install_additional_data(genomes, genome_indexes, config)
 
 def install_data_rsync(config_source):
@@ -386,7 +385,7 @@ def upload_s3(config_source):
 
 
 def _install_additional_data(genomes, genome_indexes, config):
-    download_dbsnp(genomes, BROAD_BUNDLE_VERSION, DBSNP_VERSION)
+    dbsnp.download_dbnsfp(genomes)
     for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
@@ -697,9 +696,11 @@ def _index_star(ref_file):
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
     # if there is a large number of contigs, scale nbits down
     # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
+    # if there is a small genome, scale nbits down
+    # https://groups.google.com/forum/#!topic/rna-star/9g8Uoe1Igho
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
     nrefs = float(subprocess.check_output(cmd, shell=True))
-    nbits = int(round(min(18, log(GenomeLength/nrefs, 2))))
+    nbits = int(round(min(14, log(GenomeLength/nrefs, 2), log(GenomeLength, 2)/2 - 1)))
     try:
         cpu = env.cores
     except:
@@ -732,11 +733,11 @@ def _index_hisat2(ref_file):
     else:
         exons_file = index_prefix + ".exons"
         with open(exons_file, "w") as out_handle:
-            exons_cmd = ["extract_exons.py", gtf_file]
+            exons_cmd = ["hisat2_extract_exons.py", gtf_file]
             subprocess.check_call(exons_cmd, stdout=out_handle)
         splicesites_file = index_prefix + ".splicesites"
         with open(splicesites_file, "w") as out_handle:
-            splicesites_cmd = ["extract_splice_sites.py", gtf_file]
+            splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
             subprocess.check_call(splicesites_cmd, stdout=out_handle)
         cmd += "--exon {exons_file} --ss {splicesites_file} "
     cmd += "{ref_file} {index_prefix}"
@@ -746,12 +747,12 @@ def _index_hisat2(ref_file):
     return dir_name
 
 def _index_snap(ref_file):
-    """Snap indexing is computationally expensive. Ask for all cores and need 64Gb of memory.
+    """Snap indexing is computationally expensive. Requests all cores and 64Gb of memory.
     """
     dir_name = "snap"
     index_name = os.path.splitext(os.path.basename(ref_file))[0]
     org_arg = "-hg19" if index_name in ["hg19", "GRCh37"] else ""
-    cmd = "snap index {ref_file} {dir_name} -bSpace {org_arg}"
+    cmd = "snap-aligner index {ref_file} {dir_name} -bSpace {org_arg}"
     if not env.safe_exists(os.path.join(dir_name, "GenomeIndex")):
         env.safe_run(cmd.format(**locals()))
     return dir_name
