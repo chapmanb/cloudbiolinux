@@ -2,7 +2,7 @@
 ---
 attributes:
   name: srnaseq
-  version: 20160624
+  version: 20160328
 recipe:
   full:
     recipe_type: bash
@@ -29,6 +29,8 @@ recipe:
         wget --no-check-certificate -q -N -c -O Summary_Counts.txt.zip http://www.targetscan.org/mmu_71/mmu_71_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
         wget --no-check-certificate -q -N -c -O miR_Family_Info.txt.zip http://www.targetscan.org/mmu_71/mmu_71_data_download/miR_Family_Info.txt.zip && unzip miR_Family_Info.txt.zip
         wget --no-check-certificate -q -N -c ftp://mirbase.org/pub/mirbase/21/database_files/mirna_mature.txt.gz
+        # tdrmapper
+        wget --no-check-certificate -N -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/mm10_mature_pre_for_tdrMapper.fa
     recipe_outfiles:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
@@ -38,3 +40,4 @@ recipe:
         - srnaseq/Summary_Counts.all_predictions.txt
         - srnaseq/miR_Family_Info.txt
         - srnaseq/mirna_mature.txt.gz
+        - srnaseq/trna_mature_pre.fa
