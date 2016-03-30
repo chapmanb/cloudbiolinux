@@ -1,10 +1,6 @@
 ---
-# Remove remaining custom packages after next bcbio release
 bio_nextgen:
   alignment:
   utilities:
   analysis:
-    - picard
   variant:
-    - bcbio_variation
-    - mutect
