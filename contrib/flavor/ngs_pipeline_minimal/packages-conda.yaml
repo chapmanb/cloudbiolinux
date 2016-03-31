@@ -18,7 +18,6 @@ bio_nextgen:
   - bcftools
   - bedtools=2.24.0
   - biobambam
-  - boost=1.57.0
   - bowtie2
   - bwa
   - bwakit
@@ -48,6 +47,7 @@ bio_nextgen:
   - lumpy-sv
   - macs2
   - manta
+  - mbuffer
   - metasv
   - mirdeep2
   - moreutils
