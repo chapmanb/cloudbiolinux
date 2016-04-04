@@ -30,6 +30,7 @@ bio_nextgen:
   - cufflinks
   - cutadapt
   - delly
+  - express
   - fastqc
   - freebayes=1.0.2
   - gatk-framework

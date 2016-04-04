@@ -15,6 +15,7 @@ to_remove:
   - cramtools
   - cufflinks-binary
   - delly
+  - express-binary
   - fastqc
   - freebayes
   - gatk-framework
