@@ -331,7 +331,7 @@ def install_data(config_source, approaches=None):
     PREP_FNS = {"s3": _download_s3_index,
                 "ggd": _install_with_ggd,
                 "raw": _prep_raw_index}
-    if approaches is None: approaches = ["raw"]
+    if approaches is None: approaches = ["ggd", "s3", "raw"]
     ready_approaches = []
     for approach in approaches:
         ready_approaches.append((approach, PREP_FNS[approach]))

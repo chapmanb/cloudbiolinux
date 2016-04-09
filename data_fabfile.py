@@ -59,6 +59,12 @@ def install_data(config_source=CONFIG_FILE):
     setup_environment()
     genomes.install_data(config_source)
 
+def install_data_raw(config_source=CONFIG_FILE):
+    """Installing useful biological data building from scratch. Useful for debugging.
+    """
+    setup_environment()
+    genomes.install_data(config_source, approaches=["raw"])
+
 def install_data_s3(config_source=CONFIG_FILE, do_setup_environment=True):
     """Install data using pre-existing genomes present on Amazon s3.
     """
