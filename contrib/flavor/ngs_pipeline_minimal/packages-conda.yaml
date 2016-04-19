@@ -18,6 +18,7 @@ bio_nextgen:
   - bcftools
   - bedtools=2.24.0
   - biobambam
+  - bowtie
   - bowtie2
   - bwa
   - bwakit
@@ -30,12 +31,14 @@ bio_nextgen:
   - cufflinks
   - cutadapt
   - delly
+  - express
   - fastqc
   - freebayes=1.0.2
   - gatk-framework
   - gemini
-  - glpk
+  - glpk=4.57
   - grabix
+  - gsort
   - hall-lab-svtools
   - hmmlearn
   - hisat2
@@ -47,6 +50,7 @@ bio_nextgen:
   - lumpy-sv
   - macs2
   - manta
+  - mbuffer
   - metasv
   - mirdeep2
   - moreutils
@@ -110,6 +114,7 @@ bio_nextgen:
   - variant-effect-predictor
   - varscan
   - vawk
+  - vcfanno
   - vcflib
   - viennarna
   - vt
