@@ -36,8 +36,9 @@ bio_nextgen:
   - freebayes=1.0.2
   - gatk-framework
   - gemini
-  - glpk
+  - glpk=4.57
   - grabix
+  - gsort
   - hall-lab-svtools
   - hmmlearn
   - hisat2
@@ -113,6 +114,7 @@ bio_nextgen:
   - variant-effect-predictor
   - varscan
   - vawk
+  - vcfanno
   - vcflib
   - viennarna
   - vt
