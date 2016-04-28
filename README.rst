@@ -3,7 +3,8 @@ customizable selection of bioinformatics and machine learning libraries on a
 linux container, bare virtual machine (VM) image, freshly installed PC, or in
 the cloud. CloudBioLinux is a curated and community developed set of
 instructions for tools provided by operating system packages (debs and RPMs),
-external packaging efforts (`homebrew-science <https://github.com/Homebrew/homebrew-science>`_)
+external packaging efforts (`bioconda <https://bioconda.github.io/>`_ and
+`homebrew-science <https://github.com/Homebrew/homebrew-science>`_)
 and language specific library installers (Python, R, Perl and Ruby).
 
 CloudBioLinux included software packages are fully customizable. In
@@ -21,24 +22,26 @@ private cloud environments, including `XEN <http://xen.org/>`_, Linux
 `Eucalyptus <http://open.eucalyptus.com/>`_ and
 `Openstack <http://www.openstack.org/>`_.
 
-Using pre-built cloud images
-============================
+Quick start
+===========
 
-Amazon
-------
+`bcbio <http://bcbio-nextgen.readthedocs.io/en/latest/>`_ uses CloudBioLinux as
+the basis for tool installation and provides a large set of supported and tested
+tools. If you're looking to bootstrap a system with tools and data for high
+throughput sequencing analysis, we suggest using the `bcbio installer
+<http://bcbio-nextgen.readthedocs.io/en/latest/contents/installation.html#automated>`_
+which fully wraps CloudBioLinux and provides an easy path to customize install
+directories, organisms and biological data installed.
 
-See the 'Getting Started with CloudBioLinux' guide on the `CloudBioLinux
-website <http://cloudbiolinux.org/>`_ for a detailed description. The
-short version for users familiar with Amazon is:
+We recommend using, or developing, a custom flavor to choose tools of interest
+to install. The amount of bioinformatics software continues to increase -- there are
+`over 1000 recipes in bioconda <https://github.com/bioconda/bioconda-recipes>`_
+-- and it's difficult to come up with a default installation that includes
+everything for everyone. The ``ngs_pipeline_minimal`` flavor has the set of NGS
+analysis tools installed with bcbio and is a good starting point for
+understanding the CloudBioLinux install process::
 
--  Login to the `Amazon EC2
-   console <https://console.aws.amazon.com/ec2/home>`_.
--  Click Launch Instance, and choose the latest CloudBioLinux AMI from
-   the `website <http://cloudbiolinux.org/>`_ in the community AMI
-   section (search for 'CloudBioLinux').
--  After launching the instance, find the host details of your running
-   instance from the Instances section.
--  Connect to your machine via ssh or VNC (using the Amazon PEM keys)
+    fab -f fabfile.py -H localhost install_biolinux:flavor=ngs_pipeline_minimal
 
 Installing CloudBioLinux on a local machine
 ===========================================
@@ -189,6 +192,25 @@ from Ensembl, etc and prepare it::
 
 
     fab -f data_fabfile.py -H your_machine -c your_fabricrc.txt install_data:your_biodata.yaml
+
+Using pre-built cloud images
+============================
+
+Amazon
+------
+
+See the 'Getting Started with CloudBioLinux' guide on the `CloudBioLinux
+website <http://cloudbiolinux.org/>`_ for a detailed description. The
+short version for users familiar with Amazon is:
+
+-  Login to the `Amazon EC2
+   console <https://console.aws.amazon.com/ec2/home>`_.
+-  Click Launch Instance, and choose the latest CloudBioLinux AMI from
+   the `website <http://cloudbiolinux.org/>`_ in the community AMI
+   section (search for 'CloudBioLinux').
+-  After launching the instance, find the host details of your running
+   instance from the Instances section.
+-  Connect to your machine via ssh or VNC (using the Amazon PEM keys)
 
 Supported environments
 ======================
