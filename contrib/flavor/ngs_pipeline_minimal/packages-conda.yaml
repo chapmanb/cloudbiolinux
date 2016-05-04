@@ -10,6 +10,7 @@ minimal:
 bio_nextgen:
   - age-metasv
   - bamtools
+  - bamutil
   - bcbio-prioritize
   - bcbio-rnaseq
   - bcbio-variation
@@ -23,6 +24,7 @@ bio_nextgen:
   - bwa
   - bwakit
   - bio-vcf
+  - cage
   - cancerit-allelecount
   - cnvkit
   - cpat
@@ -35,6 +37,7 @@ bio_nextgen:
   - fastqc
   - freebayes=1.0.2
   - gatk-framework
+  - geneimpacts
   - gemini
   - glpk=4.57
   - grabix
@@ -117,6 +120,7 @@ bio_nextgen:
   - varscan
   - vawk
   - vcfanno
+  - vcf2db
   - vcflib
   - viennarna
   - vt
