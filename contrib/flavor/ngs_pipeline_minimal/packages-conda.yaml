@@ -42,7 +42,7 @@ bio_nextgen:
   - glpk=4.57
   - grabix
   - gsort
-  - hall-lab-svtools
+  - svtools
   - hap.py
   - hmmlearn
   - hisat2
@@ -90,7 +90,7 @@ bio_nextgen:
   - seqtk
   - sickle-trim
   - spades
-  - snap-aligner
+  - snap-aligner=1.0dev.97
   - snpeff
   - star
   - stringtie
