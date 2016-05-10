@@ -762,10 +762,15 @@ def _index_rtg(ref_file):
 
     https://github.com/RealTimeGenomics/rtg-tools
     """
+    path_export = ""
+    if hasattr(env, "system_install") and env.system_install:
+        local_bin = os.path.join(env.system_install, 'bin')
+        if env.safe_exists(local_bin):
+            path_export = "export PATH=%s:$PATH && " % local_bin
     dir_name = "rtg"
     index_name = "%s.sdf" % os.path.splitext(os.path.basename(ref_file))[0]
     if not env.safe_exists(os.path.join(dir_name, index_name, "done")):
-        cmd = ("export RTG_JAVA_OPTS='-Xms1g' export RTG_MEM=2g && "
+        cmd = ("{path_export}export RTG_JAVA_OPTS='-Xms1g' && export RTG_MEM=2g && "
                "rtg format -o {dir_name}/{index_name} {ref_file}")
         env.safe_run(cmd.format(**locals()))
     return dir_name
@@ -958,8 +963,8 @@ def get_index_fn(index):
     return INDEX_FNS.get(index, lambda x: None)
 
 INDEX_FNS = {
-    "seq" : _index_sam,
-    "bwa" : _index_bwa,
+    "seq": _index_sam,
+    "bwa": _index_bwa,
     "bowtie": _index_bowtie,
     "bowtie2": _index_bowtie2,
     "maq": _index_maq,
