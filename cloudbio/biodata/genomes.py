@@ -605,6 +605,7 @@ def _move_seq_files(ref_file, base_zips, seq_dir):
 def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None):
     """Low level function to do the indexing and paths with an index command.
     """
+    path_export = _get_path_export()
     index_name = os.path.splitext(os.path.basename(ref_file))[0]
     if ext is not None: index_name += ext
     full_ref_path = os.path.join(os.pardir, ref_file)
@@ -613,7 +614,7 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None)
         with cd(dir_name):
             if pre:
                 full_ref_path = pre(full_ref_path)
-            env.safe_run(command.format(ref_file=full_ref_path, index_name=index_name))
+            env.safe_run(path_export + command.format(ref_file=full_ref_path, index_name=index_name))
             if post:
                 post(full_ref_path)
     return os.path.join(dir_name, index_name)
@@ -731,14 +732,15 @@ def _index_hisat2(ref_file):
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the exons file." % (gtf_file)
     else:
+        path_export = _get_path_export()
         exons_file = index_prefix + ".exons"
         with open(exons_file, "w") as out_handle:
             exons_cmd = ["hisat2_extract_exons.py", gtf_file]
-            subprocess.check_call(exons_cmd, stdout=out_handle)
+            subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
         splicesites_file = index_prefix + ".splicesites"
         with open(splicesites_file, "w") as out_handle:
             splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
-            subprocess.check_call(splicesites_cmd, stdout=out_handle)
+            subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
         cmd += "--exon {exons_file} --ss {splicesites_file} "
     cmd += "{ref_file} {index_prefix}"
     cmd = cmd.format(**locals())
@@ -757,16 +759,22 @@ def _index_snap(ref_file):
         env.safe_run(cmd.format(**locals()))
     return dir_name
 
-def _index_rtg(ref_file):
-    """Perform indexing for use with Real Time Genomics tools.
-
-    https://github.com/RealTimeGenomics/rtg-tools
+def _get_path_export():
+    """Ensure PATH points to local install directory.
     """
     path_export = ""
     if hasattr(env, "system_install") and env.system_install:
         local_bin = os.path.join(env.system_install, 'bin')
         if env.safe_exists(local_bin):
             path_export = "export PATH=%s:$PATH && " % local_bin
+    return path_export
+
+def _index_rtg(ref_file):
+    """Perform indexing for use with Real Time Genomics tools.
+
+    https://github.com/RealTimeGenomics/rtg-tools
+    """
+    path_export = _get_path_export()
     dir_name = "rtg"
     index_name = "%s.sdf" % os.path.splitext(os.path.basename(ref_file))[0]
     if not env.safe_exists(os.path.join(dir_name, index_name, "done")):
