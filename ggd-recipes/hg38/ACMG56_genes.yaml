@@ -1,0 +1,17 @@
+# ACMG regions: http://iobio.io/2016/03/29/acmg56/
+# https://github.com/lpantano/custom_genome_annotation
+---
+attributes:
+  name: ACMG56_genes
+  version: 20160524
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://raw.githubusercontent.com/lpantano/custom_genome_annotation/master/acmg56.hg38.bed
+        mkdir -p coverage
+        cd coverage
+        wget --no-check-certificate -c -O ACMG56.bed $baseurl
+    recipe_outfiles:
+      - coverage/ACMG56.bed
