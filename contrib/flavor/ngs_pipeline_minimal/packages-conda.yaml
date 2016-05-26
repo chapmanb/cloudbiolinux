@@ -43,6 +43,7 @@ bio_nextgen:
   - grabix
   - gsort
   - svtools
+  - gvcf-regions
   - hap.py
   - hmmlearn
   - hisat2
