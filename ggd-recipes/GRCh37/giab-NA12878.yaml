@@ -1,19 +1,21 @@
 # Truth sets from Genome in a Bottle for NA12878 -- http://genomeinabottle.org/
-# Removes mitochondrial chromosome to avoid comparisons there
 ---
 attributes:
   name: giab-NA12878
-  version: v2_19_1
+  version: v3_2
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA12878
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.2
+        calls=NA12878_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid_ALLCHROM_v3.2_highconf.vcf.gz
+        regions=NA12878_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid_ALLCHROM_v3.2_highconf.bed
         mkdir -p $dir
-        wget -c -O $dir/truth_small_variants.vcf.gz ftp://ftp.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv2.19/NISTIntegratedCalls_14datasets_131103_allcall_UGHapMerge_HetHomVarPASS_VQSRv2.19_2mindatasets_5minYesNoRatio_all_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs.vcf.gz
+        wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
-        wget -c -O - ftp://ftp.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv2.19/union13callableMQonlymerged_addcert_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs_v2.19_2mindatasets_5minYesNoRatio.bed.gz | gunzip -c | grep -v ^MT > $dir/truth_regions.bed
+        wget -c -O $dir/truth_regions.bed $url/$regions 
         wget -O - ftp://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Personalis_1000_Genomes_deduplicated_deletions.bed | grep -v ^Chr > $dir/truth_DEL.bed
         wget -O - ftp://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Spiral_Genetics_insertions.bed | grep -v ^Chr > $dir/truth_INS.bed
     recipe_outfiles:
