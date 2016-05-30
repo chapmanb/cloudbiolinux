@@ -11,7 +11,7 @@ recipe:
         mkdir -p seq
         ncbidir=ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/all_assembly_versions/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
         filebase=GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-        wget -c -O seq/hg38-noalt.fa.gz $ncbidir/$filebase | gunzip -c > seq/hg38-noalt.fa
+        wget -c -O - $ncbidir/${filebase}.gz | gunzip -c > seq/hg38-noalt.fa
       - wget -c -O seq/hg38-noalt.fa.fai $ncbidir/${filebase}.fai
       - >
         [[ -f seq/hg38-noalt.dict ]] ||
