@@ -59,6 +59,7 @@ genomes:
     name: D melangogaster (dm3)
   - dbkey: TAIR10
     name: Arabidopsis thaliana (TAIR10)
+    annotations: [mirbase]
   - dbkey: xenTro3
     name: X tropicalis (xenTro3)
   - dbkey: GRCz10
