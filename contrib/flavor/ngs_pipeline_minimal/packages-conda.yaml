@@ -36,7 +36,7 @@ bio_nextgen:
   - express
   - fastqc
   - freebayes=1.0.2
-  - gatk-framework
+  - gatk-framework=3.5.21
   - geneimpacts
   - gemini
   - glpk=4.57
