@@ -11,10 +11,11 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/platinum-genome-NA12878
+        illumina_dir=2016-1.0/hg38/small_variants
         mkdir -p $dir
-        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz ftp://platgene_ro:@ussd-ftp.illumina.com/hg38/2.0.1/NA12878/NA12878.vcf.gz
-        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz.tbi ftp://platgene_ro:@ussd-ftp.illumina.com/hg38/2.0.1/NA12878/NA12878.vcf.gz.tbi
-        wget --no-check-certificate -c -O - ftp://platgene_ro:@ussd-ftp.illumina.com/hg38/2.0.1/NA12878/ConfidentRegions.bed.gz | gunzip -c > $dir/truth_regions.bed
+        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz ftp://platgene_ro:@ussd-ftp.illumina.com/$illumina_dir/NA12878/NA12878.vcf.gz
+        wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz.tbi ftp://platgene_ro:@ussd-ftp.illumina.com/$illumina_dir/NA12878/NA12878.vcf.gz.tbi
+        wget --no-check-certificate -c -O - ftp://platgene_ro:@ussd-ftp.illumina.com/$illumina_dir/NA12878/ConfidentRegions.bed.gz | gunzip -c > $dir/truth_regions.bed
     recipe_outfiles:
       - validation/platinum-genome-NA12878/truth_small_variants.vcf.gz
       - validation/platinum-genome-NA12878/truth_small_variants.vcf.gz.tbi
