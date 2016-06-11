@@ -11,7 +11,7 @@ recipe:
       - |
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
-        wget -O - http://files.figshare.com/1688228/LCR_mm10.bed.gz | gunzip -c | bgzip -c > $repeats/LCR.bed.gz
+        wget --no-check-certificate -O - http://files.figshare.com/1688228/LCR_mm10.bed.gz | gunzip -c | bgzip -c > $repeats/LCR.bed.gz
         tabix -p vcf -f $repeats/LCR.bed.gz
     recipe_outfiles:
       - coverage/problem_regions/repeats/LCR.bed.gz
