@@ -4,7 +4,7 @@
 ---
 attributes:
   name: giab-NA12878
-  version: v3_2
+  version: v3_2_2
 recipe:
   full:
     recipe_type: bash
@@ -12,9 +12,9 @@ recipe:
       - |
         dir=validation/giab-NA12878
         remapurl=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.2
-        calls=NA12878_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid_ALLCHROM_v3.2_highconf.vcf.gz
-        regions=NA12878_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid_ALLCHROM_v3.2_highconf.bed
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.2.2
+        calls=NA12878_GIAB_highconf_IllFB-IllGATKHC-CG-Ion-Solid_ALLCHROM_v3.2.2_highconf.vcf.gz
+        regions=NA12878_GIAB_highconf_IllFB-IllGATKHC-CG-Ion-Solid_ALLCHROM_v3.2.2_highconf.bed
         mkdir -p $dir
         wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
