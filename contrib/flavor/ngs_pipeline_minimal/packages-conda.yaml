@@ -88,6 +88,8 @@ bio_nextgen:
   - samtools
   - simple_sv_annotation
   - scalpel
+  - sentieon
+  - seq2c
   - seqbuster
   - seqtk
   - sickle-trim
