@@ -3,15 +3,16 @@
 ---
 attributes:
   name: ACMG56_genes
-  version: 20160524
+  version: 20160629
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         baseurl=https://raw.githubusercontent.com/lpantano/custom_genome_annotation/master/acmg56.ucsc.bed
-        mkdir -p coverage
-        cd coverage
+        dir=coverage/prioritize/actionable
+        mkdir -p $dir
+        cd $dir
         wget --no-check-certificate -c -O ACMG56.bed $baseurl
     recipe_outfiles:
-      - coverage/ACMG56.bed
+      - coverage/prioritize/actionable/ACMG56.bed
