@@ -1,18 +1,21 @@
+# UCSFify name sed magic from: https://github.com/mmarchin/utilities/blob/master/ucscify.sh
 ---
 attributes:
   name: dbsnp
-  version: 138
+  version: 147-20160408
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/b37/dbsnp_138.b37.vcf.gz
+        version=147
+        org=human_9606_b${version}_GRCh37p13
+        release=20160408
+        url=ftp://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/archive/All_${release}.vcf.gz
         mkdir -p variation
-        cd variation
-        wget -O - $baseurl | gunzip -c | bgzip -c > dbsnp_138.vcf.gz
-        tabix -f -p vcf dbsnp_138.vcf.gz
+        wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
+        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | bgzip -c > variation/dbsnp-$version.vcf.gz
+        tabix -f -p vcf variation/dbsnp-$version.vcf.gz
     recipe_outfiles:
-      - variation/dbsnp_138.vcf.gz
-      - variation/dbsnp_138.vcf.gz.tbi
- 
+      - variation/dbsnp-147.vcf.gz
+      - variation/dbsnp-147.vcf.gz.tbi
