@@ -20,14 +20,14 @@ genomes:
   - dbkey: hg19
     name: Human (hg19)
     annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
-                  mills_indels, cosmic, ancestral, qsignature, ACMG56_genes, transcripts]
+                  mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts]
     # RADAR -- currently having download problems, needs an update
     annotations_available: [battenberg, dbnsfp]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385]
   - dbkey: GRCh37
     name: Human (GRCh37)
     annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
-                  mills_indels, cosmic, ancestral, qsignature, ACMG56_genes, transcripts]
+                  mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts]
     # RADAR -- currently having download problems, needs an update
     annotations_available: [battenberg, dbnsfp]
     validation: [giab-NA12878, giab-NA24385, dream-syn3, dream-syn4]
