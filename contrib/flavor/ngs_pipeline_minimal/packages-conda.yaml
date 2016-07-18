@@ -37,7 +37,7 @@ bio_nextgen:
   - fastqc
   - freebayes=1.0.2.29
   - gatk
-  - gatk-framework=3.5.21
+  - gatk-framework
   - geneimpacts
   - gemini
   - glpk=4.57
@@ -95,7 +95,7 @@ bio_nextgen:
   - sickle-trim
   - spades
   - snap-aligner=1.0dev.97
-  - snpeff=4.2
+  - snpeff
   - star
   - stringtie
   - subread
