@@ -3,7 +3,7 @@
 ---
 attributes:
   name: ACMG56_genes
-  version: 20160629
+  version: 20160726
 recipe:
   full:
     recipe_type: bash
