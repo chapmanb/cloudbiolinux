@@ -16,12 +16,12 @@ recipe:
         tar Jxvf hg38-hisat2-tar.xz
         rm hg38-hisat2-tar.xz
     recipe_outfiles:
-      -hisat2/hg38.1.ht2
-      -hisat2/hg38.2.ht2
-      -hisat2/hg38.3.ht2
-      -hisat2/hg38.4.ht2
-      -hisat2/hg38.5.ht2
-      -hisat2/hg38.6.ht2
-      -hisat2/hg38.7.ht2
-      -hisat2/hg38.8.ht2
-      -hisat2/README.md
+      - hisat2/hg38.1.ht2
+      - hisat2/hg38.2.ht2
+      - hisat2/hg38.3.ht2
+      - hisat2/hg38.4.ht2
+      - hisat2/hg38.5.ht2
+      - hisat2/hg38.6.ht2
+      - hisat2/hg38.7.ht2
+      - hisat2/hg38.8.ht2
+      - hisat2/README.md
