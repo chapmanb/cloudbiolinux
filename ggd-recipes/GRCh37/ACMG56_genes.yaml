@@ -3,13 +3,13 @@
 ---
 attributes:
   name: ACMG56_genes
-  version: 20160629
+  version: 20160810
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://raw.githubusercontent.com/lpantano/custom_genome_annotation/master/acmg56.bed
+        baseurl=https://raw.githubusercontent.com/lpantano/custom_genome_annotation/master/acmg56.GRCh37.bed
         dir=coverage/prioritize/actionable
         mkdir -p $dir
         cd $dir
