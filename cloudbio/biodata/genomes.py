@@ -721,31 +721,35 @@ def _index_hisat2(ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
     gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
-    if not env.safe_exists(dir_name):
-        env.safe_run('mkdir -p %s' % dir_name)
     index_prefix = os.path.join(dir_name, build)
     try:
         cpu = env.cores
     except:
         cpu = 1
     cmd = "hisat2-build -p {cpu} "
-    if not os.path.exists(gtf_file):
-        print "%s not found, skipping creating the exons file." % (gtf_file)
-    else:
+
+    exons_file = index_prefix + ".exons"
+    splicesites_file = index_prefix + ".splicesites"
+    def _get_exons_and_splicesites(ref_path):
         path_export = _get_path_export()
-        exons_file = index_prefix + ".exons"
         with open(exons_file, "w") as out_handle:
             exons_cmd = ["hisat2_extract_exons.py", gtf_file]
             subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
-        splicesites_file = index_prefix + ".splicesites"
         with open(splicesites_file, "w") as out_handle:
             splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
             subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
+        return ref_path
+
+    pre_func = None
+    if not os.path.exists(gtf_file):
+        print "%s not found, skipping creating the exons file." % (gtf_file)
+    else:
         cmd += "--exon {exons_file} --ss {splicesites_file} "
+        pre_func = _get_exons_and_splicesites
     cmd += "{ref_file} {index_prefix}"
     cmd = cmd.format(**locals())
     if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
-        _index_w_command(dir_name, cmd, ref_file)
+        _index_w_command(dir_name, cmd, ref_file, pre=pre_func)
     return dir_name
 
 def _index_snap(ref_file):
