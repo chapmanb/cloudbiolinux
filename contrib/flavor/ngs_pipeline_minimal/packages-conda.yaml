@@ -102,6 +102,7 @@ bio_nextgen:
   - svtyper
   - theta2
   - tophat
+  - tophat-recondition
   - tdrmapper
   - ucsc-bedtobigbed
   - ucsc-bigbedinfo
