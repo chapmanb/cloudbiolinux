@@ -756,7 +756,7 @@ def _get_gtf_db(gtf):
         print "Creating gffutils database for %s." % (gtf)
         disable_infer_transcripts, disable_infer_genes = guess_disable_infer_extent(gtf)
         if not disable_infer_transcripts or not disable_infer_genes:
-            print ("'transcript' or 'gene' entries not found, so inferring"
+            print ("'transcript' or 'gene' entries not found, so inferring "
                    "their extent. This can be very slow.")
         id_spec = guess_id_spec(gtf)
         gffutils.create_db(gtf, dbfn=db_file,
