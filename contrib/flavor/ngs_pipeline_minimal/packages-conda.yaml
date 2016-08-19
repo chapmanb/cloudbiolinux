@@ -51,6 +51,7 @@ bio_nextgen:
   - htslib
   - htseq
   - impute2
+  - kallisto
   - kraken
   - lofreq
   - lumpy-sv
