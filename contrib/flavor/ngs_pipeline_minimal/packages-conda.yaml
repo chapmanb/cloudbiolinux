@@ -4,6 +4,7 @@ channels:
   - r
   - conda-forge
 minimal:
+  - anaconda-client
   - awscli
   - p7zip
   - s3gof3r
@@ -32,6 +33,7 @@ bio_nextgen:
   - crossmap
   - cufflinks
   - cutadapt
+  - cyvcf2
   - delly
   - express
   - fastqc
