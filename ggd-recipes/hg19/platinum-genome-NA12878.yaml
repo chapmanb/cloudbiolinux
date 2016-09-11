@@ -10,6 +10,7 @@ recipe:
     recipe_cmds:
       - |
         version=v8_0_1
+        dir=validation/platinum-genome-NA12878
         mkdir -p $dir
         wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz https://s3.amazonaws.com/cloudbiolinux/cache/platinum-genome/platinum-genome-NA12878-hg19-$version.vcf.gz
         wget --no-check-certificate -c -O $dir/truth_small_variants.vcf.gz.tbi https://s3.amazonaws.com/cloudbiolinux/cache/platinum-genome/platinum-genome-NA12878-hg19-$version.vcf.gz.tbi
