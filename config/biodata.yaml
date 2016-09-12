@@ -22,13 +22,13 @@ genomes:
     annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR]
     annotations_available: [battenberg, dbnsfp]
-    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385]
+    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
     annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR]
     annotations_available: [battenberg, dbnsfp]
-    validation: [giab-NA12878, giab-NA24385, dream-syn3, dream-syn4]
+    validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,

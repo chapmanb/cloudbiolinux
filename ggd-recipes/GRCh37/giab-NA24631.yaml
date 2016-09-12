@@ -1,0 +1,22 @@
+# Truth sets from Genome in a Bottle for NA24631 -- http://genomeinabottle.org/
+---
+attributes:
+  name: giab-NA24631
+  version: v3_3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/giab-NA24631
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/ChineseTrio/HG005_NA24631_son/NISTv3.3
+        calls=HG005_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v3.3_highconf.vcf.gz
+        regions=HG005_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v3.3_highconf.bed
+        mkdir -p $dir
+        wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
+        tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        wget -c -O $dir/truth_regions.bed $url/$regions 
+    recipe_outfiles:
+      - validation/giab-NA24631/truth_small_variants.vcf.gz
+      - validation/giab-NA24631/truth_small_variants.vcf.gz.tbi
+      - validation/giab-NA24631/truth_regions.bed
