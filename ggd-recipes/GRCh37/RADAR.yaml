@@ -1,9 +1,11 @@
-# RADAR RNA editing events: (http://www.stanford.edu/~gokulr/database/Human_AG_all_hg19_v2.txt)
-# installs a BED file of the RADAR events, converted to GRCh37 chromosome coordinates
+# RADAR RNA editing events:
+#	(http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt)
+# installs a BED file of the RADAR events, converted to GRCh37 chromosome
+# coordinates
 ---
 attributes:
   name: RADAR-GRCh37
-  version: 2
+  version: 3
 recipe:
   full:
     recipe_type: bash
