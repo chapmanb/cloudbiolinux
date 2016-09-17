@@ -9,12 +9,12 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-	url=http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt
-	TAB=$'\t'
+        url=http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt
+        TAB=$'\t'
         mkdir -p editing
         cd editing
         wget --no-check-certificate -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position${TAB}position/start${TAB}end/" | sed "s/chromosome/#chromosome/" | sort -k1,1 -k2,2n | bgzip > RADAR-hg19.bed.gz
-	tabix RADAR-hg19.bed.gz
+        tabix RADAR-hg19.bed.gz
         cd ../
     recipe_outfiles:
       - editing/RADAR-hg19.bed.gz
