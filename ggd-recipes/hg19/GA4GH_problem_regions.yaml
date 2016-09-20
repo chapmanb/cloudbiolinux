@@ -1,7 +1,7 @@
 # GA4GH problematic region files: https://drive.google.com/folderview?id=0B7Ao1qqJJDHQUjVIN3liUUZNWjg&usp=sharing#list
 ---
 attributes:
-  name: GA4GH-problem-regions
+  name: GA4GH_problem_regions
   version: 20l60916
 recipe:
   full:
