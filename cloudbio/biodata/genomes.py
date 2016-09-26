@@ -202,7 +202,6 @@ class VectorBase(_DownloadHelper):
 
 class EnsemblGenome(_DownloadHelper):
     """Retrieve genome FASTA files from Ensembl.
-
     ftp://ftp.ensemblgenomes.org/pub/plants/release-22/fasta/
     arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.22.dna.toplevel.fa.gz
     ftp://ftp.ensembl.org/pub/release-75/fasta/
@@ -282,7 +281,7 @@ GENOMES_SUPPORTED = [
                                               "human_g1k_v37.fasta", "b37")),
            ("Hsapiens", "hg38", GGDGenome("hg38")),
            ("Hsapiens", "hg38-noalt", GGDGenome("hg38-noalt")),
-           ("Rnorvegicus", "rn6", UCSCGenome("rn6")),
+           ("Rnorvegicus", "rn6", GGDGenome("rn6")),
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),

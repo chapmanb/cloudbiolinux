@@ -48,6 +48,7 @@ genomes:
     name: Rat (rn5)
   - dbkey: rn6
     name: Rat (rn6)
+    annotations: [transcripts]
   - dbkey: canFam3
     name: Dog (canFam3)
     annotations: [dbsnp, transcripts]
