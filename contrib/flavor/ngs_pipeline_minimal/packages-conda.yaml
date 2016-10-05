@@ -43,6 +43,7 @@ bio_nextgen:
   - geneimpacts
   - gemini
   - glpk=4.57
+  - goleft
   - grabix
   - gsort
   - svtools
