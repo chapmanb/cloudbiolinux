@@ -15,7 +15,7 @@ recipe:
           unzip -d tmp-unpack dbNSFPv*.zip
           head -n1 tmp-unpack/dbNSFP*_variant.chr1 > dbNSFP.txt
           cat tmp-unpack/dbNSFP*_variant.chr* | grep -v ^# >> dbNSFP.txt
-          bgzip dbNSFPv3.1c.txt tabix -s 1 -b 2 -e 2 dbNSFP.txt.gz        
+          bgzip dbNSFP.txt  
         fi
         tabix -s 1 -b 2 -e 2 dbNSFP.txt.gz
         rm -f tmp-unpack/* && rmdir tmp-unpack
