@@ -12,10 +12,12 @@ recipe:
         cd variation
         wget -c -N $baseurl
         if [ ! -f dbNSFP.txt.gz ]; then
-           7za x dbNSFPv*.zip -y -otmp-unpack
-           cat tmp-unpack/dbNSFP*_variant.chr* | bgzip -c > dbNSFP.txt.gz
+          unzip -d tmp-unpack dbNSFPv*.zip
+          head -n1 tmp-unpack/dbNSFP*_variant.chr1 > dbNSFP.txt
+          cat tmp-unpack/dbNSFP*_variant.chr* | grep -v ^# >> dbNSFP.txt
+          bgzip dbNSFP.txt  
         fi
-        tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
+        tabix -s 1 -b 2 -e 2 dbNSFP.txt.gz
         rm -f tmp-unpack/* && rmdir tmp-unpack
         rm -f dbNSFPv*.zip
     recipe_outfiles:
