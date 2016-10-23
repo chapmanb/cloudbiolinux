@@ -19,13 +19,15 @@ genomes:
     name: phiX174
   - dbkey: hg19
     name: Human (hg19)
-    annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
+    # Re-add mirbase when mirbase.org back online
+    annotations: [GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR]
     annotations_available: [battenberg, dbnsfp]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
-    annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
+    # Re-add mirbase when mirbase.org back online
+    annotations: [GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR]
     annotations_available: [battenberg, dbnsfp]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4]
@@ -43,7 +45,8 @@ genomes:
     name: Mouse (mm9)
   - dbkey: mm10
     name: Mouse (mm10)
-    annotations: [mirbase, problem_regions, dbsnp, transcripts]
+    # Re-add mirbase when mirbase.org back online
+    annotations: [problem_regions, dbsnp, transcripts]
   - dbkey: rn5
     name: Rat (rn5)
   - dbkey: rn6
@@ -57,8 +60,9 @@ genomes:
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: TAIR10
+    # Re-add mirbase when mirbase.org back online
     name: Arabidopsis thaliana (TAIR10)
-    annotations: [mirbase]
+    annotations: []
   - dbkey: xenTro3
     name: X tropicalis (xenTro3)
   - dbkey: GRCz10
