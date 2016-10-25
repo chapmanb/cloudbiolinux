@@ -37,6 +37,7 @@ bio_nextgen:
   - delly
   - express
   - fastqc
+  - fgbio
   - freebayes=1.0.2.29
   - gatk
   - gatk-framework
