@@ -19,7 +19,7 @@ recipe:
         if [ ! -f dbNSFP.txt.gz ]; then
           UNPACK_DIR=`pwd`/tmpunpack
           mkdir -p $UNPACK_DIR
-          unzip -p dbNSFPv*.zip dbNSFP3.2a_variant.chr* | awk '{if ($8 != "." && $9 != ".") print}' | sort -T $UNPACK_DIR -k8,8 -k9,9n | bgzip -c > dbNSFP.txt.gz
+          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr*" | awk '{if ($8 != "." && $9 != ".") print}' | sort -T $UNPACK_DIR -k8,8 -k9,9n | bgzip -c > dbNSFP.txt.gz
         fi
         # index by hg19/GRCh37 in position 8 and 9, hg38 in 1/2
         tabix -s 8 -b 9 -e 9 -c '#' dbNSFP.txt.gz
