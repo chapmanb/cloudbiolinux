@@ -17,13 +17,14 @@ recipe:
         getcode="$(awk '/_warning_/ {print $NF}' tmp-gcokie)"
         curl -Lb tmp-gcokie "${ggURL}&confirm=${getcode}&id=${ggID}" -o "${filename}"
         if [ ! -f dbNSFP.txt.gz ]; then
-          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr1" | head -n1 > header.txt
           UNPACK_DIR=`pwd`/tmpunpack
           mkdir -p $UNPACK_DIR
-          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr*" | grep -v '^#chr' | awk '{if ($8 != "." && $9 != ".") print}' | sort -T $UNPACK_DIR -k8,8 -k9,9n | cat header.txt - | bgzip -c > dbNSFP.txt.gz
+          # unzip only files with chromosomal info, eg. skip genes and readme.
+          # [awk] print header line, then check if hg19 position exists, if so, move data to col 1 and 2, then print and sort on first and second column
+          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr*" | awk 'NR==1{print};{if ($8 != "." && $9 != ".") $1=$8;$2=$9;print| "sort -T $UNPACK_DIR -k1,1 -k2,2n"}'| bgzip -c > dbNSFP.txt.gz
         fi
-        # index by hg19/GRCh37 in position 8 and 9, hg38 in 1/2
-        tabix -s 8 -b 9 -e 9 -c '#' dbNSFP.txt.gz
+        # index in position 1 and 2
+        tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
         rm -f tmp-unpack/* && rmdir tmp-unpack
         rm -f dbNSFPv*.zip
     recipe_outfiles:
