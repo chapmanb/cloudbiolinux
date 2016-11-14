@@ -21,7 +21,7 @@
 ---
 attributes:
   name: RADAR-hg38
-  version: 1
+  version: 2
 recipe:
   full:
     recipe_type: bash
@@ -31,6 +31,8 @@ recipe:
         mkdir -p editing
         cd editing
       	wget --no-check-certificate -qO- $url > RADAR-hg38.bed.gz
+	tabix RADAR-hg38.bed.gz
        	cd ../
     recipe_outfiles:
       - editing/RADAR-hg38.bed.gz
+      - editing/RADAR-hg38.bed.gz.tbi
