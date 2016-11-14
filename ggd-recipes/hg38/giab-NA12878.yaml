@@ -1,0 +1,23 @@
+# Truth sets from Genome in a Bottle for NA12878 -- http://genomeinabottle.org/
+# ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/
+---
+attributes:
+  name: giab-NA12878
+  version: v3_3_1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/giab-NA12878
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh38/
+        calls=HG001_GRCh38_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf_phased.vcf.gz
+        regions=HG001_GRCh38_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf_noCENorHET7.bed
+        mkdir -p $dir
+        wget -c $url/$calls -O $dir/truth_small_variants.vcf.gz
+        tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        wget -c $url/$regions -O $dir/truth_regions.bed
+    recipe_outfiles:
+      - validation/giab-NA12878/truth_small_variants.vcf.gz
+      - validation/giab-NA12878/truth_small_variants.vcf.gz.tbi
+      - validation/giab-NA12878/truth_regions.bed

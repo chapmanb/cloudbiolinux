@@ -33,7 +33,7 @@ genomes:
     name: Human (hg38) full
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts]
-    validation: [platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
+    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
