@@ -23,7 +23,7 @@ recipe:
           # unzip only files with chromosomal info, eg. skip genes and readme.
           # [awk] check if hg19 position exists, if so, move data to col 1 and 2, then print 
           # and sort on first and second column
-          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr*" | grep -v '^#chr' | awk '{if ($8 != "." && $9 != ".") $1=$8;$2=$9;print}' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat header.txt - | bgzip -c > dbNSFP.txt.gz
+          unzip -p dbNSFPv*.zip "dbNSFP3.2a_variant.chr*" | grep -v '^#chr' | awk -F $'\t' 'BEGIN {OFS = FS} {if ($8 != "." && $9 != ".") {$1=$8;$2=$9;print}}' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat header.txt - | bgzip -c > dbNSFP.txt.gz
         fi
         # index in position 1 and 2
         tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
