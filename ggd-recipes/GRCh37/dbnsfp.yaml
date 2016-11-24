@@ -27,7 +27,7 @@ recipe:
         fi
         # index in position 1 and 2
         tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
-        rm -f tmp-unpack/* && rmdir tmp-unpack
+        rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
         rm -f dbNSFPv*.zip
     recipe_outfiles:
       - variation/dbNSFP.txt.gz
