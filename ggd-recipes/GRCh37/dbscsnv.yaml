@@ -7,14 +7,15 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://dbscsnv:dbscsnv@dbscsnv.softgenetics.com/dbscSNV.zip
+        baseurl=ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbscSNV1.1.zip
         mkdir -p variation
         cd variation
         wget -c -N $baseurl
         if [ ! -f dbscSNV.txt.gz ]; then
-           7za x dbscSNV.zip -y -otmp-unpack
-           head -n1 dbscSNV.chr1 > tmp-unpack/h
-           cat tmp-unpack/dbscSNV.chr* | grep -v ^chr | cat tmp-unpack/h - | bgzip -c > dbscSNV.txt.gz
+          UNPACK_DIR=`pwd`/tmp-unpack
+          mkdir -p $UNPACK_DIR
+          unzip -p dbscSNV*.zip "dbscSNV*.chr1" | head -n1 > $UNPACK_DIR/header.txt
+          unzip -p dbscSNV*.zip "dbscSNV*.chr*" | grep -v '^chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbscSNV.txt.gz
         fi
         tabix -s 1 -b 2 -e 2 -c c dbscSNV.txt.gz
         rm -f tmp-unpack/* && rmdir tmp-unpack
