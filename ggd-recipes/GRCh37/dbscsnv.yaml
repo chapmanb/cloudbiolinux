@@ -1,0 +1,24 @@
+---
+attributes:
+  name: dbscsnv
+  version: 1.1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=ftp://dbscsnv:dbscsnv@dbscsnv.softgenetics.com/dbscSNV.zip
+        mkdir -p variation
+        cd variation
+        wget -c -N $baseurl
+        if [ ! -f dbscSNV.txt.gz ]; then
+           7za x dbscSNV.zip -y -otmp-unpack
+           head -n1 dbscSNV.chr1 > tmp-unpack/h
+           cat tmp-unpack/dbscSNV.chr* | grep -v ^chr | cat tmp-unpack/h - | bgzip -c > dbscSNV.txt.gz
+        fi
+        tabix -s 1 -b 2 -e 2 -c c dbscSNV.txt.gz
+        rm -f tmp-unpack/* && rmdir tmp-unpack
+        rm -f dbscSNV.zip
+    recipe_outfiles:
+      - variation/dbscSNV.txt.gz
+      - variation/dbscSNV.txt.gz.tbi
