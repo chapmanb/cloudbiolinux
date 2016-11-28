@@ -18,8 +18,8 @@ recipe:
           unzip -p dbscSNV*.zip "dbscSNV*.chr*" | grep -v '^chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbscSNV.txt.gz
         fi
         tabix -s 1 -b 2 -e 2 -c c dbscSNV.txt.gz
-        rm -f tmp-unpack/* && rmdir tmp-unpack
-        rm -f dbscSNV.zip
+        rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
+        rm -f dbscSNV*.zip
     recipe_outfiles:
       - variation/dbscSNV.txt.gz
       - variation/dbscSNV.txt.gz.tbi
