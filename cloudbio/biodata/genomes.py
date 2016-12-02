@@ -242,14 +242,14 @@ class BroadGenome(_DownloadHelper):
 
     Uses the UCSC-name compatible versions of the GATK bundles.
     """
-    def __init__(self, name, bundle_version, target_fasta, dl_name=None):
+    def __init__(self, name, target_fasta, dl_name=None):
         _DownloadHelper.__init__(self)
         self.data_source = "UCSC"
         self._name = name
         self.dl_name = dl_name if dl_name is not None else name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
-                        "{ver}/{org}/".format(ver=bundle_version, org=self.dl_name)
+                        "{org}/".format(org=self.dl_name)
 
     def download(self, seq_dir):
         org_file = "%s.fa" % self._name
@@ -265,20 +265,15 @@ class GGDGenome:
     def __init__(self, name):
         self._name = name
 
-BROAD_BUNDLE_VERSION = "2.8"
-
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
            ("Scerevisiae", "sacCer3", UCSCGenome("sacCer3")),
            ("Mmusculus", "mm10", UCSCGenome("mm10")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
-           ("Hsapiens", "hg18", BroadGenome("hg18", BROAD_BUNDLE_VERSION,
-                                            "Homo_sapiens_assembly18.fasta")),
-           ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
-                                            "ucsc.hg19.fasta")),
-           ("Hsapiens", "GRCh37", BroadGenome("GRCh37", BROAD_BUNDLE_VERSION,
-                                              "human_g1k_v37.fasta", "b37")),
+           ("Hsapiens", "hg18", BroadGenome("hg18", "Homo_sapiens_assembly18.fasta")),
+           ("Hsapiens", "hg19", BroadGenome("hg19", "ucsc.hg19.fasta")),
+           ("Hsapiens", "GRCh37", BroadGenome("GRCh37", "human_g1k_v37.fasta", "b37")),
            ("Hsapiens", "hg38", GGDGenome("hg38")),
            ("Hsapiens", "hg38-noalt", GGDGenome("hg38-noalt")),
            ("Rnorvegicus", "rn6", GGDGenome("rn6")),

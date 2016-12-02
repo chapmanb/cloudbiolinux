@@ -15,4 +15,3 @@ recipe:
     recipe_outfiles:
       - variation/hapmap_3.3.vcf.gz
       - variation/hapmap_3.3.vcf.gz.tbi
- 
