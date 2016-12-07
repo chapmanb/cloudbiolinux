@@ -43,6 +43,7 @@ bio_nextgen:
   - gatk-framework
   - geneimpacts
   - gemini
+  - genesplicer
   - glpk=4.57
   - goleft
   - grabix
@@ -61,6 +62,7 @@ bio_nextgen:
   - lumpy-sv
   - macs2
   - manta
+  - maxentscan
   - mbuffer
   - metasv
   - mirdeep2
