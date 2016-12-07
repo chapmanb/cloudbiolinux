@@ -124,6 +124,7 @@ bio_nextgen:
   - ucsc-gtftogenepred
   - ucsc-liftover
   - ucsc-wigtobigwig
+  - umis
   - wham
   - vardict
   - vardict-java

@@ -1,0 +1,26 @@
+# Common sets of capture region BED files for different platforms
+---
+attributes:
+  name: capture_regions
+  version: 20l61202
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://raw.githubusercontent.com/AstraZeneca-NGS/reference_data/master/GRCh37/bed
+        files="Exome-Agilent_V5_Clinical.bed Exome-Agilent_V6.bed Exome-AZ_V2.bed Exome-IDT_V1.bed
+               Exome-MedExome.bed Exome-NGv3.bed"
+        mkdir -p coverage/capture_regions
+        cd coverage/capture_regions
+        for fname in $files
+        do
+          wget --no-check-certificate -c $baseurl/$fname
+        done
+    recipe_outfiles:
+      - coverage/capture_regions/Exome-Agilent_V5_Clinical.bed
+      - coverage/capture_regions/Exome-Agilent_V6.bed
+      - coverage/capture_regions/Exome-AZ_V2.bed
+      - coverage/capture_regions/Exome-IDT_V1.bed
+      - coverage/capture_regions/Exome-MedExome.bed
+      - coverage/capture_regions/Exome-NGv3.bed
