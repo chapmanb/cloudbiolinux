@@ -46,4 +46,5 @@ recipe:
       - variation/genesplicer/f.acc
       - variation/genesplicer/outex
       - variation/genesplicer/score_ex.acc
-      - variation/genesplicer/score_in.acc seqs
+      - variation/genesplicer/score_in.acc
+      - variation/genesplicer/seqs
