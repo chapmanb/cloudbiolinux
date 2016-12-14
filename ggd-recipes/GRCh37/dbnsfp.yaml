@@ -1,7 +1,7 @@
 ---
 attributes:
   name: dbnsfp
-  version: 3.3a2
+  version: 3.3a
 recipe:
   full:
     recipe_type: bash
