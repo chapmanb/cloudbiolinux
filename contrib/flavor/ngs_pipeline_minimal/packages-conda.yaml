@@ -129,7 +129,7 @@ bio_nextgen:
   - vardict
   - vardict-java
   - variantbam
-  - variant-effect-predictor=86
+  - variant-effect-predictor=87
   - varscan
   - vawk
   - vcfanno
