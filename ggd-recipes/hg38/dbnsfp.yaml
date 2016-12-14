@@ -1,7 +1,7 @@
 ---
 attributes:
   name: dbnsfp
-  version: 3.1a
+  version: 3.3a
 recipe:
   full:
     recipe_type: bash
@@ -9,7 +9,7 @@ recipe:
       - |
         # Uses Google Drive for faster download with tricks from
         # http://stackoverflow.com/a/38937732/252589
-        ggID='0B60wROKy6OqceGo2dFhicjFVOWs'
+        ggID='0B60wROKy6OqceFMwVFBBbHAtR3M'
         ggURL='https://drive.google.com/uc?export=download'
         mkdir -p variation
         cd variation
@@ -28,6 +28,7 @@ recipe:
         # index in position 1 and 2
         tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
         rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
+        rm -f tmp-gcokie
         rm -f dbNSFPv*.zip
     recipe_outfiles:
       - variation/dbNSFP.txt.gz
