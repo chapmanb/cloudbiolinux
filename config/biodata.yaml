@@ -23,7 +23,7 @@ genomes:
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts]
-    annotations_available: [battenberg, dbnsfp]
+    annotations_available: [battenberg, dbnsfp, dbscsnv]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
@@ -31,20 +31,21 @@ genomes:
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts]
-    annotations_available: [battenberg, dbnsfp]
+    annotations_available: [battenberg, dbnsfp,dbscsnv]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
                   genesplicer, effects_transcripts]
-    annotations_available: [dbnsfp]
+    annotations_available: [dbnsfp,dbscsnv]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
     annotations: [coverage, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, transcripts]
+    annotations_available: [dbnsfp,dbscsnv]
   - dbkey: mm9
     name: Mouse (mm9)
   - dbkey: mm10
