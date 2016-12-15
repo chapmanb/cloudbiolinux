@@ -69,6 +69,7 @@ bio_nextgen:
   - moreutils
   - multiqc
   - multiqc-bcbio
+  - ngs-disambiguate
   - novoalign
   - oncofuse
   - optitype
