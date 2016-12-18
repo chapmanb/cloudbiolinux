@@ -29,7 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import dbsnp, galaxy, ggd, rnaseq
+from cloudbio.biodata import galaxy, ggd, rnaseq
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
 
@@ -379,7 +379,6 @@ def upload_s3(config_source):
 
 
 def _install_additional_data(genomes, genome_indexes, config):
-    dbsnp.download_dbnsfp(genomes)
     for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
