@@ -695,15 +695,23 @@ def _index_star(ref_file):
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
     nrefs = float(subprocess.check_output(cmd, shell=True))
     nbits = int(round(min(14, log(GenomeLength/nrefs, 2), log(GenomeLength, 2)/2 - 1)))
+    # first we estimate the number of bits we need to hold the genome and allocate
+    # double that plus some padding to build the index
+    mem = ((GenomeLength + 1) / nbits + 1) * nbits
+    mem = (mem + 10000) * 2
+    mem = mem + mem / 3
+    mem = max(mem, 30000000000)
     try:
         cpu = env.cores
     except:
         cpu = 1
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
+           "--limitGenomeGenerateRAM %s "
            "--genomeChrBinNbits %s "
            "--runMode genomeGenerate "
-           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases, nbits))
+           "--genomeSAindexNbases %s" % (dir_name, str(cpu), str(mem), Nbases,
+                                         nbits))
     if not env.safe_exists(os.path.join(dir_name, "SA")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name
