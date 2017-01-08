@@ -37,7 +37,8 @@ genomes:
     name: Human (hg38) full
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
-                  genesplicer, effects_transcripts]
+                  genesplicer, effects_transcripts, esp, exac]
+
     annotations_available: [dbnsfp, dbscsnv]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap]
@@ -87,6 +88,7 @@ annotation_groups:
               genesplicer, effects_transcripts, vcfanno]
   rnaseq: [transcripts, RADAR]
   smallrna: [mirbase]
+  gemini: [esp, exac]
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py

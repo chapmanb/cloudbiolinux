@@ -1,0 +1,19 @@
+# ExAC VCF sites: http://exac.broadinstitute.org/
+# Lifted over to hg38 by the Ensembl variation team
+---
+attributes:
+  name: exac
+  version: 0.3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensembl.org/pub/variation_genotype/homo_sapiens/ExAC.0.3.GRCh38.vcf.gz
+        ref=../seq/hg38.fa
+        mkdir -p variation
+        wget -c -O - $url | gunzip -c | vt decompose -s - | bgzip -c > variation/exac.vcf.gz
+        tabix -f -p vcf variation/exac.vcf.gz.tbi
+    recipe_outfiles:
+      - variation/exac.vcf.gz
+      - variation/exac.vcf.gz.tbi
