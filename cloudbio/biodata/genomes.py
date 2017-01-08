@@ -811,7 +811,7 @@ def _install_with_ggd(env, manager, gid, recipe):
                                                os.pardir, os.pardir, "ggd-recipes"))
     recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
     if os.path.exists(recipe_file):
-        ggd.install_recipe(env.cwd, recipe_file)
+        ggd.install_recipe(env.cwd, recipe_file, gid)
     else:
         raise NotImplementedError("GGD recipe not available for %s %s" % (gid, recipe))
 
