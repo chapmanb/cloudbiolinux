@@ -15,8 +15,9 @@ recipe:
         ref=../seq/hg38.fa
         mkdir -p variation
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
-        wget -c -O - $url | gunzip -c | vt decompose -s - | sed -f remap.sed | gsort - $ref.fai | bgzip -c > variation/exac.vcf.gz
-        tabix -f -p vcf variation/exac.vcf.gz.tbi
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | vt decompose -s - | sed -f remap.sed | gsort -m 500 /dev/stdin $ref.fai | bgzip -c > variation/exac.vcf.gz
+        tabix -f -p vcf variation/exac.vcf.gz
     recipe_outfiles:
       - variation/exac.vcf.gz
       - variation/exac.vcf.gz.tbi
