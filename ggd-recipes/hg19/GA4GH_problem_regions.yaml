@@ -2,7 +2,7 @@
 ---
 attributes:
   name: GA4GH_problem_regions
-  version: 20l60916
+  version: 20160916
 recipe:
   full:
     recipe_type: bash

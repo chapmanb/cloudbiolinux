@@ -2,7 +2,7 @@
 ---
 attributes:
   name: capture_regions
-  version: 20l61202
+  version: 20161202
 recipe:
   full:
     recipe_type: bash
