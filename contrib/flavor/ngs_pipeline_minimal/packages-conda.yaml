@@ -21,7 +21,7 @@ bio_nextgen:
   - bedtools=2.24.0
   - biobambam
   - bowtie
-  - bowtie2
+  - bowtie2=2.2.8
   - bwa
   - bwakit
   - bio-vcf
