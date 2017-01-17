@@ -38,7 +38,7 @@ bio_nextgen:
   - express
   - fastqc
   - fgbio
-  - freebayes=1.0.2.29
+  - freebayes=1.1.0
   - gatk
   - gatk-framework
   - geneimpacts
@@ -107,7 +107,7 @@ bio_nextgen:
   - star
   - stringtie
   - subread
-  - svtyper
+  - svtyper=0.0.4
   - theta2
   - tophat
   - tophat-recondition
