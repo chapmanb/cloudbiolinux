@@ -65,7 +65,7 @@ bio_nextgen:
   - maxentscan
   - mbuffer
   - metasv
-  - mirdeep2
+  - mirdeep2=2.0.0.7
   - moreutils
   - multiqc
   - multiqc-bcbio
