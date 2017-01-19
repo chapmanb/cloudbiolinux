@@ -36,6 +36,7 @@ bio_nextgen:
   - cyvcf2
   - delly
   - express
+  - extract-sv-reads
   - fastqc
   - fgbio
   - freebayes=1.1.0
