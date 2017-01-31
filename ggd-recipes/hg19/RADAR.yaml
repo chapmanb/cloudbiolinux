@@ -13,7 +13,9 @@ recipe:
         TAB=$'\t'
         mkdir -p editing
         cd editing
-        wget --no-check-certificate -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position${TAB}position/start${TAB}end/" | sed "s/chromosome/#chromosome/" | sort -k1,1 -k2,2n | bgzip > RADAR.bed.gz
+        TMPDIR=`pwd`/tmpsort
+        mkdir -p $TMPDIR
+        wget --no-check-certificate -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position${TAB}position/start${TAB}end/" | sed "s/chromosome/#chromosome/" | sort -T $TMPDIR -k1,1 -k2,2n | bgzip > RADAR.bed.gz
         tabix RADAR.bed.gz
         cd ../
     recipe_outfiles:
