@@ -49,6 +49,10 @@ def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
         final_bindir = env.safe_run_output("cd %s && pwd -P" % final_bindir)
         base_bindir = env.safe_run_output("cd %s && pwd -P" % base_bindir)
     for pkg_subdir in json.loads(env.safe_run_output("{conda_bin} list --json -f {package}".format(**locals()))):
+        # New style conda info (4.3+) is a dictionary, old style is a string. Handle both cases
+        if isinstance(pkg_subdir, dict):
+            pkg_subdir = pkg_subdir["dist_name"]
+        pkg_subdir = pkg_subdir.split("::")[-1]
         for pkg_dir in conda_info["pkgs_dirs"]:
             pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
             if env.safe_exists(pkg_bindir):

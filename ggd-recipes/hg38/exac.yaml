@@ -1,0 +1,23 @@
+# ExAC VCF sites: http://exac.broadinstitute.org/
+# Lifted over to hg38 by the Ensembl variation team
+# Script cleans up to use chr-style naming and sort by ref file
+---
+attributes:
+  name: exac
+  version: 0.3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensembl.org/pub/variation_genotype/homo_sapiens/ExAC.0.3.GRCh38.vcf.gz
+        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
+        ref=../seq/hg38.fa
+        mkdir -p variation
+        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | vt decompose -s - | sed -f remap.sed | gsort -m 500 /dev/stdin $ref.fai | bgzip -c > variation/exac.vcf.gz
+        tabix -f -p vcf variation/exac.vcf.gz
+    recipe_outfiles:
+      - variation/exac.vcf.gz
+      - variation/exac.vcf.gz.tbi

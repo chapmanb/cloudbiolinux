@@ -1,0 +1,50 @@
+---
+attributes:
+  name: genesplicer
+  version: 2004.04.03
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p variation/genesplicer
+        wget http://www.cs.jhu.edu/~genomics/GeneSplicer/GeneSplicer.tar.gz
+        tar -C variation/genesplicer --strip-components=2 -xvf GeneSplicer.tar.gz GeneSplicer/human
+        rm GeneSplicer.tar.gz
+    recipe_outfiles:
+      - variation/genesplicer/acc1.mar
+      - variation/genesplicer/acc14
+      - variation/genesplicer/acc20
+      - variation/genesplicer/acc26
+      - variation/genesplicer/acc33
+      - variation/genesplicer/acc7
+      - variation/genesplicer/chgd.fasta
+      - variation/genesplicer/don1.mar
+      - variation/genesplicer/don15
+      - variation/genesplicer/don19
+      - variation/genesplicer/don20
+      - variation/genesplicer/don24
+      - variation/genesplicer/embls.seq
+      - variation/genesplicer/exons.list
+      - variation/genesplicer/f.don
+      - variation/genesplicer/outin
+      - variation/genesplicer/score_ex.don
+      - variation/genesplicer/score_in.don
+      - variation/genesplicer/acc13
+      - variation/genesplicer/acc19
+      - variation/genesplicer/acc25
+      - variation/genesplicer/acc32
+      - variation/genesplicer/acc34
+      - variation/genesplicer/acc8
+      - variation/genesplicer/config_file
+      - variation/genesplicer/don10
+      - variation/genesplicer/don16
+      - variation/genesplicer/don2
+      - variation/genesplicer/don23
+      - variation/genesplicer/don9
+      - variation/genesplicer/exons.dat
+      - variation/genesplicer/f.acc
+      - variation/genesplicer/outex
+      - variation/genesplicer/score_ex.acc
+      - variation/genesplicer/score_in.acc
+      - variation/genesplicer/seqs

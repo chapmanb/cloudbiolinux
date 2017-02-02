@@ -11,7 +11,7 @@ recipe:
     recipe_cmds:
       - |
         baseurl=https://s3.amazonaws.com/biodata/annotation/hg19-rnaseq-2014-07-17.tar.xz
-        wget -c -N $baseurl
+        wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq
     recipe_outfiles:

@@ -1,21 +1,38 @@
 ---
 attributes:
   name: dbnsfp
-  version: 3.1c
+  version: 3.3a
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFPv3.1c.zip
+        # Uses Google Drive for faster download with tricks from
+        # http://stackoverflow.com/a/38937732/252589
+        ggID='0B60wROKy6OqceFMwVFBBbHAtR3M'
+        ggURL='https://drive.google.com/uc?export=download'
         mkdir -p variation
         cd variation
-        wget -c -N $baseurl
-        7za x dbNSFPv*.zip -y -otmp-unpack
-        cat tmp-unpack/dbNSFP*_variant.chr* | bgzip -c > dbNSFP.txt.gz
+        filename="$(curl -k -sc tmp-gcokie "${ggURL}&id=${ggID}" | grep -o '="uc-name.*</span>' | sed 's/.*">//;s/<.a> .*//')"
+        getcode="$(awk '/_warning_/ {print $NF}' tmp-gcokie)"
+        curl -k -Lb tmp-gcokie "${ggURL}&confirm=${getcode}&id=${ggID}" -o "${filename}"
+        if [ ! -f dbNSFP.txt.gz ]; then
+          UNPACK_DIR=`pwd`/tmpunpack
+          mkdir -p $UNPACK_DIR
+          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr1" | head -n1 > $UNPACK_DIR/header.txt
+          # unzip only files with chromosomal info, eg. skip genes and readme.
+          # [awk] check if hg19 position exists, if so, move data to col 1 and 2, then print
+          # and sort on first and second column
+          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | awk -F $'\t' 'BEGIN {OFS = FS} {if ($8 != "." && $9 != ".") {$1=$8;$2=$9;print}}' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbNSFP.txt.gz
+          #extract readme file, used by VEP plugin to add vcf header info
+          unzip -p dbNSFP*.zip "*readme.txt" > dbNSFP.readme.txt
+        fi
+        # index in position 1 and 2
         tabix -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
-        rm -f tmp-unpack/* && rmdir tmp-unpack
+        rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
+        rm -f tmp-gcokie
         rm -f dbNSFPv*.zip
     recipe_outfiles:
       - variation/dbNSFP.txt.gz
       - variation/dbNSFP.txt.gz.tbi
+      - variation/dbNSFP.readme.txt

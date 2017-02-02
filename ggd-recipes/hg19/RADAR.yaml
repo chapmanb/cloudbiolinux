@@ -2,17 +2,22 @@
 # installs a BED file of the RADAR events
 ---
 attributes:
-  name: RADAR-hg19
-  version: 1
+  name: RADAR
+  version: 4
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://www.stanford.edu/~gokulr/database/Human_AG_all_hg19_v2.txt
+        url=http://lilab.stanford.edu/GokulR/database/Human_AG_all_hg19_v2.txt
+        TAB=$'\t'
         mkdir -p editing
         cd editing
-        wget --no-check-certificate -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position  position/start  end/" > RADAR-hg19.bed
+        TMPDIR=`pwd`/tmpsort
+        mkdir -p $TMPDIR
+        wget --no-check-certificate -qO- $url | awk 'BEGIN{OFS="\t"} {print $1,$2,$2+1,$3,$4,$5,$6,$7,$8,$9,$10,$11}' | sed "s/position${TAB}position/start${TAB}end/" | sed "s/chromosome/#chromosome/" | sort -T $TMPDIR -k1,1 -k2,2n | bgzip > RADAR.bed.gz
+        tabix RADAR.bed.gz
         cd ../
     recipe_outfiles:
-      - editing/RADAR-hg19.bed
+      - editing/RADAR.bed.gz
+      - editing/RADAR.bed.gz.tbi

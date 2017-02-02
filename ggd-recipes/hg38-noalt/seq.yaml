@@ -9,9 +9,10 @@ recipe:
     recipe_cmds:
       - |
         mkdir -p seq
-        wget -c -O seq/hg38-noalt.fa.gz ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz
-        [[ -f seq/hg38-noalt.fa ]] || gunzip -c seq/hg38-noalt.fa.gz > seq/hg38-noalt.fa
-      - wget -c -O seq/hg38-noalt.fa.fai ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai
+        ncbidir=ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/all_assembly_versions/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
+        filebase=GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
+        wget -c -O - $ncbidir/${filebase}.gz | gunzip -c > seq/hg38-noalt.fa
+      - wget -c -O seq/hg38-noalt.fa.fai $ncbidir/${filebase}.fai
       - >
         [[ -f seq/hg38-noalt.dict ]] ||
         picard CreateSequenceDictionary REFERENCE=seq/hg38-noalt.fa OUTPUT=seq/hg38-noalt.dict SPECIES=hg38-noalt

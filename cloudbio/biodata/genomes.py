@@ -29,7 +29,7 @@ try:
 except ImportError:
     boto = None
 
-from cloudbio.biodata import dbsnp, galaxy, ggd, rnaseq
+from cloudbio.biodata import galaxy, ggd, rnaseq
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
 
@@ -202,7 +202,6 @@ class VectorBase(_DownloadHelper):
 
 class EnsemblGenome(_DownloadHelper):
     """Retrieve genome FASTA files from Ensembl.
-
     ftp://ftp.ensemblgenomes.org/pub/plants/release-22/fasta/
     arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.22.dna.toplevel.fa.gz
     ftp://ftp.ensembl.org/pub/release-75/fasta/
@@ -243,14 +242,14 @@ class BroadGenome(_DownloadHelper):
 
     Uses the UCSC-name compatible versions of the GATK bundles.
     """
-    def __init__(self, name, bundle_version, target_fasta, dl_name=None):
+    def __init__(self, name, target_fasta, dl_name=None):
         _DownloadHelper.__init__(self)
         self.data_source = "UCSC"
         self._name = name
         self.dl_name = dl_name if dl_name is not None else name
         self._target = target_fasta
         self._ftp_url = "ftp://gsapubftp-anonymous:@ftp.broadinstitute.org/bundle/" + \
-                        "{ver}/{org}/".format(ver=bundle_version, org=self.dl_name)
+                        "{org}/".format(org=self.dl_name)
 
     def download(self, seq_dir):
         org_file = "%s.fa" % self._name
@@ -266,23 +265,18 @@ class GGDGenome:
     def __init__(self, name):
         self._name = name
 
-BROAD_BUNDLE_VERSION = "2.8"
-
 GENOMES_SUPPORTED = [
            ("phiX174", "phix", NCBIRest("phix", ["NC_001422.1"])),
            ("Scerevisiae", "sacCer3", UCSCGenome("sacCer3")),
            ("Mmusculus", "mm10", UCSCGenome("mm10")),
            ("Mmusculus", "mm9", UCSCGenome("mm9")),
            ("Mmusculus", "mm8", UCSCGenome("mm8")),
-           ("Hsapiens", "hg18", BroadGenome("hg18", BROAD_BUNDLE_VERSION,
-                                            "Homo_sapiens_assembly18.fasta")),
-           ("Hsapiens", "hg19", BroadGenome("hg19", BROAD_BUNDLE_VERSION,
-                                            "ucsc.hg19.fasta")),
-           ("Hsapiens", "GRCh37", BroadGenome("GRCh37", BROAD_BUNDLE_VERSION,
-                                              "human_g1k_v37.fasta", "b37")),
+           ("Hsapiens", "hg18", BroadGenome("hg18", "Homo_sapiens_assembly18.fasta")),
+           ("Hsapiens", "hg19", BroadGenome("hg19", "ucsc.hg19.fasta")),
+           ("Hsapiens", "GRCh37", BroadGenome("GRCh37", "human_g1k_v37.fasta", "b37")),
            ("Hsapiens", "hg38", GGDGenome("hg38")),
            ("Hsapiens", "hg38-noalt", GGDGenome("hg38-noalt")),
-           ("Rnorvegicus", "rn6", UCSCGenome("rn6")),
+           ("Rnorvegicus", "rn6", GGDGenome("rn6")),
            ("Rnorvegicus", "rn5", UCSCGenome("rn5")),
            ("Rnorvegicus", "rn4", UCSCGenome("rn4")),
            ("Xtropicalis", "xenTro3", UCSCGenome("xenTro3")),
@@ -385,7 +379,6 @@ def upload_s3(config_source):
 
 
 def _install_additional_data(genomes, genome_indexes, config):
-    dbsnp.download_dbnsfp(genomes)
     for custom in (config.get("custom") or []):
         _prep_custom_genome(custom, genomes, genome_indexes, env)
     if config.get("install_liftover", False):
@@ -605,6 +598,7 @@ def _move_seq_files(ref_file, base_zips, seq_dir):
 def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None):
     """Low level function to do the indexing and paths with an index command.
     """
+    path_export = _get_path_export()
     index_name = os.path.splitext(os.path.basename(ref_file))[0]
     if ext is not None: index_name += ext
     full_ref_path = os.path.join(os.pardir, ref_file)
@@ -613,7 +607,7 @@ def _index_w_command(dir_name, command, ref_file, pre=None, post=None, ext=None)
         with cd(dir_name):
             if pre:
                 full_ref_path = pre(full_ref_path)
-            env.safe_run(command.format(ref_file=full_ref_path, index_name=index_name))
+            env.safe_run(path_export + command.format(ref_file=full_ref_path, index_name=index_name))
             if post:
                 post(full_ref_path)
     return os.path.join(dir_name, index_name)
@@ -701,15 +695,23 @@ def _index_star(ref_file):
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
     nrefs = float(subprocess.check_output(cmd, shell=True))
     nbits = int(round(min(14, log(GenomeLength/nrefs, 2), log(GenomeLength, 2)/2 - 1)))
+    # first we estimate the number of bits we need to hold the genome and allocate
+    # double that plus some padding to build the index
+    mem = ((GenomeLength + 1) / nbits + 1) * nbits
+    mem = (mem + 10000) * 2
+    mem = mem + mem / 3
+    mem = max(mem, 30000000000)
     try:
         cpu = env.cores
     except:
         cpu = 1
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
+           "--limitGenomeGenerateRAM %s "
            "--genomeChrBinNbits %s "
            "--runMode genomeGenerate "
-           "--genomeSAindexNbases %s" % (dir_name, str(cpu), Nbases, nbits))
+           "--genomeSAindexNbases %s" % (dir_name, str(cpu), str(mem), Nbases,
+                                         nbits))
     if not env.safe_exists(os.path.join(dir_name, "SA")):
         _index_w_command(dir_name, cmd, ref_file)
     return dir_name
@@ -720,30 +722,35 @@ def _index_hisat2(ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
     gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
-    if not env.safe_exists(dir_name):
-        env.safe_run('mkdir -p %s' % dir_name)
     index_prefix = os.path.join(dir_name, build)
     try:
         cpu = env.cores
     except:
         cpu = 1
     cmd = "hisat2-build -p {cpu} "
+
+    exons_file = index_prefix + ".exons"
+    splicesites_file = index_prefix + ".splicesites"
+    def _get_exons_and_splicesites(ref_path):
+        path_export = _get_path_export()
+        with open(exons_file, "w") as out_handle:
+            exons_cmd = ["hisat2_extract_exons.py", gtf_file]
+            subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
+        with open(splicesites_file, "w") as out_handle:
+            splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
+            subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
+        return ref_path
+
+    pre_func = None
     if not os.path.exists(gtf_file):
         print "%s not found, skipping creating the exons file." % (gtf_file)
     else:
-        exons_file = index_prefix + ".exons"
-        with open(exons_file, "w") as out_handle:
-            exons_cmd = ["hisat2_extract_exons.py", gtf_file]
-            subprocess.check_call(exons_cmd, stdout=out_handle)
-        splicesites_file = index_prefix + ".splicesites"
-        with open(splicesites_file, "w") as out_handle:
-            splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
-            subprocess.check_call(splicesites_cmd, stdout=out_handle)
         cmd += "--exon {exons_file} --ss {splicesites_file} "
+        pre_func = _get_exons_and_splicesites
     cmd += "{ref_file} {index_prefix}"
     cmd = cmd.format(**locals())
     if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
-        _index_w_command(dir_name, cmd, ref_file)
+        _index_w_command(dir_name, cmd, ref_file, pre=pre_func)
     return dir_name
 
 def _index_snap(ref_file):
@@ -757,15 +764,26 @@ def _index_snap(ref_file):
         env.safe_run(cmd.format(**locals()))
     return dir_name
 
+def _get_path_export():
+    """Ensure PATH points to local install directory.
+    """
+    path_export = ""
+    if hasattr(env, "system_install") and env.system_install:
+        local_bin = os.path.join(env.system_install, 'bin')
+        if env.safe_exists(local_bin):
+            path_export = "export PATH=%s:$PATH && " % local_bin
+    return path_export
+
 def _index_rtg(ref_file):
     """Perform indexing for use with Real Time Genomics tools.
 
     https://github.com/RealTimeGenomics/rtg-tools
     """
+    path_export = _get_path_export()
     dir_name = "rtg"
     index_name = "%s.sdf" % os.path.splitext(os.path.basename(ref_file))[0]
     if not env.safe_exists(os.path.join(dir_name, index_name, "done")):
-        cmd = ("export RTG_JAVA_OPTS='-Xms1g' export RTG_MEM=2g && "
+        cmd = ("{path_export}export RTG_JAVA_OPTS='-Xms1g' && export RTG_MEM=2g && "
                "rtg format -o {dir_name}/{index_name} {ref_file}")
         env.safe_run(cmd.format(**locals()))
     return dir_name
@@ -793,7 +811,7 @@ def _install_with_ggd(env, manager, gid, recipe):
                                                os.pardir, os.pardir, "ggd-recipes"))
     recipe_file = os.path.join(recipe_dir, gid, "%s.yaml" % recipe)
     if os.path.exists(recipe_file):
-        ggd.install_recipe(env.cwd, recipe_file)
+        ggd.install_recipe(env.cwd, recipe_file, gid)
     else:
         raise NotImplementedError("GGD recipe not available for %s %s" % (gid, recipe))
 
@@ -958,8 +976,8 @@ def get_index_fn(index):
     return INDEX_FNS.get(index, lambda x: None)
 
 INDEX_FNS = {
-    "seq" : _index_sam,
-    "bwa" : _index_bwa,
+    "seq": _index_sam,
+    "bwa": _index_bwa,
     "bowtie": _index_bowtie,
     "bowtie2": _index_bowtie2,
     "maq": _index_maq,

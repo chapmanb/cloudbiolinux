@@ -19,35 +19,43 @@ genomes:
     name: phiX174
   - dbkey: hg19
     name: Human (hg19)
-    annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
-                  mills_indels, cosmic, ancestral, qsignature, transcripts, RADAR]
-    annotations_available: [battenberg, dbnsfp]
-    validation: [giab-NA12878, platinum-genome-NA12878]
+    annotations: [GA4GH_problem_regions, capture_regions,
+                  MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
+                  mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
+                  genesplicer, effects_transcripts, vcfanno]
+    annotations_available: [battenberg, dbnsfp, dbscsnv]
+    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
-    annotations: [mirbase, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
-                  mills_indels, cosmic, ancestral, qsignature, transcripts, RADAR]
-    annotations_available: [battenberg, dbnsfp]
-    validation: [giab-NA12878, dream-syn3, dream-syn4]
+    annotations: [GA4GH_problem_regions, capture_regions,
+                  MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
+                  mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
+                  genesplicer, effects_transcripts, vcfanno]
+    annotations_available: [battenberg, dbnsfp, dbscsnv]
+    validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
-                  1000g_indels, mills_indels, clinvar, transcripts]
-    validation: [platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
+                  1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
+                  genesplicer, effects_transcripts, vcfanno, esp, exac]
+    annotations_available: [dbnsfp, dbscsnv]
+    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
     annotations: [coverage, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, transcripts]
+    annotations_available: [dbnsfp, dbscsnv]
   - dbkey: mm9
     name: Mouse (mm9)
   - dbkey: mm10
     name: Mouse (mm10)
-    annotations: [mirbase, problem_regions, dbsnp, transcripts]
+    annotations: [problem_regions, dbsnp, transcripts, mirbase]
   - dbkey: rn5
     name: Rat (rn5)
   - dbkey: rn6
     name: Rat (rn6)
+    annotations: [transcripts, mirbase]
   - dbkey: canFam3
     name: Dog (canFam3)
     annotations: [dbsnp, transcripts]
@@ -57,6 +65,7 @@ genomes:
     name: D melangogaster (dm3)
   - dbkey: TAIR10
     name: Arabidopsis thaliana (TAIR10)
+    annotations: [mirbase]
   - dbkey: xenTro3
     name: X tropicalis (xenTro3)
   - dbkey: GRCz10
@@ -72,10 +81,13 @@ genomes:
 
 # High level targets for specifying annotations
 annotation_groups:
-  variation: [problem_regions, GA4GH_problem_regions, MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
-              mills_indels, 1000g_indels, clinvar, cosmic, ancestral, qsignature]
+  variation: [problem_regions, GA4GH_problem_regions, capture_regions, MIG, coverage, prioritize, dbsnp,
+              hapmap, hapmap_snps, 1000g_omni_snps, ACMG56_genes,
+              1000g_snps, mills_indels, 1000g_indels, clinvar, cosmic, ancestral, qsignature,
+              genesplicer, effects_transcripts, vcfanno]
   rnaseq: [transcripts, RADAR]
   smallrna: [mirbase]
+  gemini: [esp, exac]
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py

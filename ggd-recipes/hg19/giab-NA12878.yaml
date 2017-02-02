@@ -4,17 +4,22 @@
 ---
 attributes:
   name: giab-NA12878
-  version: v2_19_1
+  version: v3_3_1
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA12878
+        remapurl=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv3.3.1/GRCh37/
+        calls=HG001_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf_phased.vcf.gz
+        regions=HG001_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-X_v.3.3.1_highconf.bed
         mkdir -p $dir
-        wget -O - ftp://ftp.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv2.19/NISTIntegratedCalls_14datasets_131103_allcall_UGHapMerge_HetHomVarPASS_VQSRv2.19_2mindatasets_5minYesNoRatio_all_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs.vcf.gz | gunzip -c | grep -v "##contig=" | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > $dir/truth_small_variants.vcf.gz
+        wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
-        wget -O - ftp://ftp.ncbi.nlm.nih.gov/giab/ftp/release/NA12878_HG001/NISTv2.19/union13callableMQonlymerged_addcert_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs_v2.19_2mindatasets_5minYesNoRatio.bed.gz | gunzip -c | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | grep -v ^MT > $dir/truth_regions.bed
+        wget -c -O - $url/$regions | sed -f remap.sed > $dir/truth_regions.bed
         wget -O - ftp://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Personalis_1000_Genomes_deduplicated_deletions.bed | grep -v ^Chr | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" > $dir/truth_DEL.bed
         wget -O -  ftp://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Spiral_Genetics_insertions.bed | grep -v ^Chr | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" > $dir/truth_INS.bed
     recipe_outfiles:

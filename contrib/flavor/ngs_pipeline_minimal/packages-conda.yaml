@@ -4,25 +4,28 @@ channels:
   - r
   - conda-forge
 minimal:
+  - anaconda-client
   - awscli
   - p7zip
   - s3gof3r
 bio_nextgen:
   - age-metasv
   - bamtools
+  - bamutil
   - bcbio-prioritize
   - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
   - bcbreport
-  - bcftools
+  - bcftools=1.3.0
   - bedtools=2.24.0
   - biobambam
   - bowtie
-  - bowtie2
+  - bowtie2=2.2.8
   - bwa
   - bwakit
   - bio-vcf
+  - cage
   - cancerit-allelecount
   - cnvkit
   - cpat
@@ -30,31 +33,44 @@ bio_nextgen:
   - crossmap
   - cufflinks
   - cutadapt
+  - cyvcf2
   - delly
   - express
+  - extract-sv-reads
   - fastqc
-  - freebayes=1.0.2
+  - fgbio
+  - freebayes=1.1.0
+  - gatk
   - gatk-framework
+  - geneimpacts
   - gemini
+  - genesplicer
   - glpk=4.57
+  - goleft
   - grabix
   - gsort
-  - hall-lab-svtools
+  - svtools
+  - gvcf-regions
+  - hap.py
   - hmmlearn
   - hisat2
   - htslib
   - htseq
   - impute2
+  - kallisto
   - kraken
   - lofreq
   - lumpy-sv
   - macs2
   - manta
+  - maxentscan
   - mbuffer
   - metasv
-  - mirdeep2
+  - mirdeep2=2.0.0.7
   - moreutils
   - multiqc
+  - multiqc-bcbio
+  - ngs-disambiguate
   - novoalign
   - oncofuse
   - optitype
@@ -81,18 +97,21 @@ bio_nextgen:
   - samtools
   - simple_sv_annotation
   - scalpel
+  - sentieon
+  - seq2c
   - seqbuster
   - seqtk
   - sickle-trim
   - spades
-  - snap-aligner
-  - snpeff
+  - snap-aligner=1.0dev.97
+  - snpeff=4.3g
   - star
   - stringtie
   - subread
-  - svtyper
+  - svtyper=0.0.4
   - theta2
   - tophat
+  - tophat-recondition
   - tdrmapper
   - ucsc-bedtobigbed
   - ucsc-bigbedinfo
@@ -107,14 +126,16 @@ bio_nextgen:
   - ucsc-gtftogenepred
   - ucsc-liftover
   - ucsc-wigtobigwig
+  - umis
   - wham
   - vardict
   - vardict-java
   - variantbam
-  - variant-effect-predictor
+  - variant-effect-predictor=87
   - varscan
   - vawk
   - vcfanno
+  - vcf2db
   - vcflib
   - viennarna
   - vt

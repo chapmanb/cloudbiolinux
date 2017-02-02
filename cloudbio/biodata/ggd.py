@@ -14,7 +14,7 @@ import subprocess
 from fabric.api import env
 import yaml
 
-def install_recipe(base_dir, recipe_file):
+def install_recipe(base_dir, recipe_file, genome_build):
     """Install data in a biodata directory given instructions from GGD YAML recipe.
     """
     assert env.hosts == ["localhost"], "GGD recipes only work for local runs"
@@ -25,7 +25,8 @@ def install_recipe(base_dir, recipe_file):
         if _has_required_programs(recipe["recipe"]["full"].get("required", [])):
             with tx_tmpdir(base_dir) as tmpdir:
                 with chdir(tmpdir):
-                    print("Running GGD recipe: %s" % recipe["attributes"]["name"])
+                    print("Running GGD recipe: %s %s %s" % (genome_build, recipe["attributes"]["name"],
+                                                            recipe["attributes"]["version"]))
                     _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"],
                                 recipe["recipe"]["full"]["recipe_type"])
                 _move_files(tmpdir, base_dir, recipe["recipe"]["full"]["recipe_outfiles"])

@@ -1,0 +1,18 @@
+---
+attributes:
+  name: qsignature
+  version: 20160526
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=http://github.com/lpantano/custom_genome_annotation/raw/master/qsignature.hg38.tbz
+        mkdir -p variation
+        cd variation
+        wget -N -c --no-check-certificate $baseurl
+        tar xjvf qsignature.hg38.tbz
+        mv qsignature.hg38.txt qsignature.txt
+    recipe_outfiles:
+        - variation/qsignature.txt
+ 

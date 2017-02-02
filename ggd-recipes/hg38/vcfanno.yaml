@@ -1,0 +1,21 @@
+# Annotation files for vcfanno variant annotation
+# Feeds into vcf2db GEMINI database creation and other annotation tasks
+---
+attributes:
+  name: vcfanno
+  version: 20170110
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        githash=ac5890aab096370d41c276d747e6f9eef0bf0867
+        mkdir -p config/vcfanno
+        cd config/vcfanno
+        bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$githash/config/vcfanno/
+        wget --no-check-certificate -O gemini.conf -c $bcbio_baseurl/hg38-gemini.conf
+        wget --no-check-certificate -O gemini.lua -c $bcbio_baseurl/hg38-gemini.lua
+
+    recipe_outfiles:
+      - config/vcfanno/gemini.lua
+      - config/vcfanno/gemini.conf

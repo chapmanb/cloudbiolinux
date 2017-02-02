@@ -7,7 +7,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/2.8/b37/hapmap_3.3.b37.vcf.gz
+        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/b37/hapmap_3.3.b37.vcf.gz
         mkdir -p variation
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > hapmap_3.3.vcf.gz
@@ -15,4 +15,3 @@ recipe:
     recipe_outfiles:
       - variation/hapmap_3.3.vcf.gz
       - variation/hapmap_3.3.vcf.gz.tbi
- 

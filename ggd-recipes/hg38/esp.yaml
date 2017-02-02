@@ -1,0 +1,18 @@
+# Exome Sequencing Project (ESP): http://evs.gs.washington.edu/EVS/
+# Lifted over to hg38 and prepped with utils/prep_esp_hg38.py
+---
+attributes:
+  name: esp
+  version: ESP6500SI-V2
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=https://s3.amazonaws.com/biodata/hg38_bundle/ESP6500SI-V2-hg38.vcf.gz
+        mkdir -p variation
+        wget -c -O variation/esp.vcf.gz $url
+        wget -c -O variation/esp.vcf.gz.tbi $url.tbi
+    recipe_outfiles:
+      - variation/esp.vcf.gz
+      - variation/esp.vcf.gz.tbi
