@@ -243,9 +243,9 @@ def install_mosaik(env):
     """MOSAIK: reference-guided aligner for next-generation sequencing technologies
     http://code.google.com/p/mosaik-aligner/
     """
-    version = "2.1.73"
-    url = "http://mosaik-aligner.googlecode.com/files/" \
-          "MOSAIK-%s-binary.tar" % version
+    version = "2.2.3"
+    url = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mosaik-aligner/" \
+          "MOSAIK-%s-Linux-x64.tar" % version
     _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
 
 # --- Utilities
