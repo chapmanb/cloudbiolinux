@@ -67,8 +67,8 @@ libraries:
   - libbz2-dev
   - zlib1g-dev
   - libcurl4-openssl-dev
-  - libgsl0-dev
-  - libgsl0ldbl
+  - libgsl-dev
+  - libgsl2
   - gsl-bin
   - mime-support
   - libncurses5-dev
@@ -231,7 +231,7 @@ java_extras:
   - libbiojava-java
   - libbiojava-java-demos
   #- eclipse
-  - maven2
+  - maven
   - libjline-java
   - libjhdf5-java
   - jruby
@@ -254,12 +254,12 @@ databases:
     - mysql-client
     - mysql-common
     - mysql-server
-    - libmysqlclient15-dev
+    - libmysqlclient-dev
   postgres:
     - postgresql
     - postgresql-client
-    - postgresql-plpython-9.3
-    - postgresql-plperl-9.3
+    - postgresql-plpython
+    - postgresql-plperl
     - libpq-dev
   sqlite:
     - libsqlite0
@@ -439,7 +439,7 @@ cloudman:
     # Needed to enable updates for Galaxy
     # - mercurial ## Included in minimal
     # Required for compiling ProFTPd (must match installed PostgreSQL version!)
-    - postgresql-server-dev-9.3
+    - postgresql-server-dev-9.5
     # Actually not sure what of the following is really needed
     - libboost-all-dev
     - libreadline6-dev
