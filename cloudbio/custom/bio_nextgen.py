@@ -609,9 +609,9 @@ def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
     http://trinityrnaseq.github.io/
     """
-    version = "2.0.2"
+    version = "2.3.2"
     url = "https://github.com/trinityrnaseq/trinityrnaseq/archive/" \
-          "v%s.tar.gz" % version
+          "Trinity-v%s.tar.gz" % version
     dir_name = "trinityrnaseq-%s" % version
     _get_install_local(url, env, _make_copy(),
                        dir_name=dir_name)
