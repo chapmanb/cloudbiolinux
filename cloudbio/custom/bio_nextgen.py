@@ -580,7 +580,7 @@ def install_velvet(env):
     """Sequence assembler for very short reads.
     http://www.ebi.ac.uk/~zerbino/velvet/
     """
-    default_version = "1.2.08"
+    default_version = "1.2.10"
     version = env.get("tool_version", default_version)
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
