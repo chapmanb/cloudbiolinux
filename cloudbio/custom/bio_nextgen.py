@@ -683,7 +683,7 @@ def install_hydra(env):
     https://code.google.com/p/hydra-sv/
     """
     version = "0.5.3"
-    url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
+    url = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hydra-sv/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         env.safe_run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
