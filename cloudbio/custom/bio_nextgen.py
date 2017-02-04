@@ -243,9 +243,9 @@ def install_mosaik(env):
     """MOSAIK: reference-guided aligner for next-generation sequencing technologies
     http://code.google.com/p/mosaik-aligner/
     """
-    version = "2.1.73"
-    url = "http://mosaik-aligner.googlecode.com/files/" \
-          "MOSAIK-%s-binary.tar" % version
+    version = "2.2.3"
+    url = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mosaik-aligner/" \
+          "MOSAIK-%s-Linux-x64.tar" % version
     _get_install(url, env, _make_copy("find . -perm -100 -type f", do_make=False))
 
 # --- Utilities
@@ -554,16 +554,16 @@ def install_abyss(env):
     http://www.bcgsc.ca/platform/bioinfo/software/abyss
     """
     # XXX check for no sparehash on non-ubuntu systems
-    default_version = "1.3.4"
+    default_version = "2.0.2"
     version = env.get("tool_version", default_version)
-    url = "http://www.bcgsc.ca/downloads/abyss/abyss-%s.tar.gz" % version
+    url = "http://www.bcgsc.ca/platform/bioinfo/software/abyss/releases/%s/abyss-%s.tar.gz" % (version, version)
     def _remove_werror_get_boost(env):
         env.safe_sed("configure", " -Werror", "")
         # http://osdir.com/ml/abyss-users-science/2011-10/msg00108.html
-        url = "http://downloads.sourceforge.net/project/boost/boost/1.47.0/boost_1_47_0.tar.bz2"
+        url = "http://downloads.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.bz2"
         dl_file = shared._remote_fetch(env, url)
         env.safe_run("tar jxf %s" % dl_file)
-        env.safe_run("ln -s boost_1_47_0/boost boost")
+        env.safe_run("ln -s boost_1_63_0/boost boost")
     _get_install(url, env, _configure_make, post_unpack_fn=_remove_werror_get_boost)
 
 def install_transabyss(env):
@@ -580,7 +580,7 @@ def install_velvet(env):
     """Sequence assembler for very short reads.
     http://www.ebi.ac.uk/~zerbino/velvet/
     """
-    default_version = "1.2.08"
+    default_version = "1.2.10"
     version = env.get("tool_version", default_version)
     url = "http://www.ebi.ac.uk/~zerbino/velvet/velvet_%s.tgz" % version
     def _fix_library_order(env):
@@ -609,9 +609,9 @@ def install_trinity(env):
     """Efficient and robust de novo reconstruction of transcriptomes from RNA-seq data.
     http://trinityrnaseq.github.io/
     """
-    version = "2.0.2"
+    version = "2.3.2"
     url = "https://github.com/trinityrnaseq/trinityrnaseq/archive/" \
-          "v%s.tar.gz" % version
+          "Trinity-v%s.tar.gz" % version
     dir_name = "trinityrnaseq-%s" % version
     _get_install_local(url, env, _make_copy(),
                        dir_name=dir_name)
@@ -683,7 +683,7 @@ def install_hydra(env):
     https://code.google.com/p/hydra-sv/
     """
     version = "0.5.3"
-    url = "http://hydra-sv.googlecode.com/files/Hydra.v{0}.tar.gz".format(version)
+    url = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/hydra-sv/Hydra.v{0}.tar.gz".format(version)
     def clean_libs(env):
         env.safe_run("make clean")
     _get_install(url, env, _make_copy("ls -1 bin/* scripts/*"),
