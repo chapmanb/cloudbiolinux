@@ -35,6 +35,7 @@ bio_nextgen:
   - cutadapt
   - cyvcf2
   - delly
+  - dkfz-bias-filter
   - express
   - extract-sv-reads
   - fastqc
