@@ -2,7 +2,7 @@
 ---
 attributes:
   name: giab-NA24385
-  version: v3_3
+  version: v3_3-sv_v0.1.8
 recipe:
   full:
     recipe_type: bash
@@ -18,7 +18,17 @@ recipe:
         wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
         wget -c -O - $url/$regions | sed -f remap.sed > $dir/truth_regions.bed
+        delurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-GIAB-2tech-dels-v0_1_8-hg19.bed.gz
+        wget -c -O $dir/truth_DEL_giab.bed.gz $delurl
+        wget -c -O $dir/truth_DEL_giab.bed.gz.tbi $delurl.tbi
+        cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-hg19.bed.gz
+        wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
+        wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
     recipe_outfiles:
       - validation/giab-NA24385/truth_small_variants.vcf.gz
       - validation/giab-NA24385/truth_small_variants.vcf.gz.tbi
       - validation/giab-NA24385/truth_regions.bed
+      - validation/giab-NA24385/truth_DEL_giab.bed.gz
+      - validation/giab-NA24385/truth_DEL_giab.bed.gz.tbi
+      - validation/giab-NA24385/truth_DEL_crowd.bed.gz
+      - validation/giab-NA24385/truth_DEL_crowd.bed.gz.tbi
