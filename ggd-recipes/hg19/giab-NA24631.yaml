@@ -2,16 +2,16 @@
 ---
 attributes:
   name: giab-NA24631
-  version: v3_3
+  version: v3_3_2
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA24631
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/ChineseTrio/HG005_NA24631_son/NISTv3.3
-        calls=HG005_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v3.3_highconf.vcf.gz
-        regions=HG005_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v3.3_highconf.bed
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/ChineseTrio/HG005_NA24631_son/NISTv3.3.2/GRCh37/
+        calls=HG005_GRCh37_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v.3.3.2_highconf.vcf.gz
+        regions=HG005_GRCh37_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v.3.3.2_highconf_noMetaSV.bed
         remapurl=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
         mkdir -p $dir
         wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
