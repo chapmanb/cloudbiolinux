@@ -2,16 +2,16 @@
 ---
 attributes:
   name: giab-NA24385
-  version: v3_3-sv_v0.1.8
+  version: v3_3_2-sv_v0.1.8
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA24385
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3
-        calls=HG002_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid-10X_CHROM1-22_v3.3_highconf.vcf.gz
-        regions=HG002_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-Solid-10X_CHROM1-22_v3.3_highconf.bed
+        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
+        calls=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
+        regions=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_noinconsistent.bed
         mkdir -p $dir
         wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
