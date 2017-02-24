@@ -105,7 +105,7 @@ bio_nextgen:
   - sickle-trim
   - spades
   - snap-aligner=1.0dev.97
-  - snpeff=4.3g
+  - snpeff=4.3i
   - star
   - stringtie
   - subread
