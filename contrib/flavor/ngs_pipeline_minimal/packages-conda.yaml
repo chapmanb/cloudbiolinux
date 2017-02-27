@@ -49,6 +49,7 @@ bio_nextgen:
   - glpk=4.57
   - goleft
   - grabix
+  - gridss
   - gsort
   - svtools
   - gvcf-regions
