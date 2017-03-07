@@ -6,6 +6,7 @@ channels:
 minimal:
   - anaconda-client
   - awscli
+  - nodejs
   - p7zip
   - s3gof3r
 bio_nextgen:
@@ -110,7 +111,7 @@ bio_nextgen:
   - star
   - stringtie
   - subread
-  - svtyper=0.0.4
+  - svtyper
   - theta2
   - tophat
   - tophat-recondition
