@@ -39,9 +39,15 @@ to install. The amount of bioinformatics software continues to increase -- there
 -- and it's difficult to come up with a default installation that includes
 everything for everyone. The ``ngs_pipeline_minimal`` flavor has the set of NGS
 analysis tools installed with bcbio and is a good starting point for
-understanding the CloudBioLinux install process::
+understanding the CloudBioLinux install process. To install inside an isolated
+conda environment on a bare machine do::
 
-    fab -f fabfile.py -H localhost install_biolinux:flavor=ngs_pipeline_minimal
+    git clone https://github.com/chapmanb/cloudbiolinux.git
+    cd cloudbiolinux
+    wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+    bash Miniconda2-latest-Linux-x86_64.sh -b -p ~/cblenv
+    ~/cblenv/bin/conda install -y -c bioconda -c conda-forge pip fabric pyyaml
+    ~/cblenv/bin/fab -f fabfile.py -H localhost install_biolinux:flavor=ngs_pipeline_minimal --set keep_isolated=true
 
 Installing CloudBioLinux on a local machine
 ===========================================
