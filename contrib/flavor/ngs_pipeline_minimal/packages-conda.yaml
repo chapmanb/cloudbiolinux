@@ -57,7 +57,7 @@ bio_nextgen:
   - hap.py
   - hmmlearn
   - hisat2
-  - htslib
+  - htslib=1.3
   - htseq
   - impute2
   - kallisto
