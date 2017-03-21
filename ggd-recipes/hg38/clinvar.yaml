@@ -1,17 +1,17 @@
 # ClinVar: http://www.clinvar.com/
-# 
+#
 # UCSFify name sed magic from: https://github.com/mmarchin/utilities/blob/master/ucscify.sh
 ---
 attributes:
   name: clinvar
-  version: 20160502
+  version: 20170130
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        release=20160502
-        baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive/2016/clinvar_${release}.vcf.gz
+        release=20170130
+        baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive/2017/clinvar_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/clinvar-orig.vcf.gz $baseurl
         [[ -f variation/clinvar.vcf.gz ]] || zcat variation/clinvar-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/clinvar.vcf.gz
