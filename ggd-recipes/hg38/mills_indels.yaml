@@ -2,21 +2,20 @@
 #
 # http://genome.cshlp.org/content/21/6/830.full
 #
-# From the Broad v2.8 resource bundle
+# From the Broad hg38 bundle:
+# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/
 # https://www.broadinstitute.org/gatk/guide/article.php?id=1213
-# lifted over to hg38 coordinates by Alison Meynert
-# https://github.com/chapmanb/bcbio-nextgen/issues/817
 ---
 attributes:
   name: mills_indels
-  version: 2.8_hg38_20150522
+  version: 20160105
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=https://s3.amazonaws.com/biodata/hg38_bundle
-        base=Mills_and_1000G_gold_standard.indels.b38.primary_assembly
+        url=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg38/
+        base=Mills_and_1000G_gold_standard.indels.hg38
         new=Mills_and_1000G_gold_standard.indels
         mkdir -p variation
         for suffix in .vcf.gz .vcf.gz.tbi
