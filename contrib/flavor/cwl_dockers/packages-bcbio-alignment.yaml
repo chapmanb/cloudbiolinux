@@ -1,0 +1,14 @@
+bcbio-process_alignment:
+- bwa
+- bwakit
+- novoalign
+- snap-aligner
+- samtools
+- sambamba
+- fgbio
+- umis
+- biobambam
+channels:
+- bioconda
+- conda-forge
+
