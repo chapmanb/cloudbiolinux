@@ -10,7 +10,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://ftp.ensembl.org/pub/variation_genotype/homo_sapiens/ExAC.0.3.GRCh38.vcf.gz
+        url=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh38/variation_genotype/ExAC.0.3.GRCh38.vcf.gz
         remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
         ref=../seq/hg38.fa
         mkdir -p variation
