@@ -9,6 +9,7 @@ minimal:
   - nodejs
   - p7zip
   - s3gof3r
+  - xz
 bio_nextgen:
   - age-metasv
   - bamtools
