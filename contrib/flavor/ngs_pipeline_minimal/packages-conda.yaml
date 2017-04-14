@@ -19,7 +19,7 @@ bio_nextgen:
   - bcbio-variation
   - bcbio-variation-recall
   - bcbreport
-  - bcftools=1.3.0
+  - bcftools
   - bedtools=2.26.0
   - biobambam
   - bowtie
@@ -58,7 +58,7 @@ bio_nextgen:
   - hap.py
   - hmmlearn
   - hisat2
-  - htslib=1.3
+  - htslib
   - htseq
   - impute2
   - kallisto
@@ -98,7 +98,7 @@ bio_nextgen:
   - salmon
   - sambamba
   - samblaster
-  - samtools=1.3.1
+  - samtools
   - simple_sv_annotation
   - scalpel
   - sentieon
