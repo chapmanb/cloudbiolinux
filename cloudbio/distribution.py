@@ -134,7 +134,7 @@ def _setup_debian():
     # fill in %s
     dist_name = unstable_remap.get(env.dist_name, env.dist_name)
     env.std_sources = _add_source_versions(dist_name, sources)
-
+    env.logger.debug(env.std_sources)
 
 def _setup_deb_general():
     """Shared settings for different debian based/derived distributions.
@@ -160,6 +160,7 @@ def _setup_deb_general():
     shared_sources = [
         "deb http://download.virtualbox.org/virtualbox/debian %s contrib",  # virtualbox
     ]
+    env.logger.info(shared_sources)
     return shared_sources
 
 
@@ -260,7 +261,7 @@ def _debian_dist_name(env):
     """
     Determine Debian dist name (e.g. squeeze).
     """
-    return env.safe_run_output("lsb_release -a | grep Codename | cut -f 2")
+    return env.safe_run_output("lsb_release -a 2> /dev/null | grep Codename | cut -f 2")
 
 
 def _determine_distribution(env):

@@ -1,0 +1,2 @@
+# GNU Guix for CloudBioLinux
+
