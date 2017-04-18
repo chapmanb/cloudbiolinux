@@ -183,6 +183,7 @@ r:
   - r-stringi
   - r-wasabi
   - bioconductor-annotate
+  - bioconductor-biocgenerics=0.18.0
   - bioconductor-biocinstaller
   - bioconductor-biocstyle
   - bioconductor-biostrings
@@ -194,6 +195,6 @@ r:
   - bioconductor-dexseq
   - bioconductor-dnacopy
   - bioconductor-genomicranges
-  - bioconductor-iranges
+  - bioconductor-iranges=2.4.7
   - bioconductor-limma
   - bioconductor-rtracklayer
