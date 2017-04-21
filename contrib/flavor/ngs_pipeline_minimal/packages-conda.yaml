@@ -1,8 +1,8 @@
 ---
 channels:
   - bioconda
-  - r
   - conda-forge
+  - r
 minimal:
   - anaconda-client
   - awscli

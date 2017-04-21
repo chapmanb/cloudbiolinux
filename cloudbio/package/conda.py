@@ -1,5 +1,6 @@
 """Install packages via the Conda package manager: http://conda.pydata.org/
 """
+import collections
 import json
 import os
 import yaml
@@ -9,12 +10,14 @@ from cloudbio.fabutils import quiet
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 
-from fabric.api import settings
-
 def install_packages(env, to_install=None, packages=None):
     if shared._is_anaconda(env):
         conda_bin = shared._conda_cmd(env)
-        config_file = get_config_file(env, "packages-conda.yaml")
+        if hasattr(env, "conda_yaml"):
+            Config = collections.namedtuple("Config", "base dist")
+            config_file = Config(base=env.conda_yaml, dist=None)
+        else:
+            config_file = get_config_file(env, "packages-conda.yaml")
         if config_file.base is None and packages is None:
             packages = []
         else:
