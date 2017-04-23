@@ -29,7 +29,7 @@ def install_packages(env, to_install=None, packages=None):
         # install our customized packages
         if len(packages) > 0:
             pkgs_str = " ".join(packages)
-            env.safe_run("{conda_bin} install -y {channels} {pkgs_str}".format(**locals()))
+            env.safe_run("{conda_bin} install --quiet -y {channels} {pkgs_str}".format(**locals()))
             for package in packages:
                 _link_bin(package, env, conda_info, conda_bin)
         # work around ncurses issues -- we don't always get the R version
