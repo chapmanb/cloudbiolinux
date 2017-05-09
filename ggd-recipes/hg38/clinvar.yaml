@@ -4,13 +4,13 @@
 ---
 attributes:
   name: clinvar
-  version: 20170130
+  version: 20170404
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        release=20170130
+        release=20170404
         baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/archive/2017/clinvar_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/clinvar-orig.vcf.gz $baseurl
