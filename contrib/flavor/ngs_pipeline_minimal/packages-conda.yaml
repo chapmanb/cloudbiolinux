@@ -38,6 +38,7 @@ bio_nextgen:
   - cyvcf2
   - delly
   - dkfz-bias-filter
+  - ensembl-vep=88.*
   - express
   - extract-sv-reads
   - fastqc
