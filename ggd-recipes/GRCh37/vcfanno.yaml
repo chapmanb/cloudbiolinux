@@ -3,13 +3,13 @@
 ---
 attributes:
   name: vcfanno
-  version: 20170105
+  version: 20170331
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        vcfanno_githash=2fa891f96cf04b3bc158f136fcdd890fde481d79
+        vcfanno_githash=5fcce8db2aeee016ab927c8ca36a715c02f982f9
         bcbio_githash=13ef069207dbd6fa5f85c09c4ad8de176b74c39e
         mkdir -p config/vcfanno
         cd config/vcfanno
