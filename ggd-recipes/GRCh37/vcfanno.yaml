@@ -10,7 +10,7 @@ recipe:
     recipe_cmds:
       - |
         vcfanno_githash=5fcce8db2aeee016ab927c8ca36a715c02f982f9
-        bcbio_githash=13ef069207dbd6fa5f85c09c4ad8de176b74c39e
+        bcbio_githash=5bcfde79c083d5c34f13f81fe578b4606a7cc80c
         mkdir -p config/vcfanno
         cd config/vcfanno
         gemini_baseurl=https://github.com/brentp/vcfanno/raw/$vcfanno_githash/example
