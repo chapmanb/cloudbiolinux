@@ -3,19 +3,24 @@
 ---
 attributes:
   name: vcfanno
-  version: 20170110
+  version: 20170522
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        githash=ac5890aab096370d41c276d747e6f9eef0bf0867
+        githash=5bcfde79c083d5c34f13f81fe578b4606a7cc80c
         mkdir -p config/vcfanno
         cd config/vcfanno
         bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$githash/config/vcfanno/
         wget --no-check-certificate -O gemini.conf -c $bcbio_baseurl/hg38-gemini.conf
         wget --no-check-certificate -O gemini.lua -c $bcbio_baseurl/hg38-gemini.lua
+        wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/hg38-dbnsfp.conf
+        wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/hg38-dbscsnv.conf
+
 
     recipe_outfiles:
       - config/vcfanno/gemini.lua
       - config/vcfanno/gemini.conf
+      - config/vcfanno/dbnsfp.conf
+      - config/vcfanno/dbscsnv.conf
