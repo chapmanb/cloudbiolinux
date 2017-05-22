@@ -15,7 +15,12 @@ recipe:
         bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$githash/config/vcfanno/
         wget --no-check-certificate -O gemini.conf -c $bcbio_baseurl/hg38-gemini.conf
         wget --no-check-certificate -O gemini.lua -c $bcbio_baseurl/hg38-gemini.lua
+        wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/hg38-dbnsfp.conf
+        wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/hg38-dbscsnv.conf
+
 
     recipe_outfiles:
       - config/vcfanno/gemini.lua
       - config/vcfanno/gemini.conf
+      - config/vcfanno/dbnsfp.conf
+      - config/vcfanno/dbscsnv.conf
