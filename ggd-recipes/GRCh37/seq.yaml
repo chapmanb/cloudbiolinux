@@ -1,0 +1,21 @@
+# GRCh37 reference genome from Broad bundle
+# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/b37
+# Include bgzipped fasta file for Ensembl and other tools that support it
+---
+attributes:
+  name: seq
+  version: broad-20120813
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        wget --no-check-certificate -c https://s3.amazonaws.com/biodata/genomes/GRCh37-seq.tar.gz
+        tar -xzvpf GRCh37-seq.tar.gz
+        gunzip -c seq/GRCh37.fa.gz > seq/GRCh37.fa
+    recipe_outfiles:
+      - seq/GRCh37.fa
+      - seq/GRCh37.fa.fai
+      - seq/GRCh37.fa.gz
+      - seq/GRCh37.fa.gz.fai
+      - seq/GRCh37.dict

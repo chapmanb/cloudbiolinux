@@ -1,0 +1,21 @@
+# hg19 reference genome from Broad bundle
+# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19
+# Include bgzipped fasta file for Ensembl and other tools that support it
+---
+attributes:
+  name: seq
+  version: broad-20120813
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        wget --no-check-certificate -c https://s3.amazonaws.com/biodata/genomes/hg19-seq.tar.gz
+        tar -xzvpf hg19-seq.tar.gz
+        gunzip -c seq/hg19.fa.gz > seq/hg19.fa
+    recipe_outfiles:
+      - seq/hg19.fa
+      - seq/hg19.fa.fai
+      - seq/hg19.fa.gz
+      - seq/hg19.fa.gz.fai
+      - seq/hg19.dict
