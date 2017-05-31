@@ -14,7 +14,7 @@ recipe:
         base=GRCh38_full_analysis_set_plus_decoy_hla
         new=hg38
         mkdir -p seq
-        for suffix in .fa .dict .fa.fai
+        for suffix in .dict .fa.fai
         do
           [[ -f seq/$new$suffix ]] || wget -c -O seq/$new$suffix $url/$base$suffix
         done
@@ -24,9 +24,13 @@ recipe:
         do
           [[ -f seq/$new$suffix ]] || wget --no-check-certificate -c -O seq/$new$suffix $urlgz/$new$suffix
         done
+        gunzip -c seq/hg38.fa.gz > seq/hg38.fa
+        touch seq/hg38.fa.fai
+        touch seq/hg38.dict
     recipe_outfiles:
       - seq/hg38.fa
       - seq/hg38.fa.fai
       - seq/hg38.fa.gz
       - seq/hg38.fa.gz.fai
+      - seq/hg38.fa.gz.gzi
       - seq/hg38.dict

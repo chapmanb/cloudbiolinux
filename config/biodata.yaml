@@ -19,6 +19,7 @@ genomes:
     name: phiX174
   - dbkey: hg19
     name: Human (hg19)
+    indexes: [seq]
     annotations: [GA4GH_problem_regions, capture_regions,
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
@@ -27,6 +28,7 @@ genomes:
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
+    indexes: [seq]
     annotations: [GA4GH_problem_regions, capture_regions,
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
@@ -35,6 +37,7 @@ genomes:
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4]
   - dbkey: hg38
     name: Human (hg38) full
+    indexes: [seq, bwa, hisat2]
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
                   genesplicer, effects_transcripts, vcfanno, esp, exac, viral]

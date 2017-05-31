@@ -13,9 +13,12 @@ recipe:
         wget --no-check-certificate -c https://s3.amazonaws.com/biodata/genomes/hg19-seq.tar.gz
         tar -xzvpf hg19-seq.tar.gz
         gunzip -c seq/hg19.fa.gz > seq/hg19.fa
+        touch seq/hg19.fa.fai
+        touch seq/hg19.dict
     recipe_outfiles:
       - seq/hg19.fa
       - seq/hg19.fa.fai
       - seq/hg19.fa.gz
       - seq/hg19.fa.gz.fai
+      - seq/hg19.fa.gz.gzi
       - seq/hg19.dict

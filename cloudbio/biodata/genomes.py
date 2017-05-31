@@ -191,7 +191,6 @@ class VectorBase(_DownloadHelper):
             self._to_get.append(_base_file.format(**locals()))
 
     def download(self, seq_dir):
-        print os.getcwd()
         genome_file = "%s.fa" % self._name
         for fn in self._to_get:
             url = self._base_url + fn
@@ -458,6 +457,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         if not env.safe_exists(org_dir):
             env.safe_run('mkdir -p %s' % org_dir)
         ggd_recipes = manager.config.get("annotations", []) + manager.config.get("validation", [])
+        ggd_recipes += [x for x in manager.config.get("indexes", []) if x in genome_indexes]
         for idx in genome_indexes + ggd_recipes:
             with cd(org_dir):
                 if idx in ggd_recipes or not env.safe_exists(idx):
@@ -481,7 +481,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         if not env.safe_exists(ref_file):
             ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)
         assert env.safe_exists(ref_file), ref_file
-        cur_indexes = manager.config.get("indexes", genome_indexes)
+        cur_indexes = [x for x in manager.config.get("indexes", genome_indexes) if x in genome_indexes]
         _index_to_galaxy(org_dir, ref_file, gid, cur_indexes, manager.config)
 
 # ## Genomes index for next-gen sequencing tools
