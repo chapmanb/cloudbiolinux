@@ -481,8 +481,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
         if not env.safe_exists(ref_file):
             ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)
         assert env.safe_exists(ref_file), ref_file
-        cur_indexes = [x for x in manager.config.get("indexes", genome_indexes) if x in genome_indexes]
-        _index_to_galaxy(org_dir, ref_file, gid, cur_indexes, manager.config)
+        _index_to_galaxy(org_dir, ref_file, gid, genome_indexes, manager.config)
 
 # ## Genomes index for next-gen sequencing tools
 
@@ -509,8 +508,7 @@ def _data_ngs_genomes(genomes, genome_indexes):
     genome_dir = _make_genome_dir()
     for organism, genome, manager in genomes:
         cur_dir = os.path.join(genome_dir, organism, genome)
-        env.logger.info("Processing genome {0} and putting it to {1}"\
-            .format(organism, cur_dir))
+        env.logger.info("Processing genome {0} and putting it to {1}".format(organism, cur_dir))
         if not env.safe_exists(cur_dir):
             env.safe_run('mkdir -p %s' % cur_dir)
         with cd(cur_dir):
