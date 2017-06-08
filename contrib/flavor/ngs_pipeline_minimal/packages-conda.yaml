@@ -46,6 +46,7 @@ bio_nextgen:
   - freebayes=1.1.0
   - gatk
   - gatk-framework
+  - gatk4
   - geneimpacts
   - gemini
   - genesplicer
