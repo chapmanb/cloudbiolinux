@@ -1,14 +1,15 @@
 ---
 channels:
-  - bioconda
   - conda-forge
-  - r
+  - bioconda
 minimal:
   - anaconda-client
   - awscli
+  - ncurses
   - nodejs
   - p7zip
   - s3gof3r
+  - bzip2
   - xz
 bio_nextgen:
   - age-metasv
@@ -163,7 +164,7 @@ perl:
   - perl-time-hires
   - perl-vcftools-vcf
 r:
-  - r
+  - r=3.3.2
   - r-cghflasso
   - r-chbutils
   - r-devtools
@@ -185,7 +186,7 @@ r:
   - r-stringi
   - r-wasabi
   - bioconductor-annotate
-  - bioconductor-biocgenerics=0.18.0
+  - bioconductor-biocgenerics
   - bioconductor-biocinstaller
   - bioconductor-biocstyle
   - bioconductor-biostrings
@@ -197,6 +198,6 @@ r:
   - bioconductor-dexseq
   - bioconductor-dnacopy
   - bioconductor-genomicranges
-  - bioconductor-iranges=2.4.7
+  - bioconductor-iranges
   - bioconductor-limma
   - bioconductor-rtracklayer

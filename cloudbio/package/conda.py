@@ -26,15 +26,20 @@ def install_packages(env, to_install=None, packages=None):
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
+        # Uninstall old R packages that clash with updated versions
+        # Temporary fix to allow upgrades from older versions that have migrated
+        # r-tximport is now bioconductor-tximport
+        for problem in ["r-tximport"]:
+            cur_packages = [x["name"] for x in
+                            json.loads(env.safe_run_output("{conda_bin} list --json {problem}".format(**locals())))]
+            if problem in cur_packages:
+                env.safe_run("{conda_bin} remove --force -y {problem}".format(**locals()))
         # install our customized packages
         if len(packages) > 0:
             pkgs_str = " ".join(packages)
             env.safe_run("{conda_bin} install --quiet -y {channels} {pkgs_str}".format(**locals()))
             for package in packages:
                 _link_bin(package, env, conda_info, conda_bin)
-        # work around ncurses issues -- we don't always get the R version
-        # https://github.com/bioconda/bioconda-recipes/issues/637
-        env.safe_run("{conda_bin} update -y -c r ncurses".format(**locals()))
         for pkg in ["python", "conda", "pip"]:
             _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
 
