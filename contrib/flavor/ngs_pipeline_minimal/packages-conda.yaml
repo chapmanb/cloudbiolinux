@@ -5,11 +5,12 @@ channels:
 minimal:
   - anaconda-client
   - awscli
+  - bzip2
   - ncurses
   - nodejs
   - p7zip
+  - readline
   - s3gof3r
-  - bzip2
   - xz
 bio_nextgen:
   - age-metasv
