@@ -88,7 +88,7 @@ def write_brew_pkg_info(out_dir, tooldir):
             brew_cmd = "brew"
         try:
             vout = subprocess.check_output([brew_cmd, "list", "--versions"])
-        except OSError:  # brew not installed/used
+        except (OSError, subprocess.CalledProcessError):  # brew not installed/used
             vout = ""
         out = {}
         for vstr in vout.split("\n"):
