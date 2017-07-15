@@ -21,7 +21,7 @@ bio_nextgen:
   - bcbio-variation
   - bcbio-variation-recall
   - bcbreport
-  - bcftools
+  - bcftools=1.5=0
   - bedtools=2.26.0
   - biobambam
   - bowtie
@@ -139,7 +139,6 @@ bio_nextgen:
   - vardict
   - vardict-java
   - variantbam
-  - variant-effect-predictor=87
   - varscan
   - vawk
   - vcfanno
