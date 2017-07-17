@@ -8,10 +8,14 @@ minimal:
   - bzip2
   - ncurses
   - nodejs
+  - nomkl
   - p7zip
   - readline
   - s3gof3r
   - xz
+# currently not included to reduce total size of Docker images
+# - pandoc
+# - viennarna
 bio_nextgen:
   - age-metasv
   - bamtools
@@ -21,7 +25,7 @@ bio_nextgen:
   - bcbio-variation
   - bcbio-variation-recall
   - bcbreport
-  - bcftools=1.5=0
+  - bcftools
   - bedtools=2.26.0
   - biobambam
   - bowtie
@@ -82,7 +86,6 @@ bio_nextgen:
   - novoalign
   - oncofuse
   - optitype
-  - pandoc
   - parallel
   - pbgzip
   - perl-sanger-cgp-battenberg
@@ -144,7 +147,6 @@ bio_nextgen:
   - vcfanno
   - vcf2db
   - vcflib
-  - viennarna
   - vt
 perl:
   - perl-app-cpanminus
