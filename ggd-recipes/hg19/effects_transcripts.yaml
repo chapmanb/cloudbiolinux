@@ -3,13 +3,13 @@
 ---
 attributes:
   name: effects_transcript
-  version: 2017-02-22
+  version: 2017-03-16
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        COMMIT=f2e7af839a9b847be9e391fb04274ef3d6340294
+        COMMIT=93d7d3794e6afe39d92e1abc0c56406373f98501
         mkdir -p snpeff/transcripts
         cd snpeff/transcripts
         wget --no-check-certificate -O canonical_cancer.txt https://raw.githubusercontent.com/AstraZeneca-NGS/reference_data/$COMMIT/transcripts/canon_cancer_replacement.txt
