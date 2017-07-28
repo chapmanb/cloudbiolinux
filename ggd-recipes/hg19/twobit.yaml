@@ -8,6 +8,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
         mkdir -p ucsc
-        faToTwoBit ../seq/hg19.fa hg19.2bit
+        cd ucsc
+        faToTwoBit ../../seq/hg19.fa hg19.2bit
     recipe_outfiles:
       - ucsc/hg19.2bit

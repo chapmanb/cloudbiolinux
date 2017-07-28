@@ -9,6 +9,7 @@ recipe:
     recipe_cmds:
       - |
         mkdir -p ucsc
-        faToTwoBit ../seq/hg38.fa hg38.2bit
+        cd ucsc
+        faToTwoBit ../../seq/hg38.fa hg38.2bit
     recipe_outfiles:
       - ucsc/hg38.2bit

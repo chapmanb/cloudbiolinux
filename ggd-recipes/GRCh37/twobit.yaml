@@ -9,7 +9,8 @@ recipe:
     recipe_cmds:
       - |
         mkdir -p ucsc
-        faToTwoBit ../seq/GRCh37.fa GRCh37.2bit
+        cd ucsc
+        faToTwoBit ../../seq/GRCh37.fa GRCh37.2bit
     recipe_outfiles:
       - ucsc/GRCh37.2bit
 
