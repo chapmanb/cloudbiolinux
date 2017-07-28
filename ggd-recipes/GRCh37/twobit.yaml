@@ -1,0 +1,15 @@
+# GRCh37 UCSC 2bit reference file
+---
+attributes:
+  name: twobit
+  version: broad-20120813
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        faToTwoBit ../seq/GRCh37.fa GRCh37.2bit
+    recipe_outfiles:
+      - ucsc/GRCh37.2bit
+

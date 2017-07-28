@@ -1,0 +1,14 @@
+# UCSC 2bit reference
+---
+attributes:
+  name: twobit
+  version: 1000g-20150219_1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        faToTwoBit ../seq/hg38.fa hg38.2bit
+    recipe_outfiles:
+      - ucsc/hg38.2bit
