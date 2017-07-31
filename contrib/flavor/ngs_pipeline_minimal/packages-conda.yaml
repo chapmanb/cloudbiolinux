@@ -18,6 +18,7 @@ minimal:
 # - viennarna
 bio_nextgen:
   - age-metasv
+  - atropos;env=python3
   - bamtools
   - bamutil
   - bcbio-prioritize

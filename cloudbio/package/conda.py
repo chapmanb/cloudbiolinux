@@ -37,14 +37,25 @@ def install_packages(env, to_install=None, packages=None):
                 env.safe_run("{conda_bin} remove --force -y {problem}".format(**locals()))
         # install our customized packages
         if len(packages) > 0:
-            pkgs_str = " ".join(packages)
-            env.safe_run("{conda_bin} install --quiet -y {channels} {pkgs_str}".format(**locals()))
-            for package in packages:
-                _link_bin(package, env, conda_info, conda_bin)
+            for env_name, env_packages in _split_by_condaenv(packages):
+                if env_name:
+                    assert env_name in conda_envs, (env_name, conda_envs)
+                    env_str = "-n %s" % env_name
+                else:
+                    env_str = ""
+                pkgs_str = " ".join(env_packages)
+                env.safe_run("{conda_bin} install --quiet -y {env_str} {channels} {pkgs_str}".format(**locals()))
+                conda_pkg_list = json.loads(env.safe_run_output(
+                    "{conda_bin} list --json {env_str}".format(**locals())))
+                for package in env_packages:
+                    _link_bin(package, env, conda_info, conda_bin, conda_pkg_list,
+                              conda_envdir=conda_envs.get(env_name))
+        conda_pkg_list = json.loads(env.safe_run_output("{conda_bin} list --json".format(**locals())))
         for pkg in ["python", "conda", "pip"]:
-            _link_bin(pkg, env, conda_info, conda_bin, [pkg], "bcbio_")
+            _link_bin(pkg, env, conda_info, conda_bin, conda_pkg_list, files=[pkg], prefix="bcbio_")
 
-def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
+def _link_bin(package, env, conda_info, conda_bin, conda_pkg_list, files=None, prefix="", conda_env=None,
+              conda_envdir=None):
     """Link files installed in the bin directory into the install directory.
 
     This is imperfect but we're trying not to require injecting everything in the anaconda
@@ -52,16 +63,16 @@ def _link_bin(package, env, conda_info, conda_bin, files=None, prefix=""):
     """
     package = package.split("=")[0]
     final_bindir = os.path.join(env.system_install, "bin")
-    base_bindir = os.path.dirname(conda_bin)
+    if conda_envdir:
+        base_bindir = os.path.join(conda_envdir, "bin")
+    else:
+        base_bindir = os.path.dirname(conda_bin)
     # resolve any symlinks in the final and base heirarchies
     with quiet():
         final_bindir = env.safe_run_output("cd %s && pwd -P" % final_bindir)
         base_bindir = env.safe_run_output("cd %s && pwd -P" % base_bindir)
-    for pkg_subdir in json.loads(env.safe_run_output("{conda_bin} list --json -f {package}".format(**locals()))):
-        # New style conda info (4.3+) is a dictionary, old style is a string. Handle both cases
-        if isinstance(pkg_subdir, dict):
-            pkg_subdir = pkg_subdir["dist_name"]
-        pkg_subdir = pkg_subdir.split("::")[-1]
+    for pkg_subdir in [x for x in conda_pkg_list if x["name"] == package]:
+        pkg_subdir = pkg_subdir["dist_name"].split("::")[-1]
         for pkg_dir in conda_info["pkgs_dirs"]:
             pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
             if env.safe_exists(pkg_bindir):
@@ -96,12 +107,29 @@ def _do_link(orig_file, final_file):
     if needs_link:
         os.symlink(os.path.relpath(orig_file, os.path.dirname(final_file)), final_file)
 
+def _split_by_condaenv(packages):
+    """Split packages into those requiring special conda environments.
+    """
+    out = collections.defaultdict(list)
+    for p in packages:
+        parts = p.split(";")
+        name = parts[0]
+        metadata = parts[1:]
+        condaenv = None
+        for k, v in [x.split("=") for x in metadata]:
+            if k == "env":
+                condaenv = v
+        out[condaenv].append(name)
+    return dict(out).items()
+
 def _create_environments(env, conda_bin):
     """Create a custom local build environment for tools. Handles python2/python3 divide.
 
     This is an initial step towards transitioning to more python3 tool support.
     """
+    out = {}
     conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
     if not any(x.endswith("/python3") for x in conda_envs):
         env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
-    return ["python3"]
+    out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
+    return out
