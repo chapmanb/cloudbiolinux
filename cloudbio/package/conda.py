@@ -25,6 +25,7 @@ def install_packages(env, to_install=None, packages=None):
                 (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
+        conda_envs = _create_environments(env, conda_bin)
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
@@ -94,3 +95,13 @@ def _do_link(orig_file, final_file):
         os.unlink(final_file)
     if needs_link:
         os.symlink(os.path.relpath(orig_file, os.path.dirname(final_file)), final_file)
+
+def _create_environments(env, conda_bin):
+    """Create a custom local build environment for tools. Handles python2/python3 divide.
+
+    This is an initial step towards transitioning to more python3 tool support.
+    """
+    conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+    if not any(x.endswith("/python3") for x in conda_envs):
+        env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
+    return ["python3"]
