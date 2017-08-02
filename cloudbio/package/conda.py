@@ -131,5 +131,6 @@ def _create_environments(env, conda_bin):
     conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
     if not any(x.endswith("/python3") for x in conda_envs):
         env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
+        conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
     out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
     return out
