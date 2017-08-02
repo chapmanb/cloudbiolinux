@@ -15,7 +15,6 @@ minimal:
   - xz
 # currently not included to reduce total size of Docker images
 # - pandoc
-# - viennarna
 bio_nextgen:
   - age-metasv
   - atropos;env=python3
@@ -148,6 +147,7 @@ bio_nextgen:
   - vcfanno
   - vcf2db
   - vcflib
+  - viennarna
   - vt
 perl:
   - perl-app-cpanminus
