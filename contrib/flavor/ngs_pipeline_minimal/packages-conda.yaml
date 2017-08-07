@@ -106,13 +106,14 @@ bio_nextgen:
   - sambamba
   - samblaster
   - samtools
-  - simple_sv_annotation
   - scalpel
   - sentieon
   - seq2c
   - seqbuster
   - seqtk
   - sickle-trim
+  - simple_sv_annotation
+  - singlecell-barcodes
   - spades
   - snap-aligner=1.0dev.97
   - snpeff=4.3i
