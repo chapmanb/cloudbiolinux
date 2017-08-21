@@ -2,7 +2,7 @@
 ---
 attributes:
   name: dbsnp
-  version: 150-20170710
+  version: 150-20170710-1
 recipe:
   full:
     recipe_type: bash
@@ -14,7 +14,7 @@ recipe:
         url=ftp://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/GATK/All_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
-        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | bgzip -c > variation/dbsnp-$version.vcf.gz
+        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > variation/dbsnp-$version.vcf.gz
         tabix -f -p vcf variation/dbsnp-$version.vcf.gz
     recipe_outfiles:
       - variation/dbsnp-150.vcf.gz

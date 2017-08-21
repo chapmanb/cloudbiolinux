@@ -1,1 +1,21 @@
-../GRCh37/dbsnp.yaml
+# UCSFify name sed magic from: https://github.com/mmarchin/utilities/blob/master/ucscify.sh
+---
+attributes:
+  name: dbsnp
+  version: 150-20170710
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        version=150
+        org=human_9606_b${version}_GRCh37p13
+        release=20170710
+        url=ftp://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/GATK/All_${release}.vcf.gz
+        mkdir -p variation
+        wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
+        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | bgzip -c > variation/dbsnp-$version.vcf.gz
+        tabix -f -p vcf variation/dbsnp-$version.vcf.gz
+    recipe_outfiles:
+      - variation/dbsnp-150.vcf.gz
+      - variation/dbsnp-150.vcf.gz.tbi
