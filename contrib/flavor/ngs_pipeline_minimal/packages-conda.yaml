@@ -93,6 +93,7 @@ bio_nextgen:
   - picard
   - pindel
   - platypus-variant
+  - preseq
   - pyloh
   - pytabix
   - pythonpy
