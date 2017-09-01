@@ -36,6 +36,7 @@ bio_nextgen:
   - cage
   - cancerit-allelecount
   - cnvkit
+  - coincbc
   - cpat
   - cramtools
   - crossmap
@@ -56,6 +57,7 @@ bio_nextgen:
   - geneimpacts
   - gemini
   - genesplicer
+  # TODO: Remove on 1.0.5 release since switched to coincbc
   - glpk=4.57
   - goleft
   - grabix
@@ -80,6 +82,7 @@ bio_nextgen:
   - metasv
   - mirdeep2=2.0.0.7
   - moreutils
+  - mosdepth
   - multiqc
   - multiqc-bcbio
   - ngs-disambiguate
