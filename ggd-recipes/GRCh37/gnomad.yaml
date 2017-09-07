@@ -1,5 +1,4 @@
 # GnomAD VCF sites: http://exac.broadinstitute.org/
-# Lifted over to hg38 by the Ensembl variation team
 # Script cleans up to use chr-style naming and sort by ref file
 ---
 attributes:
@@ -10,9 +9,9 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh38/variation_genotype/gnomad.genomes.r2.0.1.sites.GRCh38.noVEP.vcf.gz
+        url=ftp://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz
         remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
-        ref=../seq/hg38.fa
+        ref=../seq/GRCh37.fa
         mkdir -p variation
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         export TMPDIR=`pwd`
