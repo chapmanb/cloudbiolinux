@@ -95,6 +95,7 @@ bio_nextgen:
   - phylowgs
   - picard
   - pindel
+  - pizzly
   - platypus-variant
   - preseq
   - pyloh
