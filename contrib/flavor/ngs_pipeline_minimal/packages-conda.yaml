@@ -66,6 +66,7 @@ bio_nextgen:
   - svtools
   - gvcf-regions
   - hap.py
+  - h5py
   - hmmlearn
   - hisat2
   - htslib
