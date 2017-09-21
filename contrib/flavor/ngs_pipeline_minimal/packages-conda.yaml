@@ -124,7 +124,7 @@ bio_nextgen:
   - snap-aligner=1.0dev.97
   - snpeff=4.3i
   - star
-  - strelka2
+  - strelka
   - stringtie
   - subread
   - svtyper
