@@ -292,7 +292,9 @@ def _determine_distribution(env):
         return "scientificlinux"
     elif env.safe_exists("/etc/debian_version"):
         return "debian"
-    elif output.find("id=arch") >= 0:
+    elif output.find("id=arch") >= 0 or output.find('id_like="arch"') >=0:
+        return "arch"
+    elif output.find("antergos") >= 0:
         return "arch"
     # check for file used by Python's platform.mac_ver
     elif env.safe_exists("/System/Library/CoreServices/SystemVersion.plist"):
