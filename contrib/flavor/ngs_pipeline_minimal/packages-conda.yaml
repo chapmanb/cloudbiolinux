@@ -57,14 +57,13 @@ bio_nextgen:
   - geneimpacts
   - gemini
   - genesplicer
-  # TODO: Remove on 1.0.5 release since switched to coincbc
-  - glpk=4.57
   - goleft
   - grabix
   - gridss
   - gsort
   - svtools
   - gvcf-regions
+  - gvcftools
   - hap.py
   - h5py
   - hmmlearn
@@ -175,7 +174,7 @@ perl:
   - perl-time-hires
   - perl-vcftools-vcf
 r:
-  - r=3.3.2
+  - r=3.4.1
   - r-cghflasso
   - r-chbutils
   - r-devtools
