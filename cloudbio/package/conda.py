@@ -30,8 +30,9 @@ def install_packages(env, to_install=None, packages=None):
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
         # r-tximport is now bioconductor-tximport
+        # py2cairo is incompatible with r 3.4.1
         # libedit pins to curses 6.0 but bioconda requires 5.9
-        for problem in ["r-tximport", "libedit"]:
+        for problem in ["r-tximport", "py2cairo", "libedit"]:
             cur_packages = [x["name"] for x in
                             json.loads(env.safe_run_output("{conda_bin} list --json {problem}".format(**locals())))]
             if problem in cur_packages:
