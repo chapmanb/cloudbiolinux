@@ -40,7 +40,7 @@ genomes:
     indexes: [seq, twobit, bwa, hisat2]
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
-                  genesplicer, effects_transcripts, vcfanno, esp, exac, viral]
+                  genesplicer, effects_transcripts, vcfanno, esp, exac, viral, RADAR]
     annotations_available: [dbnsfp, dbscsnv]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631,
                  platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,

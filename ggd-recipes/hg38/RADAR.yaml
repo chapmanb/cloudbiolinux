@@ -20,19 +20,18 @@
 
 ---
 attributes:
-  name: RADAR-hg38
-  version: 2
+  name: RADAR
+  version: v2-20171007
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=https://biodata.s3.amazonaws.com/annotation/RADAR-hg38.bed.gz
+        url=https://s3.amazonaws.com/biodata/annotation/RADAR/hg38/RADAR.bed.gz
         mkdir -p editing
         cd editing
-      	wget --no-check-certificate -qO- $url > RADAR-hg38.bed.gz
-	tabix RADAR-hg38.bed.gz
-       	cd ../
+        wget --no-check-certificate -q $url
+        wget --no-check-certificate -q $url.tbi
     recipe_outfiles:
-      - editing/RADAR-hg38.bed.gz
-      - editing/RADAR-hg38.bed.gz.tbi
+      - editing/RADAR.bed.gz
+      - editing/RADAR.bed.gz.tbi
