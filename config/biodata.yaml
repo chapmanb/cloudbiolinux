@@ -24,7 +24,7 @@ genomes:
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts, vcfanno, viral]
-    annotations_available: [battenberg, dbnsfp, dbscsnv]
+    annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
     name: Human (GRCh37)
@@ -33,7 +33,7 @@ genomes:
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts, vcfanno, viral]
-    annotations_available: [battenberg, dbnsfp, dbscsnv]
+    annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4, giab-NA12878-NA24385-somatic]
   - dbkey: hg38
     name: Human (hg38) full
@@ -41,7 +41,7 @@ genomes:
     annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
                   genesplicer, effects_transcripts, vcfanno, esp, exac, viral, RADAR]
-    annotations_available: [dbnsfp, dbscsnv]
+    annotations_available: [dbnsfp, dbscsnv, ericscript]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631,
                  platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap, giab-NA12878-NA24385-somatic]

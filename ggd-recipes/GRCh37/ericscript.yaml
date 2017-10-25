@@ -1,0 +1,39 @@
+---
+attributes:
+  name: ericscript
+  version: 73
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        # Uses Google Drive for faster download with tricks from
+        # http://stackoverflow.com/a/38937732/252589
+        ggID='0B9s__vuJPvIibDRIb0RFdHFlQmM'
+        ggURL='https://drive.google.com/uc?export=download'
+        mkdir -p rnaseq/ericscript
+        cd rnaseq/ericscript
+        filename="$(curl -k -sc tmp-gcokie "${ggURL}&id=${ggID}" | grep -o '="uc-name.*</span>' | sed 's/.*">//;s/<.a> .*//')"
+        getcode="$(awk '/_warning_/ {print $NF}' tmp-gcokie)"
+        curl -k -Lb tmp-gcokie "${ggURL}&confirm=${getcode}&id=${ggID}" -o "${filename}" -C -
+        tar -xjvpf ericscript_db_homosapiens_ensembl73.tar.bz2
+    recipe_outfiles:
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa.amb
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa.pac
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa.bwt
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Sequences.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.GeneInfo.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.GenePosition.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa.sa
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa.amb
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Paralogs.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.GeneNames.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/allseq.fa.ann
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa.bwt
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa.sa
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Transcripts.RData
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa.ann
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Reference.fa.pac
+      - rnaseq/ericscript/ericscript_db_homosapiens_ensembl73/data/homo_sapiens/EnsemblGene.Structures.RData
