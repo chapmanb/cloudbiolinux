@@ -125,14 +125,22 @@ def _split_by_condaenv(packages):
     return dict(out).items()
 
 def _create_environments(env, conda_bin):
-    """Create a custom local build environment for tools. Handles python2/python3 divide.
+    """Creates custom local environments that conflict with global dependencies.
 
-    This is an initial step towards transitioning to more python3 tool support.
+    Available environments:
+
+    - python3 -- support tools that require python 3. This is an initial step
+      towards transitioning to more python3 tool support.
+    - samtools0 -- For tools that require older samtools 0.1.19
     """
     out = {}
     conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
     if not any(x.endswith("/python3") for x in conda_envs):
         env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
         conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+    if not any(x.endswith("/samtools0") for x in conda_envs):
+        env.safe_run("{conda_bin} create -y --name samtools0".format(**locals()))
+        conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
     out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
+    out["samtools0"] = [x for x in conda_envs if x.endswith("/samtools0")][0]
     return out
