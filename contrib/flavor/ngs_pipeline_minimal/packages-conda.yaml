@@ -18,7 +18,7 @@ minimal:
 bio_nextgen:
   - age-metasv
   - atropos;env=python3
-  - bamtools
+  - bamtools=2.4.0
   - bamutil
   - bcbio-prioritize
   - bcbio-rnaseq
