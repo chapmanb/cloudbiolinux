@@ -35,6 +35,7 @@ bio_nextgen:
   - bio-vcf
   - cage
   - cancerit-allelecount
+  - chipseq-greylist
   - cnvkit
   - coincbc
   - cpat
