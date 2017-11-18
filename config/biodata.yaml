@@ -38,7 +38,7 @@ genomes:
   - dbkey: hg38
     name: Human (hg38) full
     indexes: [seq, twobit, bwa, hisat2]
-    annotations: [coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
+    annotations: [ccds, coverage, prioritize, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
                   1000g_indels, mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
                   genesplicer, effects_transcripts, vcfanno, esp, exac, viral, RADAR]
     annotations_available: [dbnsfp, dbscsnv, ericscript]

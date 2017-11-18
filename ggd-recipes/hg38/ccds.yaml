@@ -1,0 +1,22 @@
+# Consensus CDS (CCDS https://www.ncbi.nlm.nih.gov/projects/CCDS/CcdsBrowse.cgi) regions with two adjustments:
+# 
+# - 2 bps added to internal introns to capture canonical splice acceptor/donor sites
+# - Multiple transcripts from a single gene are merged into a single all inclusive gene entry.
+---
+attributes:
+  name: ccds
+  version: r20
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/biodata/coverage/ccds-hg38-r20.bed.gz
+        outdir=coverage/coding
+        mkdir -p $outdir
+        cd $outdir
+        wget --no-check-certificate -c -O ccds.bed.gz $baseurl
+        wget --no-check-certificate -c -O ccds.bed.gz.tbi $baseurl.tbi
+    recipe_outfiles:
+      - coverage/coding/ccds.bed.gz
+      - coverage/coding/ccds.bed.gz.tbi
