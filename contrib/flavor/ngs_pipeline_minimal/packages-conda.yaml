@@ -213,4 +213,4 @@ r:
   - bioconductor-iranges
   - bioconductor-limma
   - bioconductor-rtracklayer
-  - bioconductor-titancna=1.15.0
+  - bioconductor-titancna
