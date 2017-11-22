@@ -59,6 +59,7 @@ bio_nextgen:
   - geneimpacts
   - gemini
   - genesplicer
+  - gffcompare
   - goleft
   - grabix
   - gridss
