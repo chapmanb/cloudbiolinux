@@ -665,10 +665,10 @@ def _index_minimap2(ref_file):
     dir_name = "minimap2"
     indexes = []
     for preset in ["sr"]:
-        index_name = "%s-%s.mmi" % (os.path.splitext(os.path.basename(ref_file)[0]), preset)
+        index_name = "%s-%s.mmi" % (os.path.splitext(os.path.basename(ref_file))[0], preset)
         cmd = "minimap2 -x %s -d %s {ref_file}" % (preset, index_name)
         out_basename = _index_w_command(dir_name, cmd, ref_file)
-        indexes.append(os.path.join(os.path.dirname(out_basename, index_name)))
+        indexes.append(os.path.join(os.path.dirname(out_basename), index_name))
     return indexes[0]
 
 @_if_installed("novoindex")
