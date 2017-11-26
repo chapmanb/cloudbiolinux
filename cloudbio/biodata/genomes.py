@@ -306,7 +306,7 @@ GENOMES_SUPPORTED = [
            ("Agambiae", "AgamP3", VectorBase("AgamP3", "Anopheles",
                                                "gambiae", "PEST",
                                                "AgamP3", ["CHROMOSOMES"])),]
-GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "novoalign",
+GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "minimap2", "novoalign",
                             "novoalign-cs", "ucsc", "mosaik", "snap", "star",
                             "rtg", "hisat2"]
 DEFAULT_GENOME_INDEXES = ["seq"]
@@ -474,7 +474,8 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                             if idx in ggd_recipes and method == "ggd":
                                 raise
                             else:
-                                env.logger.info("Genome preparation method {0} failed, trying next".format(method))
+                                env.logger.info("Moving on to next genome prep method after trying {0} ".format(
+                                    method))
                     if not finished:
                         raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
@@ -659,6 +660,16 @@ def _index_maq(ref_file):
     def rm_local(local_file):
         env.safe_run("rm -f {0}".format(local_file))
     return _index_w_command(dir_name, cmd, ref_file, pre=link_local, post=rm_local)
+
+def _index_minimap2(ref_file):
+    dir_name = "minimap2"
+    indexes = []
+    for preset in ["sr"]:
+        index_name = "%s-%s.mmi" % (os.path.splitext(os.path.basename(ref_file)[0]), preset)
+        cmd = "minimap2 -x %s -d %s {ref_file}" % (preset, index_name)
+        out_basename = _index_w_command(dir_name, cmd, ref_file)
+        indexes.append(os.path.join(os.path.dirname(out_basename, index_name)))
+    return indexes[0]
 
 @_if_installed("novoindex")
 def _index_novoalign(ref_file):
@@ -980,6 +991,7 @@ INDEX_FNS = {
     "bowtie2": _index_bowtie2,
     "maq": _index_maq,
     "mosaik": _index_mosaik,
+    "minimap2": _index_minimap2,
     "novoalign": _index_novoalign,
     "novoalign_cs": _index_novoalign_cs,
     "ucsc": _index_twobit,
