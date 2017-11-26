@@ -83,6 +83,7 @@ bio_nextgen:
   - maxentscan
   - mbuffer
   - metasv
+  - minimap2
   - mirdeep2=2.0.0.7
   - moreutils
   - mosdepth
