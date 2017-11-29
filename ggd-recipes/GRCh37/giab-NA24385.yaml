@@ -1,8 +1,10 @@
 # Truth sets from Genome in a Bottle for NA24385 -- http://genomeinabottle.org/
+# Structural variants from
+# ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_05092017/Preliminary_Integrations_v0.4.0/
 ---
 attributes:
   name: giab-NA24385
-  version: v3_3_2-sv_v0.1.8
+  version: v3_3_2-sv_v0.4.0
 recipe:
   full:
     recipe_type: bash
@@ -22,6 +24,9 @@ recipe:
         cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-GRCh37.bed.gz
         wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
         wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
+        svurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_05092017/Preliminary_Integrations_v0.4.0/svanalyzer_union_170509_v0.4.0.vcf.gz
+        wget -c -O $dir/truth_sv.vcf.gz $svurl
+        wget -c -O $dir/truth_sv.vcf.gz.tbi $svurl.tbi
     recipe_outfiles:
       - validation/giab-NA24385/truth_small_variants.vcf.gz
       - validation/giab-NA24385/truth_small_variants.vcf.gz.tbi
@@ -30,3 +35,5 @@ recipe:
       - validation/giab-NA24385/truth_DEL_giab.bed.gz.tbi
       - validation/giab-NA24385/truth_DEL_crowd.bed.gz
       - validation/giab-NA24385/truth_DEL_crowd.bed.gz.tbi
+      - validation/giab-NA24385/truth_sv.vcf.gz
+      - validation/giab-NA24385/truth_sv.vcf.gz.tbi
