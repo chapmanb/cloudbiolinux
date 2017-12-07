@@ -17,7 +17,7 @@ recipe:
         wget --no-check-certificate -O gemini.lua -c $bcbio_baseurl/hg38-gemini.lua
         wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/hg38-dbnsfp.conf
         wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/hg38-dbscsnv.conf
-        wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/hg38-gnomad_genome.conf
+        wget --no-check-certificate -O gnomad_genome.conf -c $bcbio_baseurl/hg38-gnomad_genome.conf
 
 
     recipe_outfiles:

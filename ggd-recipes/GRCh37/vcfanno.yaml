@@ -21,7 +21,7 @@ recipe:
         wget --no-check-certificate -O rnaedit.lua -c $bcbio_baseurl/GRCh37-rnaedit.lua
         wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/GRCh37-dbnsfp.conf
         wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/GRCh37-dbscsnv.conf
-        wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/GRCh37-gnomad_genome.conf
+        wget --no-check-certificate -O gnomad_genome.conf -c $bcbio_baseurl/GRCh37-gnomad_genome.conf
 
     recipe_outfiles:
       - config/vcfanno/gemini.lua
