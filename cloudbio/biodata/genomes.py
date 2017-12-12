@@ -727,6 +727,7 @@ def _index_star(ref_file):
 
 @_if_installed("hisat2-build")
 def _index_hisat2(ref_file):
+    path_export = _get_path_export()
     build = os.path.splitext(os.path.basename(ref_file))[0]
     (ref_dir, local_file) = os.path.split(ref_file)
     gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
@@ -736,30 +737,23 @@ def _index_hisat2(ref_file):
         cpu = env.cores
     except:
         cpu = 1
-    cmd = "hisat2-build -p {cpu} "
+    cmd = "{path_export}hisat2-build -p {cpu} "
 
     exons_file = index_prefix + ".exons"
     splicesites_file = index_prefix + ".splicesites"
-    def _get_exons_and_splicesites(ref_path):
-        path_export = _get_path_export()
+    if os.path.exists(gtf_file):
         with open(exons_file, "w") as out_handle:
             exons_cmd = ["hisat2_extract_exons.py", gtf_file]
             subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
         with open(splicesites_file, "w") as out_handle:
             splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
             subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
-        return ref_path
 
-    pre_func = None
-    if not os.path.exists(gtf_file):
-        print "%s not found, skipping creating the exons file." % (gtf_file)
-    else:
-        cmd += "--exon {exons_file} --ss {splicesites_file} "
-        pre_func = _get_exons_and_splicesites
-    cmd += "{ref_file} {index_prefix}"
-    cmd = cmd.format(**locals())
-    if not env.safe_exists(os.path.join(dir_name + ".1.ht2")):
-        _index_w_command(dir_name, cmd, ref_file, pre=pre_func)
+    if os.stat(exons_file).st_size > 0 and os.stat(splicesites_file).st_size > 0:
+        cmd += "--exons {exons_file} --splicesites {splicesites_file} "
+    cmd += "{ref_file} {index_prefix} "
+    if not env.safe_exists(os.path.join(index_prefix + ".1.ht2")):
+        env.safe_run(cmd.format(**locals()))
     return dir_name
 
 def _index_snap(ref_file):
