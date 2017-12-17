@@ -30,6 +30,7 @@ bio_nextgen:
   - biobambam
   - bowtie
   - bowtie2=2.2.8
+  - break-point-inspector
   - bwa
   - bwakit
   - bio-vcf
