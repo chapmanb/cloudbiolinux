@@ -47,7 +47,7 @@ bio_nextgen:
   - cyvcf2
   - delly
   - dkfz-bias-filter
-  - ensembl-vep=90.*
+  - ensembl-vep=91.*
   - ericscript;env=samtools0
   - express
   - extract-sv-reads
