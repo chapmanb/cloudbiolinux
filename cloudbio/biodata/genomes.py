@@ -469,13 +469,13 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns):
                             break
                         except KeyboardInterrupt:
                             raise
-                        except:
+                        except BaseException, e:
                             # Fail on incorrect GGD recipes
                             if idx in ggd_recipes and method == "ggd":
                                 raise
                             else:
-                                env.logger.info("Moving on to next genome prep method after trying {0} ".format(
-                                    method))
+                                env.logger.info("Moving on to next genome prep method after trying {0}\n{1}".format(
+                                    method, str(e)))
                     if not finished:
                         raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
@@ -733,6 +733,10 @@ def _index_hisat2(ref_file):
     gtf_file = os.path.join(ref_dir, os.pardir, "rnaseq", "ref-transcripts.gtf")
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "hisat2"))
     index_prefix = os.path.join(dir_name, build)
+    if env.safe_exists(os.path.join(index_prefix + ".1.ht2")):
+        return dir_name
+    if not env.safe_exists(dir_name):
+        env.safe_run('mkdir -p %s' % dir_name)
     try:
         cpu = env.cores
     except:
@@ -742,15 +746,17 @@ def _index_hisat2(ref_file):
     exons_file = index_prefix + ".exons"
     splicesites_file = index_prefix + ".splicesites"
     if os.path.exists(gtf_file):
-        with open(exons_file, "w") as out_handle:
-            exons_cmd = ["hisat2_extract_exons.py", gtf_file]
-            subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
-        with open(splicesites_file, "w") as out_handle:
-            splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
-            subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
+        if not env.safe_exists(gtf_file):
+            with open(exons_file, "w") as out_handle:
+                exons_cmd = ["hisat2_extract_exons.py", gtf_file]
+                subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
+        if not env.safe_exists(splicesites_file):
+            with open(splicesites_file, "w") as out_handle:
+                splicesites_cmd = ["hisat2_extract_splice_sites.py", gtf_file]
+                subprocess.check_call(path_export + " ".join(splicesites_cmd), stdout=out_handle, shell=True)
 
-    if os.stat(exons_file).st_size > 0 and os.stat(splicesites_file).st_size > 0:
-        cmd += "--exons {exons_file} --splicesites {splicesites_file} "
+        if os.stat(exons_file).st_size > 0 and os.stat(splicesites_file).st_size > 0:
+            cmd += "--exon {exons_file} --ss {splicesites_file} "
     cmd += "{ref_file} {index_prefix} "
     if not env.safe_exists(os.path.join(index_prefix + ".1.ht2")):
         env.safe_run(cmd.format(**locals()))
