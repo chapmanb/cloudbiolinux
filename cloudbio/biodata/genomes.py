@@ -746,7 +746,7 @@ def _index_hisat2(ref_file):
     exons_file = index_prefix + ".exons"
     splicesites_file = index_prefix + ".splicesites"
     if os.path.exists(gtf_file):
-        if not env.safe_exists(gtf_file):
+        if not env.safe_exists(exons_file):
             with open(exons_file, "w") as out_handle:
                 exons_cmd = ["hisat2_extract_exons.py", gtf_file]
                 subprocess.check_call(path_export + " ".join(exons_cmd), stdout=out_handle, shell=True)
