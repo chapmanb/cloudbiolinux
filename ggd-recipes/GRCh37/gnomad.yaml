@@ -1,5 +1,4 @@
 # GnomAD VCF sites: http://exac.broadinstitute.org/
-# Script cleans up to use chr-style naming and sort by ref file
 ---
 attributes:
   name: gnomad
@@ -10,12 +9,10 @@ recipe:
     recipe_cmds:
       - |
         url=ftp://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz
-        remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
         ref=../seq/GRCh37.fa
         mkdir -p variation
-        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         export TMPDIR=`pwd`
-        wget -c -O - $url | gunzip -c | vt decompose -s - | sed -f remap.sed | gsort -m 500 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
+        wget -c -O - $url | gunzip -c | vt decompose -s - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
     recipe_outfiles:
       - variation/gnomad_genome.vcf.gz
