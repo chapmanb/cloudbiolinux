@@ -25,7 +25,7 @@ def install_packages(env, to_install=None, packages=None):
                 (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
-        conda_envs = _create_environments(env, conda_bin)
+        conda_envs = _create_environments(env, conda_bin, packages)
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
@@ -124,7 +124,7 @@ def _split_by_condaenv(packages):
         out[condaenv].append(name)
     return dict(out).items()
 
-def _create_environments(env, conda_bin):
+def _create_environments(env, conda_bin, packages):
     """Creates custom local environments that conflict with global dependencies.
 
     Available environments:
@@ -133,14 +133,17 @@ def _create_environments(env, conda_bin):
       towards transitioning to more python3 tool support.
     - samtools0 -- For tools that require older samtools 0.1.19
     """
+    env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
-    if not any(x.endswith("/python3") for x in conda_envs):
-        env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
-        conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
-    if not any(x.endswith("/samtools0") for x in conda_envs):
-        env.safe_run("{conda_bin} create -y --name samtools0 python=2".format(**locals()))
-        conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
-    out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
-    out["samtools0"] = [x for x in conda_envs if x.endswith("/samtools0")][0]
+    if "python3" in env_names:
+        if not any(x.endswith("/python3") for x in conda_envs):
+            env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
+            conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+        out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
+    if "samtools0" in env_names:
+        if not any(x.endswith("/samtools0") for x in conda_envs):
+            env.safe_run("{conda_bin} create -y --name samtools0 python=2".format(**locals()))
+            conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+        out["samtools0"] = [x for x in conda_envs if x.endswith("/samtools0")][0]
     return out
