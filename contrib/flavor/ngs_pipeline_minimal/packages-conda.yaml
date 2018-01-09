@@ -73,6 +73,7 @@ bio_nextgen:
   - h5py
   - hmmlearn
   - hisat2
+  - hts-nim-tools
   - htslib
   - htseq
   - impute2
