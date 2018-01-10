@@ -1,4 +1,7 @@
 # GA4GH problematic region files: https://drive.google.com/folderview?id=0B7Ao1qqJJDHQUjVIN3liUUZNWjg&usp=sharing#list
+# Cached mappability regions
+# wget --no-check-certificate -O - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeDacMapabilityConsensusExcludable.bed.gz | gunzip -c | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > $encode/wgEncodeDacMapabilityConsensusExcludable.bed.gz
+# tabix -p bed -f $encode/wgEncodeDacMapabilityConsensusExcludable.bed.gz
 ---
 attributes:
   name: GA4GH_problem_regions
@@ -23,8 +26,10 @@ recipe:
         cd ../../..
         encode=coverage/problem_regions/ENCODE
         mkdir -p $encode
-        wget --no-check-certificate -O - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeDacMapabilityConsensusExcludable.bed.gz | gunzip -c | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > $encode/wgEncodeDacMapabilityConsensusExcludable.bed.gz
-        tabix -p bed -f $encode/wgEncodeDacMapabilityConsensusExcludable.bed.gz
+        cd $encode
+        wget --no-check-certificate http://s3.amazonaws.com/biodata/coverage/problem_regions/ENCODE/GRCh37/wgEncodeDacMapabilityConsensusExcludable.bed.gz
+        wget --no-check-certificate http://s3.amazonaws.com/biodata/coverage/problem_regions/ENCODE/GRCh37/wgEncodeDacMapabilityConsensusExcludable.bed.gz.tbi
+        cd ../../..
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
         wget --no-check-certificate -O - https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv | grep -v ^chr > $repeats/sv_repeat_telomere_centromere.bed
