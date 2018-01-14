@@ -1,7 +1,7 @@
 ---
 attributes:
   name: cosmic
-  version: 68
+  version: 68-20180114
 recipe:
   full:
     recipe_type: bash
