@@ -124,6 +124,10 @@ def _split_by_condaenv(packages):
         out[condaenv].append(name)
     return dict(out).items()
 
+def _get_conda_envs(env, conda_bin):
+    info = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))
+    return [e for e in info["envs"] if e.startswith(info["conda_prefix"])]
+
 def _create_environments(env, conda_bin, packages):
     """Creates custom local environments that conflict with global dependencies.
 
@@ -135,15 +139,15 @@ def _create_environments(env, conda_bin, packages):
     """
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
-    conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+    conda_envs = _get_conda_envs(env, conda_bin)
     if "python3" in env_names:
         if not any(x.endswith("/python3") for x in conda_envs):
             env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
-            conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+            conda_envs = _get_conda_envs(env, conda_bin)
         out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
     if "samtools0" in env_names:
         if not any(x.endswith("/samtools0") for x in conda_envs):
             env.safe_run("{conda_bin} create -y --name samtools0 python=2".format(**locals()))
-            conda_envs = json.loads(env.safe_run_output("{conda_bin} info --envs --json".format(**locals())))["envs"]
+            conda_envs = _get_conda_envs(env, conda_bin)
         out["samtools0"] = [x for x in conda_envs if x.endswith("/samtools0")][0]
     return out
