@@ -43,7 +43,7 @@ def main(cosmic_version, bcbio_genome_dir):
         ready_cosmic = combine_cosmic(sorted_inputs, bcbio_ref, out_file)
         utils.copy_plus(ready_cosmic, os.path.join(bcbio_base, "variation", os.path.basename(ready_cosmic)))
         if bcbio_build == "GRCh37":
-            bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", bcbio_build)
+            bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", "hg19")
             if not os.path.exists(bcbio_base):
                 continue
             out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, "bcbio_ready", "hg19"))
