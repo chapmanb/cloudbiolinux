@@ -88,6 +88,7 @@ bio_nextgen:
   - metasv
   - minimap2
   - mirdeep2=2.0.0.7
+  - mirtop
   - moreutils
   - mosdepth
   - multiqc
