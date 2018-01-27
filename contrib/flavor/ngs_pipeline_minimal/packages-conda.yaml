@@ -102,6 +102,7 @@ bio_nextgen:
   - peddy
   - perl-sanger-cgp-battenberg
   - phylowgs
+  - pysam>=0.13.0
   - picard
   - pindel
   - pizzly
