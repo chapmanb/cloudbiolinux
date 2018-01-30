@@ -77,7 +77,7 @@ bio_nextgen:
   - htslib
   - htseq
   - impute2
-  - kallisto
+  - kallisto>=0.43.1
   - kraken
   - lofreq
   - lumpy-sv
