@@ -46,7 +46,7 @@ def install_packages(env, to_install=None, packages=None):
                 else:
                     env_str = ""
                 pkgs_str = " ".join(env_packages)
-                env.safe_run("{conda_bin} install --quiet -y {env_str} {channels} {pkgs_str}".format(**locals()))
+                env.safe_run("{conda_bin} install -y {env_str} {channels} {pkgs_str}".format(**locals()))
                 conda_pkg_list = json.loads(env.safe_run_output(
                     "{conda_bin} list --json {env_str}".format(**locals())))
                 for package in env_packages:

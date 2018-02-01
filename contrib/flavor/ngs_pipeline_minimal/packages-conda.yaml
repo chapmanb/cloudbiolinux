@@ -8,7 +8,6 @@ minimal:
   - bzip2
   - ncurses
   - nodejs
-  - nomkl
   - p7zip
   - readline
   - s3gof3r
