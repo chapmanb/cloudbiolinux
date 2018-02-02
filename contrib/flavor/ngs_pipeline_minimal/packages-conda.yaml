@@ -86,6 +86,7 @@ bio_nextgen:
   - mbuffer
   - metasv
   - minimap2
+  - mintmap
   - mirdeep2=2.0.0.7
   - mirtop
   - moreutils
