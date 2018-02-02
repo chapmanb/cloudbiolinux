@@ -21,7 +21,7 @@
 ---
 attributes:
   name: RADAR
-  version: v2-20171007
+  version: v2-20180202
 recipe:
   full:
     recipe_type: bash
