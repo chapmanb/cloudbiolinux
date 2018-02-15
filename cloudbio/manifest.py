@@ -27,7 +27,7 @@ def create(out_dir, tooldir="/usr/local", fetch_remote=False):
     write_debian_pkg_info(out_dir, fetch_remote)
     write_python_pkg_info(out_dir)
     write_r_pkg_info(out_dir)
-    write_brew_pkg_info(out_dir, tooldir)
+    #write_brew_pkg_info(out_dir, tooldir)
     write_custom_pkg_info(out_dir, tooldir)
 
 # ## Custom packages
