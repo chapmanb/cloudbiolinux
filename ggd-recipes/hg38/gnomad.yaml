@@ -14,7 +14,7 @@ recipe:
         remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
         ref=../seq/hg38.fa
         mkdir -p variation
-        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        wget --no-check-certificate -qO- $remap_url | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2- | awk '{if(!$2) print "/^"$1"/d"; else if($1!=$2) print "s/^"$1"/"$2"/g";}' > remap.sed
         export TMPDIR=`pwd`
         wget -c -O - $url | gunzip -c | vt decompose -s - | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
