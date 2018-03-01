@@ -44,6 +44,7 @@ bio_nextgen:
   - cufflinks
   - cutadapt
   - cyvcf2
+  - deeptools
   - delly
   - dkfz-bias-filter
   - ensembl-vep=91.*
