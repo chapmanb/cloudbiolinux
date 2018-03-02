@@ -20,6 +20,7 @@ def install_packages(env, to_install=None, packages=None):
             config_file = get_config_file(env, "packages-conda.yaml")
         if config_file.base is None and packages is None:
             packages = []
+            channels = ""
         else:
             if to_install:
                 (packages, _) = _yaml_to_packages(config_file.base, to_install, config_file.dist)
@@ -27,11 +28,15 @@ def install_packages(env, to_install=None, packages=None):
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         conda_envs = _create_environments(env, conda_bin, packages)
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
+        # libedit pins to curses 6.0 but bioconda requires 5.9
+        # Ensure we have conda-forge conda installed, otherwise creates resolution
+        # and package issues with removed libedit. Hopefully can remove along with libedit
+        # hack when conda-forge synchronizes ncurses and conda with the base install.
+        env.safe_run("{conda_bin} install -y {channels} conda".format(**locals()))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
         # r-tximport is now bioconductor-tximport
         # py2cairo is incompatible with r 3.4.1
-        # libedit pins to curses 6.0 but bioconda requires 5.9
         for problem in ["r-tximport", "py2cairo", "libedit"]:
             cur_packages = [x["name"] for x in
                             json.loads(env.safe_run_output("{conda_bin} list --json {problem}".format(**locals())))]
@@ -45,10 +50,6 @@ def install_packages(env, to_install=None, packages=None):
                     env_str = "-n %s" % env_name
                 else:
                     env_str = ""
-                # Ensure we have conda-forge conda installed, otherwise creates resolution
-                # and package issues with removed libedit. Hopefully can remove along with libedit
-                # hack above when conda-forge synchronizes with the base install.
-                env.safe_run("{conda_bin} install -y {env_str} {channels} conda".format(**locals()))
                 pkgs_str = " ".join(env_packages)
                 env.safe_run("{conda_bin} install -y {env_str} {channels} {pkgs_str}".format(**locals()))
                 conda_pkg_list = json.loads(env.safe_run_output(
