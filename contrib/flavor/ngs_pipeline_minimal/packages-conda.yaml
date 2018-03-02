@@ -131,7 +131,7 @@ bio_nextgen:
   - singlecell-barcodes
   - spades
   - snap-aligner=1.0dev.97
-  - snpeff=4.3i
+  - snpeff=4.3.1t
   - star
   - strelka
   - stringtie

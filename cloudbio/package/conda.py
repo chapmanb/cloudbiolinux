@@ -45,6 +45,10 @@ def install_packages(env, to_install=None, packages=None):
                     env_str = "-n %s" % env_name
                 else:
                     env_str = ""
+                # Ensure we have conda-forge conda installed, otherwise creates resolution
+                # and package issues with removed libedit. Hopefully can remove along with libedit
+                # hack above when conda-forge synchronizes with the base install.
+                env.safe_run("{conda_bin} install -y {env_str} {channels} conda".format(**locals()))
                 pkgs_str = " ".join(env_packages)
                 env.safe_run("{conda_bin} install -y {env_str} {channels} {pkgs_str}".format(**locals()))
                 conda_pkg_list = json.loads(env.safe_run_output(
