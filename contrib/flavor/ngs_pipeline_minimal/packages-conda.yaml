@@ -131,7 +131,8 @@ bio_nextgen:
   - singlecell-barcodes
   - spades
   - snap-aligner=1.0dev.97
-  - snpeff=4.3.1t
+  # XXX move to snpeff=4.3.1t on next release with fix for sub version naming
+  - snpeff=4.3i
   - star
   - strelka
   - stringtie
