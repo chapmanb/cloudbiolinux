@@ -277,9 +277,9 @@ def _determine_distribution(env):
         return "centos"
     elif output.find("centos linux release") >= 0:
         return "centos"
-    elif output.find("red hat enterprise linux server release") >= 0:
+    elif output.find("red hat enterprise linux") >= 0:
         return "centos"
-    elif output.find("fedora release") >= 0:
+    elif output.find("fedora") >= 0:
         return "centos"
     # Amazon AMIs are Red-Hat based
     elif output.find("amzn") >= 0 or output.find("amazon") >= 0:
