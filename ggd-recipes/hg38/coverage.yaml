@@ -11,7 +11,7 @@
 ---
 attributes:
   name: coverage
-  version: 2015-11-17
+  version: 2018-03-17
 recipe:
   full:
     recipe_type: bash
@@ -25,7 +25,11 @@ recipe:
         out=$repeats/LCR.bed.gz
         wget --no-check-certificate -O $out -c $url
         tabix -f -p bed $out
+        wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz
+        wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz.tbi
     recipe_outfiles:
       - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
       - coverage/problem_regions/repeats/LCR.bed.gz
       - coverage/problem_regions/repeats/LCR.bed.gz.tbi
+      - coverage/problem_regions/repeats/polyx.bed.gz
+      - coverage/problem_regions/repeats/polyx.bed.gz.tbi

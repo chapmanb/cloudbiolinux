@@ -5,7 +5,7 @@
 ---
 attributes:
   name: GA4GH_problem_regions
-  version: 20160916
+  version: 20180317
 recipe:
   full:
     recipe_type: bash
@@ -33,6 +33,8 @@ recipe:
         wget --no-check-certificate -O - https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv | grep ^chr > $repeats/sv_repeat_telomere_centromere.bed
         wget --no-check-certificate -O - https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz | gunzip -c | grep -v ^GL | grep -v ^NC | grep -v ^hs | sed 's/^/chr/' | bgzip -c > $repeats/LCR.bed.gz
         tabix -p bed -f $repeats/LCR.bed.gz
+        wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz
+        wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz.tbi
     recipe_outfiles:
       - coverage/problem_regions/GA4GH/README.md
       - coverage/problem_regions/GA4GH/bad_promoter.bed.gz
@@ -68,3 +70,5 @@ recipe:
       - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
       - coverage/problem_regions/repeats/LCR.bed.gz
       - coverage/problem_regions/repeats/LCR.bed.gz.tbi
+      - coverage/problem_regions/repeats/polyx.bed.gz
+      - coverage/problem_regions/repeats/polyx.bed.gz.tbi
