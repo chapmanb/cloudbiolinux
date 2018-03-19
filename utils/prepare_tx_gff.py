@@ -2,16 +2,16 @@
 """Prepare GFF transcript files for use as input to RNA-seq pipelines
 
 Usage, from within the main genome directory of your organism:
-  prepare_tx_gff.py <org_build>
+  prepare_tx_gff.py <organism> <org_build>
 
-requires these python packages which may not be installed
----------------------------------------------------------
+requires these python and external packages which come pre-installed
+with bcbio using bioconda:
+
 mysql-python
 gffutils
 requests
-
-requires a picard installation with a `picard` shell script, installed
-by homebrew-science and bcbio
+picard
+kallisto
 """
 import csv
 import os
@@ -38,7 +38,7 @@ from bcbio.rnaseq.gtf import gtf_to_fasta
 from bcbio.distributed.transaction import file_transaction
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "79"
+ensembl_release = "91"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 supported_oldbuilds = {"GRCh37": "75", "hg19": "75"}
 build_subsets = {"hg38-noalt": "hg38"}
@@ -252,13 +252,14 @@ def write_version(build=None, gtf_file=None):
 
 # ## Main driver functions
 
-def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
+def main(org_build, gtf_file, genome_fasta, genome_dir, cores, args):
     genome_dir = genome_dir if genome_dir else os.curdir
     build_dir = os.path.abspath(os.path.join(genome_dir, org_build))
     work_dir = os.path.join(build_dir, "tmpcbl")
     safe_makedir(work_dir)
+    ens_version = supported_oldbuilds.get(org_build, ensembl_release)
     out_dir = os.path.join(build_dir,
-                           "rnaseq-%s" % datetime.datetime.now().strftime("%Y-%m-%d"))
+                           "rnaseq-%s_%s" % (datetime.datetime.now().strftime("%Y-%m-%d"), ens_version))
     tophat_dir = os.path.join(out_dir, "tophat")
     gtf_file = os.path.abspath(gtf_file) if gtf_file else gtf_file
 
@@ -273,7 +274,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
         if not genome_fasta:
             genome_fasta = get_genome_fasta(org_build)
         if not gtf_file:
-            write_version(build=build_info)
+            write_version(build=build_info[org_build])
             build = build_info[org_build]
             gtf_file = prepare_tx_gff(build, org_build)
         else:
@@ -294,9 +295,11 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
         rrna_gtf = prepare_rrna_gtf(gtf_file)
         if file_exists(rrna_gtf):
             gtf_to_interval(rrna_gtf, genome_fasta)
-        prepare_tophat_index(gtf_file, org_build, genome_fasta)
+        if args.tophat:
+            prepare_tophat_index(gtf_file, org_build, genome_fasta)
         transcriptome_fasta = make_transcriptome_fasta(gtf_file, genome_fasta)
-        prepare_kallisto_index(transcriptome_fasta, org_build)
+        if args.kallisto:
+            prepare_kallisto_index(transcriptome_fasta, org_build)
         make_hisat2_splicesites(gtf_file)
         cleanup(work_dir, out_dir, org_build)
         rnaseq_dir = os.path.join(build_dir, "rnaseq")
@@ -313,8 +316,8 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores):
 def make_hisat2_splicesites(gtf_file):
     base, _ = os.path.splitext(gtf_file)
     out_file = os.path.join(base + "-splicesites.txt")
-    hisat2_script = os.path.join(os.path.dirname(sys.executable),
-                                 "extract_splice_sites.py")
+    hisat2_script = os.path.join(os.path.dirname(os.path.realpath(sys.executable)),
+                                 "hisat2_extract_splice_sites.py")
     cmd = "{hisat2_script} {gtf_file} > {out_file}"
     if file_exists(out_file):
         return out_file
@@ -372,6 +375,8 @@ def cleanup(work_dir, out_dir, org_build):
         os.remove(os.path.join(work_dir, org_build + ".fa"))
     except:
         pass
+    if os.path.exists(os.path.join(work_dir, "bcbiotx")):
+        shutil.rmtree(os.path.join(work_dir, "bcbiotx"))
     shutil.move(work_dir, out_dir)
 
 def create_tarball(tar_dirs, org_build):
@@ -513,8 +518,9 @@ def prepare_kallisto_index(transcriptome_fasta, org_build):
     kallisto_dir = os.path.join(base_dir, "kallisto")
     safe_makedir(kallisto_dir)
     kallisto_index = os.path.join(kallisto_dir, org_build)
-    cmd = ("kallisto index -i {kallisto_index} {transcriptome_fasta}")
-    subprocess.check_call(cmd.format(**locals()), shell=True)
+    if not os.path.exists(kallisto_index):
+        cmd = ("kallisto index -i {kallisto_index} {transcriptome_fasta}")
+        subprocess.check_call(cmd.format(**locals()), shell=True)
     return kallisto_index
 
 def prepare_sailfish_index(transcriptome_fasta, org_build):
@@ -771,7 +777,7 @@ def _get_gtf_db(gtf):
 def _dexseq_preparation_path():
     PREP_FILE = "python_scripts/dexseq_prepare_annotation.py"
     try:
-        cmd = "Rscript -e 'find.package(\"DEXSeq\")'"
+        cmd = "%s/Rscript -e 'find.package(\"DEXSeq\")'" % os.path.dirname(os.path.realpath(sys.executable))
         output = subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError:
         return None
@@ -811,6 +817,10 @@ if __name__ == "__main__":
                         help=("Optional location of the root genome directory. "
                               "For example --genome-dir=/foo will install the files "
                               "for a Hsapiens hg19 genome to /foo/Hsapiens/hg19."))
+    parser.add_argument("--tophat", help="Build TopHat indices",
+                        default=False, action="store_true")
+    parser.add_argument("--kallisto", help="Build Kallisto indices",
+                        default=False, action="store_true")
     parser.add_argument("organism", help="Short name of organism (for example Hsapiens)")
     parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
@@ -818,4 +828,4 @@ if __name__ == "__main__":
         genome_dir = os.path.join(args.genome_dir, args.organism)
     else:
         genome_dir = os.curdir
-    main(args.org_build, args.gtf, args.fasta, genome_dir, args.cores)
+    main(args.org_build, args.gtf, args.fasta, genome_dir, args.cores, args)
