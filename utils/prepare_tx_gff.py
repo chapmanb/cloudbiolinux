@@ -310,7 +310,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores, args):
                 shutil.rmtree(rnaseq_dir)
         os.symlink(out_dir, rnaseq_dir)
 
-    tar_dirs = [out_dir]
+    tar_dirs = [os.path.relpath(out_dir)]
     tarball = create_tarball(tar_dirs, org_build)
 
 def make_hisat2_splicesites(gtf_file):
