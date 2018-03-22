@@ -4,24 +4,28 @@
 ---
 attributes:
   name: transcripts
-  version: 2014-07-20
+  version: 2018-03-22_91
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/annotation/canFam3-rnaseq-2014-07-20.tar.xz
+        baseurl=https://s3.amazonaws.com/biodata/annotation/canFam3-rnaseq-2018-03-22_91.tar.xz
         wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq
     recipe_outfiles:
-      - rnaseq/tophat
-      - rnaseq/ref-transcripts.dexseq.gff
+      - rnaseq/ref-transcripts.bed
+      - rnaseq/ref-transcripts.dexseq.gff3
+      - rnaseq/ref-transcripts.fa
       - rnaseq/ref-transcripts.genePred
       - rnaseq/ref-transcripts.gtf
       - rnaseq/ref-transcripts.gtf.db
       - rnaseq/ref-transcripts-mask.gtf
       - rnaseq/ref-transcripts.refFlat
+      - rnaseq/ref-transcripts-splicesites.txt
       - rnaseq/rRNA.gtf
       - rnaseq/rRNA.gtf.db
       - rnaseq/rRNA.interval_list
+      - rnaseq/tx2gene.csv
+      - rnaseq/version.txt

@@ -4,23 +4,28 @@
 ---
 attributes:
   name: transcripts
-  version: 2016-09-22 # Ensembl release 85
+  version: 2018-03-22_91
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/annotation/rn6-rnaseq-2016-09-22.tar.xz
+        baseurl=https://s3.amazonaws.com/biodata/annotation/rn6-rnaseq-2018-03-22_91.tar.xz
         wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq
     recipe_outfiles:
-      - rnaseq/tophat
+      - rnaseq/ref-transcripts.bed
+      - rnaseq/ref-transcripts.dexseq.gff3
+      - rnaseq/ref-transcripts.fa
       - rnaseq/ref-transcripts.genePred
       - rnaseq/ref-transcripts.gtf
       - rnaseq/ref-transcripts.gtf.db
       - rnaseq/ref-transcripts-mask.gtf
       - rnaseq/ref-transcripts.refFlat
+      - rnaseq/ref-transcripts-splicesites.txt
       - rnaseq/rRNA.gtf
       - rnaseq/rRNA.gtf.db
       - rnaseq/rRNA.interval_list
+      - rnaseq/tx2gene.csv
+      - rnaseq/version.txt
