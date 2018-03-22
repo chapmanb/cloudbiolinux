@@ -1,0 +1,15 @@
+# UCSC twobit reference
+---
+attributes:
+  name: twobit
+  version: canFam3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        cd ucsc
+        faToTwoBit ../../seq/canFam3.fa canFam3.2bit
+    recipe_outfiles:
+      - ucsc/canFam3.2bit

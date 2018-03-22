@@ -1,0 +1,15 @@
+# UCSC twobit reference
+---
+attributes:
+  name: twobit
+  version: mm10
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        cd ucsc
+        faToTwoBit ../../seq/mm10.fa mm10.2bit
+    recipe_outfiles:
+      - ucsc/mm10.2bit

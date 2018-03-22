@@ -54,14 +54,17 @@ genomes:
     name: Mouse (mm9)
   - dbkey: mm10
     name: Mouse (mm10)
+    indexes: [twobit]
     annotations: [problem_regions, dbsnp, transcripts, mirbase]
   - dbkey: rn5
     name: Rat (rn5)
   - dbkey: rn6
     name: Rat (rn6)
+    indexes: [seq, twobit]
     annotations: [transcripts, mirbase]
   - dbkey: canFam3
     name: Dog (canFam3)
+    indexes: [twobit]
     annotations: [dbsnp, transcripts]
   - dbkey: galGal4
     name: Chicken (galGal4)

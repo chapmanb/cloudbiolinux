@@ -92,8 +92,8 @@ def ucsc_ensembl_map_via_download(org_build):
 def ensembl_to_ucsc(ensembl_dict, ucsc_dict, org_build):
     name_map = {}
     for md5, name in ensembl_dict.items():
-        if ucsc_dict.get("md5"):
-            name_map[name] = ucsc_dict["md5"]
+        if ucsc_dict.get(md5):
+            name_map[name] = ucsc_dict[md5]
     map_file = "%s-map.csv" % (org_build)
     with open(map_file, "w") as out_handle:
         writer = csv.writer(out_handle)
@@ -151,6 +151,9 @@ build_info = {
     "rn5": Build("rattus_norvegicus", None,
                  ucsc_ensembl_map_via_download,
                  "Rattus_norvegicus.Rnor_5.0." + ensembl_release),
+    "rn6": Build("rattus_norvegicus", None,
+                 ucsc_ensembl_map_via_download,
+                 "Rattus_norvegicus.Rnor_6.0." + ensembl_release),
     "hg38": Build("homo_sapiens", "hsapiens_gene_ensembl",
                   manual_ucsc_ensembl_map,
                   "Homo_sapiens.GRCh38." + ensembl_release),
@@ -162,6 +165,7 @@ build_info = {
                      "Canis_familiaris.CanFam3.1." + ensembl_release),
     "sacCer3": Build("saccharomyces_cerevisiae", None,
                      ucsc_ensembl_map_via_download,
+
                      "Saccharomyces_cerevisiae.R64-1-1." + ensembl_release),
     "WBcel235": Build("caenorhabditis_elegans", None,
                       ucsc_ensembl_map_via_download,
@@ -225,7 +229,7 @@ def get_ucsc_dict(org_build):
 def make_fasta_dict(fasta_file):
     dict_file = os.path.splitext(fasta_file.replace(".fa.gz", ".fa"))[0] + ".dict"
     if not os.path.exists(dict_file):
-        subprocess.check_call("picard CreateSequenceDictionary R={fasta_file} "
+        subprocess.check_call("picard -Xms1g -Xmx3g CreateSequenceDictionary R={fasta_file} "
                               "O={dict_file}".format(**locals()), shell=True)
     return dict_file
 
@@ -370,11 +374,12 @@ def get_fasta_names(genome_fasta):
     return seqs
 
 def cleanup(work_dir, out_dir, org_build):
-    try:
-        os.remove(os.path.join(work_dir, org_build + ".dict"))
-        os.remove(os.path.join(work_dir, org_build + ".fa"))
-    except:
-        pass
+    for fname in [os.path.join(work_dir, org_build + ".dict"),
+                  os.path.join(work_dir, org_build + ".fa"),
+                  os.path.join(work_dir, org_build + ".fa.gz"),
+                  os.path.join(work_dir, org_build + "-map.csv")]:
+        if os.path.exists(fname):
+            os.remove(fname)
     if os.path.exists(os.path.join(work_dir, "bcbiotx")):
         shutil.rmtree(os.path.join(work_dir, "bcbiotx"))
     shutil.move(work_dir, out_dir)
