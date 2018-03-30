@@ -15,13 +15,11 @@ from cloudbio.galaxy.tools import _install_tools
 from fabfile import _perform_install, _install_custom
 
 from .util import eval_template
-from .volume import attach_volumes, make_snapshots, detach_volumes
 
 import cloudbio.deploy.plugins
 
 from fabric.main import load_settings
 from fabric.api import put, run, env, settings, sudo
-
 
 try:
     from .vmlauncher.transfer import FileTransferManager
@@ -93,6 +91,7 @@ class LocalVmLauncher:
 
 
 def _setup_vm(options, vm_launcher, actions):
+    from .volume import attach_volumes, make_snapshots, detach_volumes
     destroy_on_complete = get_boolean_option(options, 'destroy_on_complete', False)
     try:
         ip = vm_launcher.get_ip()
