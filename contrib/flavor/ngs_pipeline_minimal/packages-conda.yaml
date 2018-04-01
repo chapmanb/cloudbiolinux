@@ -129,14 +129,17 @@ bio_nextgen:
   - sickle-trim
   - simple_sv_annotation
   - singlecell-barcodes
-  - spades
+  - smoove
   - snap-aligner=1.0dev.97
   # XXX move to snpeff=4.3.1t on next release with fix for sub version naming
   - snpeff=4.3i
+  - solvebio
+  - spades
   - star
   - strelka
   - stringtie
   - subread
+  - survivor
   - svtyper
   - theta2
   - tophat
