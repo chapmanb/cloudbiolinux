@@ -91,7 +91,6 @@ class LocalVmLauncher:
 
 
 def _setup_vm(options, vm_launcher, actions):
-    from .volume import attach_volumes, make_snapshots, detach_volumes
     destroy_on_complete = get_boolean_option(options, 'destroy_on_complete', False)
     try:
         ip = vm_launcher.get_ip()
@@ -99,6 +98,7 @@ def _setup_vm(options, vm_launcher, actions):
         with settings(host_string=ip):
             _setup_cloudbiolinux(options)
             if 'attach_volumes' in actions:
+                from .volume import attach_volumes
                 attach_volumes(vm_launcher, options)
             if 'max_lifetime' in options:
                 seconds = options['max_lifetime']
@@ -118,8 +118,10 @@ def _setup_vm(options, vm_launcher, actions):
             if 'attach_ip' in actions:
                 vm_launcher.attach_public_ip()
             if 'snapshot_volumes' in actions:
+                from .volume import make_snapshots
                 make_snapshots(vm_launcher, options)
             if 'detach_volumes' in actions:
+                from .volume import detach_volumes
                 detach_volumes(vm_launcher, options)
             if 'package' in actions:
                 name_template = vm_launcher.package_image_name()
