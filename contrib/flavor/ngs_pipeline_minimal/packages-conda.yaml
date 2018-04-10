@@ -131,8 +131,7 @@ bio_nextgen:
   - singlecell-barcodes
   - smoove
   - snap-aligner=1.0dev.97
-  # XXX move to snpeff=4.3.1t on next release with fix for sub version naming
-  - snpeff=4.3i
+  - snpeff=4.3.1t
   - solvebio
   - spades
   - star
