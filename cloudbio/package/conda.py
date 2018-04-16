@@ -32,7 +32,7 @@ def install_packages(env, to_install=None, packages=None):
         # Ensure we have conda-forge conda installed, otherwise creates resolution
         # and package issues with removed libedit. Hopefully can remove along with libedit
         # hack when conda-forge synchronizes ncurses and conda with the base install.
-        env.safe_run("{conda_bin} install -y {channels} conda".format(**locals()))
+        env.safe_run("{conda_bin} install -y {channels} conda python=2".format(**locals()))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
         # r-tximport is now bioconductor-tximport
