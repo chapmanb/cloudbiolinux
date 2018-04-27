@@ -56,7 +56,7 @@ genomes:
   - dbkey: mm10
     name: Mouse (mm10)
     indexes: [twobit]
-    annotations: [problem_regions, dbsnp, transcripts, mirbase, rmsk]
+    annotations: [problem_regions, dbsnp, transcripts, mirbase, rmsk, vcfanno]
   - dbkey: rn5
     name: Rat (rn5)
   - dbkey: rn6

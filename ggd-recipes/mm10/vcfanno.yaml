@@ -1,0 +1,17 @@
+# Annotation files for vcfanno variant annotation
+---
+attributes:
+  name: vcfanno
+  version: 20180427
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        githash=c523b1a8e6a7c5ced53644894815c856de506f14
+        mkdir -p config/vcfanno
+        cd config/vcfanno
+        bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$githash/config/vcfanno/
+        wget --no-check-certificate -O gemini.conf -c $bcbio_baseurl/mm10-gemini.conf
+    recipe_outfiles:
+      - config/vcfanno/gemini.conf
