@@ -147,12 +147,13 @@ def _create_environments(env, conda_bin, packages):
     conda_envs = _get_conda_envs(env, conda_bin)
     if "python3" in env_names:
         if not any(x.endswith("/python3") for x in conda_envs):
-            env.safe_run("{conda_bin} create -y --name python3 python=3".format(**locals()))
+            env.safe_run("{conda_bin} create --no-default-packages -y --name python3 python=3".format(**locals()))
             conda_envs = _get_conda_envs(env, conda_bin)
         out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
-    if "samtools0" in env_names:
-        if not any(x.endswith("/samtools0") for x in conda_envs):
-            env.safe_run("{conda_bin} create -y --name samtools0 python=2".format(**locals()))
-            conda_envs = _get_conda_envs(env, conda_bin)
-        out["samtools0"] = [x for x in conda_envs if x.endswith("/samtools0")][0]
+    for addenv in ["samtools0"]:
+        if addenv in env_names:
+            if not any(x.endswith("/%s" % addenv) for x in conda_envs):
+                env.safe_run("{conda_bin} create --no-default-packages -y --name {addenv} python=2".format(**locals()))
+                conda_envs = _get_conda_envs(env, conda_bin)
+            out[addenv] = [x for x in conda_envs if x.endswith("/%s" % addenv)][0]
     return out
