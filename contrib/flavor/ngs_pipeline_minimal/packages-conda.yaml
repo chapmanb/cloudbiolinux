@@ -55,8 +55,9 @@ bio_nextgen:
   - fastqc
   - fgbio
   - freebayes=1.1.0.46
-  - gatk
-  - gatk4
+  # XXX Unpin in next release with support for GATK script naming changes
+  - gatk=3.8=py27_2
+  - gatk4=4.0.3.0
   - geneimpacts
   - gemini
   - genesplicer
