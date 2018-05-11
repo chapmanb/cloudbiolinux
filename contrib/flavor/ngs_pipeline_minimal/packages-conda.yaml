@@ -88,6 +88,7 @@ bio_nextgen:
   - minimap2
   - mintmap
   - mirdeep2=2.0.0.7
+  - mirge
   - mirtop
   - moreutils
   - mosdepth
