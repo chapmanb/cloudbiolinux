@@ -23,7 +23,6 @@ bio_nextgen:
   - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
-  - bcbreport
   - bcftools
   - bedtools=2.27.1
   - biobambam
