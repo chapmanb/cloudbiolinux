@@ -310,7 +310,7 @@ GENOMES_SUPPORTED = [
                                                "AgamP3", ["CHROMOSOMES"])),]
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "minimap2", "novoalign",
                             "novoalign-cs", "ucsc", "mosaik", "snap", "star",
-                            "rtg", "hisat2"]
+                            "rtg", "hisat2", "bbmap"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -640,8 +640,8 @@ def _index_bowtie2(ref_file):
 def _index_bwa(ref_file):
     dir_name = "bwa"
     local_ref = os.path.split(ref_file)[-1]
-    if not env.safe_exists(dir_name):
-        env.safe_run("mkdir %s" % dir_name)
+    if not env.safe_exists(os.path.join(dir_name, "%s.bwt" % local_ref)):
+        env.safe_run("mkdir -p %s" % dir_name)
         with cd(dir_name):
             env.safe_run("ln -sf %s" % os.path.join(os.pardir, ref_file))
             with settings(warn_only=True):
@@ -651,6 +651,17 @@ def _index_bwa(ref_file):
                 env.safe_run("bwa index %s" % local_ref)
             env.safe_run("rm -f %s" % local_ref)
     return os.path.join(dir_name, local_ref)
+
+def _index_bbmap(ref_file):
+    dir_name = "bbmap"
+    try:
+        cores = env.cores
+    except:
+        cores = 1
+    if not env.safe_exists(os.path.join(dir_name, "ref", "genome", "1", "summary.txt")):
+        env.safe_run("mkdir -p %s" % dir_name)
+        env.safe_run("bbmap.sh -Xms%sg -Xmx%sg path=%s ref=%s" % (cores, 3 * int(cores), dir_name, ref_file))
+    return dir_name
 
 def _index_maq(ref_file):
     dir_name = "maq"
@@ -831,9 +842,12 @@ def _install_with_ggd(env, manager, gid, recipe):
 def _download_s3_index(env, manager, gid, idx):
     env.logger.info("Downloading genome from s3: {0} {1}".format(gid, idx))
     url = "https://s3.amazonaws.com/biodata/genomes/%s-%s.tar.xz" % (gid, idx)
-    out_file = shared._remote_fetch(env, url)
-    env.safe_run("xz -dc %s | tar -xvpf -" % out_file)
-    env.safe_run("rm -f %s" % out_file)
+    if gid in ["GRCh37", "hg19", "mm10"] and idx in ["bowtie2", "bwa", "novoalign"]:
+        out_file = shared._remote_fetch(env, url)
+        env.safe_run("xz -dc %s | tar -xvpf -" % out_file)
+        env.safe_run("rm -f %s" % out_file)
+    else:
+        raise NotImplementedError("No pre-computed indices for %s %s" % (gid, idx))
 
 def _download_genomes(genomes, genome_indexes):
     """Download a group of genomes from Amazon s3 bucket.
@@ -988,6 +1002,7 @@ def get_index_fn(index):
 
 INDEX_FNS = {
     "seq": _index_sam,
+    "bbmap": _index_bbmap,
     "bwa": _index_bwa,
     "bowtie": _index_bowtie,
     "bowtie2": _index_bowtie2,
