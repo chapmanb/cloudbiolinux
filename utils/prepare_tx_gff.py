@@ -38,7 +38,7 @@ from bcbio.rnaseq.gtf import gtf_to_fasta
 from bcbio.distributed.transaction import file_transaction
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "91"
+ensembl_release = "92"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 supported_oldbuilds = {"GRCh37": "75", "hg19": "75"}
 build_subsets = {"hg38-noalt": "hg38"}
@@ -176,9 +176,13 @@ build_info = {
     "Zv9": Build("danio_rerio", None,
                  ucsc_ensembl_map_via_download,
                  "Danio_rerio.Zv9." + ensembl_release),
+    "GRCz11": Build("danio_rerio", None, None,
+                    "Danio_rerio.GRCz11." + ensembl_release),
     "xenTro3": Build("xenopus_tropicalis", None,
                      ucsc_ensembl_map_via_download,
                      "Xenopus_tropicalis.JGI_4.2." + ensembl_release),
+    "Sscrofa11.1": Build("sus_scrofa", None, None,
+                         "Sus_scrofa.Sscrofa11.1." + ensembl_release),
 }
 
 

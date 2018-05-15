@@ -1,0 +1,14 @@
+---
+attributes:
+  name: twobit
+  version: 92
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        cd ucsc
+        faToTwoBit ../../seq/Sscrofa11.1.fa Sscrofa11.1.2bit
+    recipe_outfiles:
+      - ucsc/Sscrofa11.1.2bit

@@ -1,0 +1,14 @@
+---
+attributes:
+  name: twobit
+  version: 92
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p ucsc
+        cd ucsc
+        faToTwoBit -long ../../seq/GRCz11.fa GRCz11.2bit
+    recipe_outfiles:
+      - ucsc/GRCz11.2bit

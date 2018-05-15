@@ -1,0 +1,19 @@
+---
+attributes:
+  name: seq
+  version: 92
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        BUILD=Sscrofa11.1
+        url=ftp://ftp.ensembl.org/pub/release-92/fasta/sus_scrofa/dna/Sus_scrofa.Sscrofa11.1.dna_rm.toplevel.fa.gz
+        mkdir -p seq
+        wget --no-check-certificate -O - $url | gunzip -c > seq/$BUILD.fa
+        samtools faidx seq/$BUILD.fa
+        picard -Xms1g -Xmx3g CreateSequenceDictionary REFERENCE=seq/$BUILD.fa OUTPUT=seq/$BUILD.dict SPECIES=$BUILD
+    recipe_outfiles:
+      - seq/Sscrofa11.1.fa
+      - seq/Sscrofa11.1.fa.fai
+      - seq/Sscrofa11.1.dict

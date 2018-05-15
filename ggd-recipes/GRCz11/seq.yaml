@@ -1,0 +1,19 @@
+---
+attributes:
+  name: seq
+  version: 92
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        BUILD=GRCz11
+        url=ftp://ftp.ensembl.org/pub/release-92/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.toplevel.fa.gz
+        mkdir -p seq
+        wget --no-check-certificate -O - $url | gunzip -c > seq/$BUILD.fa
+        samtools faidx seq/$BUILD.fa
+        picard -Xms1g -Xmx3g CreateSequenceDictionary REFERENCE=seq/$BUILD.fa OUTPUT=seq/$BUILD.dict SPECIES=$BUILD
+    recipe_outfiles:
+      - seq/GRCz11.fa
+      - seq/GRCz11.fa.fai
+      - seq/GRCz11.dict

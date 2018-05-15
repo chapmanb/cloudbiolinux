@@ -69,6 +69,10 @@ genomes:
     annotations: [dbsnp, transcripts]
   - dbkey: galGal4
     name: Chicken (galGal4)
+  - dbkey: Sscrofa11.1
+    name: Pig (Sscrofa11.1)
+    indexes: [seq, twobit]
+    annotations: [transcripts]
   - dbkey: dm3
     name: D melangogaster (dm3)
   - dbkey: TAIR10
@@ -76,6 +80,10 @@ genomes:
     annotations: [mirbase]
   - dbkey: xenTro3
     name: X tropicalis (xenTro3)
+  - dbkey: GRCz11
+    name: Zebrafish (GRCz11)
+    indexes: [seq, twobit]
+    annotations: [transcripts]
   - dbkey: GRCz10
     name: Zebrafish (GRCz10)
   - dbkey: Zv9
