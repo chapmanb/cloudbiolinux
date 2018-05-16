@@ -19,6 +19,7 @@ bio_nextgen:
   - atropos;env=python3
   - bamtools=2.4.0
   - bamutil
+  - bbmap
   - bcbio-prioritize
   - bcbio-rnaseq
   - bcbio-variation
