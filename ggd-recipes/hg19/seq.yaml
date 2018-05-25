@@ -1,5 +1,5 @@
 # hg19 reference genome from Broad bundle
-# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19
+# http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19
 # Include bgzipped fasta file for Ensembl and other tools that support it
 ---
 attributes:

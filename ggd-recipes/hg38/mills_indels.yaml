@@ -3,7 +3,7 @@
 # http://genome.cshlp.org/content/21/6/830.full
 #
 # From the Broad hg38 bundle:
-# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/
+# http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/
 # https://www.broadinstitute.org/gatk/guide/article.php?id=1213
 ---
 attributes:
@@ -14,7 +14,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg38/
+        url=http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg38/
         base=Mills_and_1000G_gold_standard.indels.hg38
         new=Mills_and_1000G_gold_standard.indels
         mkdir -p variation

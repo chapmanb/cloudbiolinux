@@ -7,7 +7,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19/1000G_omni2.5.hg19.sites.vcf.gz
+        baseurl=http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19/1000G_omni2.5.hg19.sites.vcf.gz
         mkdir -p variation
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > 1000G_omni2.5.vcf.gz

@@ -1,7 +1,7 @@
 # 1000 genomes phase 1 SNP calls
 #
 # From the Broad hg38 bundle:
-# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/
+# http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/
 # https://www.broadinstitute.org/gatk/guide/article.php?id=1213
 ---
 attributes:
@@ -12,7 +12,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg38/
+        url=http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg38/
         new=1000G_phase1.snps.high_confidence
         base=$new.hg38
         mkdir -p variation

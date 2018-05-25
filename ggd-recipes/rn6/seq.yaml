@@ -1,6 +1,6 @@
 # Full hg38/GRCh38 reference genome distributed by 1000 genomes
 # Derived from NCBI set with HLA and decoy alternative alleles
-# ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
+# http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
 ---
 attributes:
   name: seq
@@ -10,7 +10,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://ftp.ensembl.org/pub/release-85/fasta/rattus_norvegicus/dna/Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa.gz
+        url=http://ftp.ensembl.org/pub/release-85/fasta/rattus_norvegicus/dna/Rattus_norvegicus.Rnor_6.0.dna.toplevel.fa.gz
         mkdir -p seq
         wget --no-check-certificate -O - $url | gunzip -c > seq/rn6.fa
     recipe_outfiles:

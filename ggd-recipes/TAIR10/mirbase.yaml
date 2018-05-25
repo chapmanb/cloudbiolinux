@@ -11,13 +11,13 @@ recipe:
         mkdir -p srnaseq
         cd srnaseq
 
-        wget -N -c -O tmp.gtf.gz ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_genomic.gff.gz
+        wget -N -c -O tmp.gtf.gz http://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_genomic.gff.gz
         zgrep -v exon tmp.gtf.gz | grep -v region | sed 's/Name/name/g' | sed 's/=/ /g' > srna-transcripts.gtf
-        wget -N -c -O hairpin.t.fa.gz ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz && gunzip -f hairpin.t.fa.gz
+        wget -N -c -O hairpin.t.fa.gz http://mirbase.org/pub/mirbase/21/hairpin.fa.gz && gunzip -f hairpin.t.fa.gz
         cat hairpin.t.fa | awk '{if ($0~/>ath/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
-        wget -N -c -O mature.t.fa.gz ftp://mirbase.org/pub/mirbase/21/mature.fa.gz && gunzip -f mature.t.fa.gz
+        wget -N -c -O mature.t.fa.gz http://mirbase.org/pub/mirbase/21/mature.fa.gz && gunzip -f mature.t.fa.gz
         cat mature.t.fa | awk '{if ($0~/>ath/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
-        wget -N -c -O miRNA.t.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz && gunzip -f miRNA.t.str.gz
+        wget -N -c -O miRNA.t.str.gz http://mirbase.org/pub/mirbase/21/miRNA.str.gz && gunzip -f miRNA.t.str.gz
         cat miRNA.t.str | awk '{if ($0~/ath/)print $0}' > miRNA.str
         wget --no-check-certificate -N -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip -f Rfam_for_miRDeep.fa.gz
     recipe_outfiles:

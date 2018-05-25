@@ -11,7 +11,7 @@ recipe:
         version=150
         org=human_9606_b${version}_GRCh37p13
         release=20170710
-        url=ftp://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/GATK/All_${release}.vcf.gz
+        url=http://ftp.ncbi.nih.gov/snp/organisms/$org/VCF/GATK/All_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
         [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > variation/dbsnp-$version.vcf.gz
