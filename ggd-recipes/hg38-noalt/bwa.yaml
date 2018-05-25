@@ -10,7 +10,7 @@ recipe:
       - |
         base=GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
         new=hg38-noalt.fa
-        ncbiurl=ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/all_assembly_versions/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
+        ncbiurl=http://ftp.ncbi.nlm.nih.gov/genomes/genbank/vertebrate_mammalian/Homo_sapiens/all_assembly_versions/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids
         wget -c $ncbiurl/$base.bwa_index.tar.gz
         [[ -f $base.fna.bwt ]] || tar -xzvpf $base.bwa_index.tar.gz
         mkdir -p bwa

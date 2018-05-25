@@ -1,5 +1,5 @@
 # Truth set for NA12878/NA24385 somatic mixture
-# ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
+# http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
 ---
 attributes:
   name: giab-NA12878-NA24385-somatic
@@ -10,7 +10,7 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA12878-NA24385-somatic
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
+        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
         calls=na12878-na24385-somatic-truth.vcf.gz
         regions=na12878-na24385-somatic-truth-regions.bed
         mkdir -p $dir

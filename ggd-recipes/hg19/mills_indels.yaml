@@ -7,7 +7,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz
+        baseurl=http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz
         mkdir -p variation
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > Mills_and_1000G_gold_standard.indels.vcf.gz

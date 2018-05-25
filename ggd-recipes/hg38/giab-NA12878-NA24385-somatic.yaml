@@ -1,5 +1,5 @@
 # Truth set for NA12878/NA24385 somatic mixture
-# ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
+# http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
 ---
 attributes:
   name: giab-NA12878-NA24385-somatic

@@ -1,5 +1,5 @@
 # GRCh37 reference genome from Broad bundle
-# ftp://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/b37
+# http://gsapubftp-anonymous:none@ftp.broadinstitute.org/bundle/b37
 # Include bgzipped fasta file for Ensembl and other tools that support it
 ---
 attributes:
