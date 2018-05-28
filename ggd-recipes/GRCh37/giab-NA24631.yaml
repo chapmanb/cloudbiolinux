@@ -9,13 +9,13 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA24631
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/ChineseTrio/HG005_NA24631_son/NISTv3.3.2/GRCh37/
+        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/ChineseTrio/HG005_NA24631_son/NISTv3.3.2/GRCh37/
         calls=HG005_GRCh37_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v.3.3.2_highconf.vcf.gz
         regions=HG005_GRCh37_highconf_CG-IllFB-IllGATKHC-Ion-SOLID_CHROM1-22_v.3.3.2_highconf_noMetaSV.bed
         mkdir -p $dir
         wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
-        wget -c -O $dir/truth_regions.bed $url/$regions 
+        wget -c -O $dir/truth_regions.bed $url/$regions
     recipe_outfiles:
       - validation/giab-NA24631/truth_small_variants.vcf.gz
       - validation/giab-NA24631/truth_small_variants.vcf.gz.tbi

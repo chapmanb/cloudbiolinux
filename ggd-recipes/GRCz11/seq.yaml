@@ -8,7 +8,7 @@ recipe:
     recipe_cmds:
       - |
         BUILD=GRCz11
-        url=ftp://ftp.ensembl.org/pub/release-92/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.toplevel.fa.gz
+        url=http://ftp.ensembl.org/pub/release-92/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.toplevel.fa.gz
         mkdir -p seq
         wget --no-check-certificate -O - $url | gunzip -c > seq/$BUILD.fa
         samtools faidx seq/$BUILD.fa

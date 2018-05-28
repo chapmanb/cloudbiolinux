@@ -8,7 +8,7 @@ recipe:
     recipe_cmds:
       - |
         BUILD=Sscrofa11.1
-        url=ftp://ftp.ensembl.org/pub/release-92/fasta/sus_scrofa/dna/Sus_scrofa.Sscrofa11.1.dna_rm.toplevel.fa.gz
+        url=http://ftp.ensembl.org/pub/release-92/fasta/sus_scrofa/dna/Sus_scrofa.Sscrofa11.1.dna_rm.toplevel.fa.gz
         mkdir -p seq
         wget --no-check-certificate -O - $url | gunzip -c > seq/$BUILD.fa
         samtools faidx seq/$BUILD.fa

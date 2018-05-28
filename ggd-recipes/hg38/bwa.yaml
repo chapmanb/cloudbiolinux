@@ -1,6 +1,6 @@
 # Full hg38/GRCh38 reference genome distributed by 1000 genomes
 # Derived from NCBI set with HLA and decoy alternative alleles
-# ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
+# http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
 # Pre-build bwa indices
 ---
 attributes:
@@ -11,7 +11,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome
+        url=http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome
         base=GRCh38_full_analysis_set_plus_decoy_hla.fa
         new=hg38.fa
         mkdir -p bwa

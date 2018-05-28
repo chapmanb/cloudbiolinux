@@ -9,7 +9,7 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA24385
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
+        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
         calls=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
         regions=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_noinconsistent.bed
         remapurl=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
@@ -24,7 +24,7 @@ recipe:
         cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-hg19.bed.gz
         wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
         wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
-        svurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_12122017/svanalyzer_union_171212_v0.5.0_annotated.vcf.gz
+        svurl=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_12122017/svanalyzer_union_171212_v0.5.0_annotated.vcf.gz
         wget -c -O - $svurl | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_sv.vcf.gz
         tabix -f -p vcf $dir/truth_sv.vcf.gz
     recipe_outfiles:
