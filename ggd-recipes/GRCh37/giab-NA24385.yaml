@@ -11,20 +11,20 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA24385
-        url=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
+        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
         calls=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
         regions=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_noinconsistent.bed
         mkdir -p $dir
         wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
-        wget -c -O $dir/truth_regions.bed $url/$regions 
+        wget -c -O $dir/truth_regions.bed $url/$regions
         delurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-GIAB-2tech-dels-v0_1_8-GRCh37.bed.gz
         wget -c -O $dir/truth_DEL_giab.bed.gz $delurl
         wget -c -O $dir/truth_DEL_giab.bed.gz.tbi $delurl.tbi
         cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-GRCh37.bed.gz
         wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
         wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
-        svurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_12122017/svanalyzer_union_171212_v0.5.0_annotated.vcf.gz
+        svurl=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_12122017/svanalyzer_union_171212_v0.5.0_annotated.vcf.gz
         wget -c -O $dir/truth_sv.vcf.gz $svurl
         wget -c -O $dir/truth_sv.vcf.gz.tbi $svurl.tbi
     recipe_outfiles:

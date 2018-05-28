@@ -1,6 +1,6 @@
 # hisat2 (v2.0.1) reference with Ensembl release 78 exon and splicesite annotations
 # Derived from NCBI set with HLA and decoy alternative alleles
-# ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
+# http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/
 # README.md has an in depth description of how this was created
 ---
 attributes:

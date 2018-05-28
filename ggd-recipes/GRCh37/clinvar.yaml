@@ -11,7 +11,7 @@ recipe:
     recipe_cmds:
       - |
         release=20170905
-        baseurl=ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2017/clinvar_${release}.vcf.gz
+        baseurl=http://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2017/clinvar_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/clinvar-orig.vcf.gz $baseurl
         [[ -f variation/clinvar.vcf.gz ]] || zcat variation/clinvar-orig.vcf.gz | bgzip -c > variation/clinvar.vcf.gz
