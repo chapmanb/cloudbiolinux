@@ -169,6 +169,7 @@ bio_nextgen:
   - vcfanno
   - vcf2db
   - vcflib
+  - verifybamid2
   - viennarna
   - vt
 perl:
