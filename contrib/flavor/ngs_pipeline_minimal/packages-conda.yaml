@@ -191,6 +191,7 @@ perl:
   - perl-vcftools-vcf
 r:
   - r=3.4.1
+  - r-bcbiornaseq
   - r-cghflasso
   - r-chbutils
   - r-devtools
