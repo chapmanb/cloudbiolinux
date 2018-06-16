@@ -2,7 +2,7 @@
 ---
 attributes:
   name: giab-NA24385
-  version: v3_3_2-sv_v0.5.0
+  version: v3_3_2-sv_v0.6
 recipe:
   full:
     recipe_type: bash
@@ -24,9 +24,11 @@ recipe:
         cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-hg19.bed.gz
         wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
         wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
-        svurl=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_UnionSVs_12122017/svanalyzer_union_171212_v0.5.0_annotated.vcf.gz
+        svurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz
+        svbedurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.bed
         wget -c -O - $svurl | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_sv.vcf.gz
         tabix -f -p vcf $dir/truth_sv.vcf.gz
+        wget -c -O - $svbedurl | sed -f remap.sed > $dir/truth_sv_regions.bed
     recipe_outfiles:
       - validation/giab-NA24385/truth_small_variants.vcf.gz
       - validation/giab-NA24385/truth_small_variants.vcf.gz.tbi
