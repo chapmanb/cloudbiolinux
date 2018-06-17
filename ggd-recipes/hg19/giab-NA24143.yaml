@@ -1,0 +1,24 @@
+# Truth sets from Genome in a Bottle for NA24143 -- http://genomeinabottle.org/
+---
+attributes:
+  name: giab-NA24143
+  version: v3_3_2
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        dir=validation/giab-NA24143
+        url=https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG004_NA24143_mother/NISTv3.3.2/GRCh37/
+        calls=HG004_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X_CHROM1-22_v.3.3.2_highconf.vcf.gz 
+        regions=HG004_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X_CHROM1-22_v.3.3.2_highconf_noinconsistent.bed
+        remapurl=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
+        mkdir -p $dir
+        wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
+        tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        wget -c -O - $url/$regions | sed -f remap.sed > $dir/truth_regions.bed
+    recipe_outfiles:
+      - validation/giab-NA24143/truth_small_variants.vcf.gz
+      - validation/giab-NA24143/truth_small_variants.vcf.gz.tbi
+      - validation/giab-NA24143/truth_regions.bed
