@@ -191,6 +191,7 @@ perl:
   - perl-vcftools-vcf
 r:
   - r=3.4.1
+  - r-basejump>=0.5.8
   - r-bcbiornaseq
   - r-cghflasso
   - r-chbutils
@@ -200,6 +201,7 @@ r:
   - r-knitr
   - r-ggdendro
   - r-ggplot2
+  - r-ggrepel>=0.7
   - r-gplots
   - r-gsalib
   - r-pheatmap
@@ -211,6 +213,7 @@ r:
   - r-sleuth
   - r-snow
   - r-stringi
+  - r-viridis>=0.5
   - r-wasabi
   - bioconductor-annotate
   - bioconductor-biocgenerics
