@@ -192,7 +192,7 @@ perl:
 r:
   - r=3.4.1
   - r-basejump>=0.5.8
-  - r-bcbiornaseq
+  - r-bcbiornaseq=0.2.4a
   - r-cghflasso
   - r-chbutils
   - r-devtools
