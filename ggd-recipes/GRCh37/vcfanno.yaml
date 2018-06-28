@@ -3,22 +3,22 @@
 ---
 attributes:
   name: vcfanno
-  version: 20171008
+  version: 20180628
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         vcfanno_githash=10f067337d1a4651882aded670b283593f94700f
-        bcbio_githash=c523b1a8e6a7c5ced53644894815c856de506f14
+        bcbio_githash=3924a6340f70256fe1e08d67341c2cb1fa22a5f7
         mkdir -p config/vcfanno
         cd config/vcfanno
         gemini_baseurl=https://github.com/brentp/vcfanno/raw/$vcfanno_githash/example
         wget --no-check-certificate -O gemini.lua -c $gemini_baseurl/custom.lua
         wget --no-check-certificate -O gemini.conf -c $gemini_baseurl/gem.conf
         bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$bcbio_githash/config/vcfanno
-        wget --no-check-certificate -O rnaedit.conf -c $bcbio_baseurl/GRCh37-rnaedit.conf
-        wget --no-check-certificate -O rnaedit.lua -c $bcbio_baseurl/GRCh37-rnaedit.lua
+        wget --no-check-certificate -O rnaedit.conf -c $bcbio_baseurl/rnaedit.conf
+        wget --no-check-certificate -O rnaedit.lua -c $bcbio_baseurl/rnaedit.lua
         wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/GRCh37-dbnsfp.conf
         wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/GRCh37-dbscsnv.conf
         wget --no-check-certificate -O gnomad_genome.conf -c $bcbio_baseurl/GRCh37-gnomad_genome.conf
