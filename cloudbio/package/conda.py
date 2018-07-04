@@ -3,6 +3,7 @@
 import collections
 import json
 import os
+import shutil
 import yaml
 
 from cloudbio.custom import shared
@@ -27,6 +28,8 @@ def install_packages(env, to_install=None, packages=None):
             with open(config_file.base) as in_handle:
                 channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
         conda_envs = _create_environments(env, conda_bin, packages)
+        for env_dir in conda_envs.values():
+            _clean_environment(env_dir)
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
         # libedit pins to curses 6.0 but bioconda requires 5.9
         # Ensure we have conda-forge conda installed, otherwise creates resolution
@@ -160,3 +163,26 @@ def _create_environments(env, conda_bin, packages):
                 conda_envs = _get_conda_envs(env, conda_bin)
             out[addenv] = [x for x in conda_envs if x.endswith("/%s" % addenv)][0]
     return out
+
+def _clean_environment(env_dir):
+    """Remove problem elements in environmental directories.
+
+    - Get rid of old history comment lines that cause parsing failures:
+      https://github.com/bcbio/bcbio-nextgen/issues/2431
+    """
+    history_file = os.path.join(env_dir, "conda-meta", "history")
+    if os.path.exists(history_file):
+        has_problem = False
+        cleaned_lines = []
+        with open(history_file) as in_handle:
+            for line in in_handle:
+                # Remove lines like `# create specs:` which have no information after colon
+                if line.startswith("#") and len([x for x in line.strip().split(":") if x]) == 1:
+                    has_problem = True
+                else:
+                    cleaned_lines.append(line)
+        if has_problem:
+            shutil.copy(history_file, history_file + ".orig")
+            with open(history_file, "w") as out_handle:
+                for line in cleaned_lines:
+                    out_handle.write(line)
