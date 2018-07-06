@@ -3,16 +3,16 @@
 ---
 attributes:
   name: giab-NA12878-NA24385-somatic
-  version: v3_2_2
+  version: v3_3_2-2018-07-05
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA12878-NA24385-somatic
-        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/use_cases/mixtures/UMCUTRECHT_NA12878_NA24385_mixture_10052016/
-        calls=na12878-na24385-somatic-truth.vcf.gz
-        regions=na12878-na24385-somatic-truth-regions.bed
+        url=https://s3.amazonaws.com/bcbio/giab/NA12878-NA24385/2018-07-05/
+        calls=na12878-na24385-somatic-GRCh37-truth.vcf.gz
+        regions=na12878-na24385-somatic-GRCh37-truth-regions.bed
         mkdir -p $dir
         wget -c $url/$calls -O $dir/truth_small_variants.vcf.gz
         wget -c $url/$calls.tbi -O $dir/truth_small_variants.vcf.gz.tbi

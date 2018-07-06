@@ -3,20 +3,20 @@
 ---
 attributes:
   name: giab-NA12878-NA24385-somatic
-  version: v3_3_2
+  version: v3_3_2-2018-07-05
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         dir=validation/giab-NA12878-NA24385-somatic
-        url=https://s3.amazonaws.com/biodata/giab/na12878-na24385-somatic
-        calls=na12878-na24385-somatic-truth-hg38.vcf.gz
-        regions=na12878-na24385-somatic-truth-regions-hg38.bed.gz
+        url=https://s3.amazonaws.com/bcbio/giab/NA12878-NA24385/2018-07-05/
+        calls=na12878-na24385-somatic-hg38-truth.vcf.gz
+        regions=na12878-na24385-somatic-hg38-truth-regions.bed
         mkdir -p $dir
         wget -c $url/$calls -O $dir/truth_small_variants.vcf.gz
         wget -c $url/$calls.tbi -O $dir/truth_small_variants.vcf.gz.tbi
-        wget -c $url/$regions -O - | gunzip -c > $dir/truth_regions.bed
+        wget -c $url/$regions -O $dir/truth_regions.bed
     recipe_outfiles:
       - validation/giab-NA12878-NA24385-somatic/truth_small_variants.vcf.gz
       - validation/giab-NA12878-NA24385-somatic/truth_small_variants.vcf.gz.tbi
