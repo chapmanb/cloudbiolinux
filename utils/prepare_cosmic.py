@@ -21,7 +21,7 @@ import os
 import subprocess
 import sys
 
-import paramiko
+import requests
 
 from bcbio import utils
 from bcbio.variation import vcfutils
@@ -30,7 +30,7 @@ def main(cosmic_version, bcbio_genome_dir):
     work_dir = utils.safe_makedir(os.path.join(os.getcwd(), "cosmic-prep"))
     os.chdir(work_dir)
 
-    for genome_build, bcbio_build, add_chr in [("grch37", "GRCh37", False), ("grch38", "hg38", True)]:
+    for genome_build, bcbio_build, add_chr in [("GRCh37", "GRCh37", False), ("GRCh38", "hg38", True)]:
         bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", bcbio_build)
         if not os.path.exists(bcbio_base):
             continue
@@ -41,7 +41,10 @@ def main(cosmic_version, bcbio_genome_dir):
         out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, "bcbio_ready", bcbio_build))
         out_file = os.path.join(out_dir, "cosmic.vcf.gz")
         ready_cosmic = combine_cosmic(sorted_inputs, bcbio_ref, out_file)
-        utils.copy_plus(ready_cosmic, os.path.join(bcbio_base, "variation", os.path.basename(ready_cosmic)))
+        variation_dir = utils.safe_makedir(os.path.join(bcbio_base, "variation"))
+        utils.copy_plus(ready_cosmic, os.path.join(variation_dir, os.path.basename(ready_cosmic)))
+        print("Created COSMIC v%s resource in %s" % (cosmic_version,
+                                                     os.path.join(variation_dir, os.path.basename(ready_cosmic))))
         if bcbio_build == "GRCh37":
             bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", "hg19")
             if not os.path.exists(bcbio_base):
@@ -49,7 +52,10 @@ def main(cosmic_version, bcbio_genome_dir):
             out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, "bcbio_ready", "hg19"))
             out_file = os.path.join(out_dir, "cosmic.vcf.gz")
             hg19_cosmic = map_coords_to_ucsc(ready_cosmic, bcbio_ref, out_file)
-            utils.copy_plus(hg19_cosmic, os.path.join(bcbio_base, "variation", os.path.basename(ready_cosmic)))
+            variation_dir = utils.safe_makedir(os.path.join(bcbio_base, "variation"))
+            utils.copy_plus(hg19_cosmic, os.path.join(variation_dir, os.path.basename(hg19_cosmic)))
+            print("Created COSMIC v%s resource in %s" % (cosmic_version,
+                                                         os.path.join(variation_dir, os.path.basename(hg19_cosmic))))
 
 def map_coords_to_ucsc(grc_cosmic, ref_file, out_file):
     hg19_ref_file = ref_file.replace("GRCh37", "hg19")
@@ -91,28 +97,32 @@ def sort_to_ref(fname, ref_file, add_chr):
             fix_chrom = ''
         contig_cl = vcfutils.add_contig_to_header_cl(ref_file, out_file)
         cmd = ("gunzip -c {fname} {fix_chrom} | "
+               "bcftools norm --check-ref s --do-not-normalize -f {ref_file} |"
                "gsort /dev/stdin {ref_file}.fai | {contig_cl} | "
                "bgzip -c > {out_file}")
         subprocess.check_call(cmd.format(**locals()), shell=True)
     return vcfutils.bgzip_and_index(out_file, {})
 
 def get_cosmic_files(genome_build, cosmic_version):
+    """Retrieve using new authentication based download approach.
+
+    GRCh38/cosmic/v85/VCF/CosmicCodingMuts.vcf.gz
+    GRCh38/cosmic/v85/VCF/CosmicNonCodingVariants.vcf.gz
     """
-    get /files/grch38/cosmic/v83/VCF/CosmicCodingMuts.vcf.gz
-    get /files/grch38/cosmic/v83/VCF/CosmicNonCodingVariants.vcf.gz
-    """
+    url = "https://cancer.sanger.ac.uk/cosmic/file_download/"
     out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, genome_build))
     fnames = []
     for ctype in ["CosmicCodingMuts", "CosmicNonCodingVariants"]:
-        fname = os.path.join(out_dir, "%s.vcf.gz" % ctype)
-        if not os.path.exists(fname):
-            remote_path = "/files/%s/cosmic/v%s/VCF/%s.vcf.gz" % (genome_build, cosmic_version, ctype)
-            t = paramiko.Transport(("sftp-cancer.sanger.ac.uk", 22))
-            t.connect(username=os.environ["COSMIC_USER"], password=os.environ["COSMIC_PASS"])
-            sftp = paramiko.SFTPClient.from_transport(t)
-            print("Getting %s" % remote_path)
-            sftp.get(remote_path, fname)
-        fnames.append(fname)
+        filename = os.path.join(out_dir, "%s.vcf.gz" % ctype)
+        if not os.path.exists(filename):
+            filepath = "%s/cosmic/v%s/VCF/%s.vcf.gz" % (genome_build, cosmic_version, ctype)
+            print("Downloading %s" % (url + filepath))
+            r = requests.get(url + filepath, auth=(os.environ["COSMIC_USER"], os.environ["COSMIC_PASS"]))
+            download_url = r.json()["url"]
+            r = requests.get(download_url)
+            with open(filename, "wb") as f:
+                f.write(r.content)
+        fnames.append(filename)
     return fnames
 
 if __name__ == "__main__":
