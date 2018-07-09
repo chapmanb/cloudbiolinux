@@ -10,7 +10,7 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA12878-NA24385-somatic
-        url=https://s3.amazonaws.com/bcbio/giab/NA12878-NA24385/2018-07-05/
+        url=https://s3.amazonaws.com/bcbio/giab/NA12878-NA24385/2018-07-05
         calls=na12878-na24385-somatic-GRCh37-truth.vcf.gz
         regions=na12878-na24385-somatic-GRCh37-truth-regions.bed
         mkdir -p $dir
