@@ -22,7 +22,7 @@ recipe:
         zcat refGene.txt.gz | awk '{print $3"\t.\tgene\t"$5"\t"$6"\t.\t"$4"\t.\tname "$13";"}' >> srna-transcripts.gtf
         wget http://www.regulatoryrna.org/database/piRNA/download/archive/v1.0/bed/piR_hg19_v1.0.bed.gz
         zcat piR_hg19_v1.0.bed.gz | awk '{print $1"\t.\tpiRNA\t"$2"\t"$3"\t.\t"$6"\t.\tname "$4";"}' >> srna-transcripts.gtf
-        mirbase
+        # mirbase
         wget  --random-wait --retry-connrefused  -q -N -c -O hairpin.fa.gz ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz
         zcat hairpin.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
         wget  --random-wait --retry-connrefused  -q -N -c -O mature.fa.gz ftp://mirbase.org/pub/mirbase/21/mature.fa.gz
@@ -30,7 +30,7 @@ recipe:
         wget  --random-wait --retry-connrefused  -q -N -c -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
         zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
         wget --random-wait --retry-connrefused -q -N -c -O mirbase.gff3 ftp://mirbase.org/pub/mirbase/21/genomes/hsa.gff3
-        #tdrmapper
+        # tdrmapper
         wget   --random-wait --retry-connrefused  --no-check-certificate -q -N -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/hg19_mature_and_pre.fa
         # mintmap
         wget  --random-wait --retry-connrefused --no-check-certificate -q -N -c https://github.com/TJU-CMC-Org/MINTmap/raw/master/LookupTable.tRFs.MINTmap_v1.txt
