@@ -96,6 +96,7 @@ bio_nextgen:
   - multiqc-bcbio
   - ngs-disambiguate
   - novoalign
+  - octopus
   - oncofuse
   - optitype
   - parallel
