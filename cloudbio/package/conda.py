@@ -55,9 +55,6 @@ def install_packages(env, to_install=None, packages=None):
                     env_str = ""
                 pkgs_str = " ".join(env_packages)
                 env.safe_run("{conda_bin} install -y {env_str} {channels} {pkgs_str}".format(**locals()))
-                # Ensure we have up to date openjdk in base environment to avoid font issues
-                if not env_name:
-                    env.safe_run("{conda_bin} install -y {env_str} {channels} openjdk".format(**locals()))
                 conda_pkg_list = json.loads(env.safe_run_output(
                     "{conda_bin} list --json {env_str}".format(**locals())))
                 for package in env_packages:
