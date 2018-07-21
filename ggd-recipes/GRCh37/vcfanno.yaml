@@ -3,14 +3,14 @@
 ---
 attributes:
   name: vcfanno
-  version: 20180628
+  version: 20180720
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         vcfanno_githash=10f067337d1a4651882aded670b283593f94700f
-        bcbio_githash=3924a6340f70256fe1e08d67341c2cb1fa22a5f7
+        bcbio_githash=4d14081e1eb9651ff8fd55db3cfaed90bcd3d959
         mkdir -p config/vcfanno
         cd config/vcfanno
         gemini_baseurl=https://github.com/brentp/vcfanno/raw/$vcfanno_githash/example
@@ -22,6 +22,7 @@ recipe:
         wget --no-check-certificate -O dbnsfp.conf -c $bcbio_baseurl/GRCh37-dbnsfp.conf
         wget --no-check-certificate -O dbscsnv.conf -c $bcbio_baseurl/GRCh37-dbscsnv.conf
         wget --no-check-certificate -O gnomad_genome.conf -c $bcbio_baseurl/GRCh37-gnomad_genome.conf
+        wget --no-check-certificate -O somatic.conf -c $bcbio_baseurl/somatic.conf
 
     recipe_outfiles:
       - config/vcfanno/gemini.lua
@@ -31,3 +32,4 @@ recipe:
       - config/vcfanno/dbnsfp.conf
       - config/vcfanno/dbscsnv.conf
       - config/vcfanno/gnomad_genome.conf
+      - config/vcfanno/somatic.conf
