@@ -24,7 +24,8 @@ bio_nextgen:
   - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
-  - bcftools
+  # XXX Remove pin on 1.1.1 bcbio release with fix for bcftools 1.9
+  - bcftools=1.8
   - bedtools=2.27.1
   - biobambam
   - bowtie
