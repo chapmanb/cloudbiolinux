@@ -23,7 +23,7 @@ genomes:
     annotations: [GA4GH_problem_regions, capture_regions, rmsk,
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
-                  genesplicer, effects_transcripts, vcfanno, viral]
+                  genesplicer, effects_transcripts, vcfanno, viral, exac, esp, 1000g]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
   - dbkey: GRCh37
@@ -32,7 +32,7 @@ genomes:
     annotations: [GA4GH_problem_regions, capture_regions,
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
-                  genesplicer, effects_transcripts, vcfanno, viral]
+                  genesplicer, effects_transcripts, vcfanno, viral, exac, esp, 1000g]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4, giab-NA12878-NA24385-somatic]
   - dbkey: hg38
@@ -103,7 +103,7 @@ annotation_groups:
               genesplicer, effects_transcripts, vcfanno, viral]
   rnaseq: [transcripts, RADAR, rmsk]
   smallrna: [mirbase]
-  gemini: [esp, exac]
+  gemini: [esp, exac, 1000g]
 
 # Global set of indexes to include for each genome.
 # Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py

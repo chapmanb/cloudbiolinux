@@ -1,0 +1,18 @@
+# 1000 genomes
+---
+attributes:
+  name: 1000g
+  version: phase3_shapeit2_mvncall_integrated_v5a.20130502
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/gemini-annotations
+        url=$baseurl/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5a.20130502.sites.tidy.vcf.gz
+        mkdir -p variation
+        wget -c -O variation/1000g.vcf.gz $url
+        wget -c -O variation/1000g.vcf.gz.tbi $url.tbi
+    recipe_outfiles:
+      - variation/1000g.vcf.gz
+      - variation/1000g.vcf.gz.tbi

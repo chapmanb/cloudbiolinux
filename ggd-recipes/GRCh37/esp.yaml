@@ -1,0 +1,18 @@
+# Exome Sequencing Project (ESP): http://evs.gs.washington.edu/EVS/
+---
+attributes:
+  name: esp
+  version: ESP6500SI-V2
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/gemini-annotations
+        url=$baseurl/ESP6500SI.all.snps_indels.tidy.v2.vcf.gz
+        mkdir -p variation
+        wget -c -O variation/esp.vcf.gz $url
+        wget -c -O variation/esp.vcf.gz.tbi $url.tbi
+    recipe_outfiles:
+      - variation/esp.vcf.gz
+      - variation/esp.vcf.gz.tbi

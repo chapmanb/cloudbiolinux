@@ -1,0 +1,18 @@
+# ExAC VCF sites: http://exac.broadinstitute.org/
+---
+attributes:
+  name: exac
+  version: 0.3
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/gemini-annotations
+        url=$baseurl/ExAC.r0.3.sites.vep.tidy.vcf.gz
+        mkdir -p variation
+        wget -c -O variation/exac.vcf.gz $url
+        wget -c -O variation/exac.vcf.gz.tbi $url.tbi
+    recipe_outfiles:
+      - variation/exac.vcf.gz
+      - variation/exac.vcf.gz.tbi

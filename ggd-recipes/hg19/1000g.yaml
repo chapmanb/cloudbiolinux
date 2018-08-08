@@ -1,0 +1,21 @@
+# 1000 genomes
+---
+attributes:
+  name: 1000g
+  version: phase3_shapeit2_mvncall_integrated_v5a.20130502
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/gemini-annotations
+        url=$baseurl/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5a.20130502.sites.tidy.vcf.gz
+        remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
+        mkdir -p variation
+        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | sed -f remap.sed | bgzip -c > variation/1000g.vcf.gz
+        tabix -f -p vcf variation/1000g.vcf.gz
+    recipe_outfiles:
+      - variation/1000g.vcf.gz
+      - variation/1000g.vcf.gz.tbi
