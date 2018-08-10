@@ -9,7 +9,7 @@ recipe:
       - |
         # Uses Google Drive for faster download with tricks from
         # http://stackoverflow.com/a/38937732/252589
-        ggID='1txQhxATJzHOasuvFmLLCN5PebEEm9_P8'
+        ggID='0B60wROKy6OqcRmZLbWd4SW5Yc1U'
         ggURL='https://drive.google.com/uc?export=download'
         mkdir -p variation
         cd variation
