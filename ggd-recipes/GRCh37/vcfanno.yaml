@@ -3,14 +3,14 @@
 ---
 attributes:
   name: vcfanno
-  version: 20180720
+  version: 20180809
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
         vcfanno_githash=10f067337d1a4651882aded670b283593f94700f
-        bcbio_githash=4d14081e1eb9651ff8fd55db3cfaed90bcd3d959
+        bcbio_githash=f27aba90647e2ac27664ea6f5e6c257038162122
         mkdir -p config/vcfanno
         cd config/vcfanno
         gemini_baseurl=https://github.com/brentp/vcfanno/raw/$vcfanno_githash/example
