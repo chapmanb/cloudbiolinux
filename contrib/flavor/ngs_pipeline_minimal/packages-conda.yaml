@@ -57,7 +57,7 @@ bio_nextgen:
   - fgbio
   - freebayes=1.1.0.46
   - gatk
-  - gatk4
+  - gatk4=4.0.7.0
   - geneimpacts
   - gemini
   - genesplicer
@@ -163,7 +163,7 @@ bio_nextgen:
   - umis
   - wham
   - vardict
-  - vardict-java
+  - vardict-java=1.5.1
   - variantbam
   - varscan
   - vawk
