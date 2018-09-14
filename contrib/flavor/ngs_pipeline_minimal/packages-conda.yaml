@@ -48,6 +48,7 @@ bio_nextgen:
   - deeptools
   - delly
   - dkfz-bias-filter
+  - duphold
   - ensembl-vep=93.*
   - ericscript;env=samtools0
   - express
