@@ -58,7 +58,7 @@ bio_nextgen:
   - fgbio
   - freebayes=1.1.0.46
   - gatk
-  - gatk4=4.0.7.0
+  - gatk4
   - geneimpacts
   - gemini
   - genesplicer
@@ -193,6 +193,8 @@ perl:
   - perl-vcftools-vcf
 r:
   - r=3.4.1
+  - r-base=3.4.1=h4fe35fd_8
+  - xorg-libxt
   - r-basejump>=0.5.8
   - r-bcbiornaseq=0.2.4a
   - r-cghflasso
