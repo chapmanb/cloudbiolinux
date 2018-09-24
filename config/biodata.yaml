@@ -25,7 +25,7 @@ genomes:
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts, vcfanno, viral, exac, esp, 1000g]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
-    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631]
+    validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631, giab-NA24143, giab-NA24149]
   - dbkey: GRCh37
     name: Human (GRCh37)
     indexes: [seq, twobit]
@@ -34,7 +34,8 @@ genomes:
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
                   genesplicer, effects_transcripts, vcfanno, viral, exac, esp, 1000g]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
-    validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4, giab-NA12878-NA24385-somatic]
+    validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4, giab-NA12878-NA24385-somatic,
+                 giab-NA24143, giab-NA24149]
   - dbkey: hg38
     name: Human (hg38) full
     indexes: [seq, twobit, bwa, hisat2]
@@ -45,7 +46,8 @@ genomes:
     annotations_available: [dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631,
                  platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
-                 dream-syn4-crossmap, dream-syn3-crossmap, giab-NA12878-NA24385-somatic]
+                 dream-syn4-crossmap, dream-syn3-crossmap, giab-NA12878-NA24385-somatic,
+                 giab-NA24143, giab-NA24149]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
     annotations: [coverage, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
