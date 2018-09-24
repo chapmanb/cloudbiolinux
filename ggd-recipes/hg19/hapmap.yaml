@@ -12,7 +12,10 @@ recipe:
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > hapmap_3.3.vcf.gz
         tabix -f -p vcf hapmap_3.3.vcf.gz
+        tabix -f -p vcf -m 12 --csi hapmap_3.3.vcf.gz
     recipe_outfiles:
       - variation/hapmap_3.3.vcf.gz
       - variation/hapmap_3.3.vcf.gz.tbi
+      - variation/hapmap_3.3.vcf.gz.csi
+
  

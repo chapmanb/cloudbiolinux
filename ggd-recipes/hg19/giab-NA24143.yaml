@@ -17,8 +17,10 @@ recipe:
         wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        tabix -f -p vcf -m 12 --csi $dir/truth_small_variants.vcf.gz
         wget -c -O - $url/$regions | sed -f remap.sed > $dir/truth_regions.bed
     recipe_outfiles:
       - validation/giab-NA24143/truth_small_variants.vcf.gz
       - validation/giab-NA24143/truth_small_variants.vcf.gz.tbi
+      - validation/giab-NA24143/truth_small_variants.vcf.gz.csi
       - validation/giab-NA24143/truth_regions.bed

@@ -12,7 +12,9 @@ recipe:
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > 1000G_phase1.snps.high_confidence.vcf.gz
         tabix -f -p vcf 1000G_phase1.snps.high_confidence.vcf.gz
+        tabix -f -p vcf -m 12 --csi 1000G_phase1.snps.high_confidence.vcf.gz
     recipe_outfiles:
       - variation/1000G_phase1.snps.high_confidence.vcf.gz
       - variation/1000G_phase1.snps.high_confidence.vcf.gz.tbi
- 
+      - variation/1000G_phase1.snps.high_confidence.vcf.gz.csi
+

@@ -17,6 +17,7 @@ recipe:
         mkdir -p $dir
         wget -c -O $dir/truth_small_variants.vcf.gz $url/$calls
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        tabix -f -p vcf -m 12 --csi $dir/truth_small_variants.vcf.gz
         wget -c -O $dir/truth_regions.bed $url/$regions
         delurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-GIAB-2tech-dels-v0_1_8-GRCh37.bed.gz
         wget -c -O $dir/truth_DEL_giab.bed.gz $delurl
@@ -32,6 +33,7 @@ recipe:
     recipe_outfiles:
       - validation/giab-NA24385/truth_small_variants.vcf.gz
       - validation/giab-NA24385/truth_small_variants.vcf.gz.tbi
+      - validation/giab-NA24385/truth_small_variants.vcf.gz.csi
       - validation/giab-NA24385/truth_regions.bed
       - validation/giab-NA24385/truth_DEL_giab.bed.gz
       - validation/giab-NA24385/truth_DEL_giab.bed.gz.tbi

@@ -20,6 +20,7 @@ recipe:
         do
           bgzip $file
           tabix -p bed $file.gz
+          tabix -p bed -m 12 --csi $file.gz
         done
         cd ../../..
         encode=coverage/problem_regions/ENCODE
@@ -27,48 +28,68 @@ recipe:
         cd $encode
         wget --no-check-certificate http://s3.amazonaws.com/biodata/coverage/problem_regions/ENCODE/hg19/wgEncodeDacMapabilityConsensusExcludable.bed.gz
         wget --no-check-certificate http://s3.amazonaws.com/biodata/coverage/problem_regions/ENCODE/hg19/wgEncodeDacMapabilityConsensusExcludable.bed.gz.tbi
+        tabix -f -p bed -m 12 --csi wgEncodeDacMapabilityConsensusExcludable.bed.gz
         cd ../../..
         repeats=coverage/problem_regions/repeats
         mkdir -p $repeats
         wget --no-check-certificate -O - https://raw.githubusercontent.com/chapmanb/delly/master/human.hg19.excl.tsv | grep ^chr > $repeats/sv_repeat_telomere_centromere.bed
         wget --no-check-certificate -O - https://github.com/lh3/varcmp/raw/master/scripts/LCR-hs37d5.bed.gz | gunzip -c | grep -v ^GL | grep -v ^NC | grep -v ^hs | sed 's/^/chr/' | bgzip -c > $repeats/LCR.bed.gz
         tabix -p bed -f $repeats/LCR.bed.gz
+        tabix -p bed -m 12 --csi $repeats/LCR.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz.tbi
+        tabix -f -p bed -m 12 --csi $repeats/polyx.bed.gz
     recipe_outfiles:
       - coverage/problem_regions/GA4GH/README.md
       - coverage/problem_regions/GA4GH/bad_promoter.bed.gz
       - coverage/problem_regions/GA4GH/bad_promoter.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/bad_promoter.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc15.bed.gz
       - coverage/problem_regions/GA4GH/gc15.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc15.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc15to20.bed.gz
       - coverage/problem_regions/GA4GH/gc15to20.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc15to20.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc20to25.bed.gz
       - coverage/problem_regions/GA4GH/gc20to25.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc20to25.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc25to30.bed.gz
       - coverage/problem_regions/GA4GH/gc25to30.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc25to30.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc65to70.bed.gz
       - coverage/problem_regions/GA4GH/gc65to70.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc65to70.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc70to75.bed.gz
       - coverage/problem_regions/GA4GH/gc70to75.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc70to75.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc75to80.bed.gz
       - coverage/problem_regions/GA4GH/gc75to80.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc75to80.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc80to85.bed.gz
       - coverage/problem_regions/GA4GH/gc80to85.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc80to85.bed.gz.csi
       - coverage/problem_regions/GA4GH/gc85.bed.gz
       - coverage/problem_regions/GA4GH/gc85.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/gc85.bed.gz.csi
       - coverage/problem_regions/GA4GH/heng_um75-hs37d5.bed.gz
       - coverage/problem_regions/GA4GH/heng_um75-hs37d5.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/heng_um75-hs37d5.bed.gz.csi
       - coverage/problem_regions/GA4GH/low_complexity_51to200bp.bed.gz
       - coverage/problem_regions/GA4GH/low_complexity_51to200bp.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/low_complexity_51to200bp.bed.gz.csi
       - coverage/problem_regions/GA4GH/low_complexity_gt200bp.bed.gz
       - coverage/problem_regions/GA4GH/low_complexity_gt200bp.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/low_complexity_gt200bp.bed.gz.csi
       - coverage/problem_regions/GA4GH/self_chain.bed.gz
       - coverage/problem_regions/GA4GH/self_chain.bed.gz.tbi
+      - coverage/problem_regions/GA4GH/self_chain.bed.gz.csi
       - coverage/problem_regions/ENCODE/wgEncodeDacMapabilityConsensusExcludable.bed.gz
       - coverage/problem_regions/ENCODE/wgEncodeDacMapabilityConsensusExcludable.bed.gz.tbi
+      - coverage/problem_regions/ENCODE/wgEncodeDacMapabilityConsensusExcludable.bed.gz.csi
       - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
       - coverage/problem_regions/repeats/LCR.bed.gz
       - coverage/problem_regions/repeats/LCR.bed.gz.tbi
+      - coverage/problem_regions/repeats/LCR.bed.gz.csi
       - coverage/problem_regions/repeats/polyx.bed.gz
       - coverage/problem_regions/repeats/polyx.bed.gz.tbi
+      - coverage/problem_regions/repeats/polyx.bed.gz.csi

@@ -19,6 +19,7 @@ recipe:
         wget -qO- $remapurl | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         wget -c -O - $url/$calls | gunzip -c | sed -f remap.sed | grep -v "##contig=" | bgzip -c > $dir/truth_small_variants.vcf.gz
         tabix -f -p vcf $dir/truth_small_variants.vcf.gz
+        tabix -f -p vcf -m 12 --csi $dir/truth_small_variants.vcf.gz
         wget -c -O - $url/$regions | sed -f remap.sed > $dir/truth_regions.bed
         wget -O - http://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Personalis_1000_Genomes_deduplicated_deletions.bed | grep -v ^Chr | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" > $dir/truth_DEL.bed
         wget -O -  http://ftp.ncbi.nih.gov/giab/ftp/technical/svclassify_Manuscript/Supplementary_Information/Spiral_Genetics_insertions.bed | grep -v ^Chr | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" > $dir/truth_INS.bed

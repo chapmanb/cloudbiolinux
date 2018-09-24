@@ -16,6 +16,8 @@ recipe:
         wget -c -O variation/clinvar-orig.vcf.gz $baseurl
         [[ -f variation/clinvar.vcf.gz ]] || zcat variation/clinvar-orig.vcf.gz | bgzip -c > variation/clinvar.vcf.gz
         tabix -f -p vcf variation/clinvar.vcf.gz
+        tabix -f -p vcf -m 12 --csi variation/clinvar.vcf.gz
     recipe_outfiles:
       - variation/clinvar.vcf.gz
       - variation/clinvar.vcf.gz.tbi
+      - variation/clinvar.vcf.gz.csi

@@ -14,6 +14,9 @@ recipe:
         export TMPDIR=`pwd`
         wget -c -O - $url | gunzip -c | vt decompose -s - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
+        tabix -f -p vcf -m 12 --csi variation/gnomad_genome.vcf.gz
     recipe_outfiles:
       - variation/gnomad_genome.vcf.gz
       - variation/gnomad_genome.vcf.gz.tbi
+      - variation/gnomad_genome.vcf.gz.csi
+

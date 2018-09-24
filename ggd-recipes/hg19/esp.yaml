@@ -16,6 +16,8 @@ recipe:
         export TMPDIR=`pwd`
         wget -c -O - $url | gunzip -c | sed -f remap.sed | bgzip -c > variation/esp.vcf.gz
         tabix -f -p vcf variation/esp.vcf.gz
+        tabix -f -p vcf -m 12 --csi variation/esp.vcf.gz
     recipe_outfiles:
       - variation/esp.vcf.gz
       - variation/esp.vcf.gz.tbi
+      - variation/esp.vcf.gz.csi

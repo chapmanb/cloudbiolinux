@@ -29,10 +29,12 @@ recipe:
         fi
         # index in position 1 and 2
         tabix -f -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
+        tabix -f -s 1 -b 2 -e 2 -c '#' -m 12 --csi dbNSFP.txt.gz
         rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
         rm -f tmp-gcokie
         rm -f dbNSFPv*.zip
     recipe_outfiles:
       - variation/dbNSFP.txt.gz
       - variation/dbNSFP.txt.gz.tbi
+      - variation/dbNSFP.txt.gz.csi
       - variation/dbNSFP.readme.txt

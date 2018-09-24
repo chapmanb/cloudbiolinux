@@ -18,6 +18,8 @@ recipe:
         wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
         [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/dbsnp-$version.vcf.gz
         tabix -f -p vcf variation/dbsnp-$version.vcf.gz
+        tabix -f -p vcf -m 12 --csi variation/dbsnp-$version.vcf.gz
     recipe_outfiles:
       - variation/dbsnp-151.vcf.gz
       - variation/dbsnp-151.vcf.gz.tbi
+      - variation/dbsnp-151.vcf.gz.csi

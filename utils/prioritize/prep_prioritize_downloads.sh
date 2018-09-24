@@ -22,6 +22,7 @@ zcat civic-GRCh37-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg19/ca
 tabix -f -p bed hg19/cancer/civic-$civicv.bed.gz
 zcat civic-GRCh38-$civicv38.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg38/cancer/civic-$civicv38.bed.gz
 tabix -f -p bed hg38/cancer/civic-$civicv38.bed.gz
+tabix -f -p bed -m 12 --csi hg38/cancer/civic-$civicv38.bed.gz
 
 # az300
 cat AZ300-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az300.bed.gz
@@ -30,6 +31,7 @@ cat AZ300-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -
 tabix -f -p bed GRCh37/cancer/az300.bed.gz
 cat AZ300-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az300.bed.gz
 tabix -f -p bed hg38/cancer/az300.bed.gz
+tabix -f -p bed -m 12 --csi hg38/cancer/az300.bed.gz
 
 # az300 with fusions
 cat AZ300_with_known-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az300-with-fusion.bed.gz
@@ -38,6 +40,7 @@ cat AZ300_with_known-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools m
 tabix -f -p bed GRCh37/cancer/az300-with-fusion.bed.gz
 cat AZ300_with_known-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az300-with-fusion.bed.gz
 tabix -f -p bed hg38/cancer/az300-with-fusion.bed.gz
+tabix -f -p bed -m 12 --csi hg38/cancer/az300-with-fusion.bed.gz
 
 # az-cancer-panel
 cat az-cancer-panel-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az-cancer-panel.bed.gz
@@ -46,6 +49,7 @@ cat az-cancer-panel-GRCh37.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools me
 tabix -f -p bed GRCh37/cancer/az-cancer-panel.bed.gz
 cat az-cancer-panel-hg38.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg38/cancer/az-cancer-panel.bed.gz
 tabix -f -p bed hg38/cancer/az-cancer-panel.bed.gz
+tabix -f -p bed -m 12 --csi hg38/cancer/az-cancer-panel.bed.gz
 
 # tar up downloads
 cd hg19

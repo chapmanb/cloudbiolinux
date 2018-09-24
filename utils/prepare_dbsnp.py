@@ -41,6 +41,7 @@ def main(org):
     shutil.move(out_file + ".gz", os.path.join(os.pardir, out_file + ".gz"))
     os.chdir(os.pardir)
     subprocess.check_call(["tabix", "-p", "vcf", out_file + ".gz"])
+    subprocess.check_call(["tabix", "-p", "vcf", "--csi", "-m", "12", out_file + ".gz"])
     shutil.rmtree(work_dir)
 
 multi_whitespace = re.compile(r"\s+")

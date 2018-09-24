@@ -12,7 +12,9 @@ recipe:
         cd variation
         wget -O - $baseurl | gunzip -c | bgzip -c > Mills_and_1000G_gold_standard.indels.vcf.gz
         tabix -f -p vcf Mills_and_1000G_gold_standard.indels.vcf.gz
+        tabix -f -p vcf -m 12 --csi Mills_and_1000G_gold_standard.indels.vcf.gz
     recipe_outfiles:
       - variation/Mills_and_1000G_gold_standard.indels.vcf.gz
       - variation/Mills_and_1000G_gold_standard.indels.vcf.gz.tbi
- 
+      - variation/Mills_and_1000G_gold_standard.indels.vcf.gz.csi
+
