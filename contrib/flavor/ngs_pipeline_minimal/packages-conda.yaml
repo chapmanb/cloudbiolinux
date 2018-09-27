@@ -164,7 +164,7 @@ bio_nextgen:
   - umis
   - wham
   - vardict
-  - vardict-java=1.5.1
+  - vardict-java
   - variantbam
   - varscan
   - vawk
