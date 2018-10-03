@@ -1,0 +1,23 @@
+# G2P is a publicly-accessible online system designed to facilitate the development, validation,
+# curation and distribution of large-scale, evidence-based datasets for use in diagnostic variant filtering.
+# Each G2P entry associates an allelic requirement and a mutational consequence at a defined locus with a disease entity.
+# A confidence level and evidence link are assigned to each entry.
+# https://www.ebi.ac.uk/gene2phenotype/about
+---
+attributes:
+  name: genotype2phenotype
+  version: 20180802
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        cancer_gene_url="https://www.ebi.ac.uk/gene2phenotype/downloads/CancerG2P.csv.gz"
+        DD_gene_url="https://www.ebi.ac.uk/gene2phenotype/downloads/DDG2P.csv.gz"
+
+        wget $cancer_gene_url
+        wget $cancer_gene_url
+        zcat *csv.gz > G2P.csv
+
+    recipe_outfiles:
+      - variation/G2P.csv
