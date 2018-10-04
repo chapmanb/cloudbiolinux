@@ -1,17 +1,18 @@
 # Transcript, annotation and indices for RNA-seq analysis
 # Prepared from Ensembl transcripts using: 
 # https://github.com/chapmanb/cloudbiolinux/blob/master/utils/prepare_tx_gff.py
+# Ensembl genebuild 93
 ---
 attributes:
   name: transcripts
-  version: 2018-03-21_91
+  version: 2018-09-28_92
 
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/annotation/mm10-rnaseq-2018-03-21_91.tar.xz
+        baseurl=https://s3.amazonaws.com/biodata/annotation/mm10-rnaseq-2018-09-28_92.tar.xz
         wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq
