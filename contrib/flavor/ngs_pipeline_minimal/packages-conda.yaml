@@ -72,6 +72,7 @@ bio_nextgen:
   - gvcftools
   - hap.py
   - h5py
+  - hmftools-purple
   - hmmlearn
   - hisat2
   - hts-nim-tools
@@ -98,7 +99,7 @@ bio_nextgen:
   - multiqc-bcbio
   - ngs-disambiguate
   - novoalign
-  - octopus
+  - octopus>=0.5.0b
   - oncofuse
   - optitype
   - parallel
@@ -234,5 +235,6 @@ r:
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
+  - bioconductor-purecn
   - bioconductor-rtracklayer
   - bioconductor-titancna
