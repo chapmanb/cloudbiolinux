@@ -197,7 +197,7 @@ r:
   - r-base=3.4.1=h4fe35fd_8
   - xorg-libxt
   - r-basejump>=0.5.8
-  - r-bcbiornaseq=0.2.4a
+  - r-bcbiornaseq>=0.2.7
   - r-cghflasso
   - r-chbutils
   - r-devtools
