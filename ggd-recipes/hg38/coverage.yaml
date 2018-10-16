@@ -11,7 +11,7 @@
 ---
 attributes:
   name: coverage
-  version: 2018-03-17
+  version: 2018-10-16
 recipe:
   full:
     recipe_type: bash
@@ -27,9 +27,13 @@ recipe:
         tabix -f -p bed $out
         wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz.tbi
+        gc=coverage/problem_regions/gc
+        mkdir -p $gc
+        wget --no-check-cerificate -O - 'https://s3.amazonaws.com/biodata/coverage/GC_profile.hg38.1000bp.cnp.gz' | gunzip -c > $gc/GC_profile.1000bp.cnp
     recipe_outfiles:
       - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
       - coverage/problem_regions/repeats/LCR.bed.gz
       - coverage/problem_regions/repeats/LCR.bed.gz.tbi
       - coverage/problem_regions/repeats/polyx.bed.gz
       - coverage/problem_regions/repeats/polyx.bed.gz.tbi
+      - coverage/gc/GC_profile.1000bp.cnp
