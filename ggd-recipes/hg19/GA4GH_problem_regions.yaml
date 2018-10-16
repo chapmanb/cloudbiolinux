@@ -35,9 +35,9 @@ recipe:
         tabix -p bed -f $repeats/LCR.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg19.bed.gz.tbi
-        gc=coverage/problem_regions/gc
+        gc=coverage/gc
         mkdir -p $gc
-        wget --no-check-cerificate -O - 'https://nc.hartwigmedicalfoundation.nl/index.php/s/a8lgLsUrZI5gndd/download?path=%2FHMF-Pipeline-Resources&files=GC_profile.1000bp.cnp.gz' | gunzip -c | sed 's/^/chr/' > $gc/GC_profile.1000bp.cnp
+        wget --no-check-certificate -O - 'https://nc.hartwigmedicalfoundation.nl/index.php/s/a8lgLsUrZI5gndd/download?path=%2FHMF-Pipeline-Resources&files=GC_profile.1000bp.cnp.gz' | gunzip -c | sed 's/^/chr/' > $gc/GC_profile.1000bp.cnp
     recipe_outfiles:
       - coverage/problem_regions/GA4GH/README.md
       - coverage/problem_regions/GA4GH/bad_promoter.bed.gz
