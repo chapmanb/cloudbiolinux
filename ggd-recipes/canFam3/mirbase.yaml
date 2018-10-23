@@ -2,7 +2,7 @@
 ---
 attributes:
   name: srnaseq
-  version: 20181023
+  version: 20181024
 recipe:
   full:
     recipe_type: bash
@@ -34,3 +34,4 @@ recipe:
         - srnaseq/mature.fa
         - srnaseq/miRNA.str
         - srnaseq/mirbase.gff3
+        - srnaseq/Rfam_for_miRDeep.fa
