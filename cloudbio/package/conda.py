@@ -11,6 +11,9 @@ from cloudbio.fabutils import quiet
 from cloudbio.flavor.config import get_config_file
 from cloudbio.package.shared import _yaml_to_packages
 
+ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=2")
+ENV_PY_VERSIONS["python3"] = "python=3"
+
 def install_packages(env, to_install=None, packages=None):
     if shared._is_anaconda(env):
         conda_bin = shared._conda_cmd(env)
@@ -35,7 +38,6 @@ def install_packages(env, to_install=None, packages=None):
         # Ensure we have conda-forge conda installed, otherwise creates resolution
         # and package issues with removed libedit. Hopefully can remove along with libedit
         # hack when conda-forge synchronizes ncurses and conda with the base install.
-        env.safe_run("{conda_bin} install -y {channels} conda python=2".format(**locals()))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
         # r-tximport is now bioconductor-tximport
@@ -53,8 +55,9 @@ def install_packages(env, to_install=None, packages=None):
                     env_str = "-n %s" % env_name
                 else:
                     env_str = ""
-                pkgs_str = " ".join(env_packages)
-                env.safe_run("{conda_bin} install -y {env_str} {channels} {pkgs_str}".format(**locals()))
+                pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
+                py_version = ENV_PY_VERSIONS[env_name]
+                env.safe_run("{conda_bin} install -y {env_str} {channels} {py_version} {pkgs_str}".format(**locals()))
                 conda_pkg_list = json.loads(env.safe_run_output(
                     "{conda_bin} list --json {env_str}".format(**locals())))
                 for package in env_packages:
