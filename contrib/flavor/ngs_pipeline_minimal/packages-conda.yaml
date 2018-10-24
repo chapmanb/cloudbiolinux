@@ -24,8 +24,7 @@ bio_nextgen:
   - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
-  # XXX Remove pin on 1.1.1 bcbio release with fix for bcftools 1.9
-  - bcftools=1.8
+  - bcftools
   - bedtools=2.27.1
   - biobambam
   - bowtie
@@ -48,7 +47,7 @@ bio_nextgen:
   - deeptools
   - delly
   - dkfz-bias-filter
-  - duphold
+  - duphold>=0.0.9
   - ensembl-vep=93.*
   - ericscript;env=samtools0
   - express
@@ -72,6 +71,7 @@ bio_nextgen:
   - gvcftools
   - hap.py
   - h5py
+  - hmftools-cobalt
   - hmftools-purple
   - hmmlearn
   - hisat2
@@ -99,7 +99,7 @@ bio_nextgen:
   - multiqc-bcbio
   - ngs-disambiguate
   - novoalign
-  - octopus>=0.5.0b
+  - octopus>=0.5.1b
   - oncofuse
   - optitype
   - parallel
@@ -107,7 +107,7 @@ bio_nextgen:
   - peddy
   - perl-sanger-cgp-battenberg
   - phylowgs
-  - pysam>=0.13.0
+  - pysam>=0.14.0
   - picard
   - pindel
   - pizzly
@@ -228,6 +228,7 @@ r:
   - bioconductor-biovizbase
   - bioconductor-bubbletree
   - bioconductor-cn.mops
+  - bioconductor-copynumber
   - bioconductor-degreport
   - bioconductor-deseq2
   - bioconductor-dexseq
