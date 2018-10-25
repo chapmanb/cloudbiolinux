@@ -39,7 +39,7 @@ genomes:
   - dbkey: hg38
     name: Human (hg38) full
     indexes: [seq, twobit, bwa, hisat2]
-    annotations: [ccds, coverage, rmsk, prioritize, dbsnp, hapmap_snps,
+    annotations: [ccds, coverage, capture_regions, rmsk, prioritize, dbsnp, hapmap_snps,
                   1000g_omni_snps, 1000g_snps, 1000g_indels,
                   mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
                   genesplicer, effects_transcripts, vcfanno, esp, exac, viral, RADAR, mirbase]
@@ -68,7 +68,7 @@ genomes:
   - dbkey: canFam3
     name: Dog (canFam3)
     indexes: [twobit]
-    annotations: [dbsnp, transcripts]
+    annotations: [dbsnp, transcripts, mirbase]
   - dbkey: galGal4
     name: Chicken (galGal4)
   - dbkey: Sscrofa11.1

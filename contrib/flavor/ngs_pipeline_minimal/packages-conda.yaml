@@ -24,8 +24,7 @@ bio_nextgen:
   - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
-  # XXX Remove pin on 1.1.1 bcbio release with fix for bcftools 1.9
-  - bcftools=1.8
+  - bcftools
   - bedtools=2.27.1
   - biobambam
   - bowtie
@@ -48,8 +47,8 @@ bio_nextgen:
   - deeptools
   - delly
   - dkfz-bias-filter
-  - duphold
-  - ensembl-vep=93.*
+  - duphold>=0.0.9
+  - ensembl-vep=94.*
   - ericscript;env=samtools0
   - express
   - extract-sv-reads
@@ -72,6 +71,8 @@ bio_nextgen:
   - gvcftools
   - hap.py
   - h5py
+  - hmftools-cobalt
+  - hmftools-purple
   - hmmlearn
   - hisat2
   - hts-nim-tools
@@ -98,7 +99,7 @@ bio_nextgen:
   - multiqc-bcbio
   - ngs-disambiguate
   - novoalign
-  - octopus
+  - octopus>=0.5.1b
   - oncofuse
   - optitype
   - parallel
@@ -106,7 +107,7 @@ bio_nextgen:
   - peddy
   - perl-sanger-cgp-battenberg
   - phylowgs
-  - pysam>=0.13.0
+  - pysam>=0.14.0
   - picard
   - pindel
   - pizzly
@@ -164,7 +165,7 @@ bio_nextgen:
   - umis
   - wham
   - vardict
-  - vardict-java=1.5.1
+  - vardict-java
   - variantbam
   - varscan
   - vawk
@@ -196,7 +197,7 @@ r:
   - r-base=3.4.1=h4fe35fd_8
   - xorg-libxt
   - r-basejump>=0.5.8
-  - r-bcbiornaseq=0.2.4a
+  - r-bcbiornaseq>=0.2.7
   - r-cghflasso
   - r-chbutils
   - r-devtools
@@ -227,6 +228,7 @@ r:
   - bioconductor-biovizbase
   - bioconductor-bubbletree
   - bioconductor-cn.mops
+  - bioconductor-copynumber
   - bioconductor-degreport
   - bioconductor-deseq2
   - bioconductor-dexseq
@@ -234,5 +236,6 @@ r:
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
+  - bioconductor-purecn
   - bioconductor-rtracklayer
   - bioconductor-titancna

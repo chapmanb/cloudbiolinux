@@ -11,7 +11,7 @@
 ---
 attributes:
   name: coverage
-  version: 2018-03-17
+  version: 2018-10-16
 recipe:
   full:
     recipe_type: bash
@@ -29,6 +29,9 @@ recipe:
         wget --no-check-certificate -O $repeats/polyx.bed.gz http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz
         wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-hg38.bed.gz.tbi
         tabix -f -p bed -m 12 --csi $repeats/polyx.bed.gz
+        gc=coverage/gc
+        mkdir -p $gc
+        wget --no-check-certificate -O - 'https://nc.hartwigmedicalfoundation.nl/index.php/s/a8lgLsUrZI5gndd/download?path=%2FHMF-Pipeline-Resources&files=GC_profile.hg38.1000bp.cnp.gz' | gunzip -c > $gc/GC_profile.1000bp.cnp
     recipe_outfiles:
       - coverage/problem_regions/repeats/sv_repeat_telomere_centromere.bed
       - coverage/problem_regions/repeats/LCR.bed.gz
@@ -37,3 +40,4 @@ recipe:
       - coverage/problem_regions/repeats/polyx.bed.gz
       - coverage/problem_regions/repeats/polyx.bed.gz.tbi
       - coverage/problem_regions/repeats/polyx.bed.gz.csi
+      - coverage/gc/GC_profile.1000bp.cnp
