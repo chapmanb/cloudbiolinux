@@ -1,0 +1,21 @@
+# GnomAD VCF sites: http://exac.broadinstitute.org/
+---
+attributes:
+  name: gnomad
+  version: 2.0.1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz
+        ref=../seq/GRCh37.fa
+        mkdir -p variation
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | vt decompose -s - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
+        tabix -f -p vcf variation/gnomad_exome.vcf.gz
+        tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
+    recipe_outfiles:
+      - variation/gnomad_exome.vcf.gz
+      - variation/gnomad_exome.vcf.gz.tbi
+      - variation/gnomad_exome.vcf.gz.csi
