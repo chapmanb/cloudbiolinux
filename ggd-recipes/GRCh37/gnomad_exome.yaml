@@ -12,7 +12,7 @@ recipe:
         ref=../seq/GRCh37.fa
         mkdir -p variation
         export TMPDIR=`pwd`
-        wget -c -O - $url | gunzip -c | vt decompose -s - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
+        wget -c -O - $url | gunzip -c | vt decompose -s -o - - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
     recipe_outfiles:
