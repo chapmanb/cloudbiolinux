@@ -3,13 +3,13 @@
 ---
 attributes:
   name: vcfanno
-  version: 20181005
+  version: 20181116
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        githash=074f6f63deada4094f6d3557ee20ea64092f6fec
+        githash=9af964618dc22402a2d793cbec91fec0ed3d9ae6
         mkdir -p config/vcfanno
         cd config/vcfanno
         bcbio_baseurl=https://github.com/chapmanb/bcbio-nextgen/raw/$githash/config/vcfanno/
