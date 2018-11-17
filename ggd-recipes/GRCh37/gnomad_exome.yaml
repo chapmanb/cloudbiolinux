@@ -1,7 +1,7 @@
 # GnomAD VCF sites: http://exac.broadinstitute.org/
 ---
 attributes:
-  name: gnomad
+  name: gnomad_exome
   version: 2.0.1
 recipe:
   full:
