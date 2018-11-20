@@ -38,7 +38,7 @@ from bcbio.rnaseq.gtf import gtf_to_fasta
 from bcbio.distributed.transaction import file_transaction
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "92"
+ensembl_release = "94"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 supported_oldbuilds = {"GRCh37": "75", "hg19": "75"}
 build_subsets = {"hg38-noalt": "hg38"}
