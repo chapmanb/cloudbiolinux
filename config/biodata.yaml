@@ -91,6 +91,7 @@ genomes:
   - dbkey: Zv9
     name: Zebrafish (Zv9)
   - dbkey: sacCer3
+    indexes: [seq]
     name: S cerevisiae (sacCer3)
   - dbkey: WBcel235
     name: C elegans (WBcel235)
