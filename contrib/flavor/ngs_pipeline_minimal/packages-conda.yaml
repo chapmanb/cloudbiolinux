@@ -68,6 +68,8 @@ bio_nextgen:
   - gsort
   - svtools
   - gvcf-regions
+  - gvcfgenotyper
+  # XXX Remove after 0.1.2 release
   - gvcftools
   - hap.py
   - h5py
@@ -226,6 +228,7 @@ r:
   - bioconductor-biocstyle
   - bioconductor-biostrings
   - bioconductor-biovizbase
+  - bioconductor-bsgenome.hsapiens.ucsc.hg38
   - bioconductor-bubbletree
   - bioconductor-cn.mops
   - bioconductor-copynumber
