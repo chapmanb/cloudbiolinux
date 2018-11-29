@@ -79,7 +79,8 @@ bio_nextgen:
   - hisat2
   - hts-nim-tools
   - htslib
-  - htseq
+  # Pinned to avoid error with dexseq_count and HTSeq version checking
+  - htseq=0.9.1
   - impute2
   - kallisto>=0.43.1
   - kraken
