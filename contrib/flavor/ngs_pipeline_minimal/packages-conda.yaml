@@ -53,7 +53,7 @@ bio_nextgen:
   - express
   - extract-sv-reads
   - fastp
-  - fastqc=0.11.7=5
+  - fastqc>=0.11.8=1
   - fgbio
   - freebayes=1.1.0.46
   - gatk
@@ -69,8 +69,6 @@ bio_nextgen:
   - svtools
   - gvcf-regions
   - gvcfgenotyper
-  # XXX Remove after 0.1.2 release
-  - gvcftools
   - hap.py
   - h5py
   - hmftools-cobalt
