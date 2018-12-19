@@ -71,6 +71,7 @@ bio_nextgen:
   - gvcfgenotyper
   - hap.py
   - h5py
+  - hmftools-amber
   - hmftools-cobalt
   - hmftools-purple
   - hmmlearn
@@ -227,6 +228,7 @@ r:
   - bioconductor-biocstyle
   - bioconductor-biostrings
   - bioconductor-biovizbase
+  - bioconductor-bsgenome.hsapiens.ucsc.hg19
   - bioconductor-bsgenome.hsapiens.ucsc.hg38
   - bioconductor-bubbletree
   - bioconductor-cn.mops
@@ -235,6 +237,7 @@ r:
   - bioconductor-deseq2
   - bioconductor-dexseq
   - bioconductor-dnacopy
+  - bioconductor-genomeinfodbdata
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
