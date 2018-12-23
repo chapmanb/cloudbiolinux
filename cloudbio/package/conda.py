@@ -147,6 +147,7 @@ def _create_environments(env, conda_bin, packages):
     - python3 -- support tools that require python 3. This is an initial step
       towards transitioning to more python3 tool support.
     - samtools0 -- For tools that require older samtools 0.1.19
+    - dv -- DeepVariant, which requires a specific version of numpy and tensorflow
     """
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
@@ -156,7 +157,7 @@ def _create_environments(env, conda_bin, packages):
             env.safe_run("{conda_bin} create --no-default-packages -y --name python3 python=3".format(**locals()))
             conda_envs = _get_conda_envs(env, conda_bin)
         out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
-    for addenv in ["samtools0"]:
+    for addenv in ["samtools0", "dv"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 env.safe_run("{conda_bin} create --no-default-packages -y --name {addenv} python=2".format(**locals()))

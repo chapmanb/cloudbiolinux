@@ -45,6 +45,7 @@ bio_nextgen:
   - cutadapt
   - cyvcf2
   - deeptools
+  - deepvariant;env=dv
   - delly
   - dkfz-bias-filter
   - duphold>=0.0.9
@@ -176,6 +177,7 @@ bio_nextgen:
   - vcflib
   - verifybamid2
   - viennarna
+  - vqsr_cnn
   - vt
 perl:
   - perl-app-cpanminus
