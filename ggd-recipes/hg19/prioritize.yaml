@@ -8,7 +8,7 @@
 ---
 attributes:
   name: prioritize
-  version: 20160215
+  version: 20181224
 recipe:
   full:
     recipe_type: bash
