@@ -1,8 +1,7 @@
 #!/bin/bash
 set -eu -o pipefail
-version=20160215
-civicv=2016-02-15
-civicv38=2016-02-15
+version=20181224
+civicv=2018-l2-24
 
 mkdir -p hg19/cancer
 mkdir -p GRCh37/cancer
@@ -20,8 +19,8 @@ zcat civic-GRCh37-$civicv.bed.gz | sort -V | bgzip -c > GRCh37/cancer/civic-$civ
 tabix -f -p bed GRCh37/cancer/civic-$civicv.bed.gz
 zcat civic-GRCh37-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg19/cancer/civic-$civicv.bed.gz
 tabix -f -p bed hg19/cancer/civic-$civicv.bed.gz
-zcat civic-GRCh38-$civicv38.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg38/cancer/civic-$civicv38.bed.gz
-tabix -f -p bed hg38/cancer/civic-$civicv38.bed.gz
+zcat civic-GRCh38-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg38/cancer/civic-$civicv.bed.gz
+tabix -f -p bed hg38/cancer/civic-$civicv.bed.gz
 
 # az300
 cat AZ300-hg19.bed | cut -f 1-4 | sort -V -k1,1 -k2,2n | bedtools merge -i - -c 4 -o distinct | bgzip -c > hg19/cancer/az300.bed.gz

@@ -14,7 +14,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg19-20160215.tar.gz
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg19-20181224.tar.gz
         outdir=coverage/prioritize
         mkdir -p $outdir
         cd $outdir
@@ -27,5 +27,5 @@ recipe:
       - coverage/prioritize/cancer/az300-with-fusion.bed.gz.tbi
       - coverage/prioritize/cancer/az-cancer-panel.bed.gz
       - coverage/prioritize/cancer/az-cancer-panel.bed.gz.tbi
-      - coverage/prioritize/cancer/civic-2016-02-15.bed.gz
-      - coverage/prioritize/cancer/civic-2016-02-15.bed.gz.tbi
+      - coverage/prioritize/cancer/civic-2018-12-24.bed.gz
+      - coverage/prioritize/cancer/civic-2018-12-24.bed.gz.tbi
