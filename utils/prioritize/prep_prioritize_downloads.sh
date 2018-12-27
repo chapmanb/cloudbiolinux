@@ -1,7 +1,8 @@
 #!/bin/bash
 set -eu -o pipefail
-version=20181224
-civicv=2018-l2-24
+version=20181227
+civicv=2018-12-27
+REF=/mnt/work/bcbio/genomes/Hsapiens
 
 mkdir -p hg19/cancer
 mkdir -p GRCh37/cancer
@@ -15,11 +16,11 @@ mkdir -p hg38/cancer
 # python az300_to_bed.py az-cancer-panel.txt
 
 # CIViC
-zcat civic-GRCh37-$civicv.bed.gz | sort -V | bgzip -c > GRCh37/cancer/civic-$civicv.bed.gz
+zcat civic-GRCh37-$civicv.bed.gz | gsort - $REF/GRCh37/seq/GRCh37.fa.fai | bgzip -c > GRCh37/cancer/civic-$civicv.bed.gz
 tabix -f -p bed GRCh37/cancer/civic-$civicv.bed.gz
-zcat civic-GRCh37-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg19/cancer/civic-$civicv.bed.gz
+zcat civic-GRCh37-$civicv.bed.gz | sed 's/^/chr/' | gsort - $REF/hg19/seq/hg19.fa.fai | bgzip -c > hg19/cancer/civic-$civicv.bed.gz
 tabix -f -p bed hg19/cancer/civic-$civicv.bed.gz
-zcat civic-GRCh38-$civicv.bed.gz | sort -V | sed 's/^/chr/' | bgzip -c > hg38/cancer/civic-$civicv.bed.gz
+zcat civic-GRCh38-$civicv.bed.gz | sed 's/^/chr/' | gsort - $REF/hg38/seq/hg38.fa.fai | bgzip -c > hg38/cancer/civic-$civicv.bed.gz
 tabix -f -p bed hg38/cancer/civic-$civicv.bed.gz
 
 # az300

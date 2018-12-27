@@ -8,13 +8,13 @@
 ---
 attributes:
   name: prioritize
-  version: 20181224
+  version: 20181227
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg38-20181224.tar.gz
+        baseurl=https://s3.amazonaws.com/biodata/coverage/prioritize/prioritize-cancer-hg38-20181227.tar.gz
         outdir=coverage/prioritize
         mkdir -p $outdir
         cd $outdir
@@ -27,5 +27,5 @@ recipe:
       - coverage/prioritize/cancer/az300-with-fusion.bed.gz.tbi
       - coverage/prioritize/cancer/az-cancer-panel.bed.gz
       - coverage/prioritize/cancer/az-cancer-panel.bed.gz.tbi
-      - coverage/prioritize/cancer/civic-2018-12-24.bed.gz
-      - coverage/prioritize/cancer/civic-2018-12-24.bed.gz.tbi
+      - coverage/prioritize/cancer/civic-2018-12-27.bed.gz
+      - coverage/prioritize/cancer/civic-2018-12-27.bed.gz.tbi
