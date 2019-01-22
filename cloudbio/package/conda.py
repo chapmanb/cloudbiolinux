@@ -4,7 +4,10 @@ import collections
 import json
 import os
 import shutil
+import subprocess
 import yaml
+
+from distutils.version import LooseVersion
 
 from cloudbio.custom import shared
 from cloudbio.fabutils import quiet
@@ -34,10 +37,14 @@ def install_packages(env, to_install=None, packages=None):
         for env_dir in conda_envs.values():
             _clean_environment(env_dir)
         conda_info = json.loads(env.safe_run_output("{conda_bin} info --json".format(**locals())))
-        # libedit pins to curses 6.0 but bioconda requires 5.9
-        # Ensure we have conda-forge conda installed, otherwise creates resolution
-        # and package issues with removed libedit. Hopefully can remove along with libedit
-        # hack when conda-forge synchronizes ncurses and conda with the base install.
+        # Temporary workaround:
+        # Ensure we have conda-forge conda installed, < 4.6.0, since 4.6.0 resolves slowly
+        # with conda-forge https://groups.google.com/d/msg/biovalidation/ZfcH1K7I-_I/q8FxBu9BDgAJ
+        py_version = ENV_PY_VERSIONS[None]
+        conda_max_version = "4.5.12"
+        conda_version = subprocess.check_output([conda_bin, "--version"], stderr=subprocess.STDOUT).split()[-1]
+        if LooseVersion(conda_version) > LooseVersion(conda_max_version):
+            env.safe_run("{conda_bin} install -y {channels} 'conda={conda_max_version}' {py_version}".format(**locals()))
         # Uninstall old R packages that clash with updated versions
         # Temporary fix to allow upgrades from older versions that have migrated
         # r-tximport is now bioconductor-tximport
