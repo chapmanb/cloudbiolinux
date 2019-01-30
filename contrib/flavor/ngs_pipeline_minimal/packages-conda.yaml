@@ -42,7 +42,7 @@ bio_nextgen:
   - cramtools
   - crossmap
   - cufflinks
-  - cutadapt
+  - cutadapt=1.16
   - cyvcf2
   - deeptools
   - deepvariant;env=dv
