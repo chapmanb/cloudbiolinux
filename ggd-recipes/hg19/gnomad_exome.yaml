@@ -10,11 +10,11 @@ recipe:
       - |
         url=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz
         remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
-        ref=`ls ../seq/*.fa.fai`
+        ref=../seq/hg19.fa
         mkdir -p variation
         export TMPDIR=`pwd`
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
-        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | gsort -m 3000 /dev/stdin $ref | bgzip -c > variation/gnomad_exome.vcf.gz
+        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
     recipe_outfiles:

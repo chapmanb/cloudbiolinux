@@ -12,7 +12,7 @@ recipe:
         ref=../seq/GRCh37.fa
         mkdir -p variation
         export TMPDIR=`pwd`
-        vt decompose -s $url | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
+        vt decompose -s $url | vt normalize -r $ref -n | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
     recipe_outfiles:
       - variation/gnomad_genome.vcf.gz

@@ -12,7 +12,7 @@ recipe:
         ref=`ls ../seq/*.fa.fai`
         mkdir -p variation
         export TMPDIR=`pwd`
-        vt decompose -s $url | gsort -m 3000 /dev/stdin $ref | bgzip -c > variation/gnomad_exome.vcf.gz
+        vt decompose -s $url | vt normalize -r $ref -n | gsort -m 3000 /dev/stdin $ref | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
     recipe_outfiles:
