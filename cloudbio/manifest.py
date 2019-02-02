@@ -66,12 +66,20 @@ def write_custom_pkg_info(out_dir, tooldir):
     if not os.path.exists(out_file):
         out = {}
         for modname in custom_names:
-            mod = getattr(__import__("cloudbio.custom", globals(), locals(),
-                                     [modname], -1),
-                          modname)
-            for prog in [x for x in dir(mod) if x.startswith("install")]:
-                pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
-                out[pkg["name"]] = pkg
+            try:
+                mod = getattr(__import__("cloudbio.custom", globals(), locals(),
+                                         [modname], -1),
+                              modname)
+            except ImportError as msg:
+                # Skip fabric import errors as we transition away from it
+                if "fabric" in str(msg):
+                    mod = None
+                else:
+                    raise
+            if mod:
+                for prog in [x for x in dir(mod) if x.startswith("install")]:
+                    pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
+                    out[pkg["name"]] = pkg
         with open(out_file, "w") as out_handle:
             yaml.safe_dump(out, out_handle, default_flow_style=False, allow_unicode=False)
     return out_file

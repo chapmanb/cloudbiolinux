@@ -1,13 +1,11 @@
 """Shared functionality useful for multiple package managers.
 """
 import yaml
-from fabric.api import *
-from fabric.contrib.files import *
 
-def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=True):
+def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=True, env=None):
     """Read a list of packages from a nested YAML configuration file.
     """
-    env.logger.info("Reading %s" % yaml_file)
+    print("Reading packages from %s" % yaml_file)
     with open(yaml_file) as in_handle:
         full_data = yaml.load(in_handle)
         if full_data is None:
@@ -19,7 +17,7 @@ def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=
         subs = {}
     # filter the data based on what we have configured to install
     data = [(k, v) for (k, v) in full_data.iteritems()
-            if to_install is None or k in to_install]
+            if (to_install is None or k in to_install) and k not in ["channels"]]
     data.sort()
     packages = []
     pkg_to_group = dict()
@@ -33,17 +31,16 @@ def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=
             elif isinstance(cur_info, dict):
                 for key, val in cur_info.iteritems():
                     # if we are okay, propagate with the top level key
-                    if key == 'needs_64bit':
+                    if env and key == 'needs_64bit':
                         if env.is_64bit:
                             data.insert(0, (cur_key, val))
-                    elif key.startswith(env.distribution):
+                    elif env and key.startswith(env.distribution):
                         if key.endswith(env.dist_name):
                             data.insert(0, (cur_key, val))
                     else:
                         data.insert(0, (cur_key, val))
             else:
                 raise ValueError(cur_info)
-    env.logger.debug("Packages to install: {0}".format(",".join(packages)))
     return packages, pkg_to_group
 
 def _filter_subs_packages(initial, subs, namesort=True):

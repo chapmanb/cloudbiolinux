@@ -2,20 +2,19 @@
 """
 import os
 
-from fabric.api import env, cd
-
-from cloudbio.custom.shared import _make_tmp_dir
-from cloudbio.package import brew
-from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
-                                  _setup_apt_automation, _setup_apt_sources)
-from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
-                                  _setup_yum_sources)
 
 def _configure_and_install_native_packages(env, pkg_install):
     """
     Setups up native package repositories, determines list
     of native packages to install, and installs them.
     """
+    from fabric.api import env
+    from cloudbio.package import brew
+    from cloudbio.package.deb import (_apt_packages, _add_apt_gpg_keys,
+                                      _setup_apt_automation, _setup_apt_sources)
+    from cloudbio.package.rpm import (_yum_packages, _setup_yum_bashrc,
+                                      _setup_yum_sources)
+
     home_dir = env.safe_run("echo $HOME")
     if home_dir:
         if env.shell_config.startswith("~"):
@@ -43,6 +42,7 @@ def _connect_native_packages(env, pkg_install, lib_install):
     This helps setup a non-sudo environment to handle software
     that needs a local version in our non-root directory tree.
     """
+    from fabric.api import env
     bin_dir = os.path.join(env.system_install, "bin")
     exports = _get_shell_exports(env)
     path = env.safe_run_output("echo $PATH")
@@ -70,6 +70,9 @@ def _print_shell_exports(env):
 def _create_local_virtualenv(target_dir):
     """Create virtualenv in target directory for non-sudo installs.
     """
+    from fabric.api import cd
+    from cloudbio.custom.shared import _make_tmp_dir
+
     url = "https://raw.github.com/pypa/virtualenv/master/virtualenv.py"
     if not os.path.exists(os.path.join(target_dir, "bin", "python")):
         with _make_tmp_dir() as work_dir:
