@@ -1,7 +1,6 @@
 """Reusable decorators and functions for custom installations.
 """
 from contextlib import contextmanager
-import datetime
 import functools
 import os
 import socket
@@ -11,16 +10,85 @@ import tempfile
 from tempfile import NamedTemporaryFile
 import urllib
 import uuid
+import shutil
 import subprocess
+import time
 
-from fabric.api import *
-from fabric.contrib.files import *
-from cloudbio.fabutils import quiet, warn_only
+# Optional fabric imports, for back compatibility
+try:
+    from fabric.api import *
+    from fabric.contrib.files import *
+    from cloudbio.fabutils import quiet, warn_only
+except ImportError:
+    pass
 
 CBL_REPO_ROOT_URL = "https://raw.github.com/chapmanb/cloudbiolinux/master/"
 
 # -- decorators and context managers
 
+@contextmanager
+def chdir(new_dir):
+    """Context manager to temporarily change to a new directory.
+
+    http://lucentbeing.com/blog/context-managers-and-the-with-statement-in-python/
+    """
+    # On busy filesystems can have issues accessing main directory. Allow retries
+    num_tries = 0
+    max_tries = 5
+    cur_dir = None
+    while cur_dir is None:
+        try:
+            cur_dir = os.getcwd()
+        except OSError:
+            if num_tries > max_tries:
+                raise
+            num_tries += 1
+            time.sleep(2)
+    safe_makedir(new_dir)
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(cur_dir)
+
+def safe_makedir(dname):
+    """Make a directory if it doesn't exist, handling concurrent race conditions.
+    """
+    if not dname:
+        return dname
+    num_tries = 0
+    max_tries = 5
+    while not os.path.exists(dname):
+        # we could get an error here if multiple processes are creating
+        # the directory at the same time. Grr, concurrency.
+        try:
+            os.makedirs(dname)
+        except OSError:
+            if num_tries > max_tries:
+                raise
+            num_tries += 1
+            time.sleep(2)
+    return dname
+
+def which(program, env=None):
+    """ returns the path to an executable or None if it can't be found"""
+    paths = os.environ["PATH"].split(os.pathsep)
+    if env and hasattr(env, "system_install"):
+        paths += [env.system_install, os.path.join(env.system_install, "anaconda")]
+
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in paths:
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+    return None
 
 def _if_not_installed(pname):
     """Decorator that checks if a callable program is installed.
@@ -82,6 +150,13 @@ def _if_not_python_lib(library):
         return decorator
     return argcatcher
 
+@contextmanager
+def make_tmp_dir_local(ext, work_dir):
+    if ext:
+        work_dir += ext
+    safe_makedir(work_dir)
+    yield work_dir
+    shutil.rmtree(work_dir)
 
 @contextmanager
 def _make_tmp_dir(ext=None, work_dir=None):
@@ -179,27 +254,28 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
     """
     if out_file is None:
         out_file = os.path.basename(url)
-    if not env.safe_exists(out_file):
+    if not os.path.exists(out_file):
         if samedir and os.path.isabs(out_file):
             orig_dir = os.path.dirname(out_file)
             out_file = os.path.basename(out_file)
         else:
-            orig_dir = env.safe_run_output("pwd").strip()
+            orig_dir = os.getcwd()
         temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL,
                                       str("file://%s/%s/%s" %
-                                          (env.host, socket.gethostname(), out_file)))
-        with _make_tmp_dir(ext=temp_ext, work_dir=orig_dir if samedir else None) as tmp_dir:
-            with cd(tmp_dir):
-                with warn_only():
-                    result = env.safe_run("wget --continue --no-check-certificate -O %s '%s'" % (out_file, url))
-                if result.succeeded:
+                                          ("localhost", socket.gethostname(), out_file)))
+        with make_tmp_dir_local(ext=temp_ext, work_dir=orig_dir if samedir else None) as tmp_dir:
+            with chdir(tmp_dir):
+                try:
+                    subprocess.check_call("wget --continue --no-check-certificate -O %s '%s'"
+                                          % (out_file, url), shell=True)
                     if fix_fn:
                         out_file = fix_fn(env, out_file)
-                    env.safe_run("mv %s %s" % (out_file, orig_dir))
-                elif allow_fail:
-                    out_file = None
-                else:
-                    raise IOError("Failure to retrieve remote file: %s" % url)
+                    subprocess.check_call("mv %s %s" % (out_file, orig_dir), shell=True)
+                except subprocess.CalledProcessError:
+                    if allow_fail:
+                        out_file = None
+                    else:
+                        raise IOError("Failure to retrieve remote file: %s" % url)
         if samedir and out_file:
             out_file = os.path.join(orig_dir, out_file)
     return out_file

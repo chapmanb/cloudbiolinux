@@ -2,10 +2,12 @@
 
 http://wiki.galaxyproject.org/Admin/Data%20Integration
 """
+import os
+import shutil
+import subprocess
 from xml.etree import ElementTree
 
-from fabric.api import *
-from fabric.contrib.files import *
+from cloudbio.custom import shared
 
 # ## Compatibility definitions
 
@@ -43,7 +45,7 @@ class LocCols(object):
         self.dbkey1 = config.get('index', dbkey)
         self.dbkey2 = config.get('index', dbkey)
 
-def _get_tool_conf(tool_name):
+def _get_tool_conf(env, tool_name):
     """
     Parse the tool_data_table_conf.xml from installed_files subfolder and extract
     values for the 'columns' tag and 'path' parameter for the 'file' tag, returning
@@ -58,12 +60,12 @@ def _get_tool_conf(tool_name):
             tool_conf['file'] = t.find('file').attrib.get('path', '')
     return tool_conf
 
-def _build_galaxy_loc_line(dbkey, file_path, config, prefix, tool_name):
+def _build_galaxy_loc_line(env, dbkey, file_path, config, prefix, tool_name):
     """Prepare genome information to write to a Galaxy *.loc config file.
     """
     if tool_name:
         str_parts = []
-        tool_conf = _get_tool_conf(tool_name)
+        tool_conf = _get_tool_conf(env, tool_name)
         loc_cols = LocCols(config, dbkey, file_path)
         # Compose the .loc file line as str_parts list by looking for column values
         # from the retrieved tool_conf (as defined in tool_data_table_conf.xml).
@@ -77,24 +79,30 @@ def _build_galaxy_loc_line(dbkey, file_path, config, prefix, tool_name):
         str_parts.insert(0, prefix)
     return str_parts
 
-def update_loc_file(ref_file, line_parts):
+def update_loc_file(env, ref_file, line_parts):
     """Add a reference to the given genome to the base index file.
     """
     if getattr(env, "galaxy_home", None) is not None:
         tools_dir = os.path.join(env.galaxy_home, "tool-data")
-        if not env.safe_exists(tools_dir):
-            env.safe_run("mkdir -p %s" % tools_dir)
+        if not os.path.exists(tools_dir):
+            subprocess.check_call("mkdir -p %s" % tools_dir, shell=True)
         dt_file = os.path.join(env.galaxy_home, "tool_data_table_conf.xml")
-        if not env.safe_exists(dt_file):
-            env.safe_put(env.tool_data_table_conf_file, dt_file)
+        if not os.path.exists(dt_file):
+            shutil.copy(env.tool_data_table_conf_file, dt_file)
         add_str = "\t".join(line_parts)
-        with cd(tools_dir):
-            if not env.safe_exists(ref_file):
-                env.safe_run("touch %s" % ref_file)
-            if not env.safe_contains(ref_file, add_str):
-                env.safe_append(ref_file, add_str)
+        with shared.chdir(tools_dir):
+            if not os.path.exists(ref_file):
+                subprocess.check_call("touch %s" % ref_file, shell=True)
+            has_line = False
+            with open(ref_file) as in_handle:
+                for line in in_handle:
+                    if line.strip() == add_str.strip():
+                        has_line = True
+            if not has_line:
+                with open(ref_file, "a") as out_handle:
+                    out_handle.write(line + "\n")
 
-def prep_locs(gid, indexes, config):
+def prep_locs(env, gid, indexes, config):
     """Prepare Galaxy location files for all available indexes.
     """
     for ref_index_file, cur_index, prefix, tool_name in [
@@ -109,8 +117,8 @@ def prep_locs(gid, indexes, config):
             ("bwa_index.loc", indexes.get("bwa", None), "", 'bwa_indexes'),
             ("novoalign_indices.loc", indexes.get("novoalign", None), "", "novoalign_indexes")]:
         if cur_index:
-            str_parts = _build_galaxy_loc_line(gid, cur_index, config, prefix, tool_name)
-            update_loc_file(ref_index_file, str_parts)
+            str_parts = _build_galaxy_loc_line(env, gid, cur_index, config, prefix, tool_name)
+            update_loc_file(env, ref_index_file, str_parts)
 
 # ## Finalize downloads
 
@@ -118,18 +126,18 @@ def index_picard(ref_file):
     """Provide a Picard style dict index file for a reference genome.
     """
     index_file = "%s.dict" % os.path.splitext(ref_file)[0]
-    if not env.safe_exists(index_file):
-        env.safe_run("picard -Xms500m -Xmx3500m CreateSequenceDictionary REFERENCE={ref} OUTPUT={out}"
-                     .format(ref=ref_file, out=index_file))
+    if not os.path.exists(index_file):
+        subprocess.check_call("picard -Xms500m -Xmx3500m CreateSequenceDictionary REFERENCE={ref} OUTPUT={out}"
+                              .format(ref=ref_file, out=index_file), shell=True)
     return index_file
 
 def _finalize_index_seq(fname):
     """Convert UCSC 2bit file into fasta file.
     """
     out_fasta = fname + ".fa"
-    if not env.safe_exists(out_fasta):
-        env.safe_run("twoBitToFa {base}.2bit {out}".format(
-            base=fname, out=out_fasta))
+    if not os.path.exists(out_fasta):
+        subprocess.check_call("twoBitToFa {base}.2bit {out}".format(
+            base=fname, out=out_fasta), shell=True)
 
 finalize_fns = {"ucsc": _finalize_index_seq,
                 "seq": index_picard}
@@ -159,8 +167,8 @@ def _get_galaxy_genomes(gid, genome_dir, genomes, genome_indexes):
     """
     out = {}
     org_dir = os.path.join(genome_dir, gid)
-    if not env.safe_exists(org_dir):
-        env.safe_run('mkdir -p %s' % org_dir)
+    if not os.path.exists(org_dir):
+        subprocess.check_call('mkdir -p %s' % org_dir, shell=True)
     for idx in genome_indexes:
         galaxy_index_name = index_map.get(idx)
         index_file = None
@@ -176,29 +184,32 @@ def _rsync_genome_index(gid, idx, org_dir):
     """Retrieve index for a genome from rsync server, returning path to files.
     """
     idx_dir = os.path.join(org_dir, idx)
-    if not env.safe_exists(idx_dir):
+    if not os.path.exists(idx_dir):
         org_rsync = None
         for subdir in galaxy_subdirs:
             test_rsync = "{server}/indexes{subdir}/{gid}/{idx}/".format(
                 server=server, subdir=subdir, gid=gid, idx=idx)
-            with quiet():
-                check_dir = env.safe_run("rsync --list-only {server}".format(server=test_rsync))
-            if check_dir.succeeded:
+            try:
+                subprocess.check_output("rsync --list-only {server}".format(server=test_rsync))
                 org_rsync = test_rsync
-                break
+            except subprocess.CalledProcessError:
+                pass
         if org_rsync is None:
             raise ValueError("Could not find genome %s on Galaxy rsync" % gid)
-        with quiet():
-            check_dir = env.safe_run("rsync --list-only {server}".format(server=org_rsync))
-        if check_dir.succeeded:
-            if not env.safe_exists(idx_dir):
-                env.safe_run('mkdir -p %s' % idx_dir)
+        try:
+            subprocess.check_call("rsync --list-only {server}".format(server=org_rsync), shell=True)
+            if not os.path.exists(idx_dir):
+                subprocess.check_call('mkdir -p %s' % idx_dir, shell=True)
             with cd(idx_dir):
-                env.safe_run("rsync -avzP {server} {idx_dir}".format(server=org_rsync,
-                                                            idx_dir=idx_dir))
-    if env.safe_exists(idx_dir):
-        with quiet():
-            has_fa_ext = env.safe_run("ls {idx_dir}/{gid}.fa*".format(idx_dir=idx_dir,
-                                                                      gid=gid))
-        ext = ".fa" if (has_fa_ext.succeeded and idx not in ["seq"]) else ""
+                subprocess.check_call("rsync -avzP {server} {idx_dir}".format(server=org_rsync,
+                                                                              idx_dir=idx_dir), shell=True)
+        except subprocess.CalledProcessError:
+            pass
+    if os.path.exists(idx_dir):
+        try:
+            subprocess.check_call("ls {idx_dir}/{gid}.fa*".format(idx_dir=idx_dir,
+                                                                  gid=gid), shell=True)
+            ext = ".fa" if (has_fa_ext.succeeded and idx not in ["seq"]) else ""
+        except subprocess.CalledProcessError:
+            pass
         return os.path.join(idx_dir, gid + ext)

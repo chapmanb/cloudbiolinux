@@ -11,13 +11,11 @@ import os
 import shutil
 import subprocess
 
-from fabric.api import env
 import yaml
 
-def install_recipe(base_dir, recipe_file, genome_build):
+def install_recipe(base_dir, system_install, recipe_file, genome_build):
     """Install data in a biodata directory given instructions from GGD YAML recipe.
     """
-    assert env.hosts == ["localhost"], "GGD recipes only work for local runs"
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
     recipe = _read_recipe(recipe_file)
@@ -28,7 +26,7 @@ def install_recipe(base_dir, recipe_file, genome_build):
                     print("Running GGD recipe: %s %s %s" % (genome_build, recipe["attributes"]["name"],
                                                             recipe["attributes"]["version"]))
                     _run_recipe(tmpdir, recipe["recipe"]["full"]["recipe_cmds"],
-                                recipe["recipe"]["full"]["recipe_type"])
+                                recipe["recipe"]["full"]["recipe_type"], system_install)
                 _move_files(tmpdir, base_dir, recipe["recipe"]["full"]["recipe_outfiles"])
             add_version(base_dir, recipe)
 
@@ -52,13 +50,13 @@ def _has_required_programs(programs):
             return False
     return True
 
-def _run_recipe(work_dir, recipe_cmds, recipe_type):
+def _run_recipe(work_dir, recipe_cmds, recipe_type, system_install):
     """Create a bash script and run the recipe to download data.
     """
     assert recipe_type == "bash", "Can only currently run bash recipes"
     run_file = os.path.join(work_dir, "ggd-run.sh")
     with open(run_file, "w") as out_handle:
-        out_handle.write("#!/bin/bash\nset -eu -o pipefail\nexport PATH=%s/bin:$PATH\n" % env.system_install)
+        out_handle.write("#!/bin/bash\nset -eu -o pipefail\nexport PATH=%s/bin:$PATH\n" % system_install)
         out_handle.write("\n".join(recipe_cmds))
     subprocess.check_output(["bash", run_file])
 
