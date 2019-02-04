@@ -9,10 +9,10 @@ recipe:
     recipe_cmds:
       - |
         url=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz
-        ref=`ls ../seq/*.fa.fai`
+        ref=../seq/GRCh37.fa
         mkdir -p variation
         export TMPDIR=`pwd`
-        vt decompose -s $url | gsort -m 3000 /dev/stdin $ref | bgzip -c > variation/gnomad_exome.vcf.gz
+        vt decompose -s $url | vt normalize -r $ref -n - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
     recipe_outfiles:
