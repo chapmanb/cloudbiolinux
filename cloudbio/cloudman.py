@@ -327,7 +327,7 @@ def _cleanup_ec2(env):
     env.logger.debug("Setting bash history")
     local = os.path.join(env.config_dir, os.pardir, "installed_files", "bash_history")
     remote = os.path.join('/home', 'ubuntu', '.bash_history')
-    put(local, remote, mode=0660, use_sudo=True)
+    put(local, remote, mode="0660", use_sudo=True)
     # Make sure the default config dir is owned by ubuntu
     sudo("chown ubuntu:ubuntu ~/.config")
     # Stop Apache from starting automatically at boot (it conflicts with Galaxy's nginx)

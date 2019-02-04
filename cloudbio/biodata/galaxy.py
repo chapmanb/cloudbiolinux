@@ -2,6 +2,8 @@
 
 http://wiki.galaxyproject.org/Admin/Data%20Integration
 """
+from __future__ import print_function
+
 import os
 import shutil
 import subprocess
@@ -177,7 +179,7 @@ def _get_galaxy_genomes(gid, genome_dir, genomes, genome_indexes):
         if index_file:
             out[idx] = index_file
         else:
-            print "Galaxy does not support {0} for {1}".format(idx, gid)
+            print("Galaxy does not support {0} for {1}".format(idx, gid))
     return out
 
 def _rsync_genome_index(gid, idx, org_dir):

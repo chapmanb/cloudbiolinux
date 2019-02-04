@@ -9,8 +9,8 @@ The main targets are fabric functions:
   - install_data -- Install biological data from scratch, including indexing genomes.
   - install_data_s3 -- Install biological data, downloading pre-computed indexes from S3.
   - upload_s3 -- Upload created indexes to biodata S3 bucket.
-
 """
+from __future__ import print_function
 import collections
 import os
 import operator
@@ -481,7 +481,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns, data_filedir):
                                 raise
                             else:
                                 print("Moving on to next genome prep method after trying {0}\n{1}".format(
-                                    method, str(e)))
+                                      method, str(e)))
                     if not finished:
                         raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
@@ -896,7 +896,7 @@ def _upload_to_s3(tarball, bucket):
     s3_key_name = os.path.join("genomes", os.path.basename(tarball))
     if not bucket.get_key(s3_key_name):
         gb_size = int(subprocess.check_output("du -sm %s" % tarball, shell=True).split()[0]) / 1000.0
-        print "Uploading %s %.1fGb" % (s3_key_name, gb_size)
+        print("Uploading %s %.1fGb" % (s3_key_name, gb_size))
         cl = ["python", upload_script, tarball, bucket.name, s3_key_name, "--public"]
         subprocess.check_call(cl)
 

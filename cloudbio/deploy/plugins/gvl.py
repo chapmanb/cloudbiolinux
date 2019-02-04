@@ -1,6 +1,7 @@
 """
 Deployer plugin containing actions related to older galaxy-vm-launcher functionality.
 """
+from __future__ import print_function
 
 import os
 import time
@@ -77,7 +78,7 @@ def stash_genomes(where):
         elif where == 'opt':
             sudo("cp %s /opt/compressed_genomes.tar.gz" % remote_compressed_indices)
         else:
-            print "Invalid option specified for stash_genomes [%s] - valid values include download and opt." % where
+            print("Invalid option specified for stash_genomes [%s] - valid values include download and opt." % where)
 
 
 def upload_genomes(options):
@@ -170,7 +171,7 @@ def wait_for_galaxy():
 
     while not "8080" in run("netstat -lant"):
         # Check if galaxy has started
-        print "Waiting for galaxy to start."
+        print("Waiting for galaxy to start.")
         time.sleep(10)
 
 

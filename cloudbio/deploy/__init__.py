@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import print_function
 import os
 
 from tempfile import tempdir
@@ -45,7 +45,7 @@ def deploy(options):
 
     if _do_perform_action("list", actions):
         for node in vm_launcher.list():
-            print "Active node with uuid %s <%s>" % (node.uuid, node)
+            print("Active node with uuid %s <%s>" % (node.uuid, node))
 
     if _do_perform_action("destroy", actions):
         target_name = options["hostname"]
@@ -58,7 +58,7 @@ def deploy(options):
 
     # Do we have remaining actions requiring an vm?
     if len(actions) > 0:
-        print 'Setting up virtual machine'
+        print('Setting up virtual machine')
         vm_launcher.boot_and_connect()
         _setup_vm(options, vm_launcher, actions)
 
@@ -128,7 +128,7 @@ def _setup_vm(options, vm_launcher, actions):
                 name = eval_template(env, name_template)
                 vm_launcher.package(name=name)
             if not destroy_on_complete and hasattr(vm_launcher, "uuid"):
-                print 'Your instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip)
+                print('Your instance (%s) is waiting at http://%s' % (vm_launcher.uuid, ip))
     finally:
         if destroy_on_complete:
             vm_launcher.destroy()
@@ -235,7 +235,7 @@ def configure_ssh_key(options):
         put(local_path=key_file,
             remote_path="/home/%s/.ssh/%s" % (env.galaxy_user, os.path.basename(key_file)),
             use_sudo=True,
-            mode=0600)
+            mode="0600")
         _chown_galaxy(env, "/home/%s/.ssh" % env.galaxy_user)
 
 

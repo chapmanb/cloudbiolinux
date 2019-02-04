@@ -1,5 +1,6 @@
 """Shared functionality useful for multiple package managers.
 """
+from __future__ import print_function
 import yaml
 
 def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=True, env=None):

@@ -4,6 +4,7 @@ Builds off work done by Aaron Quinlan to define and install genomic data:
 
 https://github.com/arq5x/ggd
 """
+from __future__ import print_function
 import collections
 import contextlib
 from distutils.version import LooseVersion

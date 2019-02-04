@@ -1,3 +1,4 @@
+from __future__ import print_function
 from fabric.api import run, env
 from time import sleep
 from boto.exception import EC2ResponseError
@@ -27,7 +28,7 @@ def attach_volumes(vm_launcher, options, format=False):
                 break
 
             sleep(5)
-            print "Waiting for volume corresponding to device %s to attach" % device_id
+            print("Waiting for volume corresponding to device %s to attach" % device_id)
             break
 
         # Don't mount if already mounted
@@ -42,7 +43,7 @@ def attach_volumes(vm_launcher, options, format=False):
             _mount(device_id, path)
         except:
             if format == "__auto__":
-                print "Failed to mount device. format is set to __auto__ so will now format device and retry mount"
+                print("Failed to mount device. format is set to __auto__ so will now format device and retry mount")
                 _format_device(device_id)
                 _mount(device_id, path)
             else:
@@ -134,9 +135,9 @@ def _make_snapshot(vm_launcher, fs_path, desc):
         delete_old_volume = False
         if delete_old_volume:
             _delete_volume(ec2_conn, fs_vol.id)
-        print "----- Done snapshoting volume '%s' for file system '%s' -----" % (fs_vol.id, fs_path)
+        print("----- Done snapshoting volume '%s' for file system '%s' -----" % (fs_vol.id, fs_path))
     else:
-        print "ERROR: Failed to find require file system, is boto installed? Is it not actually mounted?"
+        print("ERROR: Failed to find require file system, is boto installed? Is it not actually mounted?")
 
 
 def _find_mounted_device_id(path):
@@ -151,19 +152,19 @@ def _attach(ec2_conn, instance_id, volume_id, device):
     Try it for some time.
     """
     try:
-        print "Attaching volume '%s' to instance '%s' as device '%s'" % (volume_id, instance_id, device)
+        print("Attaching volume '%s' to instance '%s' as device '%s'" % (volume_id, instance_id, device))
         volumestatus = ec2_conn.attach_volume(volume_id, instance_id, device)
     except EC2ResponseError, e:
-        print "Attaching volume '%s' to instance '%s' as device '%s' failed. Exception: %s" % (volume_id, instance_id, device, e)
+        print("Attaching volume '%s' to instance '%s' as device '%s' failed. Exception: %s" % (volume_id, instance_id, device, e))
         return False
 
     for counter in range(30):
-        print "Attach attempt %s, volume status: %s" % (counter, volumestatus)
+        print("Attach attempt %s, volume status: %s" % (counter, volumestatus))
         if volumestatus == 'attached':
-            print "Volume '%s' attached to instance '%s' as device '%s'" % (volume_id, instance_id, device)
+            print("Volume '%s' attached to instance '%s' as device '%s'" % (volume_id, instance_id, device))
             break
         if counter == 29:
-            print "Volume '%s' FAILED to attach to instance '%s' as device '%s'. Aborting." % (volume_id, instance_id, device)
+            print("Volume '%s' FAILED to attach to instance '%s' as device '%s'. Aborting." % (volume_id, instance_id, device))
             return False
         volumes = ec2_conn.get_all_volumes([volume_id])
         volumestatus = volumes[0].attachment_state()
@@ -179,16 +180,16 @@ def _detach(ec2_conn, instance_id, volume_id):
     try:
         volumestatus = ec2_conn.detach_volume( volume_id, instance_id, force=True )
     except EC2ResponseError, ( e ):
-        print "Detaching volume '%s' from instance '%s' failed. Exception: %s" % ( volume_id, instance_id, e )
+        print("Detaching volume '%s' from instance '%s' failed. Exception: %s" % ( volume_id, instance_id, e ))
         return False
 
     for counter in range( 30 ):
-        print "Volume '%s' status '%s'" % ( volume_id, volumestatus )
+        print("Volume '%s' status '%s'" % ( volume_id, volumestatus ))
         if volumestatus == 'available':
-            print "Volume '%s' successfully detached from instance '%s'." % ( volume_id, instance_id )
+            print("Volume '%s' successfully detached from instance '%s'." % ( volume_id, instance_id ))
             break
         if counter == 29:
-            print "Volume '%s' FAILED to detach to instance '%s'." % ( volume_id, instance_id )
+            print("Volume '%s' FAILED to detach to instance '%s'." % ( volume_id, instance_id ))
         sleep(3)
         volumes = ec2_conn.get_all_volumes( [volume_id] )
         volumestatus = volumes[0].status
@@ -197,9 +198,9 @@ def _detach(ec2_conn, instance_id, volume_id):
 def _delete_volume(ec2_conn, vol_id):
     try:
         ec2_conn.delete_volume(vol_id)
-        print "Deleted volume '%s'" % vol_id
+        print("Deleted volume '%s'" % vol_id)
     except EC2ResponseError, e:
-        print "ERROR deleting volume '%s': %s" % (vol_id, e)
+        print("ERROR deleting volume '%s': %s" % (vol_id, e))
 
 
 def _create_snapshot(ec2_conn, volume_id, description=None):
@@ -212,8 +213,8 @@ def _create_snapshot(ec2_conn, volume_id, description=None):
         while snapshot.status != 'completed':
             sleep(6)
             snapshot.update()
-        print "Creation of snapshot for volume '%s' completed: '%s'" % (volume_id, snapshot)
+        print("Creation of snapshot for volume '%s' completed: '%s'" % (volume_id, snapshot))
         return snapshot.id
     else:
-        print "Could not create snapshot from volume with ID '%s'" % volume_id
+        print("Could not create snapshot from volume with ID '%s'" % volume_id)
         return False

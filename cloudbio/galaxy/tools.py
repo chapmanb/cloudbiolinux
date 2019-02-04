@@ -1,6 +1,7 @@
 import os
 from string import Template
 
+import six
 import yaml
 
 from cloudbio.custom.bio_general import *
@@ -98,7 +99,7 @@ def _install_configured_applications(env, tools_conf):
     if exceptions:
         for name, exception in exceptions.iteritems():
             env.logger.warn(FAILED_INSTALL_MESSAGE % name)
-        first_exception = exceptions.values()[0]
+        first_exception = list(exceptions.values())[0]
         raise first_exception
 
 
@@ -118,7 +119,7 @@ def _install_application(name, versions, tool_install_dir=None):
             bin_dirs = version_info.get("bin_dirs", ["bin"])
             env_vars = version_info.get("env_vars", {})
             provides = version_info.get("provides", [])
-            if isinstance(provides, (str, unicode, basestring)):
+            if isinstance(provides, (str, unicode, six.string_types)):
                 provides = [provides]
             for provide_conf in provides[:]:
                 if isinstance(provide_conf, dict):

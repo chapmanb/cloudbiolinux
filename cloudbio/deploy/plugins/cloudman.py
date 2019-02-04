@@ -1,3 +1,4 @@
+from __future__ import print_function
 from datetime import datetime
 from os.path import exists, join
 from os import listdir
@@ -86,7 +87,7 @@ def sync_cloudman_bucket(vm_launcher, options):
         bucket = __get_bucket_default(options)
     bucket_source = options.get("cloudman", {}).get("bucket_source", None)
     if not bucket or not bucket_source:
-        print "Warning: Failed to sync cloud bucket, bucket or bucket_source is undefined."
+        print("Warning: Failed to sync cloud bucket, bucket or bucket_source is undefined.")
         return
     conn = vm_launcher.boto_s3_connection()
     for file_name in listdir(bucket_source):
@@ -101,22 +102,22 @@ def _save_file_to_bucket(conn, bucket_name, remote_filename, local_file, **kwarg
     if b is not None:
         # print "Establishing handle with key object '%s'..." % remote_filename
         k = Key( b, remote_filename )
-        print "Attempting to save file '%s' to bucket '%s'..." % (remote_filename, bucket_name)
+        print("Attempting to save file '%s' to bucket '%s'..." % (remote_filename, bucket_name))
         try:
             # Store some metadata (key-value pairs) about the contents of the file being uploaded
             # Note that the metadata must be set *before* writing the file
             k.set_metadata('date_uploaded', str(datetime.utcnow()))
             for args_key in kwargs:
-                print "Adding metadata to file '%s': %s=%s" % (remote_filename, args_key, kwargs[args_key])
+                print("Adding metadata to file '%s': %s=%s" % (remote_filename, args_key, kwargs[args_key]))
                 k.set_metadata(args_key, kwargs[args_key])
-            print "Saving file '%s'" % local_file
+            print("Saving file '%s'" % local_file)
             k.set_contents_from_filename(local_file)
-            print "Successfully added file '%s' to bucket '%s'." % (remote_filename, bucket_name)
+            print("Successfully added file '%s' to bucket '%s'." % (remote_filename, bucket_name))
             make_public = True
             if make_public:
                 k.make_public()
         except S3ResponseError, e:
-            print "Failed to save file local file '%s' to bucket '%s' as file '%s': %s" % ( local_file, bucket_name, remote_filename, e )
+            print("Failed to save file local file '%s' to bucket '%s' as file '%s': %s" % ( local_file, bucket_name, remote_filename, e ))
             return False
         return True
     else:
@@ -159,7 +160,7 @@ def _get_bucket(s3_conn, bucket_name):
             b = s3_conn.get_bucket(bucket_name)
             break
         except S3ResponseError:
-            print "Bucket '%s' not found, attempt %s/5" % (bucket_name, i)
+            print("Bucket '%s' not found, attempt %s/5" % (bucket_name, i))
             return None
     return b
 

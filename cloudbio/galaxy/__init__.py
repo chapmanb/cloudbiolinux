@@ -2,7 +2,7 @@
 Adapted from Enis Afgan's mi-deployment code:
 https://bitbucket.org/afgane/mi-deployment
 """
-
+from __future__ import print_function
 import os
 import contextlib
 
@@ -274,7 +274,7 @@ def _configure_galaxy_options(env, option_dict=None, prefix="galaxy_universe_"):
             conf_file_name = "%s_override_%s.ini" % (option_priority, key)
             conf_file = os.path.join(galaxy_conf_directory, conf_file_name)
             contents = "[app:main]\n%s=%s" % (key, value)
-            _write_to_file(contents, conf_file, 0700)
+            _write_to_file(contents, conf_file, "0700")
             _chown_galaxy(env, conf_file)
 
 

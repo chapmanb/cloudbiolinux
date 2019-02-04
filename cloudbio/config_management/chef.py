@@ -107,5 +107,4 @@ def _parse_json(filename):
     with open(filename) as f:
         lines = f.readlines()
         content = ''.join([line for line in lines if not line.startswith('//')])
-        print content
         return json.loads(content)

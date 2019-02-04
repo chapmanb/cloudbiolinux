@@ -19,6 +19,9 @@ import shutil
 from fabric.api import env, run, sudo, local, settings, hide, put
 from fabric.contrib.files import exists, sed, contains, append, comment
 
+import six
+
+
 SUDO_ENV_KEEPS = []  # Environment variables passed through to sudo environment when using local sudo.
 SUDO_ENV_KEEPS += ["http_proxy", "https_proxy"]  # Required for local sudo to work behind a proxy.
 
@@ -139,7 +142,7 @@ def local_contains(filename, text, exact=False, use_sudo=False, escape=True,
 def local_append(filename, text, use_sudo=False, partial=False, escape=True, shell=False):
     func = use_sudo and env.safe_sudo or env.safe_run
     # Normalize non-list input to be a list
-    if isinstance(text, basestring):
+    if isinstance(text, six.string_types):
         text = [text]
     for line in text:
         regex = '^' + _escape_for_regex(line)  + ('' if partial else '$')
@@ -178,7 +181,7 @@ def configure_runsudo(env):
         env.safe_exists = exists
         env.safe_run = run
         env.safe_run_output = run_output
-    if isinstance(getattr(env, "use_sudo", "true"), basestring):
+    if isinstance(getattr(env, "use_sudo", "true"), six.string_types):
         if getattr(env, "use_sudo", "true").lower() in ["true", "yes"]:
             env.use_sudo = True
             if env.is_local:

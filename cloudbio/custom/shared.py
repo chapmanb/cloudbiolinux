@@ -1,5 +1,6 @@
 """Reusable decorators and functions for custom installations.
 """
+from __future__ import print_function
 from contextlib import contextmanager
 import functools
 import os
@@ -361,7 +362,6 @@ def _get_install_local(url, env, make_command, dir_name=None,
             with cd(work_dir):
                 dir_name = _fetch_and_unpack(url, dir_name=dir_name, safe_tar=safe_tar,
                     tar_file_name=tar_file_name)
-                print env.local_install, dir_name
                 if not env.safe_exists(os.path.join(env.local_install, dir_name)):
                     with cd(dir_name):
                         if post_unpack_fn:
@@ -591,7 +591,7 @@ def _set_default_config(env, install_dir, sym_dir_name="default"):
         if not replace_default:
             default_version = env.safe_sudo("basename `readlink -f %s`" % sym_dir)
             if version > default_version:  # Bug: Wouldn't work for 1.9 < 1.10
-                print "default version %s is older than version %s just installed, replacing..." % (default_version, version)
+                print("default version %s is older than version %s just installed, replacing..." % (default_version, version))
                 replace_default = True
         if replace_default:
             env.safe_sudo("rm -rf %s; ln -f -s %s %s" % (sym_dir, install_dir, sym_dir))

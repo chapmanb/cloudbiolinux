@@ -1,5 +1,6 @@
 """Install software and configure package managers.
 """
+from __future__ import print_function
 import os
 
 
@@ -63,9 +64,9 @@ def _print_shell_exports(env):
     """Print a set of exports to add to shell in isolated installations.
     """
     exports = _get_shell_exports(env)
-    print "\nIsolated installation: add the following to your shell to include installed files:"
+    print("\nIsolated installation: add the following to your shell to include installed files:")
     for e in ["path"]:
-        print exports[e]
+        print(exports[e])
 
 def _create_local_virtualenv(target_dir):
     """Create virtualenv in target directory for non-sudo installs.

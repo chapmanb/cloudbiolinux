@@ -3,6 +3,7 @@
 #  - Configures the environment for running the Viral Assembly (viral_assembly_pipeline.py) and VIGOR (VIGOR3.pl) pipelines (creating directory structure and installs software). 
 #
 
+from __future__ import print_function
 import os.path, re, mmap
 from fabric.api import cd, env, hide, local, run, settings, sudo, task
 from fabric.network import disconnect_all

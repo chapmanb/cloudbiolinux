@@ -2,6 +2,7 @@
 https://github.com/mxcl/homebrew
 https://github.com/Homebrew/linuxbrew
 """
+from __future__ import print_function
 import contextlib
 from distutils.version import LooseVersion
 import os

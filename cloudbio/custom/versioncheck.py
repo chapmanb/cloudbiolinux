@@ -4,6 +4,7 @@ This provides infrastructure to check version strings against installed
 tools, enabling re-installation if a version doesn't match. This is a
 lightweight way to avoid out of date dependencies.
 """
+from __future__ import print_function
 from distutils.version import LooseVersion
 
 from cloudbio.custom import shared
@@ -20,7 +21,7 @@ def _parse_from_stdoutflag(out, flag, stdout_index=-1):
         if line.find(flag) >= 0:
             parts = line.split()
             return parts[stdout_index].strip()
-    print "Did not find version information with flag %s from: \n %s" % (flag, out)
+    print("Did not find version information with flag %s from: \n %s" % (flag, out))
     return ""
 
 def _clean_version(x):

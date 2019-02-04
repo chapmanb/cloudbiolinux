@@ -1,5 +1,6 @@
 """Install next gen sequencing analysis tools not currently packaged.
 """
+from __future__ import print_function
 import os
 import re
 
@@ -126,7 +127,7 @@ def install_perm(env):
         with settings(hide('warnings', 'running', 'stdout', 'stderr'),
                       warn_only=True):
             result = env.safe_run("%s -v" % gcc_cmd)
-        print result.return_code
+        print(result.return_code)
         if result.return_code == 0:
             env.safe_sed("makefile", "g\+\+", gcc_cmd)
     _get_install(url, env, _make_copy("ls -1 perm", gcc44_makefile_patch))
