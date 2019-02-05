@@ -16,6 +16,7 @@ import os
 import operator
 import socket
 import subprocess
+import traceback
 from math import log
 
 try:
@@ -468,6 +469,7 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns, data_filedir):
             with shared.chdir(org_dir):
                 if idx in ggd_recipes or not os.path.exists(idx):
                     finished = False
+                    last_exc = None
                     for method, retrieve_fn in retrieve_fns:
                         try:
                             retrieve_fn(env, manager, gid, idx)
@@ -475,15 +477,17 @@ def _prep_genomes(env, genomes, genome_indexes, retrieve_fns, data_filedir):
                             break
                         except KeyboardInterrupt:
                             raise
-                        except BaseException, e:
+                        except BaseException as e:
                             # Fail on incorrect GGD recipes
                             if idx in ggd_recipes and method == "ggd":
                                 raise
                             else:
+                                last_exc = traceback.format_exc()
                                 print("Moving on to next genome prep method after trying {0}\n{1}".format(
                                       method, str(e)))
                     if not finished:
-                        raise IOError("Could not prepare index {0} for {1} by any method".format(idx, gid))
+                        raise IOError("Could not prepare index {0} for {1} by any method\n{2}"
+                                      .format(idx, gid, last_exc))
         ref_file = os.path.join(org_dir, "seq", "%s.fa" % gid)
         if not os.path.exists(ref_file):
             ref_file = os.path.join(org_dir, "seq", "%s.fa" % manager._name)

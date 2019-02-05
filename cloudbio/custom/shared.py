@@ -264,7 +264,7 @@ def _remote_fetch(env, url, out_file=None, allow_fail=False, fix_fn=None, samedi
         temp_ext = "/%s" % uuid.uuid3(uuid.NAMESPACE_URL,
                                       str("file://%s/%s/%s" %
                                           ("localhost", socket.gethostname(), out_file)))
-        with make_tmp_dir_local(ext=temp_ext, work_dir=orig_dir if samedir else None) as tmp_dir:
+        with make_tmp_dir_local(ext=temp_ext, work_dir=orig_dir) as tmp_dir:
             with chdir(tmp_dir):
                 try:
                     subprocess.check_call("wget --continue --no-check-certificate -O %s '%s'"
