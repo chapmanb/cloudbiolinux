@@ -38,7 +38,7 @@ bio_nextgen:
   - chipseq-greylist
   - cnvkit
   - coincbc
-  - cpat
+  - cpat;env=python2
   - cramtools
   - crossmap
   - cufflinks
@@ -47,7 +47,7 @@ bio_nextgen:
   - deeptools
   - deepvariant;env=dv
   - delly
-  - dkfz-bias-filter
+  - dkfz-bias-filter;env=python2
   - duphold>=0.0.9
   - ensembl-vep=95.*
   - ericscript;env=samtools0
@@ -60,17 +60,16 @@ bio_nextgen:
   - gatk
   - gatk4
   - geneimpacts
-  - gemini
+  - gemini;env=python2
   - genesplicer
   - gffcompare
   - goleft
   - grabix
   - gridss
   - gsort
-  - svtools
   - gvcf-regions
   - gvcfgenotyper
-  - hap.py
+  - hap.py;env=python2
   - h5py
   - hmftools-amber
   - hmftools-cobalt
@@ -85,16 +84,16 @@ bio_nextgen:
   - kallisto>=0.43.1
   - kraken
   - lofreq
-  - lumpy-sv
-  - macs2
-  - manta
+  - lumpy-sv;env=python2
+  - macs2;env=python2
+  - manta;env=python2
   - maxentscan
   - mbuffer
-  - metasv
+  - metasv;env=python2
   - minimap2
   - mintmap
   - mirdeep2=2.0.0.7
-  - mirge
+  - mirge;env=python2
   - mirtop
   - moreutils
   - mosdepth
@@ -107,14 +106,14 @@ bio_nextgen:
   - optitype
   - parallel
   - pbgzip
-  - peddy
+  - peddy;env=python2
   - perl-sanger-cgp-battenberg
-  - phylowgs
+  - phylowgs;env=python2
   - pysam>=0.14.0
   - picard
   - pindel
   - pizzly
-  - platypus-variant
+  - platypus-variant;env=python2
   - preseq
   - pyloh
   - pytabix
@@ -130,7 +129,7 @@ bio_nextgen:
   - samblaster
   - samtools
   - scalpel
-  - sentieon
+  - sentieon;env=python2
   - seq2c
   - seqbuster
   - seqtk
@@ -143,13 +142,14 @@ bio_nextgen:
   - solvebio
   - spades
   - star
-  - strelka
+  - strelka;env=python2
   - stringtie
   - subread
   - survivor
-  - svtyper
-  - theta2
-  - tophat
+  - svtools;env=python2
+  - svtyper;env=python2
+  - theta2;env=python2
+  - tophat;env=python2
   - tophat-recondition
   - tdrmapper
   - ucsc-bedtobigbed
@@ -171,9 +171,9 @@ bio_nextgen:
   - vardict-java
   - variantbam
   - varscan
-  - vawk
+  - vawk;env=python2
   - vcfanno
-  - vcf2db
+  - vcf2db;env=python2
   - vcflib
   - verifybamid2
   - viennarna

@@ -11,7 +11,11 @@ import yaml
 from cloudbio.package.shared import _yaml_to_packages
 
 ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=2")
+ENV_PY_VERSIONS[None] = "python=2"
+ENV_PY_VERSIONS["python2"] = "python=2"
 ENV_PY_VERSIONS["python3"] = "python=3"
+ENV_PY_VERSIONS["dv"] = "python=2"
+ENV_PY_VERSIONS["samtools0"] = "python=2"
 
 def install_packages(env, to_install=None, packages=None):
     """Old installation, based on pre-configured fabric inputs.
@@ -159,8 +163,10 @@ def _create_environments(conda_bin, packages):
 
     Available environments:
 
-    - python3 -- support tools that require python 3. This is an initial step
-      towards transitioning to more python3 tool support.
+    - python2 -- tools that require python 2 and are not compatible with python3.
+      The goal is to move all other installs into a default python 3 base environment.
+    - python3 -- support tools that require python 3. This will get deprecated
+      and removed as we move to an all python3 install.
     - samtools0 -- For tools that require older samtools 0.1.19
     - dv -- DeepVariant, which requires a specific version of numpy and tensorflow
     """
@@ -169,13 +175,15 @@ def _create_environments(conda_bin, packages):
     conda_envs = _get_conda_envs(conda_bin)
     if "python3" in env_names:
         if not any(x.endswith("/python3") for x in conda_envs):
+            print("Creating conda environment: %s" % "python3")
             subprocess.check_call("{conda_bin} create --no-default-packages -y --name python3 python=3"
                                   .format(**locals()), shell=True)
             conda_envs = _get_conda_envs(conda_bin)
         out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
-    for addenv in ["samtools0", "dv"]:
+    for addenv in ["samtools0", "dv", "python2"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
+                print("Creating conda environment: %s" % addenv)
                 subprocess.check_call("{conda_bin} create --no-default-packages -y --name {addenv} python=2"
                                       .format(**locals()), shell=True)
                 conda_envs = _get_conda_envs(conda_bin)
