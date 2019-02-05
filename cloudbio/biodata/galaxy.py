@@ -102,7 +102,7 @@ def update_loc_file(env, ref_file, line_parts):
                         has_line = True
             if not has_line:
                 with open(ref_file, "a") as out_handle:
-                    out_handle.write(line + "\n")
+                    out_handle.write(add_str + "\n")
 
 def prep_locs(env, gid, indexes, config):
     """Prepare Galaxy location files for all available indexes.
