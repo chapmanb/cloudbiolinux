@@ -116,7 +116,7 @@ def _save_file_to_bucket(conn, bucket_name, remote_filename, local_file, **kwarg
             make_public = True
             if make_public:
                 k.make_public()
-        except S3ResponseError, e:
+        except S3ResponseError as e:
             print("Failed to save file local file '%s' to bucket '%s' as file '%s': %s" % ( local_file, bucket_name, remote_filename, e ))
             return False
         return True

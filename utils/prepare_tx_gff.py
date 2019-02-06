@@ -13,7 +13,9 @@ requests
 picard
 kallisto
 """
+from __future__ import print_function
 import csv
+import gzip
 import os
 import sys
 import shutil
@@ -375,7 +377,6 @@ def get_fasta_names(genome_fasta):
         subprocess.check_call("samtools faidx %s" % genome_fasta, shell=True)
     with open(fa_dict) as in_handle:
         return [line.split("\t")[0] for line in in_handle]
-    return seqs
 
 def cleanup(work_dir, out_dir, org_build):
     for fname in [os.path.join(work_dir, org_build + ".dict"),
@@ -470,7 +471,7 @@ def _is_selenocysteine(feature):
 def db_to_gtf(db, out_file):
     if file_exists(out_file):
         return out_file
-    print "Writing out merged GTF file to %s." % out_file
+    print("Writing out merged GTF file to %s." % out_file)
     with open(out_file, "w") as out_handle:
         for feature in db.all_features():
             if _is_selenocysteine(feature):
@@ -682,7 +683,7 @@ def _remap_gff(base_gff, name_map):
                 if ucsc_name:
                     out_handle.write("\t".join([ucsc_name] + parts[1:]))
                 elif parts[0] not in wrote_missing and not line.startswith("#"):
-                    print "Missing", parts[0]
+                    print("Missing", parts[0])
                     wrote_missing.add(parts[0])
     return out_file
 
@@ -768,11 +769,11 @@ def guess_id_spec(gtf_file):
 def _get_gtf_db(gtf):
     db_file = gtf + ".db"
     if not file_exists(db_file):
-        print "Creating gffutils database for %s." % (gtf)
+        print("Creating gffutils database for %s." % (gtf))
         disable_infer_transcripts, disable_infer_genes = guess_disable_infer_extent(gtf)
         if not disable_infer_transcripts or not disable_infer_genes:
-            print ("'transcript' or 'gene' entries not found, so inferring "
-                   "their extent. This can be very slow.")
+            print("'transcript' or 'gene' entries not found, so inferring "
+                  "their extent. This can be very slow.")
         id_spec = guess_id_spec(gtf)
         gffutils.create_db(gtf, dbfn=db_file,
                            disable_infer_genes=disable_infer_genes,

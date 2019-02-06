@@ -91,7 +91,7 @@ def _install_configured_applications(env, tools_conf):
 
         try:
             _install_application(name, tool_conf)
-        except BaseException, e:
+        except BaseException as e:
             exceptions[name] = e
             if not defer_errors:
                 break

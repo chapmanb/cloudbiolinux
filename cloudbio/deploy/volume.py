@@ -154,7 +154,7 @@ def _attach(ec2_conn, instance_id, volume_id, device):
     try:
         print("Attaching volume '%s' to instance '%s' as device '%s'" % (volume_id, instance_id, device))
         volumestatus = ec2_conn.attach_volume(volume_id, instance_id, device)
-    except EC2ResponseError, e:
+    except EC2ResponseError as e:
         print("Attaching volume '%s' to instance '%s' as device '%s' failed. Exception: %s" % (volume_id, instance_id, device, e))
         return False
 
@@ -179,8 +179,8 @@ def _detach(ec2_conn, instance_id, volume_id):
     """
     try:
         volumestatus = ec2_conn.detach_volume( volume_id, instance_id, force=True )
-    except EC2ResponseError, ( e ):
-        print("Detaching volume '%s' from instance '%s' failed. Exception: %s" % ( volume_id, instance_id, e ))
+    except EC2ResponseError as e:
+        print("Detaching volume '%s' from instance '%s' failed. Exception: %s" % ( volume_id, instance_id, str(e) ))
         return False
 
     for counter in range( 30 ):
@@ -199,7 +199,7 @@ def _delete_volume(ec2_conn, vol_id):
     try:
         ec2_conn.delete_volume(vol_id)
         print("Deleted volume '%s'" % vol_id)
-    except EC2ResponseError, e:
+    except EC2ResponseError as e:
         print("ERROR deleting volume '%s': %s" % (vol_id, e))
 
 

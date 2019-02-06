@@ -8,9 +8,10 @@ The version information provides a reproducible dump of software on a system.
 import os
 import collections
 import inspect
-import urllib2
 import subprocess
 import sys
+
+from six.moves import urllib
 
 import yaml
 try:
@@ -76,6 +77,8 @@ def write_custom_pkg_info(out_dir, tooldir):
                     mod = None
                 else:
                     raise
+            except ValueError:
+                mod = None
             if mod:
                 for prog in [x for x in dir(mod) if x.startswith("install")]:
                     pkg = _get_custom_pkg_info(prog, getattr(mod, prog))
@@ -95,7 +98,7 @@ def write_brew_pkg_info(out_dir, tooldir):
         if not brew_cmd or not os.path.exists(brew_cmd):
             brew_cmd = "brew"
         try:
-            vout = subprocess.check_output([brew_cmd, "list", "--versions"])
+            vout = subprocess.check_output([brew_cmd, "list", "--versions"]).decode()
         except (OSError, subprocess.CalledProcessError):  # brew not installed/used
             vout = ""
         out = {}
@@ -117,12 +120,12 @@ def get_r_pkg_info():
     r_command = ("options(width=10000); subset(installed.packages(fields=c('Title', 'URL')), "
                  "select=c('Version', 'Title','URL'))")
     try:
-        out = subprocess.check_output(["Rscript", "-e", r_command])
+        out = subprocess.check_output(["Rscript", "-e", r_command]).decode()
     except (subprocess.CalledProcessError, OSError):
         out = ""
     pkg_raw_list = []
     for line in out.split("\n")[1:]:
-        pkg_raw_list.append(filter(None, [entry.strip(' ') for entry in line.split('"')]))
+        pkg_raw_list.append(list(filter(None, [entry.strip(' ') for entry in line.split('"')])))
     for pkg in pkg_raw_list:
         if len(pkg) > 2:
             yield {"name": pkg[0], "version": pkg[1],
@@ -151,12 +154,12 @@ def get_python_pkg_info():
     else:
         base_dir = os.path.dirname(os.path.realpath(sys.executable))
         if os.path.exists(os.path.join(base_dir, "conda")):
-            for line in subprocess.check_output([os.path.join(base_dir, "conda"), "list"]).split("\n"):
+            for line in subprocess.check_output([os.path.join(base_dir, "conda"), "list"]).decode().split("\n"):
                 if line.strip() and not line.startswith("#"):
                     name, version = line.split()[:2]
                     yield {"name": name.lower(), "version": version}
         else:
-            for line in subprocess.check_output([os.path.join(base_dir, "pip"), "list"]).split("\n"):
+            for line in subprocess.check_output([os.path.join(base_dir, "pip"), "list"]).decode().split("\n"):
                 if line.strip() and not line.startswith("#"):
                     name, version = line.split()[:2]
                     yield {"name": name.lower(), "version": version[1:-1]}
@@ -188,7 +191,7 @@ def _get_pkg_popcon():
     """
     url = "http://popcon.debian.org/by_vote"
     popcon = {}
-    for line in (l for l in urllib2.urlopen(url) if not l.startswith(("#", "--"))):
+    for line in (l for l in urllib.request.urlopen(url) if not l.startswith(("#", "--"))):
         parts = line.split()
         popcon[parts[1]] = int(parts[3])
     return popcon
@@ -197,7 +200,7 @@ def get_debian_pkg_info(fetch_remote=False):
     pkg_popcon = _get_pkg_popcon() if fetch_remote else {}
     cmd = ("dpkg-query --show --showformat "
            "'${Status}\t${Package}\t${Version}\t${Section}\t${Homepage}\t${binary:Summary}\n'")
-    for pkg_line in [l for l in subprocess.check_output(cmd, shell=True).split("\n")
+    for pkg_line in [l for l in subprocess.check_output(cmd, shell=True).decode().split("\n")
                      if l.startswith("install ok")]:
         parts = pkg_line.rstrip("\n").split("\t")
         if len(parts) > 5:

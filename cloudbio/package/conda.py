@@ -78,7 +78,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             else:
                 exports = ""
             subprocess.check_call("{exports}{conda_bin} install -y {env_str} {channels} "
-                                    "{py_version} {pkgs_str}".format(**locals()), shell=True)
+                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
             conda_pkg_list = json.loads(subprocess.check_output(
                 "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
             for package in env_packages:
@@ -95,22 +95,29 @@ def _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list,
     This is imperfect but we're trying not to require injecting everything in the anaconda
     directory into a user's path.
     """
-    package = package.split("=")[0]
+    package = package.split("=")[0].split(">")[0]
     final_bindir = os.path.join(system_installdir, "bin")
     if conda_envdir:
         base_bindir = os.path.join(conda_envdir, "bin")
     else:
         base_bindir = os.path.dirname(conda_bin)
     # resolve any symlinks in the final and base heirarchies
-    final_bindir = subprocess.check_output("cd %s && pwd -P" % final_bindir, shell=True)
-    base_bindir = subprocess.check_output("cd %s && pwd -P" % base_bindir, shell=True)
+    final_bindir = subprocess.check_output("cd %s && pwd -P" % final_bindir, shell=True).decode().strip()
+    base_bindir = subprocess.check_output("cd %s && pwd -P" % base_bindir, shell=True).decode().strip()
     for pkg_subdir in [x for x in conda_pkg_list if x["name"] == package]:
         pkg_subdir = pkg_subdir["dist_name"].split("::")[-1]
         for pkg_dir in conda_info["pkgs_dirs"]:
             pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
-            if os.path.exists(pkg_bindir):
+            python_bindir = os.path.join(os.path.dirname(pkg_bindir), "python-scripts")
+            if (os.path.commonprefix([pkg_bindir, base_bindir]).find("anaconda") > 0 and
+                    (os.path.exists(python_bindir) or os.path.exists(pkg_bindir))):
                 if not files:
-                    files = subprocess.check_output("ls -1 {pkg_bindir}".format(**locals()), shell=True).split()
+                    if not os.path.exists(python_bindir):
+                        python_bindir = ""
+                    if not os.path.exists(pkg_bindir):
+                        pkg_bindir = ""
+                    files = subprocess.check_output("ls -1 {pkg_bindir} {python_bindir}"
+                                                    .format(**locals()), shell=True).decode().split()
                 for fname in files:
                     # symlink to the original file in the /anaconda/bin directory
                     # this could be a hard or soft link
@@ -143,6 +150,7 @@ def _split_by_condaenv(packages):
     """Split packages into those requiring special conda environments.
     """
     out = collections.defaultdict(list)
+    envs = set([])
     for p in packages:
         parts = p.split(";")
         name = parts[0]
@@ -151,8 +159,10 @@ def _split_by_condaenv(packages):
         for k, v in [x.split("=") for x in metadata]:
             if k == "env":
                 condaenv = v
+        envs.add(condaenv)
         out[condaenv].append(name)
-    return sorted(dict(out).items())
+    envs = [None] + sorted([x for x in list(envs) if x])
+    return [(e, out[e]) for e in envs]
 
 def _get_conda_envs(conda_bin):
     info = json.loads(subprocess.check_output("{conda_bin} info --envs --json".format(**locals()), shell=True))
@@ -165,8 +175,9 @@ def _create_environments(conda_bin, packages):
 
     - python2 -- tools that require python 2 and are not compatible with python3.
       The goal is to move all other installs into a default python 3 base environment.
-    - python3 -- support tools that require python 3. This will get deprecated
-      and removed as we move to an all python3 install.
+    - python3 -- support tools that require python 3. This will get deprecated but for
+      and removed as we move to an all python3 install. For now it collects tools that
+      require 3 or some other specific requirements.
     - samtools0 -- For tools that require older samtools 0.1.19
     - dv -- DeepVariant, which requires a specific version of numpy and tensorflow
     """

@@ -28,7 +28,7 @@ bio_nextgen:
   - bedtools=2.27.1
   - biobambam
   - bowtie
-  - bowtie2=2.2.8
+  - bowtie2
   - break-point-inspector
   - bwa
   - bwakit
@@ -40,7 +40,8 @@ bio_nextgen:
   - coincbc
   - cpat;env=python2
   - cramtools
-  - crossmap
+  # Crossmap has specific pysam pinning
+  - crossmap;env=python3
   - cufflinks
   - cutadapt=1.16
   - cyvcf2
@@ -103,7 +104,7 @@ bio_nextgen:
   - novoalign
   - octopus>=0.5.1b
   - oncofuse
-  - optitype
+  - optitype;env=python2
   - parallel
   - pbgzip
   - peddy;env=python2
@@ -134,9 +135,9 @@ bio_nextgen:
   - seqbuster
   - seqtk
   - sickle-trim
-  - simple_sv_annotation
+  - simple_sv_annotation;env=python2
   - singlecell-barcodes
-  - smoove
+  - smoove;env=python2
   - snap-aligner=1.0dev.97
   - snpeff=4.3.1t
   - solvebio

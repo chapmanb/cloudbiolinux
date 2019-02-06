@@ -17,7 +17,7 @@ def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=
     else:
         subs = {}
     # filter the data based on what we have configured to install
-    data = [(k, v) for (k, v) in full_data.iteritems()
+    data = [(k, v) for (k, v) in full_data.items()
             if (to_install is None or k in to_install) and k not in ["channels"]]
     data.sort()
     packages = []
@@ -30,7 +30,7 @@ def _yaml_to_packages(yaml_file, to_install=None, subs_yaml_file=None, namesort=
                 for p in cur_info:
                     pkg_to_group[p] = cur_key
             elif isinstance(cur_info, dict):
-                for key, val in cur_info.iteritems():
+                for key, val in cur_info.items():
                     # if we are okay, propagate with the top level key
                     if env and key == 'needs_64bit':
                         if env.is_64bit:

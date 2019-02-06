@@ -376,7 +376,7 @@ def __get_plugin_modules(env):
                 for comp in plugin_module_name.split(".")[1:]:
                     module = getattr(module, comp)
                 modules.append(module)
-            except BaseException, exception:
+            except BaseException as exception:
                 exception_str = str(exception)
                 message = "%s rule module could not be loaded: %s" % (plugin_module_name, exception_str)
                 env.logger.warn(message)
