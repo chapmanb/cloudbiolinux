@@ -56,7 +56,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     # Add packages migrated into separate environments, like python2
     for env_name, env_packages in _split_by_condaenv(packages):
         if env_name:
-            problems += [env_packages]
+            problems += env_packages
     if problems:
         print("Checking for problematic or migrated packages in default environment")
         cur_packages = [x["name"] for x in
