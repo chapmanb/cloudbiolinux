@@ -64,8 +64,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
                                                            shell=True)) if x["name"] in problems]
         if cur_packages:
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
-        for problem in cur_packages:
-            subprocess.check_call("{conda_bin} remove --force -y {problem}".format(**locals()), shell=True)
+            problems = " ".join(cur_packages)
+            subprocess.check_call("{conda_bin} remove -y {problems}".format(**locals()), shell=True)
     # install our customized packages
     if len(packages) > 0:
         for env_name, env_packages in _split_by_condaenv(packages):
