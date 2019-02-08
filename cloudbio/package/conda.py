@@ -190,18 +190,12 @@ def _create_environments(conda_bin, packages):
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = _get_conda_envs(conda_bin)
-    if "python3" in env_names:
-        if not any(x.endswith("/python3") for x in conda_envs):
-            print("Creating conda environment: %s" % "python3")
-            subprocess.check_call("{conda_bin} create --no-default-packages -y --name python3 python=3"
-                                  .format(**locals()), shell=True)
-            conda_envs = _get_conda_envs(conda_bin)
-        out["python3"] = [x for x in conda_envs if x.endswith("/python3")][0]
-    for addenv in ["samtools0", "dv", "python2"]:
+    for addenv in ["python3", "samtools0", "dv", "python2"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
-                subprocess.check_call("{conda_bin} create --no-default-packages -y --name {addenv} python=2"
+                py_version = ENV_PY_VERSIONS[env_name]
+                subprocess.check_call("{conda_bin} create --no-default-packages -y --name {addenv} {pyversion} nomkl"
                                       .format(**locals()), shell=True)
                 conda_envs = _get_conda_envs(conda_bin)
             out[addenv] = [x for x in conda_envs if x.endswith("/%s" % addenv)][0]
