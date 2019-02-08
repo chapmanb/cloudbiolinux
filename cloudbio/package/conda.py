@@ -39,11 +39,12 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     """
     if config_file is None and packages is None:
         packages = []
-        channels = ""
+        check_channels = []
     else:
         (packages, _) = _yaml_to_packages(config_file)
         with open(config_file) as in_handle:
-            channels = " ".join(["-c %s" % x for x in yaml.safe_load(in_handle).get("channels", [])])
+            check_channels = yaml.safe_load(in_handle).get("channels", [])
+    channels = " ".join(["-c %s" % x for x in check_channels])
     conda_envs = _create_environments(conda_bin, packages)
     for env_dir in conda_envs.values():
         _clean_environment(env_dir)
@@ -60,8 +61,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     if problems:
         print("Checking for problematic or migrated packages in default environment")
         cur_packages = [x["name"] for x in
-                        json.loads(subprocess.check_output("%s list --json" % (conda_bin),
-                                                           shell=True)) if x["name"] in problems]
+                        json.loads(subprocess.check_output("%s list --json" % (conda_bin), shell=True))
+                        if x["name"] in problems and x["channel"] in check_channels]
         if cur_packages:
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
             problems = " ".join(cur_packages)
