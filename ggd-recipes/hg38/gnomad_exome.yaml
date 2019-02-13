@@ -16,7 +16,7 @@ recipe:
         mkdir -p variation
         wget --no-check-certificate -qO- $remap_url | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2- | awk '{if(!$2) print "/^"$1"/d"; else if($1!=$2) print "s/^"$1"/"$2"/g";}' > remap.sed
         export TMPDIR=`pwd`
-        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n - | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
+        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
     recipe_outfiles:
