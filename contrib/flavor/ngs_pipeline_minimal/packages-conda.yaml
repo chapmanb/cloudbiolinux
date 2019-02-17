@@ -68,7 +68,7 @@ bio_nextgen:
   - grabix
   - gridss
   - gsort
-  - gvcf-regions
+  - gvcf-regions;env=python2
   - gvcfgenotyper
   - hap.py;env=python2
   - h5py
@@ -136,6 +136,7 @@ bio_nextgen:
   - sickle-trim
   - simple_sv_annotation;env=python2
   - singlecell-barcodes
+  - smcounter2;env=python2
   - smoove;env=python2
   - snap-aligner=1.0dev.97
   - snpeff=4.3.1t
@@ -165,7 +166,7 @@ bio_nextgen:
   - ucsc-gtftogenepred
   - ucsc-liftover
   - ucsc-wigtobigwig
-  - umis;env=python2
+  - umis
   - wham
   - vardict
   - vardict-java
