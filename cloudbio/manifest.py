@@ -200,7 +200,7 @@ def get_debian_pkg_info(fetch_remote=False):
     pkg_popcon = _get_pkg_popcon() if fetch_remote else {}
     cmd = ("dpkg-query --show --showformat "
            "'${Status}\t${Package}\t${Version}\t${Section}\t${Homepage}\t${binary:Summary}\n'")
-    for pkg_line in [l for l in subprocess.check_output(cmd, shell=True).decode().split("\n")
+    for pkg_line in [l for l in subprocess.check_output(cmd, shell=True).decode(errors="replace").split("\n")
                      if l.startswith("install ok")]:
         parts = pkg_line.rstrip("\n").split("\t")
         if len(parts) > 5:
