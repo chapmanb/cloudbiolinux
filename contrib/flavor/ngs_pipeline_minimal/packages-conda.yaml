@@ -134,7 +134,7 @@ bio_nextgen:
   - seqbuster
   - seqtk
   - sickle-trim
-  - simple_sv_annotation;env=python2
+  - simple_sv_annotation
   - singlecell-barcodes
   - smcounter2;env=python2
   - smoove;env=python2
