@@ -52,8 +52,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     # Uninstall old R packages that clash with updated versions
     # Temporary fix to allow upgrades from older versions that have migrated
     # r-tximport is now bioconductor-tximport
-    # py2cairo is incompatible with r 3.4.1
-    problems = ["r-tximport", "py2cairo", "libedit"]
+    # py2cairo is incompatible with r 3.4.1+
+    problems = ["r-tximport", "py2cairo"]
     # Add packages migrated into separate environments, like python2
     for env_name, env_packages in _split_by_condaenv(packages):
         if env_name:

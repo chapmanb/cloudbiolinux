@@ -197,8 +197,8 @@ perl:
   - perl-time-hires
   - perl-vcftools-vcf
 r:
-  - r=3.4.1
-  - r-base=3.4.1=h4fe35fd_8
+  - r=3.5.1
+  - r-base
   - xorg-libxt
   - r-basejump>=0.5.8
   - r-bcbiornaseq>=0.2.7
