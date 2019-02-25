@@ -21,7 +21,6 @@ bio_nextgen:
   - bamutil
   - bbmap
   - bcbio-prioritize
-  - bcbio-rnaseq
   - bcbio-variation
   - bcbio-variation-recall
   - bcftools
