@@ -200,7 +200,6 @@ r:
   - r=3.5.1
   - r-base
   - xorg-libxt
-  - r-basejump>=0.5.8
   - r-bcbiornaseq>=0.2.7
   - r-cghflasso
   - r-chbutils
