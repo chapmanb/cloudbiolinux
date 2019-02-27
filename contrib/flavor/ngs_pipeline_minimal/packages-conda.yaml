@@ -42,7 +42,8 @@ bio_nextgen:
   # Crossmap has specific pysam pinning
   - crossmap;env=python3
   - cufflinks
-  - cutadapt=1.16
+  # Specific pinned version for mirge compatibility in python2 environment
+  - cutadapt=1.16;env=python2
   - cyvcf2
   - deeptools
   - deepvariant;env=dv
