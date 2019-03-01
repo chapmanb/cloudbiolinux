@@ -1,0 +1,19 @@
+---
+attributes:
+  name: gtf
+  version: 67
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=ftp://ftp.ensembl.org/pub/release-67/gtf/homo_sapiens/Homo_sapiens.GRCh37.67.gtf.gz
+        mkdir -p rnaseq
+        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
+        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        wget --no-check-certificate -qO- $url | gunzip -c > hg19.gtf
+        sed -f remap.sed hg19.gtf | grep -v _hap > rnaseq/hg19.gtf
+        rm remap.sed
+        rm hg19.gtf
+    recipe_outfiles:
+    - rnaseq/hg19.gtf

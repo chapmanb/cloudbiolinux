@@ -1,27 +1,32 @@
 # Transcript, annotation and indices for RNA-seq analysis
 # Prepared from Ensembl transcripts using: 
 # https://github.com/chapmanb/cloudbiolinux/blob/master/utils/prepare_tx_gff.py
+# Built from ftp://ftp.ensembl.org/pub/release-67/gtf/homo_sapiens/Homo_sapiens.GRCh37.67.gtf.gz
+# translated to UCSC chromosomes, with genes in haplotype patches discarded.
+# See gtf.yaml for details.
 ---
 attributes:
   name: transcripts
-  version: 2014-07-17_2
+  version: 2019-02-28_75
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/annotation/hg19-rnaseq-2014-07-17_2.tar.xz
+        baseurl=https://s3.amazonaws.com/biodata/annotation/hg19-rnaseq-2019-02-28_75.tar.xz
         wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq
     recipe_outfiles:
       - rnaseq/ref-transcripts.bed
-      - rnaseq/ref-transcripts.dexseq.gff
+      - rnaseq/ref-transcripts.fa
       - rnaseq/ref-transcripts.genePred
       - rnaseq/ref-transcripts.gtf
       - rnaseq/ref-transcripts.gtf.db
       - rnaseq/ref-transcripts-mask.gtf
       - rnaseq/ref-transcripts.refFlat
+      - rnaseq/ref-transcripts-splicesites.txt
       - rnaseq/rRNA.gtf
       - rnaseq/rRNA.gtf.db
       - rnaseq/rRNA.interval_list
+      - rnaseq/tx2gene.csv
