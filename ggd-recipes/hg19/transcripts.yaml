@@ -7,13 +7,13 @@
 ---
 attributes:
   name: transcripts
-  version: 2019-02-28_75
+  version: 2019-03-01_87
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        baseurl=https://s3.amazonaws.com/biodata/annotation/hg19-rnaseq-2019-02-28_75.tar.xz
+        baseurl=https://s3.amazonaws.com/biodata/annotation/hg19-rnaseq-2019-03-01_75.tar.xz
         wget -c -N --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar -xpf -
         mv */rnaseq-* rnaseq

@@ -1,13 +1,13 @@
 ---
 attributes:
   name: gtf
-  version: 67
+  version: 87
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=ftp://ftp.ensembl.org/pub/release-67/gtf/homo_sapiens/Homo_sapiens.GRCh37.67.gtf.gz
+        url=ftp://ftp.ensembl.org/pub/grch37/current/gtf/homo_sapiens/Homo_sapiens.GRCh37.87.gtf.gz
         mkdir -p rnaseq
         remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
