@@ -1,0 +1,19 @@
+# Topmed WGS allele frequencies: https://bravo.sph.umich.edu/freeze3a/hg19/
+---
+attributes:
+  name: topmed
+  version: freeze3a
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh37/variation_genotype/TOPMED_GRCh37.vcf.gz
+        ref=../seq/GRCh37.fa
+        mkdir -p variation
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
+        tabix -f -p vcf variation/topmed.vcf.gz
+    recipe_outfiles:
+      - variation/topmed.vcf.gz
+      - variation/topmed.vcf.gz.tbi
