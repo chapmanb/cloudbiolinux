@@ -78,6 +78,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
                 env_str = ""
             pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
             py_version = ENV_PY_VERSIONS[env_name]
+            # During openssl transition, pin to 1.1.1 to avoid slow resolve times
+            extra_pins = "'openssl=1.1.1b'"
             if "deepvariant" in env_packages:
                 # Ignore /etc/boto.cfg which creates conflicts with conda gsutils
                 # https://github.com/GoogleCloudPlatform/gsutil/issues/516
@@ -85,7 +87,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             else:
                 exports = ""
             subprocess.check_call("{exports}{conda_bin} install -y {env_str} {channels} "
-                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
+                                  "{py_version} {extra_pins} {pkgs_str}".format(**locals()), shell=True)
             conda_pkg_list = json.loads(subprocess.check_output(
                 "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
             for package in env_packages:
