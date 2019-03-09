@@ -1,0 +1,22 @@
+# Topmed WGS allele frequencies: https://bravo.sph.umich.edu/freeze5/hg38/
+# topmed vcf from ensembl does not have contig names
+---
+attributes:
+  name: topmed
+  version: freeze5
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh38/variation_genotype/TOPMED_GRCh38_20180418.vcf.gz
+        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
+        ref=../seq/hg38.fa
+        wget --no-check-certificate -qO- $remap_url | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2- | awk '{if(!$2) print "/^"$1"/d"; else if($1!=$2) print "s/^"$1"/"$2"/g";}' > remap.sed
+        mkdir -p variation
+        export TMPDIR=`pwd`
+        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
+        tabix -f -p vcf variation/topmed.vcf.gz
+    recipe_outfiles:
+      - variation/topmed.vcf.gz
+      - variation/topmed.vcf.gz.tbi
