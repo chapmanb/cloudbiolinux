@@ -166,7 +166,7 @@ bio_nextgen:
   - ucsc-gtftogenepred
   - ucsc-liftover
   - ucsc-wigtobigwig
-  - umis
+  - umis;env=python2
   - wham
   - vardict
   - vardict-java
