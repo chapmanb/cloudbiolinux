@@ -132,6 +132,7 @@ bio_nextgen:
   - sentieon;env=python2
   - seq2c
   - seqbuster
+  - seqcluster
   - seqtk
   - sickle-trim
   - simple_sv_annotation
