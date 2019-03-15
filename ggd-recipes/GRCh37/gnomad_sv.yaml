@@ -1,0 +1,21 @@
+---
+attributes:
+  name: gnomad_sv
+  version: 2
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://storage.googleapis.com/gnomad-public/papers/2019-sv/gnomad_v2_sv.sites
+        mkdir -p variation
+        cd variation
+        wget -O - $baseurl.vcf.gz | gunzip -c | bgzip -c > gnomad_sv.vcf.gz
+        tabix -f -p vcf gnomad_sv.vcf.gz
+        wget -O - $baseurl.bed.gz | gunzip -c | bgzip -c > gnomad_sv.bed.gz
+        tabix -f -p bed gnomad_sv.bed.gz
+    recipe_outfiles:
+      - variation/gnomad_sv.vcf.gz
+      - variation/gnomad_sv.vcf.gz.tbi
+      - variation/gnomad_sv.bed.gz
+      - variation/gnomad_sv.bed.gz.tbi
