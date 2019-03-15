@@ -35,9 +35,8 @@ except:
     MySQLdb = None
 
 
-from bcbio.utils import chdir, safe_makedir, file_exists
+from bcbio.utils import chdir, safe_makedir, file_exists, get_program_python
 from bcbio.rnaseq.gtf import gtf_to_fasta
-from bcbio.distributed.transaction import file_transaction
 
 # ##  Version and retrieval details for Ensembl and UCSC
 ensembl_release = "94"
@@ -326,9 +325,10 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores, args):
 def make_hisat2_splicesites(gtf_file):
     base, _ = os.path.splitext(gtf_file)
     out_file = os.path.join(base + "-splicesites.txt")
-    hisat2_script = os.path.join(os.path.dirname(os.path.realpath(sys.executable)),
+    executable = get_program_python("hisat2")
+    hisat2_script = os.path.join(os.path.dirname(executable),
                                  "hisat2_extract_splice_sites.py")
-    cmd = "{hisat2_script} {gtf_file} > {out_file}"
+    cmd = "{executable} {hisat2_script} {gtf_file} > {out_file}"
     if file_exists(out_file):
         return out_file
     if not file_exists(hisat2_script):
@@ -791,7 +791,7 @@ def _dexseq_preparation_path():
         output = subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError:
         return None
-    for line in output.split("\n"):
+    for line in output.decode().split("\n"):
         if line.startswith("["):
             dirname = line.split("[1]")[1].replace("\"", "").strip()
             path = os.path.join(dirname, PREP_FILE)
@@ -807,7 +807,7 @@ def prepare_dexseq(gtf):
     dexseq_path = _dexseq_preparation_path()
     if not dexseq_path:
         return None
-    executable = sys.executable
+    executable = get_program_python("htseq-count")
     cmd = "{executable} {dexseq_path} {gtf} {out_file}"
     subprocess.check_call(cmd.format(**locals()), shell=True)
     return out_file

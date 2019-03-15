@@ -76,11 +76,11 @@ bio_nextgen:
   - hmftools-cobalt
   - hmftools-purple
   - hmmlearn
-  - hisat2
+  - hisat2;env=python2
   - hts-nim-tools
   - htslib
   # Pinned to avoid error with dexseq_count and HTSeq version checking
-  - htseq=0.9.1
+  - htseq=0.9.1;env=python2
   - impute2
   - kallisto>=0.43.1
   - kraken
