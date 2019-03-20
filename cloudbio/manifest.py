@@ -7,6 +7,7 @@ The version information provides a reproducible dump of software on a system.
 """
 import os
 import collections
+import json
 import inspect
 import subprocess
 import sys
@@ -144,6 +145,11 @@ def write_r_pkg_info(out_dir):
 
 # ## Python packages
 
+def _get_conda_envs(conda_bin):
+    info = json.loads(subprocess.check_output("{conda_bin} info --envs --json".format(**locals()), shell=True))
+    prefix = info["conda_prefix"] + "/envs/"
+    return [e.replace(prefix, "") for e in info["envs"] if e.startswith(prefix)]
+
 def get_python_pkg_info():
     if yolk:
         for dist in yolk.yolklib.Distributions().get_packages("all"):
@@ -153,11 +159,18 @@ def get_python_pkg_info():
                    "homepage_uri": md.get("Home-page", "")}
     else:
         base_dir = os.path.dirname(os.path.realpath(sys.executable))
-        if os.path.exists(os.path.join(base_dir, "conda")):
-            for line in subprocess.check_output([os.path.join(base_dir, "conda"), "list"]).decode().split("\n"):
+        conda_bin = os.path.join(base_dir, "conda")
+        if os.path.exists(conda_bin):
+            for line in subprocess.check_output([conda_bin, "list"]).decode().split("\n"):
                 if line.strip() and not line.startswith("#"):
                     name, version = line.split()[:2]
                     yield {"name": name.lower(), "version": version}
+            for env in _get_conda_envs(conda_bin):
+                for line in subprocess.check_output([conda_bin, "list", "-n", env]).decode().split("\n"):
+                    if line.strip() and not line.startswith("#"):
+                        name, version = line.split()[:2]
+                    yield {"name": name.lower(), "version": version}
+
         else:
             for line in subprocess.check_output([os.path.join(base_dir, "pip"), "list"]).decode().split("\n"):
                 if line.strip() and not line.startswith("#"):
