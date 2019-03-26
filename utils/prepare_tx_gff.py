@@ -39,7 +39,7 @@ from bcbio.utils import chdir, safe_makedir, file_exists, get_program_python
 from bcbio.rnaseq.gtf import gtf_to_fasta
 
 # ##  Version and retrieval details for Ensembl and UCSC
-ensembl_release = "94"
+ensembl_release = "95"
 base_ftp = "ftp://ftp.ensembl.org/pub/release-{release}/gtf"
 supported_oldbuilds = {"GRCh37": "75", "hg19": "75"}
 build_subsets = {"hg38-noalt": "hg38"}
