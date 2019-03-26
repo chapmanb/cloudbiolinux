@@ -1,0 +1,17 @@
+# Drosophila BDGP6 genome distributed by Ensembl
+---
+attributes:
+  name: seq
+  version: BDGP6
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p seq
+        url=http://ftp.ensembl.org/pub/release-95/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna.toplevel.fa.gz
+        wget -c -O seq/BDGP6.fa.gz ${url}
+        gunzip -c seq/BDGP6.fa.gz > seq/BDGP6.fa
+    recipe_outfiles:
+      - seq/BDGP6.fa
+      - seq/BDGP6.fa.gz

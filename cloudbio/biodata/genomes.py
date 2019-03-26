@@ -278,6 +278,7 @@ GENOMES_SUPPORTED = [
            ("Athaliana", "TAIR10", EnsemblGenome("plants", "26",
                                                  "Arabidopsis_thaliana", "TAIR10")),
            ("Dmelanogaster", "dm3", UCSCGenome("dm3")),
+           ("Dmelanogaster", "BDGP6", GGDGenome("BDGP6")),
            ("Celegans", "WBcel235", EnsemblGenome("standard", "80",
                                                   "Caenorhabditis_elegans", "WBcel235")),
            ("Mtuberculosis_H37Rv", "mycoTube_H37RV", NCBIRest("mycoTube_H37RV",

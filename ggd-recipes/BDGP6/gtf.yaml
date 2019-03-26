@@ -1,0 +1,15 @@
+# Ensembl GTF file distributed by Ensembl for BDGP6
+---
+attributes:
+  name: gtf
+  version: 95
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://ftp.ensembl.org/pub/release-95/gtf/drosophila_melanogaster/Drosophila_melanogaster.BDGP6.95.gtf.gz
+        mkdir -p rnaseq
+        wget --no-check-certificate -qO- $url | gunzip -c | rnaseq/BDGP6.gtf
+    recipe_outfiles:
+    - rnaseq/BDGP6.gtf
