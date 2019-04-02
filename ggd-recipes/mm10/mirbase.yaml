@@ -2,7 +2,7 @@
 ---
 attributes:
   name: srnaseq
-  version: 20170626
+  version: 20190402
 recipe:
   full:
     recipe_type: bash
@@ -24,6 +24,7 @@ recipe:
         zcat mature.fa.gz |  awk '{if ($0~/>mmu/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
         wget --random-wait --retry-connrefused  -q -N -c -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
         zcat miRNA.str.gz | awk '{if ($0~/mmu/)print $0}' > miRNA.str
+        wget --random-wait --retry-connrefused -nv -N -c -O mirbase.gff3 ftp://mirbase.org/pub/mirbase/21/genomes/mmu.gff3
         wget --random-wait --retry-connrefused  --no-check-certificate -q -N -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip Rfam_for_miRDeep.fa.gz
         # targetscan analysis
         # wget --no-check-certificate -q -N -c -O Summary_Counts.txt.zip http://www.targetscan.org/mmu_71/mmu_71_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
@@ -35,6 +36,7 @@ recipe:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
         - srnaseq/mature.fa
+        - srnaseq/mirbase.gff3
         - srnaseq/miRNA.str
         - srnaseq/Rfam_for_miRDeep.fa
         - srnaseq/trna_mature_pre.fa
