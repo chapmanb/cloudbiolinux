@@ -10,8 +10,8 @@ import yaml
 
 from cloudbio.package.shared import _yaml_to_packages
 
-ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=2")
-ENV_PY_VERSIONS[None] = "python=2"
+ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=3")
+ENV_PY_VERSIONS[None] = "python=3"
 ENV_PY_VERSIONS["python2"] = "python=2"
 ENV_PY_VERSIONS["python3"] = "python=3"
 ENV_PY_VERSIONS["dv"] = "python=2"
