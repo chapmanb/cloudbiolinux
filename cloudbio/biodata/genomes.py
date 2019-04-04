@@ -117,7 +117,7 @@ class UCSCGenome(_DownloadHelper):
                 else:
                     raise ValueError("Do not know how to handle: %s" % zipped_file)
                 tmp_file = genome_file.replace(".fa", ".txt")
-                result = subprocess.check_output("find `pwd` -name '*.fa'", shell=True)
+                result = subprocess.check_output("find `pwd` -name '*.fa'", shell=True).decode()
                 result = [x.strip() for x in result.split("\n")]
                 if len(result) == 1:
                     orig_result = result[0]
@@ -126,10 +126,10 @@ class UCSCGenome(_DownloadHelper):
                 result = self._karyotype_sort(result)
                 subprocess.check_call("rm -f inputs.txt", shell=True)
                 for fname in result:
-                    subprocess.check_output("echo '%s' >> inputs.txt" % fname, shell=True)
+                    subprocess.check_output("echo '%s' >> inputs.txt" % fname, shell=True).decode()
                 subprocess.check_call("cat `cat inputs.txt` > %s" % (tmp_file), shell=True)
                 for fname in result:
-                    subprocess.check_output("rm -f %s" % fname, shell=True)
+                    subprocess.check_output("rm -f %s" % fname, shell=True).decode()
                 subprocess.check_call("mv %s %s" % (tmp_file, genome_file), shell=True)
                 zipped_file = os.path.join(prep_dir, zipped_file)
                 genome_file = os.path.join(prep_dir, genome_file)
@@ -446,7 +446,7 @@ def _if_installed(pname):
 
 def _make_genome_dir(data_filedir):
     genome_dir = os.path.join(data_filedir, "genomes")
-    subprocess.check_output("mkdir -p %s" % genome_dir, shell=True)
+    subprocess.check_output("mkdir -p %s" % genome_dir, shell=True).decode()
     return genome_dir
 
 def _make_genome_directories(genomes, data_filedir):
@@ -726,7 +726,7 @@ def _index_star(env, ref_file):
     # if there is a small genome, scale nbits down
     # https://groups.google.com/forum/#!topic/rna-star/9g8Uoe1Igho
     cmd = 'grep ">" {ref_file} | wc -l'.format(ref_file=ref_file)
-    nrefs = float(subprocess.check_output(cmd, shell=True))
+    nrefs = float(subprocess.check_output(cmd, shell=True).decode())
     nbits = int(round(min(14, log(GenomeLength / nrefs, 2), log(GenomeLength, 2) / 2 - 1)))
     # first we estimate the number of bits we need to hold the genome and allocate
     # double that plus some padding to build the index
@@ -900,7 +900,7 @@ def _upload_to_s3(tarball, bucket):
                                  "utils", "s3_multipart_upload.py")
     s3_key_name = os.path.join("genomes", os.path.basename(tarball))
     if not bucket.get_key(s3_key_name):
-        gb_size = int(subprocess.check_output("du -sm %s" % tarball, shell=True).split()[0]) / 1000.0
+        gb_size = int(subprocess.check_output("du -sm %s" % tarball, shell=True).decode().split()[0]) / 1000.0
         print("Uploading %s %.1fGb" % (s3_key_name, gb_size))
         cl = ["python", upload_script, tarball, bucket.name, s3_key_name, "--public"]
         subprocess.check_call(cl)
@@ -929,7 +929,7 @@ def _clean_directory(dir, gid):
     remove_exts = ["*.gz", "*.zip"]
     with shared.chdir(os.path.join(dir, "seq")):
         for rext in remove_exts:
-            fnames = subprocess.check_output("find . -name '%s'" % rext, shell=True)
+            fnames = subprocess.check_output("find . -name '%s'" % rext, shell=True).decode()
             for fname in (f.strip() for f in fnames.split("\n") if f.strip()):
                 subprocess.check_call("rm -f %s" % fname, shell=True)
 
