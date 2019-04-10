@@ -217,3 +217,14 @@ against the package list, and checking /etc.
 BioLinux comes with a testing framework in ./test. The frame work
 creates a new VM on a local machine. You can add tests, to check if a
 VM is complete. See the main README file for more information.
+
+## Testing a ggd recipe
+
+Separate wget downloading from processing in the recipe. Download partial small vcf files manually and put into txtmp dir. Comment wget -c.
+For per-chromosome recipies use 21 22 X Y for a test. 
+
+system_install=/path/bcbio without bin.
+```
+export PYTHONPATH=/path/tools/cloudbiolinux:$PYTHONPATH
+python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "hg38")'
+```
