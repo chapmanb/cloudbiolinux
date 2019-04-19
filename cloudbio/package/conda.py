@@ -116,7 +116,7 @@ def _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list,
     for pkg_subdir in [x for x in conda_pkg_list if x["name"] == package]:
         pkg_subdir = pkg_subdir["dist_name"].split("::")[-1]
         for pkg_dir in conda_info["pkgs_dirs"]:
-            pkg_bindir = os.path.join(pkg_dir, pkg_subdir, "bin")
+            pkg_bindir = os.path.join(os.path.realpath(pkg_dir), pkg_subdir, "bin")
             python_bindir = os.path.join(os.path.dirname(pkg_bindir), "python-scripts")
             if (os.path.commonprefix([pkg_bindir, base_bindir]).find("anaconda") > 0 and
                     (os.path.exists(python_bindir) or os.path.exists(pkg_bindir))):
