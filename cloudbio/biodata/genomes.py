@@ -16,6 +16,7 @@ import os
 import operator
 import socket
 import subprocess
+import sys
 import traceback
 from math import log
 
@@ -66,9 +67,9 @@ class UCSCGenome(_DownloadHelper):
                 base = base[3:]
             parts = base.split("_")
             try:
-                parts[0] = int(parts[0])
+                base = int(parts[0])
             except ValueError:
-                pass
+                base = sys.maxsize
             # unplaced at the very end
             if parts[0] == "Un":
                 parts.insert(0, "z")
@@ -78,7 +79,10 @@ class UCSCGenome(_DownloadHelper):
             # sort random and extra chromosomes after M
             elif len(parts) > 1:
                 parts.insert(0, "y")
-            return parts
+            # standard integers, sort first
+            else:
+                parts.insert(0, "a")
+            return [base] + parts
         return sorted(xs, key=karyotype_keyfn)
 
     def _split_multifasta(self, fasta_file):
