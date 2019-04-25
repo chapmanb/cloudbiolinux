@@ -24,17 +24,16 @@ recipe:
         mkdir -p variation
         export TMPDIR=`pwd`
 
-        fields_to_remove_url=https://gist.githubusercontent.com/naumenko-sa/8580e1bc91602fd67dc6331e7002dbdf/raw/ab72c1001fbbd5bed008bd3198687f687adda7f0/gnomad_fields_to_remove.txt    
-        wget --no-check-certificate -c $fields_to_remove_url
+        gnomad_fields_to_remove_url=https://gist.githubusercontent.com/naumenko-sa/8580e1bc91602fd67dc6331e7002dbdf/raw/ab72c1001fbbd5bed008bd3198687f687adda7f0/gnomad_fields_to_remove.txt    
+        wget --no-check-certificate -c $gnomad_fields_to_remove_url
 
         for chrom in $(seq 1 22;echo X Y)
         do
           vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
           vcf_url=${url_prefix}${vcf}
           wget -c $vcf_url
-          gunzip -c $vcf | gsort -m 3000 /dev/stdin $ref.fai | \
-          bcftools view -f PASS -Ov  | \
-          vt rminfo -t $(cat fields_to_remove_url.txt | paste -sd, ) - | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | grep -v "##contig=" | bgzip -c > variation/gnomad_exome.chr${chrom}.vcf.gz
+          gunzip -c $vcf | gsort -m 3000 /dev/stdin $ref.fai | bcftools view -f PASS -Ov  | \
+          vt rminfo -t $(cat gnomad_fields_to_remove.txt | paste -sd, ) - | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | grep -v "##contig=" | bgzip -c > variation/gnomad_exome.chr${chrom}.vcf.gz
 
           tabix variation/gnomad_exome.chr${chrom}.vcf.gz
           rm $vcf
