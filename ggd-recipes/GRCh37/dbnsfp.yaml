@@ -19,7 +19,9 @@ recipe:
         UNPACK_DIR=`pwd`/tmpunpack
         if [ ! -f dbNSFP.txt.gz ]; then
           mkdir -p $UNPACK_DIR
-          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr1" | head -n1 > $UNPACK_DIR/header.txt
+          unzip dbNSFPv*.zip "dbNSFP*_variant.chrM" 
+          head -n1 dbNSFPv*_variant.chrM > $UNPACK_DIR/header.txt
+          rm dbNSFPv*_variant.chrM
           # unzip only files with chromosomal info, eg. skip genes and readme.
           # [awk] check if hg19 position exists, if so, move data to col 1 and 2, then print
           # and sort on first and second column
