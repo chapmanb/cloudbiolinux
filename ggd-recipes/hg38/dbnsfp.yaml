@@ -20,9 +20,9 @@ recipe:
 
           UNPACK_DIR=`pwd`/tmpunpack
           mkdir -p $UNPACK_DIR
-          unzip dbNSFPv*.zip "dbNSFP*_variant.chrM" 
-          head -n1 dbNSFPv*_variant.chrM > $UNPACK_DIR/header.txt
-          rm dbNSFPv*_variant.chrM          
+          unzip dbNSFP*.zip "dbNSFP*_variant.chrM" 
+          head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
+          rm dbNSFP*_variant.chrM          
           # unzip only files with chromosomal info, eg. skip genes and readme.
           unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbNSFP.txt.gz
           #extract readme file, used by VEP plugin to add vcf header info
