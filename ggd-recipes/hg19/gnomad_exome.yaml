@@ -1,22 +1,54 @@
-# GnomAD VCF sites: http://exac.broadinstitute.org/
+# GnomAD VCF sites: 
+# - https://gnomad.broadinstitute.org/downloads
+# - https://macarthurlab.org/2018/10/17/gnomad-v2-1/
+# - http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad/r2.1/exomes/
+# Script 
+# - cleans up to use chr-style naming,
+# - sorts by ref file
+# - decomposes and normalizes (input is decomposed in 2.1 but not normalized)
+# - filters only PASS variants (segdup, decoy are retained)
+# - removes many INFO fields to reduce file size: controls_, hist, non_
+# - merges all chr into a single file
+# wget is separated from the processing because wget in the pipe fails randomly: it comes out when downloading many files.
 ---
 attributes:
   name: gnomad_exome
-  version: 2.0.1
+  version: 2.1
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz
+        url_prefix=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad/r2.1/exomes/
+        vcf_prefix=gnomad.exomes.r2.1.sites.chr
+        
         remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
         ref=../seq/hg19.fa
         mkdir -p variation
         export TMPDIR=`pwd`
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
-        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/gnomad_exome.vcf.gz
+
+        gnomad_fields_to_remove_url=https://gist.githubusercontent.com/naumenko-sa/8580e1bc91602fd67dc6331e7002dbdf/raw/ab72c1001fbbd5bed008bd3198687f687adda7f0/gnomad_fields_to_remove.txt    
+        wget --no-check-certificate -c $gnomad_fields_to_remove_url
+
+        for chrom in $(seq 1 22;echo X Y)
+        do
+          vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
+          vcf_url=${url_prefix}${vcf}
+          wget -c $vcf_url 
+          gunzip -c $vcf | sed -f remap.sed | gsort -m 3000 /dev/stdin $ref.fai | bcftools view -f PASS -Ov  | \
+          vt rminfo -t $(cat gnomad_fields_to_remove.txt | paste -sd, ) - | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | grep -v "##contig=" | bgzip -c > variation/gnomad_exome.chr${chrom}.vcf.gz
+          rm $vcf
+
+          tabix variation/gnomad_exome.chr${chrom}.vcf.gz
+        done
+
+        bcftools concat variation/gnomad_exome.chr*.vcf.gz -Ov | bgzip -c > variation/gnomad_exome.vcf.gz 
+        rm variation/gnomad_exome.chr*.vcf.gz
+        rm variation/gnomad_exome.chr*.vcf.gz.tbi
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
+
     recipe_outfiles:
       - variation/gnomad_exome.vcf.gz
       - variation/gnomad_exome.vcf.gz.tbi
