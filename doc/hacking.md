@@ -229,3 +229,5 @@ ln -s /path/bcbio/genomes/Hsapiens/hg38/seq seq
 export PYTHONPATH=/path/tools/cloudbiolinux:$PYTHONPATH
 python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "hg38")'
 ```
+
+In bcbio another option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes and rerun bcbio_nextgen.py upgrade [params].
