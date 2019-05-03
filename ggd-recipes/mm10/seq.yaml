@@ -1,0 +1,15 @@
+---
+attributes:
+  name: seq
+  version: ucsc-201112
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        wget --no-check-certificate -c https://s3.amazonaws.com/biodata/genomes/mm10-seq.tar.xz
+        tar -xJvpf mm10-seq.tar.xz
+    recipe_outfiles:
+      - seq/mm10.fa
+      - seq/mm10.fa.fai
+      - seq/mm10.dict
