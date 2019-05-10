@@ -220,14 +220,24 @@ VM is complete. See the main README file for more information.
 
 ## Testing a ggd recipe
 
-Separate wget downloading from processing in the recipe. Download partial small vcf files manually and put into txtmp dir. Comment wget -c.
-For per-chromosome recipies use 21 22 X Y for a test. 
+reference=hg38, or GRCh37, or another.
+
+```
+mkdir recipe_test
+cp recipe.yaml recipe_test
+cd recipe_test
+```
+
+For a quick test separate wget downloading from processing in the recipe and download partial small vcf files manually, put them into txtmp dir. 
+Comment wget -c. For per-chromosome recipies use 21 22 X Y. 
 
 system_install=/path/bcbio without bin.
 ```
-ln -s /path/bcbio/genomes/Hsapiens/hg38/seq seq
-export PYTHONPATH=/path/tools/cloudbiolinux:$PYTHONPATH
-python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "hg38")'
+ln -s /path/bcbio/genomes/Hsapiens/[reference]/seq seq
+export PYTHONPATH=/path/cloudbiolinux:$PYTHONPATH
+python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "[reference]")'
 ```
 
-In bcbio another option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes and rerun bcbio_nextgen.py upgrade [params].
+In bcbio the alternative option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes and rerun bcbio_nextgen.py upgrade [params].
+
+

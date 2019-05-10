@@ -38,7 +38,13 @@ recipe:
           wget -c $vcf_url 
           wget -c $vcf_url.tbi
 
-          gunzip -c $vcf | sed -f remap.sed | gsort -m 3000 /dev/stdin $ref.fai | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | grep -v "##contig="| bgzip -c >  variation/gnomad_exome.chr${chrom}.vcf.gz
+          fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
+          gunzip -c $vcf | sed -f remap.sed | gsort -m 3000 /dev/stdin $ref.fai | grep -v "##contig=" | bcftools view -f PASS -Ov | bgzip -c > gnomad_exome.tmp.chr${chrom}.vcf.gz
+          tabix gnomad_exome.tmp.chr${chrom}.vcf.gz
+          bcftools annotate -x "^$fields_to_keep" -Ov gnomad_exome.tmp.chr${chrom}.vcf.gz | bgzip -c >  variation/gnomad_exome.chr${chrom}.vcf.gz
+
+          rm gnomad_exome.tmp.chr${chrom}.vcf.gz
+          rm gnomad_exome.tmp.chr${chrom}.vcf.gz.tbi 
 
           rm $vcf
           rm $vcf.tbi
