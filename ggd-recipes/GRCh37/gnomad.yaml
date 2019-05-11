@@ -28,7 +28,8 @@ recipe:
         gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
         wget --no-check-certificate -c $gnomad_fields_to_keep_url
 
-        for chrom in $(seq 1 22;echo X Y)
+        # no chr Y for gnomad genomes
+        for chrom in $(seq 1 22;echo X)
         do
           vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
           vcf_url=${url_prefix}${vcf}
