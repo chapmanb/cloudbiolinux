@@ -10,6 +10,7 @@
 # - removes many INFO fields to reduce file size: controls_, hist, non_, using bcftools annotate instead of vt rminfo, because it failed randomly on chr1
 # - merges all chr into a single file
 # wget is separated from the processing because wget in the pipe fails randomly (on some systems?): it comes out when downloading many files.
+# recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe 
 ---
 attributes:
   name: gnomad_exome
@@ -39,8 +40,10 @@ recipe:
           wget -c $vcf_url 
           wget -c $vcf_url.tbi
 
-          gunzip -c $vcf | sed -f remap.sed | gsort -m 3000 /dev/stdin $ref.fai | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | grep -v "##contig="| bgzip -c >  variation/gnomad_exome.chr${chrom}.vcf.gz
-       
+          fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
+          # bcftools annotate is picky about vcf header and brakes if moved down the pipe after remap
+          gunzip -c $vcf | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c >  variation/gnomad_exome.chr${chrom}.vcf.gz
+           
           rm $vcf
           rm $vcf.tbi
 

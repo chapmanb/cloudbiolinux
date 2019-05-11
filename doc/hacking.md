@@ -228,8 +228,23 @@ cp recipe.yaml recipe_test
 cd recipe_test
 ```
 
-For a quick test separate wget downloading from processing in the recipe and download partial small vcf files manually, put them into txtmp dir. 
-Comment wget -c. For per-chromosome recipies use 21 22 X Y. 
+For a quick test separate wget downloading from processing in the recipe and download partial small vcf files:
+```
+#!/bin/bash
+# prepares full chomosome test set for gnomad to test ggd recipe
+mkdir txtmp
+cd txtmp
+prefix=gnomad.exomes.r2.1.sites.grch38.chr
+for chrom in $(seq 1 22;echo X Y)
+do
+  curl -r 0-1000000 -O http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh38/variation_genotype/gnomad/r2.1/exomes/${prefix}${chrom}_noVEP.vcf.gz
+  gunzip -c ${prefix}${chrom}_noVEP.vcf.gz | head -n 1400 > ${prefix}${chrom}_noVEP.vcf
+  bgzip -f ${prefix}${chrom}_noVEP.vcf
+  tabix ${prefix}${chrom}_noVEP.vcf.gz
+done
+cd ..
+```
+Comment wget -c in the recipe.
 
 system_install=/path/bcbio without bin.
 ```
@@ -239,5 +254,3 @@ python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/pat
 ```
 
 In bcbio the alternative option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes and rerun bcbio_nextgen.py upgrade [params].
-
-
