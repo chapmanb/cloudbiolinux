@@ -253,4 +253,4 @@ export PYTHONPATH=/path/cloudbiolinux:$PYTHONPATH
 python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "[reference]")'
 ```
 
-In bcbio the alternative option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes and rerun bcbio_nextgen.py upgrade [params].
+In bcbio the alternative option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes (not in ggd-run.sh!) and rerun bcbio_nextgen.py upgrade [params].

@@ -13,7 +13,7 @@ gnomad_exome.chr7.vcf.gz gnomad_exome.chr8.vcf.gz gnomad_exome.chr9.vcf.gz gnoma
 gnomad_exome.chr13.vcf.gz gnomad_exome.chr14.vcf.gz gnomad_exome.chr15.vcf.gz gnomad_exome.chr16.vcf.gz gnomad_exome.chr17.vcf.gz gnomad_exome.chr18.vcf.gz \
 gnomad_exome.chr19.vcf.gz gnomad_exome.chr20.vcf.gz gnomad_exome.chr21.vcf.gz gnomad_exome.chr22.vcf.gz gnomad_exome.chrX.vcf.gz gnomad_exome.chrY.vcf.gz -Ov | bgzip -c > gnomad_exome.vcf.gz
 
-tabix -f -p vcf variation/gnomad_exome.vcf.gz
-tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
+tabix -f -p vcf gnomad_exome.vcf.gz
+tabix -f -p vcf --csi gnomad_exome.vcf.gz
 cd ..
 date
