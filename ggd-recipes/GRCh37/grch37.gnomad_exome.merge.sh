@@ -5,6 +5,8 @@
 #PBS -d .
 #PBS -l vmem=10g,mem=10g
 
+# to merge preprocessed per chr vcfs, resulting file is 4.6G
+
 date
 
 export PATH=/hpf/largeprojects/ccmbio/naumenko/tools/bcbio_1.1.5/bin:$PATH
