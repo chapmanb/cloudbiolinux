@@ -4,16 +4,16 @@
 ---
 attributes:
   name: clinvar
-  version: 20170905
+  version: 20190513
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        release=20170905
-        baseurl=http://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2017/clinvar_${release}.vcf.gz
+        release=20190513
+        baseurl=https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2019/clinvar_${release}.vcf.gz        
         mkdir -p variation
-        wget -c -O variation/clinvar-orig.vcf.gz $baseurl
+        wget --no-check-certificate -c -O variation/clinvar-orig.vcf.gz $baseurl
         [[ -f variation/clinvar.vcf.gz ]] || zcat variation/clinvar-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/clinvar.vcf.gz
         tabix -f -p vcf variation/clinvar.vcf.gz
     recipe_outfiles:
