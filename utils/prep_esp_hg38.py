@@ -20,7 +20,7 @@ def main():
     subprocess.check_call("tar -xzvpf esp-orig.tar.gz", shell=True)
     raw_file = "esp-raw.vcf"
     with open(raw_file, "w") as out_handle:
-        for i, chrom in enumerate(range(1, 22) + ["X", "Y"]):
+        for i, chrom in enumerate(list(range(1, 23)) + ["X", "Y"]):
             fnames = glob.glob("*chr%s.snps_indels.vcf" % chrom)
             assert len(fnames) == 1, (chrom, fnames)
             with open(fnames[0]) as in_handle:
