@@ -4,7 +4,7 @@
 ---
 attributes:
   name: esp
-  version: ESP6500SI-V2
+  version: ESP6500SI-V2-fix
 recipe:
   full:
     recipe_type: bash
