@@ -1,4 +1,5 @@
 # Exome Sequencing Project (ESP): http://evs.gs.washington.edu/EVS/
+# http://evs.gs.washington.edu/evs_bulk_data/ESP6500SI-V2-SSA137.GRCh38-liftover.snps_indels.vcf.tar.gz
 # Lifted over to hg38 and prepped with utils/prep_esp_hg38.py
 ---
 attributes:
