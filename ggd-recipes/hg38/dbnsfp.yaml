@@ -17,20 +17,21 @@ recipe:
         getcode="$(awk '/_warning_/ {print $NF}' tmp-gcokie)"
         curl -k -Lb tmp-gcokie "${ggURL}&confirm=${getcode}&id=${ggID}" -o "${filename}" -C -
         if [ ! -f dbNSFP.txt.gz ]; then
-
           UNPACK_DIR=`pwd`/tmpunpack
           mkdir -p $UNPACK_DIR
           unzip dbNSFP*.zip "dbNSFP*_variant.chrM" 
           head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
           rm dbNSFP*_variant.chrM          
           # unzip only files with chromosomal info, eg. skip genes and readme.
-          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbNSFP.txt.gz
+          cat $UNPACK_DIR/header > dbNSFP.txt
+          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n >> dbNSFP.txt
+          bgzip dbNSFP.txt
           #extract readme file, used by VEP plugin to add vcf header info
           unzip -p dbNSFP*.zip "*readme.txt" > dbNSFP.readme.txt
         fi
         # index in position 1 and 2
         tabix -f -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
-        rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
+        rm -f ${UNPACK_DIR}/* && rmdir $UNPACK_DIR
         rm -f tmp-gcokie
         rm -f dbNSFPv*.zip
     recipe_outfiles:
