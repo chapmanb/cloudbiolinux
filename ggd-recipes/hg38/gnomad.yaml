@@ -53,10 +53,10 @@ recipe:
                 wget -c $vcf_url.tbi
                 
                 sum_obs=`sum $vcf_local`
-                sum_exp=`grep $vcf_local CHECKSUMS | awk '{print $1,$2}'`
+                sum_exp=sum_exp=`awk 'BEGIN{OFS=" "} $3==FN{gsub("\t"FN,""); print $0}' "FN=$vcf_local" CHECKSUMS`
                 
                 sum_obs_index=`sum $vcf_local.tbi`
-                sum_exp_index=`grep $vcf_local.tbi CHECKSUMS | awk '{print $1,$2}'`
+                sum_exp_index=sum_exp=`awk 'BEGIN{OFS=" "} $3==FN{gsub("\t"FN,""); print $0}' "FN=$vcf_local.tbi" CHECKSUMS`
                 
                 if [[ $sum_obs != $sum_exp ]]
                 then
