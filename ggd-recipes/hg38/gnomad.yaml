@@ -37,19 +37,22 @@ recipe:
         # no chrY in gnomad genome in hg38
         for chrom in $(seq 1 22;echo X)
         do
-          vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
-          vcf_url=${url_prefix}${vcf}
-          wget -c $vcf_url
-          wget -c $vcf_url.tbi
+          if [ ! -f variation/gnomad_genome.chr${chrom}.vcf.gz.tbi ]
+          then
+             vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
+             vcf_url=${url_prefix}${vcf}
+             wget -c $vcf_url
+             wget -c $vcf_url.tbi
 
-          fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
-          # bcftools annotate is picky about vcf header and brakes if moved down the pipe after remap
-          gunzip -c $vcf | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | vt normalize -r $ref -n - | vt uniq - | bgzip -c >  variation/gnomad_genome.chr${chrom}.vcf.gz
+             fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
+             # bcftools annotate is picky about vcf header and brakes if moved down the pipe after remap
+             gunzip -c $vcf | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | vt normalize -r $ref -n - | vt uniq - | bgzip -c >  variation/gnomad_genome.chr${chrom}.vcf.gz
 
-          rm $vcf
-          rm $vcf.tbi
+             rm $vcf
+             rm $vcf.tbi
 
-          tabix variation/gnomad_genome.chr${chrom}.vcf.gz
+             tabix variation/gnomad_genome.chr${chrom}.vcf.gz
+          fi
         done
 
         cd variation
