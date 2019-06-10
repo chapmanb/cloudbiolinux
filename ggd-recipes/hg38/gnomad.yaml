@@ -33,23 +33,62 @@ recipe:
 
         gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
         wget --no-check-certificate -c $gnomad_fields_to_keep_url
+        wget -c ${url_prefix}CHECKSUMS
 
         # no chrY in gnomad genome in hg38
         for chrom in $(seq 1 22;echo X)
         do
-          vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
-          vcf_url=${url_prefix}${vcf}
-          wget -c $vcf_url
-          wget -c $vcf_url.tbi
+          if [ ! -f variation/gnomad_genome.chr${chrom}.vcf.gz.tbi ]
+          then
+             vcf=${vcf_prefix}${chrom}_noVEP.vcf.gz
+             vcf_url=${url_prefix}${vcf}
+             vcf_local=`basename $vcf_url`
+             get_vcf=0
+             
+             while [ $get_vcf -lt 2 ]
+             do
+                let get_vcf=$get_vcf+1
 
-          fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
-          # bcftools annotate is picky about vcf header and brakes if moved down the pipe after remap
-          gunzip -c $vcf | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | vt normalize -r $ref -n - | vt uniq - | bgzip -c >  variation/gnomad_genome.chr${chrom}.vcf.gz
+                wget -c $vcf_url
+                wget -c $vcf_url.tbi
+                
+                sum_obs=`sum $vcf_local`
+                sum_exp=sum_exp=`awk 'BEGIN{OFS=" "} $3==FN{gsub("\t"FN,""); print $0}' "FN=$vcf_local" CHECKSUMS`
+                
+                sum_obs_index=`sum $vcf_local.tbi`
+                sum_exp_index=sum_exp=`awk 'BEGIN{OFS=" "} $3==FN{gsub("\t"FN,""); print $0}' "FN=$vcf_local.tbi" CHECKSUMS`
+                
+                if [[ $sum_obs != $sum_exp ]]
+                then
+                   rm $vcf_local
+                fi
+                
+                if [[ $sum_obs_index != $sum_exp_index ]]
+                then
+                   rm $vcf_local.tbi
+                fi
+                
+                if [[ $sum_obs == $sum_exp ]] & [[ $sum_obs_index == $sum_exp_index ]]
+                then
+                   get_vcf=100
+                fi
+             done
+             
+             if [ $get_vcf -ne 100 ]
+             then
+                echo "Failed to download `basename $vcf_url`"
+                exit
+             fi
 
-          rm $vcf
-          rm $vcf.tbi
+             fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
+             # bcftools annotate is picky about vcf header and brakes if moved down the pipe after remap
+             gunzip -c $vcf | bcftools view -f PASS -Ov | bcftools annotate -x "^$fields_to_keep" -Ov | sed -f remap.sed | grep -v "##contig=" | gsort -m 3000 /dev/stdin $ref.fai | vt normalize -r $ref -n - | vt uniq - | bgzip -c >  variation/gnomad_genome.chr${chrom}.vcf.gz
 
-          tabix variation/gnomad_genome.chr${chrom}.vcf.gz
+             rm $vcf
+             rm $vcf.tbi
+
+             tabix variation/gnomad_genome.chr${chrom}.vcf.gz
+          fi
         done
 
         cd variation
