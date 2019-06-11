@@ -10,16 +10,16 @@ recipe:
         baseurl=ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbscSNV1.1.zip
         mkdir -p variation
         cd variation
-        wget -c -N $baseurl
-        if [ ! -f dbscSNV.txt.gz ]; then
-          UNPACK_DIR=`pwd`/tmp-unpack
-          mkdir -p $UNPACK_DIR
+        UNPACK_DIR=`pwd`/tmp-unpack
+        mkdir -p $UNPACK_DIR
+        if [ ! -f dbscSNV.txt.gz.tbi ]; then
+          wget -c -N $baseurl
           # [awk] check if hg38 position exists, if so, move data to col 1 and 2, then print
           # and sort on first and second column
           unzip -p dbscSNV*.zip "dbscSNV*.chr*" | awk -F $'\t' 'BEGIN {OFS = FS} (FNR==1){print} ($1~/^chr/){next} ($5 != "." && $6 != "."){$1=$5;$2=$6;print | "sort -T "UNPACK_DIR" -k1,1 -k2,2n"}' "UNPACK_DIR=$UNPACK_DIR" | bgzip -c > dbscSNV.txt.gz
+          tabix -s 1 -b 2 -e 2 -S 1 dbscSNV.txt.gz
         fi
-        tabix -s 1 -b 2 -e 2 -S 1 dbscSNV.txt.gz
-        rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
+        rm -f $UNPACK_DIR/* && rm -rf $UNPACK_DIR
         rm -f dbscSNV*.zip
     recipe_outfiles:
       - variation/dbscSNV.txt.gz
