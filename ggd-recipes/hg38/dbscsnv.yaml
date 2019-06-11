@@ -14,12 +14,11 @@ recipe:
         if [ ! -f dbscSNV.txt.gz ]; then
           UNPACK_DIR=`pwd`/tmp-unpack
           mkdir -p $UNPACK_DIR
-          unzip -p dbscSNV*.zip "dbscSNV*.chr1" | head -n1 > $UNPACK_DIR/header.txt
           # [awk] check if hg38 position exists, if so, move data to col 1 and 2, then print
           # and sort on first and second column
-          unzip -p dbscSNV*.zip "dbscSNV*.chr*" | grep -v '^chr' | awk -F $'\t' 'BEGIN {OFS = FS} {if ($5 != "." && $6 != ".") {$1=$5;$2=$6;print}}' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbscSNV.txt.gz
+          unzip -p dbscSNV*.zip "dbscSNV*.chr*" | awk -F $'\t' 'BEGIN {OFS = FS} (FNR!=1 && $1~/^chr/){next} {if ($5 != "." && $6 != ".") {$1=$5;$2=$6;print}}' | sort -T $UNPACK_DIR -k1,1 -k2,2n | cat $UNPACK_DIR/header.txt - | bgzip -c > dbscSNV.txt.gz
         fi
-        tabix -s 1 -b 2 -e 2 -c c dbscSNV.txt.gz
+        tabix -s 1 -b 2 -e 2 -S 1 dbscSNV.txt.gz
         rm -f $UNPACK_DIR/* && rmdir $UNPACK_DIR
         rm -f dbscSNV*.zip
     recipe_outfiles:
