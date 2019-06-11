@@ -23,7 +23,7 @@ recipe:
           head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
           rm dbNSFP*_variant.chrM          
           # unzip only files with chromosomal info, eg. skip genes and readme.
-          cat $UNPACK_DIR/header > dbNSFP.txt
+          cat $UNPACK_DIR/header.txt > dbNSFP.txt
           unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n >> dbNSFP.txt
           bgzip dbNSFP.txt
           #extract readme file, used by VEP plugin to add vcf header info
