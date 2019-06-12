@@ -26,6 +26,7 @@ bio_nextgen:
   - bcftools
   - bedtools=2.27.1
   - biobambam
+  - bismark=0.22.1
   - bowtie
   - bowtie2
   - break-point-inspector
@@ -155,6 +156,7 @@ bio_nextgen:
   - tophat;env=python2
   - tophat-recondition
   - tdrmapper
+  - trim-galore=0.6.2
   - ucsc-bedtobigbed
   - ucsc-bigbedinfo
   - ucsc-bigbedsummary
