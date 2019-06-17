@@ -73,7 +73,7 @@ list may be in a new main.yaml file.  Kicking it into submission:
 
           fab -f $source/fabfile.py -H target_hostname -c $source/contrib/flavor/pjotrp/biotest/fabricrc_debian.txt install_biolinux:flavor=$source/contrib/flavor/pjotrp/biotest
 
-The flavor module itsefl sets env.flavor on loading the module (this can only
+The flavor module itself sets env.flavor on loading the module (this can only
 happen once). For more examples see the files in ./contrib/flavor.
 
 ## Distribute a VirtualBox
@@ -169,7 +169,7 @@ For a full Flavor example see
 
     https://github.com/pjotrp/cloudbiolinux/blob/master/contrib/flavor/pjotrp/biotest/biotestflavor.py
 
-## Individualize a Flavor with env.enviroment
+## Individualize a Flavor with env.environment
 
 Sometimes it may be useful to have post-install one-offs, for
 individual purposes (say you want to define a user account for

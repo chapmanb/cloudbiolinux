@@ -1,8 +1,8 @@
 Integration test for CloudBioLinux.
 
 When you have a base install running, you only need to supply the
-(local) IP addrees of the VM, and the password-less key for the 
-install user (who has sudo bash). The tests get invoked wiht
+(local) IP address of the VM, and the password-less key for the 
+install user (who has sudo bash). The tests get invoked with
 
   ./test_biolinux [-i key.pub] [-u user] IPaddr [Flavor]
 

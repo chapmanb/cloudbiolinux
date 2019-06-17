@@ -5,7 +5,7 @@ VM. And you can use X programs through ssh, naturally.
 
 ## VNC
 
-VNC is a ubiquous remote access tool - always there, and easy to install/use.
+VNC is a ubiquitous remote access tool - always there, and easy to install/use.
 
 In a nutshell:
 
@@ -20,7 +20,7 @@ Run the client on your desktop
        vncviewer -FullColor=1 HostIP:1
 
 Where HostIP is the reachable host IP address or DNS name. Next, it 
-may be necessary to start an X desktop, such as ldxe:
+may be necessary to start an X desktop, such as LXDE:
 
        startlxde
 

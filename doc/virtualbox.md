@@ -44,7 +44,7 @@ Despite the extra work, starting from scratch may have advantages. For
 one you have more control of the base install. Say for a different
 version of Linux, a BSD kernel, or for install less software (do you
 really need X/KDE/Gnome?), so you do not end up with an 8 GB VM, or for more
-software and/or data pre-intstalled on a VM. 
+software and/or data pre-installed on a VM. 
 
 The BioLinux setup is designed to be modular, to support multiple 
 flavors (see the main README for an explanation of terms).
@@ -196,7 +196,7 @@ Start with the Cloud BioLinux Virtualbox .vmdk (its location is in the VM
 properties from the Virtualbox GUI). Resize the vmdk, since the size may be
 40G, and the Eucalyptus image will have that size. 
 
-Accordint to http://mtnbike.org/blog/?p=29 and the same here:
+According to http://mtnbike.org/blog/?p=29 and the same here:
 http://www.my-guides.net/en/content/view/122/26/
 
 convert to raw .img 

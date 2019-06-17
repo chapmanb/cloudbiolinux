@@ -9,7 +9,7 @@ have been added.
 ## Prerequisites
 
 The `deploy.sh` script should install the needed dependencies in a Python
-virutal environment using venvburrito and doesn't require special permissions
+virtual environment using venvburrito and doesn't require special permissions
 as long as `python`, `easy_install`, and `git` are available.
 
 ## Specify settings

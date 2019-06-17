@@ -2,7 +2,7 @@
 
 As far as I can determine there is no current documentation on how to build
 CloudMan instances from scratch. Thus I am collecting my unofficial notes on
-how to do this here - spefically using the CloudBioLinux deployer.
+how to do this here - specifically using the CloudBioLinux deployer.
 
 You will need to navigate the AWS management console and obtain the following
 information.
@@ -10,9 +10,9 @@ information.
 * Your AWS Access ID and secret key (`access_id`, `secret_key`)
 * Ubuntu EBS-backed AMI ID to target. This writeup was tested with ami-9b85eef2 (12.04.2 (64-bit) in us-east-1)
 * Image size to use (e.g. m1-small)
-* Availibity zone (e.g. us-east-1)
+* Availability zone (e.g. us-east-1)
 * You will need to setup a bucket to store your snaps file, here you will need the bucket name.
-* You will need to setup two volumes in your target availibity zone, one for
+* You will need to setup two volumes in your target availability zone, one for
   Galaxy tools and data (perhaps 20Gb for testing) and one for galaxyIndices. Here you will need the volume ids.
 * Generate a private a key (e.g. galaxy1.pem) and copy it into keys directory (or anywhere really), 
   also note the keypair_name corresponding to the key.
@@ -53,7 +53,7 @@ that we will fill out as we good.
           name: us-east-1
 
 Immediately this template can be updated to reflect the bucket created above
-and the availibity zone you are targetting. We can update teh snap_id's and
+and the availability zone you are targetting. We can update the snap_id's and
 the default_mi after creating them.
 
 Copy and modify `settings-sample-cm.yaml` to `settings.yaml`:

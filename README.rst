@@ -277,7 +277,7 @@ Vagrant and VirtualBox
 ----------------------
 
 Vagrant allows easy deploying and connecting to VirtualBox images. The
-setup is ideal for runnig CloudBioLinux on a desktop computer. Install
+setup is ideal for running CloudBioLinux on a desktop computer. Install
 `VirtualBox <https://www.virtualbox.org/>`_
 and `vagrant <http://vagrantup.com/>`_.
 

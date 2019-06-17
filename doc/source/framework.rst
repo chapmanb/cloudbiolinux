@@ -43,7 +43,7 @@ console and obtain the following information.
 * Ubuntu EBS-backed AMI ID to target. This writeup was tested with 
   `ami-9b85eef2` (12.04.2 (64-bit) in us-east-1).
 * Image size to use (e.g. m1-small)
-* Availibity zone (e.g. us-east-1)
+* Availability zone (e.g. us-east-1)
 
 Carefully scan through `settings.yaml` and change the properties marked as
 requiring change. The word `UPDATE` in the comments indicates properties of
@@ -86,7 +86,7 @@ To fill out the remaining options found in this file, you will need to return
 the AWS management console and do the following:
 
 * You will need to setup a bucket to store your snaps file, here you will need the bucket name.
-* You will need to setup two volumes in your target availibity zone, one for
+* You will need to setup two volumes in your target availability zone, one for
   Galaxy tools and data (perhaps 20Gb for testing) and one for galaxyIndices. Here you will need the volume ids.
 * Generate a private a key (e.g. galaxy1.pem) and copy it into keys directory (or anywhere really), 
   also note the keypair_name corresponding to the key.
@@ -133,13 +133,13 @@ that we will fill out as we good.
           name: us-east-1
 
 Immediately this template can be updated to reflect the bucket created above
-and the availibity zone you are targetting. We can update the snap_id's and
+and the availability zone you are targetting. We can update the snap_id's and
 the default_mi after creating them.
 
 Reopen ``settings.yaml`` and fill out the remaining properties, including the
 volume ids you just created and the name of the bucket you used.
 
-The folllowing set of commands will now launch a new cloud instance, attach
+The following set of commands will now launch a new cloud instance, attach
 and format tool and data volumes for CloudMan, build CloudBioLinux, snapshot
 these volumes, and package the image.
 
