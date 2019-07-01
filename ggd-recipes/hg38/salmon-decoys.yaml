@@ -1,0 +1,23 @@
+# Decoys for SA mode of Salmon
+# built against hg38 with the alt alleles
+# Ensembl gene build 94
+---
+attributes:
+  name: salmon-decoys
+  version: 94
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=https://s3.amazonaws.com/biodata/annotation/hg38-build94-salmon-decoys.tar.gz
+        outdir=rnaseq/salmon-decoys
+        mkdir -p ${outdir}
+        wget -c -O decoys.tar.gz ${url}
+        tar zxvf decoys.tar.gz
+        mv decoys.fa ${outdir}/.
+        mv decoys.txt ${outdir}/.
+        rm decoys.tar.gz
+    recipe_outfiles:
+      - rnaseq/salmon-decoys/decoys.fa
+      - rnaseq/salmon-decoys/decoys.txt
