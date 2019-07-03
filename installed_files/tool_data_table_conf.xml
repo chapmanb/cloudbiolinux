@@ -1,5 +1,5 @@
 <tables>
-    <!-- Locations of MAF files that have been indexed with bx-python -->    
+    <!-- Locations of MAF files that have been indexed with bx-python -->
     <table name="indexed_maf_files">
         <columns>name, value, dbkey, species</columns>
         <file path="tool-data/maf_index.loc" />
@@ -18,6 +18,11 @@
     <table name="bowtie2_indexes" comment_char="#">
         <columns>value, dbkey, name, path</columns>
         <file path="tool-data/bowtie2_indices.loc" />
+    </table>
+    <!-- Locations of indexes in the Bismark mapper format -->
+    <table name="bismark_indexes" comment_char="#">
+        <columns>value, dbkey, name, path</columns>
+        <file path="tool-data/bismark_indices.loc" />
     </table>
     <!-- Locations of indexes in the Bowtie mapper format for TopHat to use -->
     <table name="tophat_indexes" comment_char="#">
