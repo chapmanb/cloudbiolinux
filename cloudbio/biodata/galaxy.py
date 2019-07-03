@@ -15,7 +15,8 @@ from cloudbio.custom import shared
 
 server = "rsync://datacache.g2.bx.psu.edu"
 
-index_map = {"bowtie": "bowtie_index",
+index_map = {"bismark": "bismark_index",
+             "bowtie": "bowtie_index",
              "bowtie2": "bowtie2_index",
              "bwa": "bwa_index",
              "novoalign": "novoalign_index",
@@ -108,16 +109,17 @@ def prep_locs(env, gid, indexes, config):
     """Prepare Galaxy location files for all available indexes.
     """
     for ref_index_file, cur_index, prefix, tool_name in [
-            ("sam_fa_indices.loc", indexes.get("seq", None), "", 'sam_fa_indexes'),
-            ("picard_index.loc", indexes.get("seq", None), "", "picard_indexes"),
-            ("gatk_sorted_picard_index.loc", indexes.get("seq", None), "", "gatk_picard_indexes"),
             ("alignseq.loc", indexes.get("ucsc", None), "seq", None),
-            ("twobit.loc", indexes.get("ucsc", None), "", None),
-            ("bowtie_indices.loc", indexes.get("bowtie", None), "", 'bowtie_indexes'),
+            ("bismark_indices.loc", indexes.get("bismark", None), "", 'bismark_indexes'),
             ("bowtie2_indices.loc", indexes.get("bowtie2", None), "", 'bowtie2_indexes'),
-            ("mosaik_index.loc", indexes.get("mosaik", None), "", "mosaik_indexes"),
+            ("bowtie_indices.loc", indexes.get("bowtie", None), "", 'bowtie_indexes'),
             ("bwa_index.loc", indexes.get("bwa", None), "", 'bwa_indexes'),
-            ("novoalign_indices.loc", indexes.get("novoalign", None), "", "novoalign_indexes")]:
+            ("gatk_sorted_picard_index.loc", indexes.get("seq", None), "", "gatk_picard_indexes"),
+            ("mosaik_index.loc", indexes.get("mosaik", None), "", "mosaik_indexes"),
+            ("novoalign_indices.loc", indexes.get("novoalign", None), "", "novoalign_indexes"),
+            ("picard_index.loc", indexes.get("seq", None), "", "picard_indexes"),
+            ("sam_fa_indices.loc", indexes.get("seq", None), "", 'sam_fa_indexes'),
+            ("twobit.loc", indexes.get("ucsc", None), "", None)]:
         if cur_index:
             str_parts = _build_galaxy_loc_line(env, gid, cur_index, config, prefix, tool_name)
             update_loc_file(env, ref_index_file, str_parts)
