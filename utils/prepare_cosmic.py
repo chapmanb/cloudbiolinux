@@ -17,45 +17,99 @@ Usage:
 References:
 http://gatkforums.broadinstitute.org/discussion/2226/cosmic-and-dbsnp-files-for-mutect
 """
+import gzip
+import logging
 import os
+import re
+import requests
 import subprocess
 import sys
-
-import requests
+import tempfile
+from argparse import ArgumentParser
 
 from bcbio import utils
 from bcbio.variation import vcfutils
 
-def main(cosmic_version, bcbio_genome_dir):
+logging.basicConfig(format='%(asctime)s [%(levelname).1s] %(message)s', level=logging.INFO)
+
+def main(cosmic_version, bcbio_genome_dir, overwrite=False):
     work_dir = utils.safe_makedir(os.path.join(os.getcwd(), "cosmic-prep"))
     os.chdir(work_dir)
 
     for genome_build, bcbio_build, add_chr in [("GRCh37", "GRCh37", False), ("GRCh38", "hg38", True)]:
         bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", bcbio_build)
+        installed_file = os.path.join(bcbio_base, "variation", f"cosmic-v{cosmic_version}.vcf.gz")
+        installed_link = os.path.join(bcbio_base, "variation", "cosmic.vcf.gz")
+        logging.info(f"Beginning COSMIC v{cosmic_version} prep for {genome_build}.")
         if not os.path.exists(bcbio_base):
             continue
-        bcbio_ref = os.path.join(bcbio_base, "seq", "%s.fa" % bcbio_build)
+        if os.path.exists(installed_file):
+            if not overwrite:
+                logging.info(f"{installed_file} exists, please use the --overwrite flag to overwrite the existing files if you want to reinstall.")
+                continue
+            else:
+                logging.info(f"{installed_file} exists, removing.")
+                remove_installed(installed_file, installed_link)
+        bcbio_ref = os.path.join(bcbio_base, "seq", f"{bcbio_build}.fa")
+        cosmic_vcf_files = get_cosmic_vcf_files(genome_build, cosmic_version)
         sorted_inputs = []
-        for fname in get_cosmic_files(genome_build, cosmic_version):
+        for fname in cosmic_vcf_files:
             sorted_inputs.append(sort_to_ref(fname, bcbio_ref, add_chr=add_chr))
-        out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, "bcbio_ready", bcbio_build))
+        out_dir = utils.safe_makedir(os.path.join(f"v{cosmic_version}", "bcbio_ready", bcbio_build))
         out_file = os.path.join(out_dir, "cosmic.vcf.gz")
         ready_cosmic = combine_cosmic(sorted_inputs, bcbio_ref, out_file)
         variation_dir = utils.safe_makedir(os.path.join(bcbio_base, "variation"))
-        utils.copy_plus(ready_cosmic, os.path.join(variation_dir, os.path.basename(ready_cosmic)))
-        print("Created COSMIC v%s resource in %s" % (cosmic_version,
-                                                     os.path.join(variation_dir, os.path.basename(ready_cosmic))))
+        utils.copy_plus(ready_cosmic, installed_file)
+        logging.info(f"Created COSMIC v{cosmic_version} resource in {installed_file}.")
+        logging.info(f"Linking {installed_file} as {installed_link}.")
+        make_links(installed_file, installed_link)
+        logging.info(f"Finished COSMIC v{cosmic_version} prep for {genome_build}.")
+        # prepare hg19 from the GRCh37 file
         if bcbio_build == "GRCh37":
-            bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", "hg19")
+            genome_build = "hg19"
+            logging.info(f"Prepping COSMIC v{cosmic_version} for {genome_build} from the GRCh37 preparation.")
+            bcbio_base = os.path.join(bcbio_genome_dir, "genomes", "Hsapiens", genome_build)
             if not os.path.exists(bcbio_base):
                 continue
-            out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, "bcbio_ready", "hg19"))
-            out_file = os.path.join(out_dir, "cosmic.vcf.gz")
+            if os.path.exists(installed_file):
+                installed_file = os.path.join(bcbio_base, "variation", f"cosmic-v{cosmic_version}.vcf.gz")
+                installed_link = os.path.join(bcbio_base, "variation", "cosmic.vcf.gz")
+                if not overwrite:
+                    logging.info(f"{installed_file} exists, please use the --overwrite flag to overwrite the existing files if you want to reinstall.")
+                    continue
+                else:
+                    logging.info(f"{installed_file} exists, removing.")
+                    remove_installed(installed_file, installed_link)
+            out_dir = utils.safe_makedir(os.path.join(f"v{cosmic_version}", "bcbio_ready", genome_build))
+            out_file = os.path.join(out_dir, f"cosmic-v{cosmic_version}.vcf.gz")
+            logging.info(f"Translating GRCh37 chromosome names to hg19 chromosome names.")
             hg19_cosmic = map_coords_to_ucsc(ready_cosmic, bcbio_ref, out_file)
             variation_dir = utils.safe_makedir(os.path.join(bcbio_base, "variation"))
-            utils.copy_plus(hg19_cosmic, os.path.join(variation_dir, os.path.basename(hg19_cosmic)))
-            print("Created COSMIC v%s resource in %s" % (cosmic_version,
-                                                         os.path.join(variation_dir, os.path.basename(hg19_cosmic))))
+            utils.copy_plus(hg19_cosmic, installed_file)
+            logging.info(f"Created COSMIC v{cosmic_version} resource in {installed_file}.")
+            logging.info(f"Linking {installed_file} as {installed_link}.")
+            make_links(installed_file, installed_link)
+            logging.info(f"Finished COSMIC v{cosmic_version} prep for {genome_build}.")
+
+def remove_installed(installed_file, installed_link):
+    logging.info(f"Removing {installed_file}.")
+    if os.path.exists(installed_file):
+        os.remove(installed_file)
+    installed_index = installed_file + ".tbi"
+    logging.info(f"Removing {installed_index}.")
+    if os.path.exists(installed_index):
+        os.remove(installed_index)
+    logging.info(f"Removing {installed_link}.")
+    if os.path.lexists(installed_link):
+        os.remove(installed_link)
+    installed_index = installed_link + ".tbi"
+    logging.info(f"Removing {installed_index}.")
+    if os.path.lexists(installed_index):
+        os.remove(installed_index)
+
+def make_links(installed_file, installed_link):
+    os.symlink(os.path.basename(installed_file), installed_link)
+    os.symlink(os.path.basename(installed_file + ".tbi"), installed_link + ".tbi")
 
 def map_coords_to_ucsc(grc_cosmic, ref_file, out_file):
     hg19_ref_file = ref_file.replace("GRCh37", "hg19")
@@ -79,6 +133,7 @@ def _rename_to_ucsc(line):
     return "%s\t%s" % (new_chrom, rest)
 
 def combine_cosmic(fnames, ref_file, out_file):
+    logging.info(f"Combining COSMIC files to {out_file}.")
     if not os.path.exists(out_file):
         cmd = ["picard", "MergeVcfs", "O=%s" % out_file, "D=%s" % ref_file.replace(".fa", ".dict")] + \
               ["I=%s" % x for x in fnames] + \
@@ -89,6 +144,7 @@ def combine_cosmic(fnames, ref_file, out_file):
 def sort_to_ref(fname, ref_file, add_chr):
     """Match reference genome ordering.
     """
+    logging.info(f"Sorting {fname} to match the order of {ref_file}.")
     out_file = "%s-prep.vcf.gz" % (fname.replace(".vcf.gz", ""))
     if not os.path.exists(out_file):
         if add_chr:
@@ -98,17 +154,20 @@ def sort_to_ref(fname, ref_file, add_chr):
         contig_cl = vcfutils.add_contig_to_header_cl(ref_file, out_file)
         cmd = ("gunzip -c {fname} {fix_chrom} | "
                "bcftools norm --check-ref s --do-not-normalize -f {ref_file} |"
+               "bcftools view -e 'SNP=1' |"
                "gsort /dev/stdin {ref_file}.fai | {contig_cl} | "
                "bgzip -c > {out_file}")
         subprocess.check_call(cmd.format(**locals()), shell=True)
+    logging.info(f"bgzipping and indexing {out_file}.")
     return vcfutils.bgzip_and_index(out_file, {})
 
-def get_cosmic_files(genome_build, cosmic_version):
+def get_cosmic_vcf_files(genome_build, cosmic_version):
     """Retrieve using new authentication based download approach.
 
     GRCh38/cosmic/v85/VCF/CosmicCodingMuts.vcf.gz
     GRCh38/cosmic/v85/VCF/CosmicNonCodingVariants.vcf.gz
     """
+    logging.info("Downloading COSMIC VCF files.")
     url = "https://cancer.sanger.ac.uk/cosmic/file_download/"
     out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, genome_build))
     fnames = []
@@ -116,7 +175,7 @@ def get_cosmic_files(genome_build, cosmic_version):
         filename = os.path.join(out_dir, "%s.vcf.gz" % ctype)
         if not os.path.exists(filename):
             filepath = "%s/cosmic/v%s/VCF/%s.vcf.gz" % (genome_build, cosmic_version, ctype)
-            print("Downloading %s" % (url + filepath))
+            logging.info("Downloading %s" % (url + filepath))
             r = requests.get(url + filepath, auth=(os.environ["COSMIC_USER"], os.environ["COSMIC_PASS"]))
             download_url = r.json()["url"]
             r = requests.get(download_url)
@@ -126,4 +185,9 @@ def get_cosmic_files(genome_build, cosmic_version):
     return fnames
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    parser = ArgumentParser()
+    parser.add_argument("cosmic_version", help="COSMIC version to install.", default="89")
+    parser.add_argument("bcbio_directory", help="Path to bcbio installation. Should contain the 'genomes' directory.")
+    parser.add_argument("--overwrite", action="store_true", default=False)
+    args = parser.parse_args()
+    main(args.cosmic_version, args.bcbio_directory, args.overwrite)
