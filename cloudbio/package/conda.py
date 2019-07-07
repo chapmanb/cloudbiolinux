@@ -67,6 +67,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
             problems = " ".join(cur_packages)
             subprocess.check_call("{conda_bin} remove -y {problems}".format(**locals()), shell=True)
+    _initial_base_install(conda_bin, [ps for (n, ps) in _split_by_condaenv(packages) if n is None][0], check_channels)
     # install our customized packages
     if len(packages) > 0:
         for env_name, env_packages in _split_by_condaenv(packages):
@@ -78,8 +79,6 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
                 env_str = ""
             pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
             py_version = ENV_PY_VERSIONS[env_name]
-            # During openssl transition, pin to 1.1.1 to avoid slow resolve times
-            extra_pins = "'openssl=1.1.1b'"
             if "deepvariant" in env_packages:
                 # Ignore /etc/boto.cfg which creates conflicts with conda gsutils
                 # https://github.com/GoogleCloudPlatform/gsutil/issues/516
@@ -87,7 +86,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             else:
                 exports = ""
             subprocess.check_call("{exports}{conda_bin} install -y {env_str} {channels} "
-                                  "{py_version} {extra_pins} {pkgs_str}".format(**locals()), shell=True)
+                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
             conda_pkg_list = json.loads(subprocess.check_output(
                 "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
             for package in env_packages:
@@ -96,6 +95,34 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json".format(**locals()), shell=True))
     for pkg in ["python", "conda", "pip"]:
         _link_bin(pkg, system_installdir, conda_info, conda_bin, conda_pkg_list, files=[pkg], prefix="bcbio_")
+
+def _initial_base_install(conda_bin, env_packages, check_channels):
+    """Provide a faster initial installation of base packages, avoiding dependency issues.
+
+    Uses mamba (https://github.com/QuantStack/mamba) to provide quicker package resolution
+    and avoid dependency conflicts with base install environment. Bootstraps the initial
+    installation of all tools when key inputs that cause conflicts are missing.
+    """
+    initial_package_targets = {None: ["r-base"]}
+    env_name = None
+    env_str = ""
+    channels = " ".join(["-c %s" % x for x in check_channels])
+    cur_ps = [x["name"] for x in
+              json.loads(subprocess.check_output("{conda_bin} list --json {env_str}".format(**locals()), shell=True))
+              if x["channel"] in check_channels]
+    have_package_targets = env_name in initial_package_targets and any([p for p in cur_ps
+                                                                        if p in initial_package_targets[env_name]])
+    if not have_package_targets:
+        print("Initalling initial set of packages for %s environment with mamba" % (env_name or "default"))
+        py_version = ENV_PY_VERSIONS[env_name]
+        pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
+        if "mamba" not in cur_ps:
+            subprocess.check_call("{conda_bin} install -y {env_str} {channels} "
+                                  "{py_version} mamba".format(**locals()), shell=True)
+        mamba_bin = os.path.join(os.path.dirname(conda_bin), "mamba")
+        pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
+        subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
+                              "{py_version} {pkgs_str}".format(**locals()), shell=True)
 
 def _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list, files=None,
               prefix="", conda_env=None, conda_envdir=None):
