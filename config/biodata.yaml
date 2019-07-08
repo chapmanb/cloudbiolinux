@@ -114,7 +114,7 @@ annotation_groups:
   gemini: [esp, exac, gnomad_exome, 1000g]
 
 # Global set of indexes to include for each genome.
-# Available choices are in GENOMES_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
+# Available choices are in GENOME_INDEXES_SUPPORTED in cloudbio/biodata/genomes.py
 genome_indexes:
   - bwa
   - twobit

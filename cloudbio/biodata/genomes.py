@@ -311,7 +311,7 @@ GENOMES_SUPPORTED = [
                                              "AgamP3", ["CHROMOSOMES"]))]
 GENOME_INDEXES_SUPPORTED = ["bowtie", "bowtie2", "bwa", "maq", "minimap2", "novoalign",
                             "novoalign-cs", "ucsc", "mosaik", "snap", "star",
-                            "rtg", "hisat2", "bbmap"]
+                            "rtg", "hisat2", "bbmap", "bismark"]
 DEFAULT_GENOME_INDEXES = ["seq"]
 
 # -- Fabric instructions
@@ -678,6 +678,12 @@ def _index_bbmap(env, ref_file):
                               (cores, 3 * int(cores), dir_name, ref_file), shell=True)
     return dir_name
 
+def _index_bismark(env, ref_file):
+    """Bismark indexing happens in GGD recipes. This links to the proper output directory.
+    """
+    dir_name = "bismark/Bisulfite_Genome"
+    return dir_name
+
 def _index_maq(env, ref_file):
     dir_name = "maq"
     cmd = "maq fasta2bfa {ref_file} {index_name}"
@@ -1019,6 +1025,7 @@ def get_index_fn(index):
 INDEX_FNS = {
     "seq": _index_sam,
     "bbmap": _index_bbmap,
+    "bismark": _index_bismark,
     "bwa": _index_bwa,
     "bowtie": _index_bowtie,
     "bowtie2": _index_bowtie2,
