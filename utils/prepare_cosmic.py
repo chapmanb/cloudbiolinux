@@ -177,7 +177,7 @@ def get_cosmic_vcf_files(genome_build, cosmic_version):
     GRCh38/cosmic/v85/VCF/CosmicNonCodingVariants.vcf.gz
     """
     vdir = os.path.join("v%s" % cosmic_version, genome_build)
-    if not os.path.exists(vdir):
+    if os.path.exists(vdir):
         if not clean:
             logging.info(f"{vdir} files exist, please use the --clean flag to overwrite the existing files if you want to reinstall.")
         else:
