@@ -181,9 +181,9 @@ def get_cosmic_vcf_files(genome_build, cosmic_version):
         if not clean:
             logging.info(f"{vdir} files exist, please use the --clean flag to overwrite the existing files if you want to reinstall.")
             continue
-            else:
-                logging.info(f"{vdir} exists, removing.")
-                remove_cosmic_directory(vdir)
+        else:
+            logging.info(f"{vdir} exists, removing.")
+            remove_cosmic_directory(vdir)
     logging.info("Downloading COSMIC VCF files.")
     url = "https://cancer.sanger.ac.uk/cosmic/file_download/"
     out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, genome_build))
