@@ -53,7 +53,7 @@ def main(cosmic_version, bcbio_genome_dir, overwrite=False, clean=False):
                 logging.info(f"{installed_file} exists, removing.")
                 remove_installed(installed_file, installed_link)
         bcbio_ref = os.path.join(bcbio_base, "seq", f"{bcbio_build}.fa")
-        cosmic_vcf_files = get_cosmic_vcf_files(genome_build, cosmic_version)
+        cosmic_vcf_files = get_cosmic_vcf_files(genome_build, cosmic_version, clean)
         sorted_inputs = []
         for fname in cosmic_vcf_files:
             sorted_inputs.append(sort_to_ref(fname, bcbio_ref, add_chr=add_chr))
@@ -170,7 +170,7 @@ def sort_to_ref(fname, ref_file, add_chr):
     return vcfutils.bgzip_and_index(out_file, {})
 
 
-def get_cosmic_vcf_files(genome_build, cosmic_version):
+def get_cosmic_vcf_files(genome_build, cosmic_version, clean):
     """Retrieve using new authentication based download approach.
 
     GRCh38/cosmic/v85/VCF/CosmicCodingMuts.vcf.gz
