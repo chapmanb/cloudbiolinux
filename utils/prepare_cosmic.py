@@ -180,7 +180,6 @@ def get_cosmic_vcf_files(genome_build, cosmic_version):
     if not os.path.exists(vdir):
         if not clean:
             logging.info(f"{vdir} files exist, please use the --clean flag to overwrite the existing files if you want to reinstall.")
-            continue
         else:
             logging.info(f"{vdir} exists, removing.")
             remove_cosmic_directory(vdir)
