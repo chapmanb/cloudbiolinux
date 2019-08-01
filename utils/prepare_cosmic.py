@@ -25,6 +25,7 @@ import requests
 import subprocess
 import sys
 import tempfile
+import shutil
 from argparse import ArgumentParser
 
 from bcbio import utils
@@ -32,7 +33,8 @@ from bcbio.variation import vcfutils
 
 logging.basicConfig(format='%(asctime)s [%(levelname).1s] %(message)s', level=logging.INFO)
 
-def main(cosmic_version, bcbio_genome_dir, overwrite=False):
+
+def main(cosmic_version, bcbio_genome_dir, overwrite=False, clean=False):
     work_dir = utils.safe_makedir(os.path.join(os.getcwd(), "cosmic-prep"))
     os.chdir(work_dir)
 
@@ -91,6 +93,7 @@ def main(cosmic_version, bcbio_genome_dir, overwrite=False):
             make_links(installed_file, installed_link)
             logging.info(f"Finished COSMIC v{cosmic_version} prep for {genome_build}.")
 
+
 def remove_installed(installed_file, installed_link):
     logging.info(f"Removing {installed_file}.")
     if os.path.exists(installed_file):
@@ -107,9 +110,11 @@ def remove_installed(installed_file, installed_link):
     if os.path.lexists(installed_index):
         os.remove(installed_index)
 
+
 def make_links(installed_file, installed_link):
     os.symlink(os.path.basename(installed_file), installed_link)
     os.symlink(os.path.basename(installed_file + ".tbi"), installed_link + ".tbi")
+
 
 def map_coords_to_ucsc(grc_cosmic, ref_file, out_file):
     hg19_ref_file = ref_file.replace("GRCh37", "hg19")
@@ -124,6 +129,7 @@ def map_coords_to_ucsc(grc_cosmic, ref_file, out_file):
         os.remove("%s-header.txt" % utils.splitext_plus(out_file)[0])
     return vcfutils.bgzip_and_index(out_file, {})
 
+
 def _rename_to_ucsc(line):
     chrom, rest = line.split("\t", 1)
     if chrom == "MT":
@@ -131,6 +137,7 @@ def _rename_to_ucsc(line):
     else:
         new_chrom = "chr%s" % chrom
     return "%s\t%s" % (new_chrom, rest)
+
 
 def combine_cosmic(fnames, ref_file, out_file):
     logging.info(f"Combining COSMIC files to {out_file}.")
@@ -140,6 +147,7 @@ def combine_cosmic(fnames, ref_file, out_file):
               ["USE_JDK_DEFLATER=true", "USE_JDK_INFLATER=true", "CREATE_INDEX=false"]
         subprocess.check_call(cmd)
     return vcfutils.bgzip_and_index(out_file, {})
+
 
 def sort_to_ref(fname, ref_file, add_chr):
     """Match reference genome ordering.
@@ -161,12 +169,21 @@ def sort_to_ref(fname, ref_file, add_chr):
     logging.info(f"bgzipping and indexing {out_file}.")
     return vcfutils.bgzip_and_index(out_file, {})
 
+
 def get_cosmic_vcf_files(genome_build, cosmic_version):
     """Retrieve using new authentication based download approach.
 
     GRCh38/cosmic/v85/VCF/CosmicCodingMuts.vcf.gz
     GRCh38/cosmic/v85/VCF/CosmicNonCodingVariants.vcf.gz
     """
+    vdir = os.path.join("v%s" % cosmic_version, genome_build)
+    if not os.path.exists(vdir):
+        if not clean:
+            logging.info(f"{vdir} files exist, please use the --clean flag to overwrite the existing files if you want to reinstall.")
+                continue
+            else:
+                logging.info(f"{vdir} exists, removing.")
+                remove_cosmic_directory(vdir)
     logging.info("Downloading COSMIC VCF files.")
     url = "https://cancer.sanger.ac.uk/cosmic/file_download/"
     out_dir = utils.safe_makedir(os.path.join("v%s" % cosmic_version, genome_build))
@@ -176,7 +193,11 @@ def get_cosmic_vcf_files(genome_build, cosmic_version):
         if not os.path.exists(filename):
             filepath = "%s/cosmic/v%s/VCF/%s.vcf.gz" % (genome_build, cosmic_version, ctype)
             logging.info("Downloading %s" % (url + filepath))
-            r = requests.get(url + filepath, auth=(os.environ["COSMIC_USER"], os.environ["COSMIC_PASS"]))
+            try:
+                r = requests.get(url + filepath, auth=(os.environ["COSMIC_USER"], os.environ["COSMIC_PASS"]))
+            except KeyError as e:
+                print("KeyError: {} not found. Be sure to export your COSMIC_USER and COSMIC_PASS before running in order to download the files".format(e))
+                raise e
             download_url = r.json()["url"]
             r = requests.get(download_url)
             with open(filename, "wb") as f:
@@ -184,10 +205,17 @@ def get_cosmic_vcf_files(genome_build, cosmic_version):
         fnames.append(filename)
     return fnames
 
+
+def remove_cosmic_directory(installed_directory):
+    logging.info(f"Removing {installed_directory}.")
+    shutil.rmtree(installed_directory)
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("cosmic_version", help="COSMIC version to install.", default="89")
     parser.add_argument("bcbio_directory", help="Path to bcbio installation. Should contain the 'genomes' directory.")
     parser.add_argument("--overwrite", action="store_true", default=False)
+    parser.add_argument("--clean", action="store_true", default=False)
     args = parser.parse_args()
     main(args.cosmic_version, args.bcbio_directory, args.overwrite)
