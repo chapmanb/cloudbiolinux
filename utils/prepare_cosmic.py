@@ -217,4 +217,4 @@ if __name__ == "__main__":
     parser.add_argument("--overwrite", action="store_true", default=False)
     parser.add_argument("--clean", action="store_true", default=False)
     args = parser.parse_args()
-    main(args.cosmic_version, args.bcbio_directory, args.overwrite)
+    main(args.cosmic_version, args.bcbio_directory, args.overwrite, args.clean)
