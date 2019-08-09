@@ -16,6 +16,7 @@ minimal:
 # - pandoc
 bio_nextgen:
   - age-metasv
+  - arriba
   - atropos;env=python3
   - bamtools=2.4.0
   - bamutil
