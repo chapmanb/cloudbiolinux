@@ -231,6 +231,7 @@ r:
   - r-viridis>=0.5
   - r-wasabi
   - bioconductor-annotate
+  - bioconductor-apeglm
   - bioconductor-biocgenerics
   - bioconductor-biocinstaller
   - bioconductor-biocstyle
