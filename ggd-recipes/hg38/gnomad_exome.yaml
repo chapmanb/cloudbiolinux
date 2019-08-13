@@ -2,17 +2,19 @@
 # - https://gnomad.broadinstitute.org/downloads
 # - https://macarthurlab.org/2018/10/17/gnomad-v2-1/
 # Lifted over to hg38 by Gnomad team
-# Script 
+# Script
 # - no need in decomposing, normalizing,sort, and uniq anymore - it is done in gnomad 2.1.1 exomes
 # - filters only PASS variants (segdup, decoy are retained)
 # - removes many INFO fields to reduce file size: controls_, hist, non_, using bcftools annotate instead of vt rminfo, because it failed randomly on chr1
-# wget is separated from the processing because wget in the pipe fails randomly (on some systems?): it comes out when downloading many files.
 # recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe 
-# much faster from gnomad google cloud - 20-25 min on O2
+# much faster from gnomad in google cloud - downloads in 20-25 min on O2
+# vt is 3x faster than bcftools for removing INFO tags: in a test with 4444 variants t(bcftools -x) = t(bcftools -x "^") = 27s, time(vt rminfo) = 8s,
+# but vt rminfo is failing after 148M, using bcftools
+# overall processing is still slow: 87G to G in 
 ---
 attributes:
   name: gnomad_exome
-  version: 2.2
+  version: 2.1.1
 recipe:
   full:
     recipe_type: bash
@@ -22,13 +24,13 @@ recipe:
         vcf_file=gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz
         mkdir -p variation
         export TMPDIR=`pwd`
-        gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
-        wget --no-check-certificate -c $gnomad_fields_to_keep_url    
+        gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt        
+        wget --no-check-certificate -c $gnomad_fields_to_keep_url
         vcf=${vcf_prefix}${vcf_file}
         wget --no-check-certificate -c $vcf
         wget --no-check-certificate -c $vcf.tbi
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
-        bcftools view -f PASS -Ov $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | bgzip -c --threads 2 >  variation/gnomad_exome.vcf.gz
+        bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | bgzip -c > variation/gnomad_exome.vcf.gz
         tabix -f -p vcf variation/gnomad_exome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_exome.vcf.gz
         rm $vcf_file $vcf_file.tbi

@@ -221,36 +221,20 @@ VM is complete. See the main README file for more information.
 ## Testing a ggd recipe
 
 reference=hg38, or GRCh37, or another.
+system_install=/path/bcbio without bin
 
 ```
 mkdir recipe_test
 cp recipe.yaml recipe_test
 cd recipe_test
-```
-
-For a quick test separate wget downloading from processing in the recipe and download partial small vcf files:
-```
-#!/bin/bash
-# prepares full chomosome test set for gnomad to test ggd recipe
-mkdir txtmp
-cd txtmp
-prefix=gnomad.exomes.r2.1.sites.grch38.chr
-for chrom in $(seq 1 22;echo X Y)
-do
-  curl -r 0-1000000 -O http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh38/variation_genotype/gnomad/r2.1/exomes/${prefix}${chrom}_noVEP.vcf.gz
-  gunzip -c ${prefix}${chrom}_noVEP.vcf.gz | head -n 1400 > ${prefix}${chrom}_noVEP.vcf
-  bgzip -f ${prefix}${chrom}_noVEP.vcf
-  tabix ${prefix}${chrom}_noVEP.vcf.gz
-done
-cd ..
-```
-Comment wget -c in the recipe.
-
-system_install=/path/bcbio without bin.
-```
+git clone https://github.com/chapmanb/cloudbiolinux
 ln -s /path/bcbio/genomes/Hsapiens/[reference]/seq seq
 export PYTHONPATH=/path/cloudbiolinux:$PYTHONPATH
 python -c 'from cloudbio.biodata.ggd import install_recipe; install_recipe("/path/where_to_install", "/path/bcbio", "recipe.yaml", "[reference]")'
 ```
 
-In bcbio the alternative option is to modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes (not in ggd-run.sh!) and rerun bcbio_nextgen.py upgrade [params].
+In bcbio the alternative option is to:
+- start bcbio_nextge.py upgrade [options]
+- interrupt it
+- modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes (not in ggd-run.sh!) 
+- rerun bcbio_nextgen.py upgrade [options].
