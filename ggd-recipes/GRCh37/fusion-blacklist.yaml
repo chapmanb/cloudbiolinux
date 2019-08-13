@@ -1,0 +1,22 @@
+# fusion blacklist regions from arriba
+---
+attributes:
+  name: fusion-blacklist
+  version: 1
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        version=v1.1.0
+        url=https://github.com/suhrig/arriba/releases/download/${version}/arriba_${version}.tar.gz
+        arriba_tarball=arriba_${version}.tar.gz
+        outdir=rnaseq/fusion-blacklist
+        mkdir -p ${outdir}
+        wget -c -O ${arriba_tarball} ${url}
+        tar zxvf ${arriba_tarball}
+        gzip -cd arriba_${version}/database/blacklist_hg19_hs37d5_GRCh37_2018-11-04.tsv.gz | gzip -c > ${outdir}/arriba-blacklist.tsv.gz
+        rm -r arriba_${version}
+        rm ${arriba_tarball}
+    recipe_outfiles:
+      - rnaseq/fusion-blacklist/arriba-blacklist.tsv.gz

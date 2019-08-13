@@ -10,10 +10,10 @@ import yaml
 
 from cloudbio.package.shared import _yaml_to_packages
 
-ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=3")
-ENV_PY_VERSIONS[None] = "python=3"
+ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=3.6")
+ENV_PY_VERSIONS[None] = "python=3.6"
 ENV_PY_VERSIONS["python2"] = "python=2"
-ENV_PY_VERSIONS["python3"] = "python=3"
+ENV_PY_VERSIONS["python3"] = "python=3.6"
 ENV_PY_VERSIONS["dv"] = "python=2"
 ENV_PY_VERSIONS["samtools0"] = "python=2"
 
@@ -66,7 +66,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
         if cur_packages:
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
             problems = " ".join(cur_packages)
-            subprocess.check_call("{conda_bin} remove -y {problems}".format(**locals()), shell=True)
+            subprocess.check_call("{conda_bin} remove {channels} -y {problems}".format(**locals()), shell=True)
     _initial_base_install(conda_bin, [ps for (n, ps) in _split_by_condaenv(packages) if n is None][0], check_channels)
     # install our customized packages
     if len(packages) > 0:
