@@ -40,7 +40,7 @@ recipe:
         wget --no-check-certificate -O $repeats/polyx.bed.gz.tbi http://s3.amazonaws.com/biodata/coverage/problem_regions/polyx/polyX-GRCh37.bed.gz.tbi
         gc=coverage/gc
         mkdir -p $gc
-        wget --no-check-certificate -O - 'https://nc.hartwigmedicalfoundation.nl/index.php/s/a8lgLsUrZI5gndd/download?path=%2FHMF-Pipeline-Resources&files=GC_profile.hg19.1000bp.cnp.gz' | gunzip -c > $gc/GC_profile.1000bp.cnp
+        wget --no-check-certificate -O - https://s3.amazonaws.com/biodata/collections/GRCh37/coverage/gc/GC_profile.1000bp.cnp > $gc/GC_profile.1000bp.cnp
     recipe_outfiles:
       - coverage/problem_regions/GA4GH/README.md
       - coverage/problem_regions/GA4GH/bad_promoter.bed.gz
