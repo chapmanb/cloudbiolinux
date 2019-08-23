@@ -252,4 +252,5 @@ r:
   - bioconductor-limma
   - bioconductor-purecn
   - bioconductor-rtracklayer
+  - bioconductor-snpchip # needed for the TitanCNA wrapper but not listed as a depedency in the formula
   - bioconductor-titancna
