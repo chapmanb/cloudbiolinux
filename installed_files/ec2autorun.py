@@ -402,14 +402,14 @@ def _load_user_data(user_data):
     the `_merge` function above and priority is always given to
     user supplied options.
     """
-    ud = yaml.load(user_data)
+    ud = yaml.safe_load(user_data)
     if ud == user_data:
         # Bad user data, cannot merge default
         return ud
     default_user_data_path = \
         os.path.join(os.path.dirname(os.path.abspath(__file__)), 'IMAGE_USER_DATA')
     if os.path.exists(default_user_data_path):
-        image_ud = yaml.load(open(default_user_data_path, 'r').read())
+        image_ud = yaml.safe_load(open(default_user_data_path, 'r').read())
         if image_ud:
             ud = _merge(ud, image_ud)
     return ud

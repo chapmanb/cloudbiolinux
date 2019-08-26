@@ -57,7 +57,7 @@ def install_packages(env, to_install=None, packages=None):
     for pkg_str in ["pkg-config", "openssl", "cmake", "unzip"]:
         _safe_unlink_pkg(env, pkg_str, brew_cmd)
     with open(config_file.base) as in_handle:
-        to_remove = yaml.load(in_handle).get("to_remove", [])
+        to_remove = yaml.safe_load(in_handle).get("to_remove", [])
     for pkg_str in ["curl"] + to_remove:
         _safe_uninstall_pkg(env, pkg_str, brew_cmd)
 
@@ -68,7 +68,7 @@ def _remove_old(env, config_file):
     if env.safe_exists(brew_cmd):
         baseline = ["pkg-config", "openssl", "cmake", "unzip", "curl"]
         with open(config_file) as in_handle:
-            to_remove = yaml.load(in_handle).get("to_remove", [])
+            to_remove = yaml.safe_load(in_handle).get("to_remove", [])
         for pkg_str in baseline + to_remove:
             _safe_uninstall_pkg(env, pkg_str, brew_cmd)
 

@@ -50,7 +50,7 @@ def _tools_conf_path(env):
 
 def _load_tools_conf(env):
     with open(_tools_conf_path(env)) as in_handle:
-        full_data = yaml.load(in_handle)
+        full_data = yaml.safe_load(in_handle)
     return full_data
 
 

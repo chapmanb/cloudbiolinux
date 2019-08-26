@@ -411,7 +411,7 @@ def _get_genomes(config_source):
         if yaml is None:
             raise ImportError("install yaml to read configuration from %s" % config_source)
         with open(config_source) as in_handle:
-            config = yaml.load(in_handle)
+            config = yaml.safe_load(in_handle)
     genomes = []
     genomes_config = config["genomes"] or []
     print("List of genomes to get (from the config file at '{0}'): {1}"

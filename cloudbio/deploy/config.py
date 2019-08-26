@@ -15,4 +15,4 @@ def _path_from_root(name):
 
 def _read_yaml(yaml_file):
     with open(yaml_file) as in_handle:
-        return yaml.load(in_handle)
+        return yaml.safe_load(in_handle)

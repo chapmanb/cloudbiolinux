@@ -96,7 +96,7 @@ def parse_settings(name):
 
 def _read_yaml(yaml_file):
     with open(yaml_file) as in_handle:
-        return yaml.load(in_handle)
+        return yaml.safe_load(in_handle)
 
 
 if __name__ == "__main__":

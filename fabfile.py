@@ -356,7 +356,7 @@ def _read_main_config():
     """
     yaml_file = get_config_file(env, "main.yaml").base
     with open(yaml_file) as in_handle:
-        full_data = yaml.load(in_handle)
+        full_data = yaml.safe_load(in_handle)
     packages = full_data.get('packages', [])
     packages = env.flavor.rewrite_config_items("main_packages", packages)
     libraries = full_data.get('libraries', [])
@@ -455,5 +455,5 @@ def _do_library_installs(to_install):
     for iname in to_install:
         yaml_file = get_config_file(env, "%s.yaml" % iname).base
         with open(yaml_file) as in_handle:
-            config = yaml.load(in_handle)
+            config = yaml.safe_load(in_handle)
         lib_installers[iname](config)

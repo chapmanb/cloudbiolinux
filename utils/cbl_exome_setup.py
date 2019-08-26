@@ -93,7 +93,7 @@ def read_pp_config(fname):
     """Read AMQP vhost from YAML configuration file.
     """
     with open(fname) as in_handle:
-        config = yaml.load(in_handle)
+        config = yaml.safe_load(in_handle)
     return config["distributed"]["rabbitmq_vhost"]
 
 def read_ampq_config(fname):

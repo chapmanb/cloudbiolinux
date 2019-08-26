@@ -10,7 +10,7 @@ import yaml
 
 def main(config_file):
     with open(config_file) as in_handle:
-        config = yaml.load(in_handle)
+        config = yaml.safe_load(in_handle)
     channels = config["channels"]
     channels.reverse()
     for p in sorted(config["bio_nextgen"]):

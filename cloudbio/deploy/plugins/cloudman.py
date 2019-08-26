@@ -61,7 +61,7 @@ def cloudman_launch(vm_launcher, options):
             raise Exception("CloudMan AMI set to __use_snaps__ but now snaps.yaml file could be found with path %s" % snaps_path)
         snaps = {}
         with open(snaps_path, "r") as in_handle:
-            snaps = yaml.load(in_handle)
+            snaps = yaml.safe_load(in_handle)
         clouds = snaps["clouds"]
         if len(clouds) != 1:
             raise Exception("Exactly one cloud must be defined snaps.yaml for the deployer's CloudMan launch to work.")
