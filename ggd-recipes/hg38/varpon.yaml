@@ -11,8 +11,8 @@ recipe:
       - |
         ref=../seq/hg38.fa
         mkdir -p variation
-        wget --no-check-certificate -O - 'https://nc.hartwigmedicalfoundation.nl/index.php/s/a8lgLsUrZI5gndd/download?path=%2FHMF-Pipeline-Resources&files=GermlineHetPon.hg38.bed.gz' | gunzip -c | python -c 'import sys; want=tuple(["chr%s" % x for x in list(range(1, 23)) + ["X", "Y"]]); [sys.stdout.write(l) for l in sys.stdin if l.startswith(want)]' | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/germline_het_pon.bed.gz
-        tabix -f -p bed variation/germline_het_pon.bed.gz
+        wget --no-check-certificate -O - 'https://s3.amazonaws.com/biodata/collections/hg38/variation/germline_het_pon.bed.gz' > variation/germline_het_pon.bed.gz
+        wget --no-check-certificate -O - 'https://s3.amazonaws.com/biodata/collections/hg38/variation/germline_het_pon.bed.gz.tbi' > variation/germline_het_pon.bed.gz.tbi
     recipe_outfiles:
       - variation/germline_het_pon.bed.gz
       - variation/germline_het_pon.bed.gz.tbi
