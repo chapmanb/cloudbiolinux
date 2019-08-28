@@ -730,7 +730,7 @@ def _index_star(env, ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
     build = os.path.basename(os.path.splitext(ref_file)[0])
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
-    if build == "hg38":
+    if build == "hg38" and not os.path.exists(os.path.join(dir_name, "SA")):
         simple_file = os.path.join(os.path.splitext(ref_file)[0] + "-simple.fa")
         print("hg38 detected, building a simple reference with no alts, decoys or HLA.")
         ref_file = prepare_simple_reference(ref_file, simple_file)
