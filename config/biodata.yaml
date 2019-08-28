@@ -42,7 +42,7 @@ genomes:
     annotations: [ccds, coverage, capture_regions, rmsk, prioritize, dbsnp, hapmap_snps,
                   1000g_omni_snps, 1000g_snps, 1000g_indels,
                   mills_indels, clinvar, qsignature, ACMG56_genes, transcripts,
-                  genesplicer, effects_transcripts, vcfanno, esp, exac, gnomad_exome, viral, RADAR, mirbase, varpon, topmed, genotype2phenotype, salmon-decoys]
+                  genesplicer, effects_transcripts, vcfanno, esp, exac, gnomad_exome, viral, RADAR, mirbase, varpon, topmed, genotype2phenotype, salmon-decoys, fusion-blacklist]
     annotations_available: [dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631,
                  platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
