@@ -411,7 +411,7 @@ def _get_genomes(config_source):
         if yaml is None:
             raise ImportError("install yaml to read configuration from %s" % config_source)
         with open(config_source) as in_handle:
-            config = yaml.safe_load(in_handle)
+            config = yaml.load(in_handle)
     genomes = []
     genomes_config = config["genomes"] or []
     print("List of genomes to get (from the config file at '{0}'): {1}"
@@ -728,9 +728,14 @@ def _index_sam(env, ref_file):
 @_if_installed("STAR")
 def _index_star(env, ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
+    build = os.path.basename(os.path.splitext(ref_file)[0])
+    dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
+    if build == "hg38":
+        simple_file = os.path.join(os.path.splitext(ref_file)[0] + "-simple.fa")
+        print("hg38 detected, building a simple reference with no alts, decoys or HLA.")
+        ref_file = prepare_simple_reference(ref_file, simple_file)
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2) / 2 - 2), 0))
-    dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
     # if there is a large number of contigs, scale nbits down
     # https://github.com/alexdobin/STAR/issues/103#issuecomment-173009628
     # if there is a small genome, scale nbits down
@@ -757,6 +762,8 @@ def _index_star(env, ref_file):
                                          nbits))
     if not os.path.exists(os.path.join(dir_name, "SA")):
         _index_w_command(env, dir_name, cmd, ref_file)
+    if build == "hg38":
+        os.remove(ref_file)
     return dir_name
 
 @_if_installed("hisat2-build")
@@ -1011,8 +1018,6 @@ def _index_blast_db(work_dir, base_file, db_type):
                       (os.path.exists("%s.%s" % (db_name, ext)) for ext in type_to_ext[db_type])):
             subprocess.check_call("makeblastdb -in %s -dbtype %s -out %s" %
                                   (base_file, db_type, db_name), shell=True)
-
-
 def get_index_fn(index):
     """
     return the index function for an index, if it is missing return a function
@@ -1021,6 +1026,29 @@ def get_index_fn(index):
     def noop(env, ref_file):
         pass
     return INDEX_FNS.get(index, noop)
+
+def prepare_simple_reference(ref_file, out_file):
+    """
+    given an hg38 FASTA file, create a FASTA file with no alts, HLA or decoys
+    """
+    if os.path.exists(out_file):
+        return out_file
+    with open(ref_file + ".fai") as in_handle:
+        chroms = [x.split()[0].strip() for x in in_handle]
+    chroms = [x for x in chroms if not (is_alt(x) or is_decoy(x) or is_HLA(x))]
+    cmd = ["samtools", "faidx", ref_file] + chroms
+    with open(out_file, "w") as out_handle:
+        subprocess.check_call(cmd, stdout=out_handle)
+    return out_file
+
+def is_alt(chrom):
+    return chrom.endswith("_alt")
+
+def is_decoy(chrom):
+    return chrom.endswith("_decoy")
+
+def is_HLA(chrom):
+    return chrom.startswith("HLA")
 
 INDEX_FNS = {
     "seq": _index_sam,
