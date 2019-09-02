@@ -730,9 +730,12 @@ def _index_star(env, ref_file):
     (ref_dir, local_file) = os.path.split(ref_file)
     build = os.path.basename(os.path.splitext(ref_file)[0])
     dir_name = os.path.normpath(os.path.join(ref_dir, os.pardir, "star"))
-    if build == "hg38" and not os.path.exists(os.path.join(dir_name, "SA")):
-        simple_file = os.path.join(os.path.splitext(ref_file)[0] + "-simple.fa")
-        print("hg38 detected, building a simple reference with no alts, decoys or HLA.")
+    sentinel_file = os.path.join(dir_name, "SA")
+    if os.path.exists(sentinel_file):
+        return dir_name 
+    if build == "hg38":
+        simple_file = os.path.splitext(ref_file)[0] + "-simple.fa"
+        print(f"hg38 detected, building a simple reference with no alts, decoys or HLA from {ref_file} to {simple_file}.")
         ref_file = prepare_simple_reference(ref_file, simple_file)
     GenomeLength = os.path.getsize(ref_file)
     Nbases = int(round(min(14, log(GenomeLength, 2) / 2 - 2), 0))
@@ -753,6 +756,7 @@ def _index_star(env, ref_file):
         cpu = env.cores
     except:
         cpu = 1
+    print(f"Preparing STAR index from {ref_file}.") 
     cmd = ("STAR --genomeDir %s --genomeFastaFiles {ref_file} "
            "--runThreadN %s "
            "--limitGenomeGenerateRAM %s "
@@ -763,6 +767,7 @@ def _index_star(env, ref_file):
     if not os.path.exists(os.path.join(dir_name, "SA")):
         _index_w_command(env, dir_name, cmd, ref_file)
     if build == "hg38":
+        print(f"Removing {ref_file}.")
         os.remove(ref_file)
     return dir_name
 
