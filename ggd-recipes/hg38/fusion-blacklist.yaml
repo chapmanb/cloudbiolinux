@@ -2,7 +2,7 @@
 ---
 attributes:
   name: fusion-blacklist
-  version: 1
+  version: 2
 recipe:
   full:
     recipe_type: bash
@@ -15,8 +15,14 @@ recipe:
         mkdir -p ${outdir}
         wget -c -O ${arriba_tarball} ${url}
         tar zxvf ${arriba_tarball}
-        gzip -cd arriba_${version}/database/blacklist_hg38_GRCh38_2018-11-04.tsv.gz | sed 's/^[[:alnum:]]\+:[[:alnum:]]\+/chr&/g' | sed 's/[[:alnum:]]\+:[[:alnum:]]\+-[[:alnum:]]\+$/chr&/' | sed 's/[[:alnum:]]\+:[[:alnum:]]\+$/chr&/' | gzip -c > ${outdir}/arriba-blacklist.tsv.gz
+        mv arriba_${version}/database/blacklist_hg38_GRCh38_2018-11-04.tsv.gz ${outdir}/arriba-blacklist.tsv.gz
+        mv arriba_${version}/database/cytobands_hg38_GRCh38_2018-02-23.tsv ${outdir}/arriba-cytobands.tsv
+        mv arriba_${version}/database/protein_domains_hg38_GRCh38_2018-03-06.gff3 ${outdir}/arriba-protein-domains.gff3
+        mv arriba_${version}/database/protein_domains_hg38_GRCh38_2018-03-06.gff3.idx ${outdir}/arriba-protein-domains.gff3.idx
         rm -r arriba_${version}
         rm ${arriba_tarball}
     recipe_outfiles:
       - rnaseq/fusion-blacklist/arriba-blacklist.tsv.gz
+      - rnaseq/fusion-blacklist/arriba-cytobands.tsv
+      - rnaseq/fusion-blacklist/arriba-protein-domains.gff3
+      - rnaseq/fusion-blacklist/arriba-protein-domains.gff3.idx
