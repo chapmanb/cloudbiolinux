@@ -112,6 +112,9 @@ def remove_installed(installed_file, installed_link):
 
 
 def make_links(installed_file, installed_link):
+    if os.path.islink(installed_link):
+        os.remove(installed_link)
+        os.remove(installed_link + ".tbi")
     os.symlink(os.path.basename(installed_file), installed_link)
     os.symlink(os.path.basename(installed_file + ".tbi"), installed_link + ".tbi")
 
