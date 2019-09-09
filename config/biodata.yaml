@@ -23,7 +23,7 @@ genomes:
     annotations: [GA4GH_problem_regions, capture_regions, rmsk,
                   MIG, prioritize, dbsnp, hapmap, 1000g_omni_snps, 1000g_snps,
                   mills_indels, cosmic, ancestral, clinvar, qsignature, ACMG56_genes, transcripts, RADAR, mirbase,
-                  genesplicer, effects_transcripts, vcfanno, viral, exac, gnomad_exome, esp, 1000g, varpon, topmed, genotype2phenotype]
+                  genesplicer, effects_transcripts, vcfanno, viral, exac, gnomad_exome, esp, 1000g, varpon, topmed, genotype2phenotype, fusion-blacklist]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, platinum-genome-NA12878, giab-NA24385, giab-NA24631, giab-NA24143, giab-NA24149]
   - dbkey: GRCh37
