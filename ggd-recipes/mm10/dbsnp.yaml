@@ -1,3 +1,5 @@
+# dbsnp for mouse was discontinued in 2017, we are using the latest release
+# https://www.animalgenome.org/community/angenmap/hmail/archive/5936.html
 ---
 attributes:
   name: dbsnp
