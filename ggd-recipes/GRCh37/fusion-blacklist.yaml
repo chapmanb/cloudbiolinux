@@ -13,7 +13,7 @@ recipe:
         arriba_tarball=arriba_${version}.tar.gz
         outdir=rnaseq/fusion-blacklist
         mkdir -p ${outdir}
-        wget -c -O ${arriba_tarball} ${url}
+        wget --no-check-certificate -c -O ${arriba_tarball} ${url}
         tar zxvf ${arriba_tarball}
         mv arriba_${version}/database/blacklist_hg19_hs37d5_GRCh37_2018-11-04.tsv.gz ${outdir}/arriba-blacklist.tsv.gz
         mv arriba_${version}/database/cytobands_hg19_hs37d5_GRCh37_2018-02-23.tsv ${outdir}/arriba-cytobands.tsv
