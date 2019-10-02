@@ -65,6 +65,7 @@ def main(cosmic_version, bcbio_genome_dir, overwrite=False, clean=False):
         logging.info(f"Created COSMIC v{cosmic_version} resource in {installed_file}.")
         logging.info(f"Linking {installed_file} as {installed_link}.")
         make_links(installed_file, installed_link)
+        update_version_file(bcbio_base, cosmic_version)
         logging.info(f"Finished COSMIC v{cosmic_version} prep for {genome_build}.")
         # prepare hg19 from the GRCh37 file
         if bcbio_build == "GRCh37":
@@ -91,6 +92,7 @@ def main(cosmic_version, bcbio_genome_dir, overwrite=False, clean=False):
             logging.info(f"Created COSMIC v{cosmic_version} resource in {installed_file}.")
             logging.info(f"Linking {installed_file} as {installed_link}.")
             make_links(installed_file, installed_link)
+            update_version_file(bcbio_base, cosmic_version)
             logging.info(f"Finished COSMIC v{cosmic_version} prep for {genome_build}.")
 
 
@@ -212,6 +214,27 @@ def remove_cosmic_directory(installed_directory):
     logging.info(f"Removing {installed_directory}.")
     shutil.rmtree(installed_directory)
 
+def update_version_file(bcbio_base, version):
+    """
+    update the version of cosmic used in the versions.csv file, adding it if it does not exist
+    """
+    versionfile = os.path.join(bcbio_base, "versions.csv")
+    updatedfile = os.path.join(bcbio_base, "versions.csv-tmp")
+    logging.info(f"Updating {versionfile}.")
+    found = False
+    with open(versionfile) as in_handle, open(updatedfile, "w") as out_handle:
+        for line in in_handle:
+            tokens = line.split(",")
+            if tokens[0] != "cosmic":
+                out_handle.write(line)
+            else:
+                # only write it once
+                if not found:
+                    out_handle.write(f"cosmic,{version}\n")
+                found = True
+        if not found:
+            out_handle.write(f"cosmic,{version}\n")
+    shutil.move(updatedfile, versionfile)
 
 if __name__ == "__main__":
     parser = ArgumentParser()
