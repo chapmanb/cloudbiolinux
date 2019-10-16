@@ -254,3 +254,4 @@ r:
   - bioconductor-rtracklayer
   - bioconductor-snpchip # needed for the TitanCNA wrapper but not listed as a depedency in the formula
   - bioconductor-titancna
+  - bioconductor-vsn>=3.50.0 
