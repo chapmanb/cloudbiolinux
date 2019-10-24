@@ -51,7 +51,7 @@ bio_nextgen:
   - deepvariant;env=dv
   - delly
   - dkfz-bias-filter;env=python2
-  - duphold=0.1.4
+  - duphold
   - ensembl-vep=98.*
   - ericscript;env=samtools0
   - express
