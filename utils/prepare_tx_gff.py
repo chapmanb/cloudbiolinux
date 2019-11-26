@@ -251,9 +251,10 @@ def _download_ensembl_genome(org_build):
         subprocess.check_call(["wget", "-c", dl_url])
     return out_file
 
-def write_version(build=None, gtf_file=None):
+def write_version(build=None, gtf_file=None, build_version=None):
     gtf_file = build.fbase if build else gtf_file
     gtf_file = os.path.abspath(gtf_file)
+    gtf_file = build_version if build_version else gtf_file
     version_file = "version.txt"
     with open(version_file, "w") as out_handle:
         out_handle.write("Created from: %s" % gtf_file)
@@ -287,7 +288,7 @@ def main(org_build, gtf_file, genome_fasta, genome_dir, cores, args):
             build = build_info[org_build]
             gtf_file = prepare_tx_gff(build, org_build)
         else:
-            write_version(gtf_file=gtf_file)
+            write_version(gtf_file=gtf_file, build_version=args.buildversion)
             work_gtf = os.path.join(work_dir, "ref-transcripts.gtf")
             if not os.path.exists(work_gtf):
                 shutil.copy(gtf_file, work_gtf)
@@ -831,6 +832,9 @@ if __name__ == "__main__":
                         default=False, action="store_true")
     parser.add_argument("--kallisto", help="Build Kallisto indices",
                         default=False, action="store_true")
+    parser.add_argument("--buildversion", help=("Store build information. String should be source_genomebuild." 
+                        " Examples: Ensembl_94, EnsemblMetazoa_94, FlyBase_23, etc"),
+                        default=None)
     parser.add_argument("organism", help="Short name of organism (for example Hsapiens)")
     parser.add_argument("org_build", help="Build of organism to run.")
     args = parser.parse_args()
