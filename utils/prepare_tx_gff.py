@@ -714,7 +714,8 @@ def _create_tiny_gffutils_db(gtf_file):
         in_handle.close()
     db = gffutils.create_db(tmp_out, dbfn=":memory:",
                             disable_infer_genes=True,
-                            disable_infer_transcripts=True)
+                            disable_infer_transcripts=True,
+                            merge_strategy="warning")
     os.remove(tmp_out)
     return db
 
