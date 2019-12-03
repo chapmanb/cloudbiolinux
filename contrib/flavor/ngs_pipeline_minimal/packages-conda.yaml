@@ -86,6 +86,7 @@ bio_nextgen:
   - impute2
   - kallisto>=0.43.1
   - kraken
+  - ldc>=1.13.0
   - lofreq
   - lumpy-sv;env=python2
   - macs2;env=python2
