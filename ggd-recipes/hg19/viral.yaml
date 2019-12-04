@@ -1,1 +1,26 @@
-../hg38/viral.yaml
+# Virus reference genomes, prepared for bwa alignment
+# Taken from TCGA GDC reference genome
+# https://gdc.cancer.gov/about-data/data-harmonization-and-generation/gdc-reference-files
+---
+attributes:
+  name: viral
+  version: 2019.12.03
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        url=http://s3.amazonaws.com/biodata/viral/GRCh37-gdc-viral.tar.gz
+        mkdir -p viral
+        wget --no-check-certificate -c $url
+        tar -xzvpf *.tar.gz
+        mv *-gdc-viral/* viral
+    recipe_outfiles:
+      - viral/gdc-viral.fa
+      - viral/gdc-viral.dict
+      - viral/gdc-viral.fa.ann
+      - viral/gdc-viral.fa.fai
+      - viral/gdc-viral.fa.pac
+      - viral/gdc-viral.fa.bwt
+      - viral/gdc-viral.fa.amb
+      - viral/gdc-viral.fa.sa
