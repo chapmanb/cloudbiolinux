@@ -679,10 +679,14 @@ def _index_bbmap(env, ref_file):
     return dir_name
 
 def _index_bismark(env, ref_file):
-    """Bismark indexing happens in GGD recipes. This links to the proper output directory.
-    """
-    dir_name = "bismark/Bisulfite_Genome"
-    return dir_name
+    dir_name = "bismark"
+    subprocess.check_call("mkdir -p %s" % dir_name, shell=True)
+    with shared.chdir(dir_name):
+        local = os.path.basename(ref_file)
+        subprocess.check_call("ln -sf {0} {1}".format(ref_file, local), shell=True)
+        cmd= f"bismark_genome_preparation ."
+        subprocess.check_call(cmd, shell=True)
+    return os.path.join(dir_name, "Bisulfite_Genome")
 
 def _index_maq(env, ref_file):
     dir_name = "maq"
