@@ -102,7 +102,6 @@ def _initial_base_install(conda_bin, env_packages, check_channels):
     Uses mamba (https://github.com/QuantStack/mamba) to provide quicker package resolution
     and avoid dependency conflicts with base install environment. Bootstraps the initial
     installation of all tools when key inputs that cause conflicts are missing.
-
     """
     initial_package_targets = {None: ["r-base"]}
     env_name = None
@@ -117,22 +116,18 @@ def _initial_base_install(conda_bin, env_packages, check_channels):
         print("Initalling initial set of packages for %s environment with mamba" % (env_name or "default"))
         py_version = ENV_PY_VERSIONS[env_name]
         pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
-        # TODO: mamba is currently pinned to conda <4.8 so conflicts with latest version.
-        # Need to re-enable when functional
-        if False:
-            if "mamba" not in cur_ps:
-                subprocess.check_call("{conda_bin} install -y {env_str} {channels} "
-                                      "{py_version} mamba".format(**locals()), shell=True)
+        if "mamba" not in cur_ps:
+            subprocess.check_call("{conda_bin} install -y {env_str} {channels} "
+                                  "{py_version} mamba".format(**locals()), shell=True)
         mamba_bin = os.path.join(os.path.dirname(conda_bin), "mamba")
         pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
-        if os.path.exists(mamba_bin):
-            try:
-                subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
-                                      "{py_version} {pkgs_str}".format(**locals()), shell=True)
-            except subprocess.CalledProcessError:
-                # Fall back to standard conda install when we have system specific issues
-                # https://github.com/bcbio/bcbio-nextgen/issues/2871
-                pass
+        try:
+            subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
+                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
+        except subprocess.CalledProcessError:
+            # Fall back to standard conda install when we have system specific issues
+            # https://github.com/bcbio/bcbio-nextgen/issues/2871
+            pass
 
 def _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list, files=None,
               prefix="", conda_env=None, conda_envdir=None):
