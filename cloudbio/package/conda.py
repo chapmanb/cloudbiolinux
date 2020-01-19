@@ -32,6 +32,43 @@ def install_packages(env, to_install=None, packages=None):
             config_file = get_config_file(env, "packages-conda.yaml")
         install_in(conda_bin, env.system_install, config_file.base, packages)
 
+def _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels):
+    """Install packages into the given environment.
+
+    Uses mamba for initial install for speed, following by conda for completeness.
+
+    TODO: currently duplicates mamba base code in _initial_base_install to make it
+    easy to remove or roll back general mamba usage. We can refactor _initial_base_install
+    in favor of this after further testing.
+    """
+    mamba_bin = os.path.join(os.path.dirname(conda_bin), "mamba")
+    if env_name:
+        assert env_name in conda_envs, (env_name, conda_envs)
+        env_str = "-n %s" % env_name
+    else:
+        env_str = ""
+    pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
+    py_version = ENV_PY_VERSIONS[env_name]
+    if "deepvariant" in env_packages:
+        # Ignore /etc/boto.cfg which creates conflicts with conda gsutils
+        # https://github.com/GoogleCloudPlatform/gsutil/issues/516
+        exports = "export BOTO_CONFIG=/ignoreglobal && "
+    else:
+        exports = ""
+    if os.path.exists(mamba_bin):
+        try:
+            subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
+                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
+        except subprocess.CalledProcessError:
+            # Fall back to standard conda install when we have system specific issues
+            # https://github.com/bcbio/bcbio-nextgen/issues/2871
+            pass
+    subprocess.check_call("{exports}{conda_bin} install -y {env_str} {channels} "
+                          "{py_version} {pkgs_str}".format(**locals()), shell=True)
+    conda_pkg_list = json.loads(subprocess.check_output(
+        "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
+    return conda_pkg_list
+
 def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     """Install packages inside a given anaconda directory.
 
@@ -67,29 +104,14 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
             problems = " ".join(cur_packages)
             subprocess.check_call("{conda_bin} remove {channels} -y {problems}".format(**locals()), shell=True)
-    _initial_base_install(conda_bin, [ps for (n, ps) in _split_by_condaenv(packages) if n is None][0], check_channels)
+    _initial_base_install(conda_bin, [ps for (n, ps) in _split_by_condaenv(packages) if n is None][0],
+                          check_channels)
     # install our customized packages
     if len(packages) > 0:
         for env_name, env_packages in _split_by_condaenv(packages):
             print("# Installing into conda environment %s: %s" % (env_name or "default", ", ".join(env_packages)))
-            if env_name:
-                assert env_name in conda_envs, (env_name, conda_envs)
-                env_str = "-n %s" % env_name
-            else:
-                env_str = ""
-            pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
-            py_version = ENV_PY_VERSIONS[env_name]
-            if "deepvariant" in env_packages:
-                # Ignore /etc/boto.cfg which creates conflicts with conda gsutils
-                # https://github.com/GoogleCloudPlatform/gsutil/issues/516
-                exports = "export BOTO_CONFIG=/ignoreglobal && "
-            else:
-                exports = ""
-            subprocess.check_call("{exports}{conda_bin} install -y {env_str} {channels} "
-                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
-            conda_pkg_list = json.loads(subprocess.check_output(
-                "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
             for package in env_packages:
+                conda_pkg_list = _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels)
                 _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list,
                             conda_envdir=conda_envs.get(env_name))
     conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json".format(**locals()), shell=True))
@@ -102,6 +124,9 @@ def _initial_base_install(conda_bin, env_packages, check_channels):
     Uses mamba (https://github.com/QuantStack/mamba) to provide quicker package resolution
     and avoid dependency conflicts with base install environment. Bootstraps the initial
     installation of all tools when key inputs that cause conflicts are missing.
+
+    TODO: we could remove mamba package running code here in favor of _install_env_pkgs general
+    mamba usage once that is further tested.
     """
     initial_package_targets = {None: ["r-base"]}
     env_name = None
@@ -121,13 +146,15 @@ def _initial_base_install(conda_bin, env_packages, check_channels):
                                   "{py_version} mamba".format(**locals()), shell=True)
         mamba_bin = os.path.join(os.path.dirname(conda_bin), "mamba")
         pkgs_str = " ".join(["'%s'" % x for x in sorted(env_packages)])
-        try:
-            subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
-                                  "{py_version} {pkgs_str}".format(**locals()), shell=True)
-        except subprocess.CalledProcessError:
-            # Fall back to standard conda install when we have system specific issues
-            # https://github.com/bcbio/bcbio-nextgen/issues/2871
-            pass
+        # Skip in favor of _install_env_pkgs, can be removed later after testing
+        if False:
+            try:
+                subprocess.check_call("{mamba_bin} install -y {env_str} {channels} "
+                                      "{py_version} {pkgs_str}".format(**locals()), shell=True)
+            except subprocess.CalledProcessError:
+                # Fall back to standard conda install when we have system specific issues
+                # https://github.com/bcbio/bcbio-nextgen/issues/2871
+                pass
 
 def _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list, files=None,
               prefix="", conda_env=None, conda_envdir=None):
