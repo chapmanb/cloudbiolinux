@@ -53,7 +53,7 @@ bio_nextgen:
   - delly
   - dkfz-bias-filter;env=python2
   - duphold
-  - ensembl-vep=98.*
+  - ensembl-vep=99.*
   - ericscript;env=samtools0
   - express
   - extract-sv-reads
@@ -256,4 +256,4 @@ r:
   - bioconductor-rtracklayer
   - bioconductor-snpchip # needed for the TitanCNA wrapper but not listed as a depedency in the formula
   - bioconductor-titancna
-  - bioconductor-vsn>=3.50.0 
+  - bioconductor-vsn>=3.50.0
