@@ -110,8 +110,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     if len(packages) > 0:
         for env_name, env_packages in _split_by_condaenv(packages):
             print("# Installing into conda environment %s: %s" % (env_name or "default", ", ".join(env_packages)))
+            conda_pkg_list = _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels)
             for package in env_packages:
-                conda_pkg_list = _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels)
                 _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list,
                             conda_envdir=conda_envs.get(env_name))
     conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json".format(**locals()), shell=True))
