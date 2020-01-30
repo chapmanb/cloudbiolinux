@@ -15,9 +15,9 @@ recipe:
         remap_url=https://gist.githubusercontent.com/matthdsm/f833aedd2d67e28013ff1d171c70f4ee/raw/442a45ed3ddc6e85c66c5e58e0fa78e16a0821c8/refseq2ucsc.tsv
         ref=../seq/hg38.fa
         mkdir -p variation
-        wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         wget -c -O variation/dbsnp-$build-orig.vcf.gz $url
-        [[ -f variation/dbsnp-$build.vcf.gz ]] || zcat variation/dbsnp-$build-orig.vcf.gz | sed -f remap.sed | gsort -m 500 /dev/stdin $ref.fai | bgzip -c > variation/dbsnp-$build.vcf.gz
+        [[ -f variation/dbsnp-$build.vcf.gz ]] || bcftools annotate -Ou --rename-chrs $remap_url variation/dbsnp-$build-orig.vcf.gz |\
+        bcftools sort -m 1G -Oz -o variation/dbsnp-$build.vcf.gz && \
         tabix -f -p vcf -C variation/dbsnp-$build.vcf.gz
 
     recipe_outfiles:
