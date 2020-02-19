@@ -3,17 +3,18 @@
 # - https://macarthurlab.org/2018/10/17/gnomad-v2-1/
 # Using one VCF from Gnomad, removing some fields to make it smaller
 # recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe
+# v3 is the native hg38 calls, not a liftover
 ---
 attributes:
   name: gnomad
-  version: 2.1.1
+  version: 3
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        vcf_prefix=https://storage.googleapis.com/gnomad-public/release/2.1.1/liftover_grch38/vcf/genomes/
-        vcf_file=gnomad.genomes.r2.1.1.sites.liftover_grch38.vcf.bgz
+        vcf_prefix=https://storage.googleapis.com/gnomad-public/release/3.0/vcf/genomes/
+        vcf_file=gnomad.genomes.r3.0.sites.vcf.bgz
         mkdir -p variation
         export TMPDIR=`pwd`
         gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
@@ -22,7 +23,8 @@ recipe:
         wget --no-check-certificate -c $vcf
         wget --no-check-certificate -c $vcf.tbi
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
-        bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | bgzip -c > variation/gnomad_genome.vcf.gz
+        ref=../seq/hg38.fa
+        bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_genome.vcf.gz
         rm $vcf_file $vcf_file.tbi
