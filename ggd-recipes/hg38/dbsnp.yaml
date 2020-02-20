@@ -1,5 +1,4 @@
 # dbSNP 153: http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
-
 ---
 attributes:
   name: dbsnp
@@ -16,10 +15,11 @@ recipe:
         ref=../seq/hg38.fa
         mkdir -p variation
         wget -c -O variation/dbsnp-$build-orig.vcf.gz $url
+        wget -c -O variation/dbsnp-$build-orig.vcf.gz.tbi $url.tbi
         [[ -f variation/dbsnp-$build.vcf.gz ]] || bcftools annotate -Ou --rename-chrs $remap_url variation/dbsnp-$build-orig.vcf.gz |\
-        bcftools sort -m 1G -Oz -o variation/dbsnp-$build.vcf.gz && \
+        bcftools sort -m 1G -Oz -T . -o variation/dbsnp-$build.vcf.gz && \
         tabix -f -p vcf -C variation/dbsnp-$build.vcf.gz
-
+        tabix -f -p vcf variation/dbsnp-$build.vcf.gz
     recipe_outfiles:
       - variation/dbsnp-153.vcf.gz
       - variation/dbsnp-153.vcf.gz.csi
