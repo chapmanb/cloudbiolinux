@@ -34,6 +34,7 @@ bio_nextgen:
   - break-point-inspector
   - bwa
   - bwakit
+  - bx-python=0.8.8
   - bio-vcf
   - cage
   - cancerit-allelecount
