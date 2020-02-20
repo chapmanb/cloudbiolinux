@@ -23,3 +23,4 @@ recipe:
     recipe_outfiles:
       - variation/dbsnp-153.vcf.gz
       - variation/dbsnp-153.vcf.gz.csi
+      - variation/dbsnp-153.vcf.gz.tbi
