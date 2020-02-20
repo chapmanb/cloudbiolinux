@@ -1,4 +1,6 @@
 # dbSNP 153: http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
+# install time: 1h20min
+# install size: 14G
 ---
 attributes:
   name: dbsnp
