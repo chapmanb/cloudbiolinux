@@ -1,23 +1,26 @@
-# dbSNP 151: http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
-#
-# UCSFify name sed magic from: https://github.com/mmarchin/utilities/blob/master/ucscify.sh
+# dbSNP 153: http://www.ncbi.nlm.nih.gov/variation/docs/human_variation_vcf/
 ---
 attributes:
   name: dbsnp
-  version: 151-20180418
+  version: 153-20180725
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        version=151
-        org=human_9606_b${version}_GRCh38p7
-        release=20180418
-        url=http://ftp.ncbi.nih.gov/snp/pre_build152/organisms/$org/VCF/GATK/All_${release}.vcf.gz
+        build=153
+        version=GCF_000001405.38
+        url=http://ftp.ncbi.nih.gov/snp/archive/b$build/VCF/$version.gz
+        remap_url=https://gist.githubusercontent.com/matthdsm/f833aedd2d67e28013ff1d171c70f4ee/raw/442a45ed3ddc6e85c66c5e58e0fa78e16a0821c8/refseq2ucsc.tsv
+        ref=../seq/hg38.fa
         mkdir -p variation
-        wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
-        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/dbsnp-$version.vcf.gz
-        tabix -f -p vcf variation/dbsnp-$version.vcf.gz
+        wget -c -O variation/dbsnp-$build-orig.vcf.gz $url
+        wget -c -O variation/dbsnp-$build-orig.vcf.gz.tbi $url.tbi
+        [[ -f variation/dbsnp-$build.vcf.gz ]] || bcftools annotate -Ou --rename-chrs $remap_url variation/dbsnp-$build-orig.vcf.gz |\
+        bcftools sort -m 1G -Oz -T . -o variation/dbsnp-$build.vcf.gz && \
+        tabix -f -p vcf -C variation/dbsnp-$build.vcf.gz
+        tabix -f -p vcf variation/dbsnp-$build.vcf.gz
     recipe_outfiles:
-      - variation/dbsnp-151.vcf.gz
-      - variation/dbsnp-151.vcf.gz.tbi
+      - variation/dbsnp-153.vcf.gz
+      - variation/dbsnp-153.vcf.gz.csi
+      - variation/dbsnp-153.vcf.gz.tbi
