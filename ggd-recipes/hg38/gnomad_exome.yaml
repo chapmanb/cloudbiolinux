@@ -3,15 +3,15 @@
 # - https://macarthurlab.org/2018/10/17/gnomad-v2-1/
 # Lifted over to hg38 by Gnomad team
 # Script
-# - no need in decomposing, normalizing,sort, and uniq anymore - it is done in gnomad 2.1.1 exomes
 # - filters only PASS variants (segdup, decoy are retained)
 # - removes many INFO fields to reduce file size: controls_, hist, non_, using bcftools annotate instead of vt rminfo, because it failed randomly on chr1
 # recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe
-# much faster from gnomad in google cloud - downloads in 20-25 min on O2
+# much faster from gnomad in the google cloud - download in 20-25 min on O2
 # vt is 3x faster than bcftools for removing INFO tags: in a test with 4444 variants t(bcftools -x) = t(bcftools -x "^") = 27s, time(vt rminfo) = 8s,
 # but vt rminfo is failing after 148M, using bcftools
-# overall processing is still slow: 87G to 4G in
-# there is no native hg38 exome calls in gnomad.v3 - only for genomes
+# processing time: 87G to 4G in 7h
+# there are no native hg38 exome calls in gnomad.v3 - only for genomes, so exome variants are still lifted over from grch37,
+# and they need processing because liftover creates duplicated variants
 ---
 attributes:
   name: gnomad_exome
