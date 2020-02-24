@@ -18,17 +18,17 @@ bio_nextgen:
   - age-metasv
   - arriba
   - ataqv
-  - atropos;env=python3
-  - bamtools=2.4.0
+  - atropos
+  - bamtools
   - bamutil
   - bbmap
   - bcbio-prioritize
   - bcbio-variation
   - bcbio-variation-recall
   - bcftools
-  - bedtools=2.27.1
+  - bedtools
   - biobambam
-  - bismark=0.22.1;env=python2
+  - bismark=0.22.*
   - bowtie
   - bowtie2
   - break-point-inspector
@@ -40,10 +40,9 @@ bio_nextgen:
   - chipseq-greylist
   - cnvkit
   - coincbc
-  - cpat;env=python2
+  - cpat
   - cramtools
-  # Crossmap has specific pysam pinning
-  - crossmap;env=python3
+  - crossmap
   - cufflinks
   # Specific pinned version for mirge compatibility in python2 environment
   - cutadapt=1.16;env=python2
@@ -54,24 +53,24 @@ bio_nextgen:
   - dkfz-bias-filter;env=python2
   - duphold
   - ensembl-vep=99.*
-  - ericscript;env=samtools0
+  - ericscript
   - express
   - extract-sv-reads
   - fastp
   - fastqc>=0.11.8=1
   - fgbio
-  - freebayes=1.1.0.46
+  - freebayes
   - gatk
   - gatk4
   - geneimpacts
-  - gemini;env=python2
+  - gemini
   - genesplicer
   - gffcompare
   - goleft
   - grabix
   - gridss
   - gsort
-  - gvcf-regions;env=python2
+  - gvcf-regions
   - gvcfgenotyper
   - hap.py;env=python2
   - h5py
@@ -79,7 +78,7 @@ bio_nextgen:
   - hmftools-cobalt
   - hmftools-purple
   - hmmlearn
-  - hisat2;env=python2
+  - hisat2
   - hts-nim-tools
   - htslib
   # Pinned to avoid error with dexseq_count and HTSeq version checking
@@ -89,15 +88,15 @@ bio_nextgen:
   - kraken
   - ldc>=1.13.0
   - lofreq
-  - lumpy-sv;env=python2
-  - macs2;env=python2
-  - manta;env=python2
+  - lumpy-sv
+  - macs2
+  - manta
   - maxentscan
   - mbuffer
   - metasv;env=python2
   - minimap2
   - mintmap
-  - mirdeep2=2.0.0.7
+  - mirdeep2=2.*
   - mirge;env=python2
   - mirtop
   - moreutils
@@ -111,7 +110,7 @@ bio_nextgen:
   - optitype;env=python2
   - parallel
   - pbgzip
-  - peddy;env=python2
+  - peddy
   - perl-sanger-cgp-battenberg
   - phylowgs;env=python2
   - pysam>=0.14.0
@@ -143,7 +142,7 @@ bio_nextgen:
   - simple_sv_annotation
   - singlecell-barcodes
   - smcounter2;env=python2
-  - smoove;env=python2
+  - smoove
   - snap-aligner=1.0dev.97
   - snpeff=4.3.1t
   - solvebio
@@ -179,7 +178,7 @@ bio_nextgen:
   - vardict-java
   - variantbam
   - varscan
-  - vawk;env=python2
+  - vawk
   - vcfanno
   - vcf2db;env=python2
   - vcflib
