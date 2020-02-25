@@ -148,6 +148,7 @@ bio_nextgen:
   - snpeff=4.3.1t
   - solvebio
   - spades
+  - staden_io_lib
   - star=2.6.1d
   - strelka;env=python2
   - stringtie
