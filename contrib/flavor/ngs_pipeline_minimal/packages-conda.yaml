@@ -180,7 +180,7 @@ bio_nextgen:
   - varscan
   - vawk
   - vcfanno
-  - vcf2db;env=python2
+  - vcf2db
   - vcflib
   - verifybamid2
   - viennarna
