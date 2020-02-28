@@ -238,3 +238,16 @@ In bcbio the alternative option is to:
 - interrupt it
 - modify the recipe in tmpbcbio-install/cloudbiolinux/ggd-recipes (not in ggd-run.sh!) 
 - rerun bcbio_nextgen.py upgrade [options].
+
+## Testing conda environments with bcbio before pushing a PR:
+
+When bcbio is doing an update 
+`bcbio_nexgen.py upgrade -u development --tools`, it pulls cloudbiolinux from github.
+To use your copy of cloudbiolinux with modified conda yaml:
+
+Before running bcbio upgrade do
+```
+mkdir tmpbcbio-install
+ln -s /your/test/copy/of/cloudbiolinux tmpbcbio-install/cloudbiolinux
+```
+and bcbio will skip that step and use the link instead, so you can make the change locally and test it out before pushing it.
