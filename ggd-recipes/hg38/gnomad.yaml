@@ -4,6 +4,7 @@
 # Using one VCF from Gnomad, removing some fields to make it smaller
 # recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe
 # gnomad v3. is native hg38 not a liftover
+# processes 241G vcf.gz to 132G vcf.gz in < 6 days
 ---
 attributes:
   name: gnomad
