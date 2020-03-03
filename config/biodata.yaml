@@ -80,7 +80,7 @@ genomes:
   - dbkey: BDGP6
     name: D melangogaster (BDGP6)
     indexes: [seq]
-    annotations: [transcripts]
+    annotations: [transcripts, mirbase]
   - dbkey: TAIR10
     name: Arabidopsis thaliana (TAIR10)
     annotations: [mirbase]
