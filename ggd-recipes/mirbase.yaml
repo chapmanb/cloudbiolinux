@@ -1,0 +1,37 @@
+# small RNA seq annotation from different sources
+---
+attributes:
+  name: srnaseq
+  version: 20200302
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p srnaseq
+        cd srnaseq
+        wget --random-wait --retry-connrefused -nv -c -O tmp.gtf.gz ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/215/GCF_000001215.4_Release_6_plus_ISO1_MT/GCF_000001215.4_Release_6_plus_ISO1_MT_genomic.gff.gz
+        zgrep -v exon tmp.gtf.gz | grep -v region | sed 's/Name/name/g' | sed -e 's/NC_004353.4/chr4/g; s/NC_004354.4/chrX/g; s/NC_024511.2/chrM/g; s/NC_024512.1/chrY/g; s/NT_033777.3/chr3R/g; s/NT_033778.4/chr2R/g; s/NT_033779.5/chr2L/g; s/NT_037436.4/chr3L/g; s/NW_007931121.1/CP007120.1/g' | sed 's/=/ /g' > srna-transcripts.gtf
+        # mirbase
+        wget --random-wait --retry-connrefused -nv -c -O hairpin.t.fa.gz ftp://mirbase.org/pub/mirbase/22/hairpin.fa.gz && gunzip -f hairpin.t.fa.gz
+        cat hairpin.t.fa | awk '{if ($0~/>dme/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
+        wget --random-wait --retry-connrefused -nv -c -O mature.t.fa.gz ftp://mirbase.org/pub/mirbase/22/mature.fa.gz && gunzip -f mature.t.fa.gz
+        cat mature.t.fa | awk '{if ($0~/>dme/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
+        wget --random-wait --retry-connrefused -nv -c -O miRNA.t.str.gz ftp://mirbase.org/pub/mirbase/22/miRNA.str.gz && gunzip -f miRNA.t.str.gz
+        cat miRNA.t.str | awk '{if ($0~/dme/)print $0}' > miRNA.str
+        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 ftp://mirbase.org/pub/mirbase/22/genomes/dme.gff3
+        wget --no-check-certificate -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip -f Rfam_for_miRDeep.fa.gz
+        # targetscan analysis
+        wget  --random-wait --retry-connrefused --no-check-certificate -nv -c -O Summary_Counts.txt.zip http://www.targetscan.org/fly_72/fly_72_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
+        wget  --random-wait --retry-connrefused --no-check-certificate -nv -c -O miR_Family_Info.txt.zip http://www.targetscan.org/fly_72/fly_72_data_download/miR_Family_Info.txt.zip && unzip miR_Family_Info.txt.zip
+        wget  --random-wait --retry-connrefused --no-check-certificate -nv -N -c ftp://mirbase.org/pub/mirbase/22/database_files/mirna_mature.txt.gz
+    recipe_outfiles:
+        - srnaseq/srna-transcripts.gtf
+        - srnaseq/hairpin.fa
+        - srnaseq/mature.fa
+        - srnaseq/miRNA.str
+        - srnaseq/mirbase.gff3
+        - srnaseq/Rfam_for_miRDeep.fa
+        - srnaseq/Summary_Counts.all_predictions.txt
+        - srnaseq/miR_Family_Info.txt
+        - srnaseq/mirna_mature.txt.gz
