@@ -681,12 +681,15 @@ def _index_bbmap(env, ref_file):
 def _index_bismark(env, ref_file):
     dir_name = "bismark"
     subprocess.check_call("mkdir -p %s" % dir_name, shell=True)
+    out_dir = os.path.join(dir_name, "Bisulfite_Genome")
+    if os.path.exists(out_dir):
+        return out_dir
     with shared.chdir(dir_name):
         local = os.path.basename(ref_file)
         subprocess.check_call("ln -sf {0} {1}".format(ref_file, local), shell=True)
         cmd= f"bismark_genome_preparation ."
         subprocess.check_call(cmd, shell=True)
-    return os.path.join(dir_name, "Bisulfite_Genome")
+    return out_dir
 
 def _index_maq(env, ref_file):
     dir_name = "maq"
