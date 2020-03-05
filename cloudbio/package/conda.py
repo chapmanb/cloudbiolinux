@@ -16,6 +16,7 @@ ENV_PY_VERSIONS["python2"] = "python=2"
 ENV_PY_VERSIONS["python3"] = "python=3.6"
 ENV_PY_VERSIONS["dv"] = "python=2"
 ENV_PY_VERSIONS["samtools0"] = "python=2"
+ENV_PY_VERSIONS["r36"] = "python=3"
 
 def install_packages(env, to_install=None, packages=None):
     """Old installation, based on pre-configured fabric inputs.
@@ -248,11 +249,12 @@ def _create_environments(conda_bin, packages):
       require 3 or some other specific requirements.
     - samtools0 -- For tools that require older samtools 0.1.19
     - dv -- DeepVariant, which requires a specific version of numpy and tensorflow
+    - r36 -- R3.6 for PureCN
     """
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = _get_conda_envs(conda_bin)
-    for addenv in ["python3", "samtools0", "dv", "python2"]:
+    for addenv in ["python3", "samtools0", "dv", "python2", "r36"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
