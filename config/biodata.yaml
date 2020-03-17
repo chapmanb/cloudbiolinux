@@ -47,7 +47,7 @@ genomes:
     validation: [giab-NA12878, giab-NA24385, giab-NA24631,
                  platinum-genome-NA12878, giab-NA12878-remap, giab-NA12878-crossmap,
                  dream-syn4-crossmap, dream-syn3-crossmap, giab-NA12878-NA24385-somatic,
-                 giab-NA24143, giab-NA24149]
+                 giab-NA24143, giab-NA24149, giab-NA24694, giab-NA24695]
   - dbkey: hg38-noalt
     name: Human (hg38) without alternative alleles
     annotations: [coverage, dbsnp, hapmap_snps, 1000g_omni_snps, 1000g_snps,
