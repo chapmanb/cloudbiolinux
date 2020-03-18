@@ -35,7 +35,7 @@ genomes:
                   genesplicer, effects_transcripts, vcfanno, viral, exac, gnomad_exome, esp, 1000g, varpon, topmed, genotype2phenotype, fusion-blacklist]
     annotations_available: [battenberg, dbnsfp, dbscsnv, ericscript, gnomad]
     validation: [giab-NA12878, giab-NA24385, giab-NA24631, dream-syn3, dream-syn4, giab-NA12878-NA24385-somatic,
-                 giab-NA24143, giab-NA24149]
+                 giab-NA24143, giab-NA24149, giab-NA24694, giab-NA24695]
   - dbkey: hg38
     name: Human (hg38) full
     indexes: [seq, twobit, bwa, hisat2]
