@@ -101,7 +101,7 @@ bio_nextgen:
   - mirge;env=python2
   - mirtop
   - moreutils
-  - mosdepth
+  - mosdepth;env=htslib1.10
   - multiqc
   - multiqc-bcbio
   - ngs-disambiguate
