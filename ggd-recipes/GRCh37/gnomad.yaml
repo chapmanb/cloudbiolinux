@@ -18,7 +18,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url_prefix=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad/r2.1/genomes/
+        url_prefix=http://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad/r2.1/genomes/
         vcf_prefix=gnomad.genomes.r2.1.sites.chr
         
         ref=../seq/GRCh37.fa
