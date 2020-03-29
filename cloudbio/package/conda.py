@@ -14,7 +14,7 @@ ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=3.6")
 ENV_PY_VERSIONS[None] = "python=3.6"
 ENV_PY_VERSIONS["python2"] = "python=2"
 ENV_PY_VERSIONS["python3"] = "python=3.6"
-ENV_PY_VERSIONS["dv"] = "python=2"
+ENV_PY_VERSIONS["dv"] = "python=3.6"
 ENV_PY_VERSIONS["samtools0"] = "python=2"
 ENV_PY_VERSIONS["r36"] = "python=3"
 ENV_PY_VERSIONS["htslib1.10"] = "python=3"
