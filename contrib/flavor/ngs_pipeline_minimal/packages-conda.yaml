@@ -90,7 +90,7 @@ bio_nextgen:
   - ldc>=1.13.0
   - lofreq
   - lumpy-sv;env=python2
-  - macs2;env=python2
+  - macs2
   - manta;env=python2
   - maxentscan
   - mbuffer
