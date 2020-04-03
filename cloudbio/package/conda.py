@@ -235,7 +235,7 @@ def _split_by_condaenv(packages):
     return [(e, out[e]) for e in envs]
 
 def _get_conda_envs(conda_bin):
-    info = json.loads(subprocess.check_output("{conda_bin} info --envs --json".format(**locals()), shell=True))
+    info = json.loads(subprocess.check_output("{conda_bin} info --envs --json -q".format(**locals()), shell=True))
     return [e for e in info["envs"] if e.startswith(info["conda_prefix"])]
 
 def _create_environments(conda_bin, packages):
