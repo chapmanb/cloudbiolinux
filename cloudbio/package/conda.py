@@ -262,7 +262,7 @@ def _create_environments(conda_bin, packages):
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
                 py_version = ENV_PY_VERSIONS[addenv]
-                subprocess.check_call("{conda_bin} create --no-default-packages -y --name {addenv} {py_version} nomkl"
+                subprocess.check_call("{conda_bin} create -q --no-default-packages -y --name {addenv} {py_version} nomkl"
                                       .format(**locals()), shell=True)
                 conda_envs = _get_conda_envs(conda_bin)
             out[addenv] = [x for x in conda_envs if x.endswith("/%s" % addenv)][0]
