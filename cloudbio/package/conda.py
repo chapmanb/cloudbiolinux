@@ -87,7 +87,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     conda_envs = _create_environments(conda_bin, packages)
     for env_dir in conda_envs.values():
         _clean_environment(env_dir)
-    conda_info = json.loads(subprocess.check_output("{conda_bin} info --json".format(**locals()), shell=True))
+    conda_info = json.loads(subprocess.check_output("{conda_bin} info --json -q".format(**locals()), shell=True))
     # Uninstall old R packages that clash with updated versions
     # Temporary fix to allow upgrades from older versions that have migrated
     # r-tximport is now bioconductor-tximport
@@ -100,7 +100,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     if problems:
         print("Checking for problematic or migrated packages in default environment")
         cur_packages = [x["name"] for x in
-                        json.loads(subprocess.check_output("%s list --json" % (conda_bin), shell=True))
+                        json.loads(subprocess.check_output("%s list --json -q" % (conda_bin), shell=True))
                         if x["name"] in problems and x["channel"] in check_channels]
         if cur_packages:
             print("Found packages that moved from default environment: %s" % ", ".join(cur_packages))
@@ -116,7 +116,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
             for package in env_packages:
                 _link_bin(package, system_installdir, conda_info, conda_bin, conda_pkg_list,
                             conda_envdir=conda_envs.get(env_name))
-    conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json".format(**locals()), shell=True))
+    conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json -q".format(**locals()), shell=True))
     for pkg in ["python", "conda", "pip"]:
         _link_bin(pkg, system_installdir, conda_info, conda_bin, conda_pkg_list, files=[pkg], prefix="bcbio_")
 
@@ -135,7 +135,7 @@ def _initial_base_install(conda_bin, env_packages, check_channels):
     env_str = ""
     channels = " ".join(["-c %s" % x for x in check_channels])
     cur_ps = [x["name"] for x in
-              json.loads(subprocess.check_output("{conda_bin} list --json {env_str}".format(**locals()), shell=True))
+              json.loads(subprocess.check_output("{conda_bin} list --json {env_str} -q".format(**locals()), shell=True))
               if x["channel"] in check_channels]
     have_package_targets = env_name in initial_package_targets and any([p for p in cur_ps
                                                                         if p in initial_package_targets[env_name]])
