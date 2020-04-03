@@ -68,7 +68,7 @@ def _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels):
     subprocess.check_call("{exports}{conda_bin} install -q -y {env_str} {channels} "
                           "{py_version} {pkgs_str}".format(**locals()), shell=True)
     conda_pkg_list = json.loads(subprocess.check_output(
-        "{conda_bin} list --json {env_str}".format(**locals()), shell=True))
+        "{conda_bin} list --json {env_str} -q".format(**locals()), shell=True))
     return conda_pkg_list
 
 def install_in(conda_bin, system_installdir, config_file=None, packages=None):
