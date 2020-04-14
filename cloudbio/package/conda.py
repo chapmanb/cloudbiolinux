@@ -42,8 +42,11 @@ def _install_env_pkgs(env_name, env_packages, conda_bin, conda_envs, channels):
     TODO: currently duplicates mamba base code in _initial_base_install to make it
     easy to remove or roll back general mamba usage. We can refactor _initial_base_install
     in favor of this after further testing.
+
+    conda_bin could refer to mamba
     """
     mamba_bin = os.path.join(os.path.dirname(conda_bin), "mamba")
+    conda_bin = os.path.join(os.path.dirname(mamba_bin), "conda")
     if env_name:
         assert env_name in conda_envs, (env_name, conda_envs)
         env_str = "-n %s" % env_name
@@ -75,6 +78,7 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     """Install packages inside a given anaconda directory.
 
     New approach, local only and not dependent on fabric.
+    conda_bin could refer to mamba
     """
     if config_file is None and packages is None:
         packages = []
