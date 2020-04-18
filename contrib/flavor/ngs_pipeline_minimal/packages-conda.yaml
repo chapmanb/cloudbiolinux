@@ -108,7 +108,7 @@ bio_nextgen:
   - novoalign
   - octopus>=0.5.1b
   - oncofuse
-  - optitype;env=python2
+  - optitype>=1.3.4
   - parallel
   - pbgzip
   - peddy;env=python2
