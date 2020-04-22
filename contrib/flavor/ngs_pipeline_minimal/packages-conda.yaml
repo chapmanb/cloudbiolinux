@@ -111,7 +111,7 @@ bio_nextgen:
   - optitype>=1.3.4
   - parallel
   - pbgzip
-  - peddy;env=python2
+  - peddy
   - perl-sanger-cgp-battenberg
   - phylowgs;env=python2
   - pysam>=0.14.0
