@@ -26,6 +26,7 @@ bio_nextgen:
   - bcbio-variation
   - bcbio-variation-recall
   - bcftools
+  - bedops
   - bedtools=2.27.1
   - biobambam
   - bismark=0.22.1;env=python2
