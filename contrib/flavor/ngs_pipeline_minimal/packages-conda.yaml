@@ -39,7 +39,8 @@ bio_nextgen:
   - cage
   - cancerit-allelecount
   - chipseq-greylist
-  - cnvkit
+  # we see a lot of issues with 0.9.6 and 0.9.7b
+  - cnvkit=0.9.5
   - coincbc
   - cpat;env=python2
   - cramtools
