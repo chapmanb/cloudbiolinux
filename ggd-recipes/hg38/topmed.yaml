@@ -1,5 +1,16 @@
 # Topmed WGS allele frequencies: https://bravo.sph.umich.edu/freeze5/hg38/
 # topmed vcf from ensembl does not have contig names
+# 
+# made via:
+# url=ftp://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh38/variation_genotype/TOPMED_GRCh38_20180418.vcf.gz
+# remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
+# ref=hg38.fa
+# wget --no-check-certificate -qO- $remap_url | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2- | awk '{if(!$2) print "/^"$1"/d"; else if($1!=$2) print "s/^"$1"/"$2"/g";}' > remap.sed
+# mkdir -p variation
+# export TMPDIR=`pwd`
+# wget --no-check-certificate -qO- ${url} > topmed.vcf.gz
+# gunzip -c topmed.vcf.gz | sed -f remap.sed | sed s/Number=\./Number=N/g | vt normalize -r $ref -n - | vt uniq - | gsort -m 5000  /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
+# tabix -f -p vcf variation/topmed.vcf.gz
 ---
 attributes:
   name: topmed
@@ -9,14 +20,18 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh38/variation_genotype/TOPMED_GRCh38_20180418.vcf.gz
-        remap_url=http://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh38_ensembl2UCSC.txt
-        ref=../seq/hg38.fa
-        wget --no-check-certificate -qO- $remap_url | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2- | awk '{if(!$2) print "/^"$1"/d"; else if($1!=$2) print "s/^"$1"/"$2"/g";}' > remap.sed
+        url=http://s3.amazonaws.com/bcbio-nextgen/genomes/Hsapiens/hg38/variation/topmed-freeze5.vcf.gz
         mkdir -p variation
-        export TMPDIR=`pwd`
-        wget -c -O - $url | gunzip -c | sed -f remap.sed | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
-        tabix -f -p vcf variation/topmed.vcf.gz
+        wget -c -O - ${url} > variation/topmed-freeze5.vcf.gz
+        url=http://s3.amazonaws.com/bcbio-nextgen/genomes/Hsapiens/hg38/variation/topmed-freeze5.vcf.gz.tbi
+        wget -c -O - ${url} > variation/topmed-freeze5.vcf.gz.tbi
+        rm -f variation/topmed.vcf.gz
+        rm -f variation/topmed.vcf.gz.tbi
+        cd variation
+        ln -s topmed-freeze5.vcf.gz topmed.vcf.gz
+        ln -s topmed-freeze5.vcf.gz.tbi topmed.vcf.gz.tbi
     recipe_outfiles:
-      - variation/topmed.vcf.gz
-      - variation/topmed.vcf.gz.tbi
+        - variation/topmed-freeze5.vcf.gz
+        - variation/topmed-freeze5.vcf.gz.tbi
+        - variation/topmed.vcf.gz
+        - variation/topmed.vcf.gz.tbi
