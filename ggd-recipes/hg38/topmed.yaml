@@ -9,7 +9,7 @@
 # mkdir -p variation
 # export TMPDIR=`pwd`
 # wget --no-check-certificate -qO- ${url} > topmed.vcf.gz
-# gunzip -c topmed.vcf.gz | sed -f remap.sed | sed s/Number=\./Number=N/g | vt normalize -r $ref -n - | vt uniq - | gsort -m 5000  /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
+# gunzip -c topmed.vcf.gz | sed -f remap.sed | sed s/Number=\./Number=A/g | vt normalize -r $ref -n - | vt uniq - | gsort -m 5000  /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
 # tabix -f -p vcf variation/topmed.vcf.gz
 ---
 attributes:
