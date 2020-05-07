@@ -1,4 +1,10 @@
 # Topmed WGS allele frequencies: https://bravo.sph.umich.edu/freeze3a/hg19/
+#url=ftp://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/TOPMED_GRCh37.vcf.gz
+#ref=GRCh37.fa
+#mkdir -p variation
+#export TMPDIR=`pwd`
+#gunzip -c TOPMED_GRCh37.vcf.gz | sed s/Number=\./Number=A/g | vt normalize -r $ref -n - | vt uniq - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/topmed-freeze3a.vcf.gz
+#tabix -f -p vcf variation/topmed-freeze3a.vcf.gz
 ---
 attributes:
   name: topmed
@@ -8,12 +14,18 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://ftp.ensemblorg.ebi.ac.uk/pub/data_files/homo_sapiens/GRCh37/variation_genotype/TOPMED_GRCh37.vcf.gz
-        ref=../seq/GRCh37.fa
+        url=http://s3.amazonaws.com/bcbio-nextgen/genomes/Hsapiens/GRCh37/variation/topmed-freeze3a.vcf.gz
         mkdir -p variation
-        export TMPDIR=`pwd`
-        wget -c -O - $url | gunzip -c | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | gsort -m 3000 /dev/stdin $ref.fai | bgzip -c > variation/topmed.vcf.gz
-        tabix -f -p vcf variation/topmed.vcf.gz
+        wget -c -O - ${url} > variation/topmed-freeze3a.vcf.gz
+        url=http://s3.amazonaws.com/bcbio-nextgen/genomes/Hsapiens/GRCh37/variation/topmed-freeze3a.vcf.gz.tbi
+        wget -c -O - ${url} > variation/topmed-freeze3a.vcf.gz.tbi
+        rm -f variation/topmed.vcf.gz
+        rm -f variation/topmed.vcf.gz.tbi
+        cd variation
+        ln -s topmed-freeze3a.vcf.gz topmed.vcf.gz
+        ln -s topmed-freeze3a.vcf.gz.tbi topmed.vcf.gz.tbi
     recipe_outfiles:
       - variation/topmed.vcf.gz
       - variation/topmed.vcf.gz.tbi
+      - variation/topmed-freeze3a.vcf.gz
+      - variation/topmed-freeze3a.vcf.gz.tbi
