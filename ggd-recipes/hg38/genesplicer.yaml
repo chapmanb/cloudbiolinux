@@ -8,7 +8,7 @@ recipe:
     recipe_cmds:
       - |
         mkdir -p variation/genesplicer
-        wget http://www.cs.jhu.edu/~genomics/GeneSplicer/GeneSplicer.tar.gz
+        wget ftp://ftp.ccb.jhu.edu/pub/software/genesplicer/GeneSplicer.tar.gz
         tar -C variation/genesplicer --strip-components=2 -xvf GeneSplicer.tar.gz GeneSplicer/human
         rm GeneSplicer.tar.gz
     recipe_outfiles:
