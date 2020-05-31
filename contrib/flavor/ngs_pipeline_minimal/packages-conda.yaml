@@ -54,7 +54,7 @@ bio_nextgen:
   - delly
   - dkfz-bias-filter;env=python2
   - duphold
-  - ensembl-vep=99.*
+  - ensembl-vep=100.*
   - ericscript;env=samtools0
   - express
   - extract-sv-reads
