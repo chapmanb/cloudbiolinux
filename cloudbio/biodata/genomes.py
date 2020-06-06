@@ -674,7 +674,7 @@ def _index_bbmap(env, ref_file):
         cores = 1
     if not os.path.exists(os.path.join(dir_name, "ref", "genome", "1", "summary.txt")):
         subprocess.check_call("mkdir -p %s" % dir_name, shell=True)
-        subprocess.check_call("bbmap.sh -Xms%sg -Xmx20g path=%s ref=%s" %
+        subprocess.check_call("bbmap.sh -Xms%sg -Xmx24g path=%s ref=%s" %
                               (cores, dir_name, ref_file), shell=True)
     return dir_name
 
