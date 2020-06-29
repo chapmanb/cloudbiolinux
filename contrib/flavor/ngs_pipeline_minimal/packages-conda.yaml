@@ -21,7 +21,6 @@ bio_nextgen:
   - atropos;env=python3
   - bamtools=2.4.0
   - bamutil
-  - biopython=1.76
   - bbmap
   - bcbio-prioritize
   - bcbio-variation
