@@ -133,7 +133,7 @@ bio_nextgen:
   - salmon
   - sambamba
   - samblaster
-  - samtools
+  - samtools=1.7
   - scalpel
   - sentieon;env=python2
   - seq2c<2016
