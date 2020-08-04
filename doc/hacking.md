@@ -242,7 +242,7 @@ In bcbio the alternative option is to:
 ## Testing conda environments with bcbio before pushing a PR:
 
 When bcbio is doing an update 
-`bcbio_nexgen.py upgrade -u development --tools`, it pulls cloudbiolinux from github.
+`bcbio_nextgen.py upgrade -u development --tools`, it pulls cloudbiolinux from github.
 To use your copy of cloudbiolinux with modified conda yaml:
 
 Before running bcbio upgrade do
