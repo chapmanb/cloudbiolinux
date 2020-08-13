@@ -1,5 +1,5 @@
 # af_only_gnomad file for t-only variant calling with mutect2
-# From the Broad hg38 bundle:
+# From the Broad bundle:
 # ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.raw.sites.b37.vcf.gz
 ---
 attributes:
@@ -12,12 +12,12 @@ recipe:
       - |
         url=ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/
         base=af-only-gnomad.raw.sites.b37
-        new=af-only-gnomad
+        new=af_only_gnomad
         mkdir -p variation
         for suffix in .vcf.gz .vcf.gz.tbi
         do
           [[ -f variation/$new$suffix ]] || wget --no-check-certificate -c -O variation/$new$suffix $url/$base$suffix
         done
     recipe_outfiles:
-      - variation/af-only-gnomad.vcf.gz
-      - variation/af-only-gnomad.vcf.gz.tbi
+      - variation/af_only_gnomad.vcf.gz
+      - variation/af_only_gnomad.vcf.gz.tbi
