@@ -17,8 +17,9 @@ recipe:
         if [ ! -f dbNSFP.txt.gz ]; then
           mkdir -p $UNPACK_DIR
           unzip dbNSFP*.zip "dbNSFP*_variant.chrM.gz"
-          gunzip -c dbNSFP*_variant.chrM.gz | head -n1 > $UNPACK_DIR/header.txt
-          rm dbNSFP*_variant.chrM.gz
+          gunzip dbNSFP*_variant.chrM.gz
+          head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
+          rm dbNSFP*_variant.chrM
           # unzip only files with chromosomal info, eg. skip genes and readme.
           # [awk] check if hg19 position exists, if so, move data to col 1 and 2, then print
           # and sort on first and second column
