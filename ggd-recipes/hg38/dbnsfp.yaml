@@ -16,12 +16,12 @@ recipe:
         if [ ! -f dbNSFP.txt.gz ]; then
           UNPACK_DIR=`pwd`/tmpunpack
           mkdir -p $UNPACK_DIR
-          unzip dbNSFP*.zip "dbNSFP*_variant.chrM" 
-          head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
-          rm dbNSFP*_variant.chrM
+          unzip dbNSFP*.zip "dbNSFP*_variant.chrM.gz"
+          gunzip -c dbNSFP*_variant.chrM.gz | head -n1 > $UNPACK_DIR/header.txt
+          rm dbNSFP*_variant.chrM.gz
           # unzip only files with chromosomal info, eg. skip genes and readme.
           cat $UNPACK_DIR/header.txt > dbNSFP.txt
-          unzip -p dbNSFPv*.zip "dbNSFP*_variant.chr*" | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n >> dbNSFP.txt
+          unzip -p dbNSFP*.zip "dbNSFP*_variant.chr*.gz" | gunzip -c | grep -v '^#chr' | sort -T $UNPACK_DIR -k1,1 -k2,2n >> dbNSFP.txt
           bgzip dbNSFP.txt
           #extract readme file, used by VEP plugin to add vcf header info
           unzip -p dbNSFP*.zip "*readme.txt" > dbNSFP.readme.txt
@@ -29,8 +29,7 @@ recipe:
         # index in position 1 and 2
         tabix -f -s 1 -b 2 -e 2 -c '#' dbNSFP.txt.gz
         rm -f ${UNPACK_DIR}/* && rmdir $UNPACK_DIR
-        rm -f tmp-gcokie
-        rm -f dbNSFPv*.zip
+        rm -f dbNSFP*.zip
     recipe_outfiles:
       - variation/dbNSFP.txt.gz
       - variation/dbNSFP.txt.gz.tbi
