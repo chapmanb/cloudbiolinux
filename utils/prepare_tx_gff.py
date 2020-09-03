@@ -364,7 +364,9 @@ def clean_gtf(gtf_file, genome_fasta):
             if 'gene_id' not in line:
                 continue
             out_gtf.write(line)
-    shutil.move(temp_gtf, gtf_file)
+    # shutil.move breaks on some clusters when /tmp and target dir are on different filesystems
+    shutil.copy(temp_gtf, gtf_file)
+    os.remove(temp_gtf)
     return gtf_file
 
 def get_genome_fasta(org_build):
