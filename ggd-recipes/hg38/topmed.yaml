@@ -31,7 +31,7 @@ recipe:
         ln -s topmed-freeze5.vcf.gz topmed.vcf.gz
         ln -s topmed-freeze5.vcf.gz.tbi topmed.vcf.gz.tbi
     recipe_outfiles:
-        - variation/topmed-freeze5.vcf.gz
-        - variation/topmed-freeze5.vcf.gz.tbi
         - variation/topmed.vcf.gz
         - variation/topmed.vcf.gz.tbi
+        - variation/topmed-freeze5.vcf.gz
+        - variation/topmed-freeze5.vcf.gz.tbi
