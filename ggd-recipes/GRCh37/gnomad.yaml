@@ -28,7 +28,7 @@ recipe:
         wget --no-check-certificate -c $gnomad_fields_to_keep_url
 
 
-        vcf=${vcf_prefix}${vcf_file}
+        vcf=${url_prefix}${vcf_file}
         wget --no-check-certificate -c $vcf
         wget --no-check-certificate -c $vcf.tbi
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
