@@ -1,5 +1,6 @@
 # mappability regions for purecn analyses:
 # http://bioconductor.org/packages/release/bioc/vignettes/PureCN/inst/doc/Quick.html
+# file size: 1.5G
 ---
 attributes:
   name: purecn_mappability
