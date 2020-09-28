@@ -258,4 +258,12 @@ r:
   - bioconductor-snpchip # needed for the TitanCNA wrapper but not listed as a depedency in the formula
   - bioconductor-titancna
   - bioconductor-vsn>=3.50.0
-  - bioconductor-purecn>=1.16.0;env=r36
+  - r-optparse;env=r36
+  - r-pscbs;env=r36
+  - bioconductor-purecn>=1.18.0;env=r36
+  - bioconductor-txdb.hsapiens.ucsc.hg38.knowngene;env=r36
+  - bioconductor-org.hs.eg.db;env=r36
+  - bioconductor-genomeinfodb;env=r36
+  - bioconductor-genomeinfodbdata;env=r36
+  - bioconductor-rtracklayer;env=r36
+  - bioconductor-txdb.hsapiens.ucsc.hg19.knowngene;env=r36
