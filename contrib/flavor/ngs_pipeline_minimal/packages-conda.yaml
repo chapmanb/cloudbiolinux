@@ -266,4 +266,4 @@ r:
   - bioconductor-genomeinfodb;env=r36
   - bioconductor-genomeinfodbdata;env=r36
   - bioconductor-rtracklayer;env=r36
-  - bioconductor-txdb.hsapiens.ucsc.hg19.knowngene
+  - bioconductor-txdb.hsapiens.ucsc.hg19.knowngene;env=r36
