@@ -17,7 +17,7 @@ recipe:
 
         wget $cancer_gene_url
         wget $cancer_gene_url
-        zcat *csv.gz > G2P.csv
+        gzcat *csv.gz > G2P.csv
 
     recipe_outfiles:
       - variation/G2P.csv

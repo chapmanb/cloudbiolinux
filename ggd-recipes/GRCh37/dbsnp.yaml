@@ -14,7 +14,7 @@ recipe:
         url=http://ftp.ncbi.nih.gov/snp/pre_build152/organisms/$org/VCF/GATK/All_${release}.vcf.gz
         mkdir -p variation
         wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
-        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > variation/dbsnp-$version.vcf.gz
+        [[ -f variation/dbsnp-$version.vcf.gz ]] || gzcat variation/dbsnp-$version-orig.vcf.gz | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > variation/dbsnp-$version.vcf.gz
         tabix -f -p vcf variation/dbsnp-$version.vcf.gz
     recipe_outfiles:
       - variation/dbsnp-151.vcf.gz

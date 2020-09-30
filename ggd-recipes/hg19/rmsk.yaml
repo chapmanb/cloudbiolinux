@@ -11,6 +11,6 @@ recipe:
         mkdir -p coverage/problem_regions/repeats
         cd coverage/problem_regions/repeats
         wget  --random-wait --retry-connrefused -q -c -O rmsk.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/rmsk.txt.gz
-        zcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' | gzip > rmsk.gtf.gz
+        gzcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' | gzip > rmsk.gtf.gz
     recipe_outfiles:
       - coverage/problem_regions/repeats/rmsk.gtf.gz

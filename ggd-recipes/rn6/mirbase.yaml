@@ -11,17 +11,17 @@ recipe:
         mkdir -p srnaseq
         cd srnaseq
         wget -q -N -c ftp://ftp.ensembl.org/pub/release-86/gtf/rattus_norvegicus/Rattus_norvegicus.Rnor_6.0.86.gtf.gz
-        zcat  Rattus_norvegicus.Rnor_6.0.86.gtf.gz | awk '$5-$4 < 500' | grep -v "^#"> srna-transcripts.gtf
+        gzcat  Rattus_norvegicus.Rnor_6.0.86.gtf.gz | awk '$5-$4 < 500' | grep -v "^#"> srna-transcripts.gtf
         wget -q -N -c http://hgdownload.soe.ucsc.edu/goldenPath/rn6/database/rmsk.txt.gz
-        zcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' | sed 's/^chr//' | sed 's/^M/MT/' >> srna-transcripts.gtf
+        gzcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' | sed 's/^chr//' | sed 's/^M/MT/' >> srna-transcripts.gtf
         # wget -q -N -c ftp://mirbase.org/pub/mirbase/20/genomes/rno.gff3
         # awk '$3=="miRNA"' mmu.gff3 | sed 's/=/ /g' >> srna-transcripts.gtf
         wget -q -c -O hairpin.fa.gz ftp://mirbase.org/pub/mirbase/21/hairpin.fa.gz
-        zcat hairpin.fa.gz |  awk '{if ($0~/>rno/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
+        gzcat hairpin.fa.gz |  awk '{if ($0~/>rno/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
         wget -q -c -O mature.fa.gz ftp://mirbase.org/pub/mirbase/21/mature.fa.gz
-        zcat mature.fa.gz |  awk '{if ($0~/>rno/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
+        gzcat mature.fa.gz |  awk '{if ($0~/>rno/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
         wget -q -c -O miRNA.str.gz ftp://mirbase.org/pub/mirbase/21/miRNA.str.gz
-        zcat miRNA.str.gz | awk '{if ($0~/rno/)print $0}' > miRNA.str
+        gzcat miRNA.str.gz | awk '{if ($0~/rno/)print $0}' > miRNA.str
         wget --no-check-certificate -q -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip Rfam_for_miRDeep.fa.gz
         # targetscan analysis
         # tdrmapper
