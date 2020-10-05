@@ -10,9 +10,9 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        mkdir -p variation
-        cd variation
+        mkdir -p coverage/mappability
+        cd coverage/mappability
         wget --no-check-cerfiticate -c https://s3.amazonaws.com/purecn/GCA_000001405.15_GRCh38_no_alt_analysis_set_100.bw
         cd ..
     recipe_outfiles:
-      - variation/GCA_000001405.15_GRCh38_no_alt_analysis_set_100.bw
+      - coverage/mappability/GCA_000001405.15_GRCh38_no_alt_analysis_set_100.bw
