@@ -14,7 +14,7 @@ recipe:
         baseurl=https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/archive_2.0/2019/clinvar_${release}.vcf.gz        
         mkdir -p variation
         wget --no-check-certificate -c -O variation/clinvar-orig.vcf.gz $baseurl
-        [[ -f variation/clinvar.vcf.gz ]] || gzcat variation/clinvar-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/clinvar.vcf.gz
+        [[ -f variation/clinvar.vcf.gz ]] || zcat variation/clinvar-orig.vcf.gz | sed "s/^\([0-9]\+\)\t/chr\1\t/g" | sed "s/^MT/chrM/g" | sed "s/^X/chrX/g" | sed "s/^Y/chrY/g" | bgzip -c > variation/clinvar.vcf.gz
         tabix -f -p vcf variation/clinvar.vcf.gz
     recipe_outfiles:
       - variation/clinvar.vcf.gz
