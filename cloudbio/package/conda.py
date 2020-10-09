@@ -261,7 +261,7 @@ def _create_environments(conda_bin, packages):
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = _get_conda_envs(conda_bin)
-    for addenv in ["python3", "samtools0", "dv", "python2", "r36", "htslib1.10"]:
+    for addenv in ["python3", "samtools0", "dv", "python2", "r36", "htslib1.10", "htslib1.11"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
