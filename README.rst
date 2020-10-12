@@ -33,6 +33,13 @@ throughput sequencing analysis, we suggest using the `bcbio installer
 which fully wraps CloudBioLinux and provides an easy path to customize install
 directories, organisms and biological data installed.
 
+To modify/add data/package recipies to bcbio, edit the below configs:
+
+- bcbio data recipes: https://github.com/chapmanb/cloudbiolinux/tree/master/ggd-recipes
+- bcbio data index1: https://github.com/chapmanb/cloudbiolinux/blob/master/config/biodata.yaml
+- bcbio data index2: https://github.com/bcbio/bcbio-nextgen/tree/master/config/genomes
+- bcbio conda packages index: https://github.com/chapmanb/cloudbiolinux/blob/master/contrib/flavor/ngs_pipeline_minimal/packages-conda.yaml
+
 We recommend using, or developing, a custom flavor to choose tools of interest
 to install. The amount of bioinformatics software continues to increase -- there are
 `over 1000 recipes in bioconda <https://github.com/bioconda/bioconda-recipes>`_
