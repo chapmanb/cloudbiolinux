@@ -1,0 +1,18 @@
+# mappability regions for purecn analyses:
+# http://bioconductor.org/packages/release/bioc/vignettes/PureCN/inst/doc/Quick.html
+# file size: 99M
+---
+attributes:
+  name: purecn_mappability
+  version: 20200928
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p coverage/mappability
+        cd coverage/mappability
+        wget --no-check-certificate -c http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeMapability/wgEncodeCrgMapabilityAlign100mer.bigWig
+        cd ..
+    recipe_outfiles:
+      - coverage/mappability/wgEncodeCrgMapabilityAlign100mer.bigWig

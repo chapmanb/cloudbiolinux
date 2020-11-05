@@ -1,0 +1,16 @@
+# UCSC repeats track for purecn variant filtration:
+---
+attributes:
+  name: simple_repeat
+  version: 20200928
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p coverage/problem_regions/repeats
+        cd coverage/problem_regions/repeats
+        wget --random-wait --retry-connrefused -q -c -O simple_repeat.txt.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/simpleRepeat.txt.gz
+        zcat simple_repeat.txt.gz | awk -F '\t' '{print $2"\t"$3"\t"$4"\t"$5"\t"$11"\t."}' > simple_repeat.bed
+    recipe_outfiles:
+      - coverage/problem_regions/repeats/simple_repeat.bed
