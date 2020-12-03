@@ -61,7 +61,7 @@ bio_nextgen:
   - fastp
   - fastqc>=0.11.8=1
   - fgbio
-  - freebayes=1.1.0.46
+  - freebayes
   - gatk
   - gatk4
   - geneimpacts
