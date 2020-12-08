@@ -25,7 +25,7 @@ recipe:
         bcftools view -f PASS $base.vcf.gz | sed -f remap.sed | grep -v "##config=" | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/af_only_gnomad.vcf.gz
         tabix -f -p vcf variation/af_only_gnomad.vcf.gz
         tabix -f -p vcf --csi variation/af_only_gnomad.vcf.gz
-        rm $base.vcf.gz $base.vcf.tbi
+        rm $base.vcf.gz $base.vcf.gz.tbi
     recipe_outfiles:
       - variation/af_only_gnomad.vcf.gz
       - variation/af_only_gnomad.vcf.gz.tbi
