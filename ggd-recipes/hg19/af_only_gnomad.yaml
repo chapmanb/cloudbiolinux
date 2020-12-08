@@ -15,7 +15,7 @@ recipe:
         mkdir -p variation
         for suffix in .vcf.gz .vcf.gz.tbi
         do
-          [[ -f variation/$new$suffix ]] || wget --no-check-certificate -c $url/$base$suffix
+          wget --no-check-certificate -c ${url}/${base}${suffix}
         done
         remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_ensembl2UCSC.txt
         ref=../seq/hg19.fa
