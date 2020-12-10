@@ -21,8 +21,8 @@ recipe:
         ref=../seq/hg19.fa
         export TMPDIR=`pwd`
         wget --no-check-certificate -qO- $remap_url | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
-
-        bcftools view -f PASS $base.vcf.gz | sed -f remap.sed | grep -v "##config=" | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/af_only_gnomad.vcf.gz
+        # remove grch37 contig names in the header
+        bcftools view -f PASS $base.vcf.gz | sed -f remap.sed | grep -v "##contig=" | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/af_only_gnomad.vcf.gz
         tabix -f -p vcf variation/af_only_gnomad.vcf.gz
         tabix -f -p vcf --csi variation/af_only_gnomad.vcf.gz
         rm $base.vcf.gz $base.vcf.gz.tbi
