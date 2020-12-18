@@ -217,6 +217,7 @@ r:
   - r-devtools
   - r-dplyr
   - r-dt
+  - r-janitor
   - r-knitr
   - r-ggdendro
   - r-ggplot2
