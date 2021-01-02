@@ -34,7 +34,7 @@ bio_nextgen:
   - bowtie2
   - break-point-inspector
   - bwa
-  - bwakit
+  - bwakit;env=bwakit
   - bio-vcf
   - cage
   - cancerit-allelecount
