@@ -135,7 +135,7 @@ bio_nextgen:
   - samblaster
   - samtools=1.9
   - scalpel
-  - scramble
+  - scramble;env=htslib1.11
   - sentieon;env=python2
   - seq2c<2016
   - seqbuster

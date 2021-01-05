@@ -18,6 +18,7 @@ ENV_PY_VERSIONS["dv"] = "python=3"
 ENV_PY_VERSIONS["samtools0"] = "python=2"
 ENV_PY_VERSIONS["r36"] = "python=3"
 ENV_PY_VERSIONS["htslib1.10"] = "python=3"
+ENV_PY_VERSIONS["htslib1.11"] = "python=3"
 ENV_PY_VERSIONS["bwakit"] = "python=3"
 
 def install_packages(env, to_install=None, packages=None):
@@ -257,12 +258,13 @@ def _create_environments(conda_bin, packages):
     - r36 -- R3.6 for PureCN
     - htslib1.10 -- htslib 1.10 for mosdepth and other packages that require it until bioconda
       switches off of 1.9.
+    - htslib1.11 -- htslib 1.11 for scramble until bioconda switched off of 1.9
     - bwakit -- requires a specific (old) version of samblaster
     """
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = _get_conda_envs(conda_bin)
-    for addenv in ["python3", "samtools0", "dv", "python2", "r36", "htslib1.10", "bwakit"]:
+    for addenv in ["python3", "samtools0", "dv", "python2", "r36", "htslib1.10", "htslib1.11", "bwakit"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
