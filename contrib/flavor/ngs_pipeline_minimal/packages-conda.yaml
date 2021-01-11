@@ -178,7 +178,7 @@ bio_nextgen:
   - ucsc-wigtobigwig
   - umis
   - wham
-  - vardict
+  - vardict<=2015
   - vardict-java
   - variantbam
   - varscan
