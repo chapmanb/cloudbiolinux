@@ -1,5 +1,8 @@
 # install time: 1h20min
 # install size: 16G
+# order of files in recipe_outfiles is important
+# first come symlinks, than real files.
+# otherwise real files get copied first, and symlinks become corrupt
 ---
 attributes:
   name: dbsnp
@@ -20,16 +23,15 @@ recipe:
         [[ -f dbsnp-$build.vcf.gz ]] || bcftools annotate -Ou --rename-chrs $remap_url dbsnp-$build-orig.vcf.gz |\
         bcftools sort -m 1G -Oz -T . -o dbsnp-$build.vcf.gz && \
         tabix -f -p vcf -C dbsnp-${build}.vcf.gz
-        tabix -f -p vcf dbsnp-${build}.vcf.gz
-        rm -f dbsnp.vcf.gz dbsnp.vcf.gz.tbi dbsnp.vcf.gz.csi
-        ln -s dbsnp-${build}.vcf.gz dbsnp.vcf.gz
-        ln -s dbsnp-${build}.vcf.gz.tbi dbsnp.vcf.gz.tbi
-        ln -s dbsnp-${build}.vcf.gz.csi dbsnp.vcf.gz.csi
+        tabix -f -p vcf dbsnp-${build}.vcf.gz        
+        ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz
+        ln -sf dbsnp-${build}.vcf.gz.tbi dbsnp.vcf.gz.tbi
+        ln -sf dbsnp-${build}.vcf.gz.csi dbsnp.vcf.gz.csi
         cd ..
     recipe_outfiles:
-      - variation/dbsnp-154.vcf.gz
-      - variation/dbsnp-154.vcf.gz.csi
-      - variation/dbsnp-154.vcf.gz.tbi
       - variation/dbsnp.vcf.gz
       - variation/dbsnp.vcf.gz.csi
       - variation/dbsnp.vcf.gz.tbi
+      - variation/dbsnp-154.vcf.gz
+      - variation/dbsnp-154.vcf.gz.csi
+      - variation/dbsnp-154.vcf.gz.tbi 
