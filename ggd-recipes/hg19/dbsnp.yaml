@@ -14,7 +14,10 @@ recipe:
         cd variation
         wget -c -O dbsnp-${build}-orig.vcf.gz $url
         wget -c -O dbsnp-${build}-orig.vcf.gz.tbi $url.tbi
-        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | bgzip -c > dbsnp-${build}.vcf.gz
+        remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_NCBI2UCSC.txt
+        wget --no-check-certificate -qO- $remap_url | sed 's/\r//' | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        export TMPDIR=`pwd`
+        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed -f remap.sed | bgzip -c > dbsnp-${build}.vcf.gz
         tabix -f -p vcf dbsnp-${build}.vcf.gz
         tabix -f -p vcf -C dbsnp-${build}.vcf.gz
         ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz

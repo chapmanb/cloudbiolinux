@@ -1,4 +1,5 @@
 # UCSFify name sed magic from: https://github.com/mmarchin/utilities/blob/master/ucscify.sh
+# https://github.com/dpryan79/ChromosomeMappings/
 ---
 attributes:
   name: dbsnp
@@ -15,7 +16,10 @@ recipe:
         cd variation
         wget -c -O dbsnp-${build}-orig.vcf.gz $url
         wget -c -O dbsnp-${build}-orig.vcf.gz.tbi $url.tbi
-        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > dbsnp-${build}.not_sorted.vcf.gz && \
+        remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_NCBI2UCSC.txt
+        wget --no-check-certificate -qO- $remap_url | sed 's/\r//' | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        export TMPDIR=`pwd`
+        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed -f remap.sed | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > dbsnp-${build}.not_sorted.vcf.gz && \
             bcftools sort -m 1G -Oz -T . -o dbsnp-${build}.vcf.gz dbsnp-${build}.not_sorted.vcf.gz
         tabix -f -p vcf -C dbsnp-${build}.vcf.gz
         tabix -f -p vcf dbsnp-${build}.vcf.gz
