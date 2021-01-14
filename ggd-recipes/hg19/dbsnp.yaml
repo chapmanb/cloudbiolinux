@@ -17,7 +17,8 @@ recipe:
         remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_NCBI2UCSC.txt
         wget --no-check-certificate -qO- $remap_url | sed 's/\r//' | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
         export TMPDIR=`pwd`
-        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed -f remap.sed | bgzip -c > dbsnp-${build}.vcf.gz
+        [[ -f dbsnp-${build}.unsorted.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed -f remap.sed | bgzip -c > dbsnp-${build}.unsorted.vcf.gz
+        bcftools sort -m 1G -Oz -T . -o dbsnp-${build}.vcf.gz dbsnp-${build}.unsorted.vcf.gz
         tabix -f -p vcf dbsnp-${build}.vcf.gz
         tabix -f -p vcf -C dbsnp-${build}.vcf.gz
         ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz
