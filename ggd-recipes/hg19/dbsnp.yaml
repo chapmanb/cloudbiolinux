@@ -1,20 +1,30 @@
 ---
 attributes:
   name: dbsnp
-  version: 151-20180423
+  version: 154-20210112
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        version=151
-        org=human_9606_b${version}_GRCh37p13
-        release=20180423
-        url=http://ftp.ncbi.nih.gov/snp/pre_build152/organisms/$org/VCF/GATK/All_${release}.vcf.gz
+        build=154
+        version=GCF_000001405.25
+        url=https://ftp.ncbi.nih.gov/snp/archive/b$build/VCF/$version.gz
         mkdir -p variation
-        wget -c -O variation/dbsnp-$version-orig.vcf.gz $url
-        [[ -f variation/dbsnp-$version.vcf.gz ]] || zcat variation/dbsnp-$version-orig.vcf.gz | bgzip -c > variation/dbsnp-$version.vcf.gz
-        tabix -f -p vcf variation/dbsnp-$version.vcf.gz
+        cd variation
+        wget -c -O dbsnp-${build}-orig.vcf.gz $url
+        wget -c -O dbsnp-${build}-orig.vcf.gz.tbi $url.tbi
+        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | bgzip -c > dbsnp-${build}.vcf.gz
+        tabix -f -p vcf dbsnp-${build}.vcf.gz
+        tabix -f -p vcf -C dbsnp-${build}.vcf.gz
+        ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz
+        ln -sf dbsnp-${build}.vcf.gz.tbi dbsnp.vcf.gz.tbi
+        ln -sf dbsnp-${build}.vcf.gz.csi dbsnp.vcf.gz.csi
+        cd ..
     recipe_outfiles:
-      - variation/dbsnp-151.vcf.gz
-      - variation/dbsnp-151.vcf.gz.tbi
+      - variation/dbsnp.vcf.gz
+      - variation/dbsnp.vcf.gz.csi
+      - variation/dbsnp.vcf.gz.tbi
+      - variation/dbsnp-154.vcf.gz
+      - variation/dbsnp-154.vcf.gz.csi
+      - variation/dbsnp-154.vcf.gz.tbi 
