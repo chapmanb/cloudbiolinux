@@ -12,21 +12,21 @@ recipe:
         build=154
         version=GCF_000001405.25
         url=https://ftp.ncbi.nih.gov/snp/archive/b$build/VCF/$version.gz
-        mkdir -p variation
-        cd variation
         wget -c -O dbsnp-${build}-orig.vcf.gz $url
         wget -c -O dbsnp-${build}-orig.vcf.gz.tbi $url.tbi
-        remap_url=https://raw.githubusercontent.com/dpryan79/ChromosomeMappings/master/GRCh37_NCBI2UCSC.txt
-        wget --no-check-certificate -qO- $remap_url | sed 's/\r//' | awk '{if($1!=$2) print "s/^"$1"/"$2"/g"}' > remap.sed
+        remap_url=https://raw.githubusercontent.com/chapmanb/cloudbiolinux/master/ggd-recipes/GRCh37/GRCh37_NCBI2ensembl.txt
+        wget --no-check-certificate -q -O remap.tsv $remap_url
         export TMPDIR=`pwd`
-        [[ -f dbsnp-${build}.vcf.gz ]] || zcat dbsnp-${build}-orig.vcf.gz | sed -f remap.sed | sed "s/^chrM/MT/g" | sed "s/^chr//g" | bgzip -c > dbsnp-${build}.not_sorted.vcf.gz && \
-            bcftools sort -m 1G -Oz -T . -o dbsnp-${build}.vcf.gz dbsnp-${build}.not_sorted.vcf.gz
+        # remove NW_ and NT_ contigs absent in hg19 and in GRCh37
+        gunzip -c dbsnp-${build}-orig.vcf.gz | grep -v "^NW_" | grep -v "^NT_" | bgzip -c > dbsnp-${build}.noNW.vcf.gz
+        tabix dbsnp-${build}.noNW.vcf.gz
+        bcftools annotate -Ou --rename-chrs remap.tsv dbsnp-${build}.noNW.vcf.gz | \
+            bcftools sort -m 1G -Oz -T . -o dbsnp-${build}.vcf.gz
         tabix -f -p vcf -C dbsnp-${build}.vcf.gz
         tabix -f -p vcf dbsnp-${build}.vcf.gz
         ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz
         ln -sf dbsnp-${build}.vcf.gz.tbi dbsnp.vcf.gz.tbi
         ln -sf dbsnp-${build}.vcf.gz.csi dbsnp.vcf.gz.csi
-        cd ..
     recipe_outfiles:
       - variation/dbsnp.vcf.gz
       - variation/dbsnp.vcf.gz.csi
