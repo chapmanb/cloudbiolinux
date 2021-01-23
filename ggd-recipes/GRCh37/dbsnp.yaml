@@ -12,6 +12,8 @@ recipe:
         build=154
         version=GCF_000001405.25
         url=https://ftp.ncbi.nih.gov/snp/archive/b$build/VCF/$version.gz
+        mkdir -p variation
+        cd variation
         wget -c -O dbsnp-${build}-orig.vcf.gz $url
         wget -c -O dbsnp-${build}-orig.vcf.gz.tbi $url.tbi
         remap_url=https://raw.githubusercontent.com/chapmanb/cloudbiolinux/master/ggd-recipes/GRCh37/GRCh37_NCBI2ensembl.txt
@@ -27,6 +29,7 @@ recipe:
         ln -sf dbsnp-${build}.vcf.gz dbsnp.vcf.gz
         ln -sf dbsnp-${build}.vcf.gz.tbi dbsnp.vcf.gz.tbi
         ln -sf dbsnp-${build}.vcf.gz.csi dbsnp.vcf.gz.csi
+        cd ..
     recipe_outfiles:
       - variation/dbsnp.vcf.gz
       - variation/dbsnp.vcf.gz.csi
