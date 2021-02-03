@@ -27,7 +27,7 @@ bio_nextgen:
   - bcbio-variation-recall
   - bcftools
   - bedops
-  - bedtools=2.27.1
+  - bedtools
   - biobambam
   - bismark;env=python2
   - bowtie
