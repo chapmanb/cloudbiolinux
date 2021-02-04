@@ -3,7 +3,7 @@
 ---
 attributes:
   name: vcfanno
-  version: 20210203b
+  version: 20210204
 recipe:
   full:
     recipe_type: bash
