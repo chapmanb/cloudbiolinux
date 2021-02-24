@@ -110,6 +110,8 @@ bio_nextgen:
   - octopus>=0.5.1b
   - oncofuse
   - optitype>=1.3.4
+  # pin pandoc because the later one does not have pandoc-citeproc - necessary for older r-bcbiornaseq we use
+  - pandoc=2.9.2
   - parallel
   - pbgzip
   - peddy
