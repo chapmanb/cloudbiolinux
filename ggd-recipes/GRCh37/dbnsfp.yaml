@@ -16,7 +16,7 @@ recipe:
         UNPACK_DIR=`pwd`/tmpunpack
         if [ ! -f dbNSFP.txt.gz ]; then
           mkdir -p $UNPACK_DIR
-          unzip dbNSFP*.zip "dbNSFP*_variant.chrM.gz"
+          7z e dbNSFP*.zip "dbNSFP*_variant.chrM.gz"
           gunzip dbNSFP*_variant.chrM.gz
           head -n1 dbNSFP*_variant.chrM > $UNPACK_DIR/header.txt
           rm dbNSFP*_variant.chrM
