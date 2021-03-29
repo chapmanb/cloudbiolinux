@@ -1,7 +1,8 @@
 ---
 # Configuration file defining biological data to retrieve and install.
-# These are stored in an Amazon S3 bucket:
+# These are stored in an Amazon S3 buckets:
 # https://s3.amazonaws.com/biodata
+# https://s3.amazonaws.com/bcbio-nextgen
 # and retrieved using the data_fabfile Fabric script.
 
 # ## Genome data -- Next generation sequencing and Galaxy
@@ -61,7 +62,7 @@ genomes:
   - dbkey: mm10
     name: Mouse (mm10)
     indexes: [seq, twobit]
-    annotations: [problem_regions, dbsnp, transcripts, mirbase, rmsk, vcfanno]
+    annotations: [problem_regions, dbsnp, transcripts, mirbase, rmsk, vcfanno, prioritize]
   - dbkey: rn5
     name: Rat (rn5)
   - dbkey: rn6
