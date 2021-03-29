@@ -1,0 +1,22 @@
+# Regions for prioritization:
+# cancer
+#  - az-cancer-panel -- az300 genes plus additional useful panel genes
+# mm10 version contributed by Ramiya Gurrapu
+---
+attributes:
+  name: prioritize
+  version: 20210329
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        baseurl=https://s3.amazonaws.com/bcbio-nextgen/coverage/prioritize/prioritize-cancer-mm10-20210329.tar.gz
+        outdir=coverage/prioritize
+        mkdir -p $outdir
+        cd $outdir
+        wget --no-check-certificate -c -O cancer.tar.gz $baseurl
+        tar -xzvpf cancer.tar.gz
+    recipe_outfiles:
+      - coverage/prioritize/cancer/az-cancer-panel.bed.gz
+      - coverage/prioritize/cancer/az-cancer-panel.bed.gz.tbi
