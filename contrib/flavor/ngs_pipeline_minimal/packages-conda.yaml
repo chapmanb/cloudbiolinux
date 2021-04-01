@@ -277,4 +277,5 @@ r:
   - bioconductor-tximport;env=r36
   - bioconductor-degreport;env=r36
   - r-deconstructsigs;env=r36
-  
+  - bioconductor-bsgenome.hsapiens.ucsc.hg19;env=r36
+  - bioconductor-bsgenome.hsapiens.ucsc.hg38;env=r36
