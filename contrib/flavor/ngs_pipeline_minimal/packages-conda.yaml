@@ -276,3 +276,5 @@ r:
   - bioconductor-deseq2;env=r36
   - bioconductor-tximport;env=r36
   - bioconductor-degreport;env=r36
+  - r-deconstructsigs;env=r36
+  
