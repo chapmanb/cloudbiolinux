@@ -227,6 +227,7 @@ r:
   - r-ggrepel>=0.7
   - r-gplots
   - r-gsalib
+  - r-optparse
   - r-pheatmap
   - r-plyr
   - r-pscbs
