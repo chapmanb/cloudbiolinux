@@ -28,7 +28,7 @@ bio_nextgen:
   - bcftools
   - bedops
   - bedtools
-  - biobambam
+  - biobambam=2.0.87
   - bismark;env=python2
   - bowtie
   - bowtie2
