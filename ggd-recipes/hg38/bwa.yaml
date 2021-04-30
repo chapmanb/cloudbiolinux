@@ -11,7 +11,7 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
-        url=http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome
+        url=ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome
         base=GRCh38_full_analysis_set_plus_decoy_hla.fa
         new=hg38.fa
         mkdir -p bwa
