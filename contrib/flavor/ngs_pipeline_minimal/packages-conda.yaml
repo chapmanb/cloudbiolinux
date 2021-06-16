@@ -149,7 +149,7 @@ bio_nextgen:
   - smcounter2;env=python2
   - smoove;env=python2
   - snap-aligner=1.0dev.97
-  - snpeff=4.3.1t
+  - snpeff
   - solvebio
   - spades
   - staden_io_lib
