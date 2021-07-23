@@ -252,7 +252,7 @@ r:
   - bioconductor-copynumber
   - bioconductor-degreport
   - bioconductor-deseq2
-  - bioconductor-dexseq
+  - bioconductor-dexseq;env=r36
   - bioconductor-dnacopy
   - bioconductor-genomeinfodbdata
   - bioconductor-genomicranges
