@@ -161,6 +161,7 @@ bio_nextgen:
   - svtools;env=python2
   - svtyper;env=python2
   - theta2;env=python2
+  - tomli=1.2.0
   - tophat;env=python2
   - tophat-recondition
   - tdrmapper
