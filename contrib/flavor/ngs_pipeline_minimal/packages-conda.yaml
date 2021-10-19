@@ -94,7 +94,7 @@ bio_nextgen:
   - manta;env=python2
   - maxentscan
   - mbuffer
-  - metasv=0.4.0;env=python2
+  - metasv;env=python2
   - minimap2
   - mintmap
   - mirdeep2=2.0.0.7
