@@ -13,12 +13,17 @@ from cloudbio.package.shared import _yaml_to_packages
 ENV_PY_VERSIONS = collections.defaultdict(lambda: "python=3")
 ENV_PY_VERSIONS[None] = "python=3"
 ENV_PY_VERSIONS["python2"] = "python=2"
-ENV_PY_VERSIONS["python3"] = "python=3"
-ENV_PY_VERSIONS["dv"] = "python=3"
+ENV_PY_VERSIONS["python3.6"] = "python=3.6"
+ENV_PY_VERSIONS["dv"] = "python=3.6"
 ENV_PY_VERSIONS["samtools0"] = "python=3"
-ENV_PY_VERSIONS["r36"] = "python=3"
+ENV_PY_VERSIONS["r35"] = "python=3"
+ENV_PY_VERSIONS["rbcbiornaseq"] = "python=3"
+ENV_PY_VERSIONS["htslib1.9"] = "python=3"
 ENV_PY_VERSIONS["htslib1.10"] = "python=3"
 ENV_PY_VERSIONS["htslib1.11"] = "python=3"
+ENV_PY_VERSIONS["htslib1.12"] = "python=3"
+ENV_PY_VERSIONS["htslib1.12_py3.9"] = "python=3.9"
+ENV_PY_VERSIONS["java"] = "python=3"
 ENV_PY_VERSIONS["bwakit"] = "python=3"
 
 def install_packages(env, to_install=None, packages=None):
@@ -264,7 +269,9 @@ def _create_environments(conda_bin, packages):
     env_names = set([e for e, ps in _split_by_condaenv(packages) if e])
     out = {}
     conda_envs = _get_conda_envs(conda_bin)
-    for addenv in ["python3", "samtools0", "dv", "python2", "r36", "htslib1.10", "htslib1.11", "bwakit"]:
+    for addenv in ["python3.6", "samtools0", "dv", "python2", "r35", 
+                   "htslib1.9", "htslib1.10", "htslib1.11", "htslib1.12", "htslib1.12_py3.9", 
+                   "bwakit", "java", "fresh", "rbcbiornaseq"]:
         if addenv in env_names:
             if not any(x.endswith("/%s" % addenv) for x in conda_envs):
                 print("Creating conda environment: %s" % addenv)
