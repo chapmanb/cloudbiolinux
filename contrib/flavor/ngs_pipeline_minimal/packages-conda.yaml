@@ -1,4 +1,11 @@
 ---
+# some ideas how to debug solving issues
+# not pinning is best - easier to solve, assuming latest possible versions
+# sometimes pinning means the latest version, say we update the old one by pinning package>=2.0
+# in 3 years that pinning pushes the installation down (it is still calculated as lower boundary)
+# don't duplicate packages - if a package is in bcbio bioconda recipe, delete it from here
+# mind r-base / python / htslib / java differences - their versions create separate solution spaces
+# the goal is to make one big main enviroment and isolate problematic packages
 channels:
   - conda-forge
   - bioconda
@@ -15,129 +22,98 @@ minimal:
 # currently not included to reduce total size of Docker images
 # - pandoc
 bio_nextgen:
+  # default: python3.7.10  htslib1.13
+  # htslib1.14 is too fresh - solving issues
   - age-metasv
-  - arriba=1.2.0
-  - ataqv;env=r36
-  - atropos;env=python3
-  - bamtools=2.4.0
+  - atropos
+  - bamtools
   - bamutil
+  # installs samtools, a lot of xorg, openjdk11.0.9.1 - a candidate for isolation
   - bbmap
-  - bcbio-prioritize
-  - bcbio-variation
-  - bcbio-variation-recall
-  - bcftools
+  # wants to update htslib if unrestricted
+  # installs perl 5.32.1
+  - bcftools=1.13
   - bedops
-  - bedtools
-  - biobambam=2.0.87
-  - bismark;env=python2
+  # installed by bcbio bioconda recipe
+  # 2.30.0 + pybedtools
+  # - bedtools
+  # installs boost, curl, libmaus
+  - biobambam
   - bowtie
-  - bowtie2
   - break-point-inspector
   - bwa
-  - bwakit;env=bwakit
+  # installs ruby
   - bio-vcf
   - cage
-  - cancerit-allelecount
-  - chipseq-greylist
+  # downgrades joblib
   - cnvkit
   - coincbc
-  - cpat;env=python2
   - cramtools
-  # Crossmap has specific pysam pinning
-  - crossmap;env=python3
-  - cufflinks
-  # Specific pinned version for mirge compatibility in python2 environment
-  - cutadapt=1.16;env=python2
-  - cyvcf2
+  # cyvcf2 is installed from bcbio-nextgen.yaml
+  # debugpy=1.4.1 may cause solve issues
+  # - debugpy=1.4.0=py37he226ad3_0
   - deeptools
-  - deepvariant;env=dv
-  - delly
-  - dkfz-bias-filter;env=python2
-  - duphold
-  - ensembl-vep=100.*
-  - ericscript;env=samtools0
   - express
-  - extract-sv-reads
   - fastp
-  - fastqc>=0.11.8=1
-  - fgbio
-  - freebayes
-  - gatk
-  - gatk4
+  - fastqc
   - geneimpacts
-  - gemini;env=python2
+  # installs libgcc 7.20
   - genesplicer
   - gffcompare
   - goleft
   - grabix
-  - gridss
   - gsort
-  - gvcf-regions;env=python2
   - gvcfgenotyper
-  - hap.py;env=python2
   - h5py
-  - hmftools-amber
-  - hmftools-cobalt
-  - hmftools-purple
   - hmmlearn
   - hisat2
-  - hts-nim-tools
-  - htslib
-  - htseq;env=r36
+  # installed by bcbio bioconda recipe
+  # - htslib=1.13 
+  - htseq
   - impute2
-  - kallisto>=0.43.1
+  # upgrades h5py 3.30, hdf5 1.10.6, not working with 3.4.0/1.12.1
+  # kallisto 0.46.2
+  - kallisto
+  # downgrades perl to 5.26.2
   - kraken
-  - ldc>=1.13.0
-  - lofreq
-  - lumpy-sv;env=python2
+  - ldc
+  # installed by bcbio bioconda recipe = 7.79.1 required by pysam and mamba
+  # - libcurl
   - macs2
-  - manta;env=python2
   - maxentscan
   - mbuffer
-  - metasv;env=python2
   - minimap2
   - mintmap
-  - mirdeep2=2.0.0.7
-  - mirge;env=python2
+  - mirdeep2
   - mirtop
   - moreutils
-  - mosdepth;env=htslib1.10
   - multiqc
   - multiqc-bcbio
   - ngs-disambiguate
   - novoalign
-  - octopus>=0.5.1b
   - oncofuse
-  - optitype>=1.3.4
-  # pin pandoc because the later one does not have pandoc-citeproc - necessary for older r-bcbiornaseq we use
-  - pandoc=2.9.2
+  - pandoc
   - parallel
   - pbgzip
   - peddy
-  - perl-sanger-cgp-battenberg
-  - phylowgs;env=python2
-  - pysam>=0.14.0
-  - picard
-  - pindel
+  # installed by bcbio conda recipe
+  #- pysam>=0.14.0
   - pizzly
-  - platypus-variant;env=python2
   # TODO: re-enable preseq but it pulls in openblas which causes problems with other blas libraries
   # - preseq
-  - pyloh
   - pythonpy
   - qsignature
-  - qualimap
   - rapmap
-  - razers3=3.5.0
+  # installed by optitype
+  # - razers3
   - rtg-tools
   - sailfish
   - salmon
-  - sambamba
   - samblaster
-  - samtools=1.9
+  # installed
+  #- samtools=1.13
   - scalpel
-  - scramble;env=htslib1.11
-  - sentieon;env=python2
+  # why?
   - seq2c<2016
   - seqbuster
   - seqcluster
@@ -145,22 +121,17 @@ bio_nextgen:
   - sickle-trim
   - simple_sv_annotation
   - singlecell-barcodes
-  - smcounter2;env=python2
-  - smoove;env=python2
   - snap-aligner=1.0dev.97
   - snpeff=4.3.1t
   - solvebio
+  # downgrades openmp
   - spades
-  - staden_io_lib
+  # installed
+  #- staden_io_lib
   - star=2.6.1d
-  - strelka;env=python2
   - stringtie
   - subread
   - survivor
-  - svtools;env=python2
-  - svtyper;env=python2
-  - theta2;env=python2
-  - tophat;env=python2
   - tophat-recondition
   - tdrmapper
   - trim-galore
@@ -179,18 +150,17 @@ bio_nextgen:
   - ucsc-wigtobigwig
   - umis
   - wham
+  # why?
+  # ok with r installed, without r installs r3.2.2
   - vardict<=2015
   - vardict-java
   - variantbam
   - varscan
-  - vawk;env=python2
   - vcfanno
-  - vcf2db;env=python2
-  - vcflib
-  - verifybamid2
   - viennarna
+  # a lot of dependencies including QT - separate env?
   - vqsr_cnn
-  - vt
+#installs many more perl dependencies
 perl:
   - perl-app-cpanminus
   - perl-archive-extract
@@ -205,16 +175,18 @@ perl:
   - perl-ipc-system-simple
   - perl-lwp-simple
   - perl-lwp-protocol-https
+  - perl-sanger-cgp-battenberg
   - perl-statistics-descriptive
   - perl-time-hires
   - perl-vcftools-vcf
 r:
-  - r=3.5.1
-  - r-base
+  # default r=4.1 SI=1.22 VA=1.38 htslib1.13
+  # r4.0 pushes htslibto 1.10
+  - r=4.1=r41hd8ed1ab_1004
+  # yes r is two digit, rbase is three
+  # another 4.1.1 rbase pushed down htslib
+  - r-base=4.1.1=hb67fd72_0
   - xorg-libxt
-  - r-basejump=0.7.2
-  - r-bcbiornaseq>=0.2.7
-  - r-cghflasso
   - r-chbutils
   - r-devtools
   - r-dplyr
@@ -223,10 +195,9 @@ r:
   - r-knitr
   - r-ggdendro
   - r-ggplot2
-  - r-ggrepel>=0.7
+  - r-ggrepel
   - r-gplots
   - r-gsalib
-  - r-optparse
   - r-pheatmap
   - r-plyr
   - r-pscbs
@@ -236,7 +207,7 @@ r:
   - r-sleuth
   - r-snow
   - r-stringi
-  - r-viridis>=0.5
+  - r-viridis
   - r-wasabi
   - bioconductor-annotate
   - bioconductor-apeglm
@@ -244,38 +215,150 @@ r:
   - bioconductor-biocinstaller
   - bioconductor-biocstyle
   - bioconductor-biostrings
+  # 1.22.0 requires r4.1 which gives more solve issues
+  # 1.20.0 = r40_0
+  - bioconductor-summarizedexperiment
   - bioconductor-biovizbase
   - bioconductor-bsgenome.hsapiens.ucsc.hg19
   - bioconductor-bsgenome.hsapiens.ucsc.hg38
   - bioconductor-bubbletree
   - bioconductor-cn.mops
   - bioconductor-copynumber
+  - bioconductor-dnacopy
   - bioconductor-degreport
   - bioconductor-deseq2
-  - bioconductor-dexseq;env=r36
-  - bioconductor-dnacopy
+  - bioconductor-dexseq
   - bioconductor-genomeinfodbdata
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
   - bioconductor-rtracklayer
-  - bioconductor-snpchip # needed for the TitanCNA wrapper but not listed as a depedency in the formula
+  # no bioconductor-snpchip in bioconda anymore
+  # bioconductor-snpchip needed for the TitanCNA wrapper but not listed as a depedency in the formula
   - bioconductor-titancna
-  - bioconductor-vsn>=3.50.0
-  - r-optparse;env=r36
-  - r-pscbs;env=r36
-  - bioconductor-purecn>=1.18.0;env=r36
-  - bioconductor-txdb.hsapiens.ucsc.hg38.knowngene;env=r36
-  - bioconductor-org.hs.eg.db;env=r36
-  - bioconductor-genomeinfodb;env=r36
-  - bioconductor-genomeinfodbdata;env=r36
-  - bioconductor-rtracklayer;env=r36
-  - bioconductor-txdb.hsapiens.ucsc.hg19.knowngene;env=r36
-  - r-tidyverse;env=r36
-  - r-janitor;env=r36
-  - bioconductor-deseq2;env=r36
-  - bioconductor-tximport;env=r36
-  - bioconductor-degreport;env=r36
-  - r-deconstructsigs;env=r36
-  - bioconductor-bsgenome.hsapiens.ucsc.hg19;env=r36
-  - bioconductor-bsgenome.hsapiens.ucsc.hg38;env=r36
+  - bioconductor-vsn
+  #- r-optparse=1.7.1=r40hc72bb7e_0
+  - r-optparse
+  - bioconductor-purecn
+  - bioconductor-txdb.hsapiens.ucsc.hg38.knowngene
+  - bioconductor-org.hs.eg.db
+  - bioconductor-genomeinfodb
+  - bioconductor-genomeinfodbdata
+  - bioconductor-rtracklayer
+  - bioconductor-txdb.hsapiens.ucsc.hg19.knowngene
+  - r-tidyverse
+  - bioconductor-tximport
+  - r-deconstructsigs
+r35:
+  # for arriba, old r dependencies htslib1.9,
+  # libtiff -> libdeflate nightmare
+  - r=3.5.1;env=r35
+  - r-base=3.5.1;env=r35
+  - arriba=1.2.0;env=r35
+# to isolate rbcbiornaseq
+rbcbiornaseq:
+  #- r>=4.1;env=rbcbiornaseq
+  #- r-base>=4.1;env=rbcbiornaseq
+  - r-basejump=0.14.19;env=rbcbiornaseq
+  - r-bcbiornaseq=0.3.42;env=rbcbiornaseq
+  #- bioconductor-summarizedexperiment>=1.22.0;env=rbcbiornaseq
+# openjdk 8
+java:
+  - fgbio;env=java
+  - gatk;env=java
+  - gatk4;env=java
+  - picard;env=java
+  # lots of dependencies
+  - gridss;env=java
+  - hmftools-amber;env=java
+  - hmftools-cobalt;env=java
+  - hmftools-purple;env=java
+  - qualimap;env=java
+  - bcbio-prioritize;env=java
+  - bcbio-variation;env=java
+  # does not work with java11
+  - bcbio-variation-recall;env=java
+htslib1.12:
+  - htslib=1.12;env=htslib1.12
+  - octopus>=0.7.4;env=htslib1.12
+htslib1.11:
+  - htslib=1.11;env=htslib1.11
+  - scramble;env=htslib1.11
+htslib1.10:
+  - htslib=1.10;env=htslib1.10
+  - ataqv;env=htslib1.10
+  - mosdepth;env=htslib1.10
+  - hts-nim-tools;env=htslib1.10
+  - pindel;env=htslib1.10
+  - ensembl-vep=104;env=htslib1.10
+  - perl-bio-db-hts>=3.01;env=htslib1.10
+  - cancerit-allelecount;env=htslib1.10
+  - delly;env=htslib1.10
+  - freebayes;env=htslib1.10
+  - vcflib;env=htslib1.10
+  - verifybamid2;env=htslib1.10
+  # this isn't working for vt normalize
+  #- vt;env=htslib1.10
+htslib1.12_py3.9:
+  - htslib=1.12;env=htslib1.12_py3.9
+  - lofreq;env=htslib1.12_py3.9
+  - sambamba;env=htslib1.12_py3.9
+  - chipseq-greylist;env=htslib1.12_py3.9
+htslib1.9:
+  - htslib=1.9;env=htslib1.9
+  - duphold;env=htslib1.9
+  - extract-sv-reads;env=htslib1.9
+# stall packages
+python3.6:
+  # pushes down mamba, libtiff, but not hts
+  - bowtie2;env=python3.6
+  # uses specific pysam 
+  - crossmap;env=python3.6
+  - cufflinks;env=python3.6
+  - pyloh;env=python3.6
+  # vt is tricky, the only combination that works for vt normalize is
+  - samtools=1.7;env=python3.6
+  - htslib=1.7;env=python3.6
+  - vt=2015.11.10=he941832_3;env=python3.6
+  # not working in the base py3.7
+  - optitype;env=python3.6
+  - razers3;env=python3.6
+  - pysam=0.15.4;env=python3.6
+  - pandas=0.25.3;env=python3.6
+#htslib/samtools 1.10
+python2:
+  - bismark;env=python2
+  - cpat;env=python2
+  - cutadapt=1.16;env=python2
+  - dkfz-bias-filter;env=python2
+  - gemini;env=python2
+  - gvcf-regions;env=python2
+  - hap.py;env=python2
+  - lumpy-sv;env=python2
+  - manta;env=python2
+  - metasv;env=python2
+  - mirge;env=python2
+  - phylowgs;env=python2
+  - platypus-variant;env=python2
+  - sentieon;env=python2
+  - smcounter2;env=python2
+  - smoove;env=python2
+  - strelka;env=python2
+  - svtools;env=python2
+  - svtyper;env=python2
+  - theta2;env=python2
+  - tophat;env=python2
+  - vawk;env=python2
+  - vcf2db;env=python2
+  # for dkfz filter
+  # downgrades metasv0.4.0 and libdeflate1.3
+  - pysam=0.15.3;env=python2
+samtools0:
+  # rbase4.1.1 ncurses5.9. samtools0.1.19
+  - ericscript;env=samtools0
+# samtools 1.7
+bwakit:
+  - bwakit;env=bwakit
+# python3.6
+dv:
+  - deepvariant;env=dv
