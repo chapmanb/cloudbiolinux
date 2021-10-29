@@ -64,16 +64,16 @@ bio_nextgen:
   - grabix
   - gsort
   - gvcfgenotyper
-  - h5py
+  - h5py=3.3
+  - hdf5=1.10
   - hmmlearn
   - hisat2
   # installed by bcbio bioconda recipe
   # - htslib=1.13 
   - htseq
   - impute2
-  # upgrades h5py 3.30, hdf5 1.10.6, not working with 3.4.0/1.12.1
-  # kallisto 0.46.2
-  - kallisto
+  # kallisto 0.46 downgrades h5py to 3.3.0, to hdf5 1.10.6, kallisto is not working with 3.4.0/1.12.1
+  - kallisto=0.46
   # downgrades perl to 5.26.2
   - kraken
   - ldc
