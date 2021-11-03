@@ -113,7 +113,7 @@ bio_nextgen:
   # installed
   #- samtools=1.13
   - scalpel
-  # why?
+  # old versions numbered as 2015.x new versions - 1.3
   - seq2c<2016
   - seqbuster
   - seqcluster
@@ -150,7 +150,7 @@ bio_nextgen:
   - ucsc-wigtobigwig
   - umis
   - wham
-  # why?
+  # old versions numbered as 2015.x new versions - 1.8.2
   # ok with r installed, without r installs r3.2.2
   - vardict<=2015
   - vardict-java
@@ -160,6 +160,17 @@ bio_nextgen:
   - viennarna
   # a lot of dependencies including QT - separate env?
   - vqsr_cnn
+# corrects bcbio install, lift up to bcbio conda recipe
+ipython:
+  # noarch
+  - ipython-cluster-helper=0.6.4=py_0
+  - ipython_genutils=0.2.0=py37_0
+  # 5x fails
+  - traitlets=4.3.3
+  # 7x has different interface
+  - ipyparallel=6.3.0
+  # <6.0.0 pin in requirements isn't applied
+  - ipython=7.29.0
 #installs many more perl dependencies
 perl:
   - perl-app-cpanminus
@@ -232,6 +243,8 @@ r:
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
+  # 2.38.0 breaks wasabi
+  - bioconductor-rhdf5=2.36.0
   - bioconductor-rtracklayer
   # no bioconductor-snpchip in bioconda anymore
   # bioconductor-snpchip needed for the TitanCNA wrapper but not listed as a depedency in the formula
