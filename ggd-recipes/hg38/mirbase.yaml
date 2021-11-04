@@ -34,9 +34,10 @@ recipe:
         #tdrmapper
         wget   --random-wait --retry-connrefused  --no-check-certificate -q -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/hg19_mature_and_pre.fa
         # mintmap
-        wget  --random-wait --retry-connrefused --no-check-certificate -q -N -c https://github.com/TJU-CMC-Org/MINTmap/raw/master/LookupTable.tRFs.MINTmap_v1.txt
-        wget  --random-wait --retry-connrefused --no-check-certificate -q -N -c https://github.com/TJU-CMC-Org/MINTmap/raw/master/tRNAspace.Spliced.Sequences.MINTmap_v1.fa
-        wget  --random-wait --retry-connrefused  --no-check-certificate -q -N -c https://github.com/TJU-CMC-Org/MINTmap/raw/master/OtherAnnotations.MINTmap_v1.txt
+        wget --random-wait --retry-connrefused  -nv -c https://github.com/TJU-CMC-Org/MINTmap/archive/refs/tags/MINTmap_Standard_v1.0.tar.gz
+        tar xzf MINTmap_Standard_v1.0.tar.gz MINTmap-MINTmap_Standard_v1.0/LookupTable.tRFs.MINTmap_v1.txt --strip-components=1
+        tar xzf MINTmap_Standard_v1.0.tar.gz MINTmap-MINTmap_Standard_v1.0/tRNAspace.Spliced.Sequences.MINTmap_v1.fa --strip-components=1
+        tar xzf MINTmap_Standard_v1.0.tar.gz MINTmap-MINTmap_Standard_v1.0/OtherAnnotations.MINTmap_v1.txt --strip-components=1
         # mirdeep2
         wget  --random-wait --retry-connrefused --no-check-certificate -q -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip Rfam_for_miRDeep.fa.gz
         # targetscan analysis
