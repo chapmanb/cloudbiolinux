@@ -42,7 +42,7 @@ recipe:
         # targetscan analysis
         wget  --random-wait --retry-connrefused --no-check-certificate -nv -c -O Summary_Counts.txt.zip http://www.targetscan.org/vert_71/vert_71_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
         wget  --random-wait --retry-connrefused --no-check-certificate -nv -c -O miR_Family_Info.txt.zip http://www.targetscan.org/vert_71/vert_71_data_download/miR_Family_Info.txt.zip && unzip miR_Family_Info.txt.zip
-        wget  --random-wait --retry-connrefused --no-check-certificate -nv -N -c https://www.mirbase.org/ftp/21/database_files/mirna_context.txt.gz
+        wget  --random-wait --retry-connrefused --no-check-certificate -nv -N -c https://www.mirbase.org/ftp/21/database_files/mirna_mature.txt.gz
     recipe_outfiles:
         - srnaseq/srna-transcripts.gtf
         - srnaseq/hairpin.fa
