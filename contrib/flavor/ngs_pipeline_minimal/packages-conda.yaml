@@ -363,6 +363,7 @@ python2:
   - tophat;env=python2
   - vawk;env=python2
   - vcf2db;env=python2
+  - numpy=1.16;env=python2
   # for dkfz filter
   # downgrades metasv0.4.0 and libdeflate1.3
   - pysam=0.15.3;env=python2
