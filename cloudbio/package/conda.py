@@ -120,7 +120,8 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
                           check_channels)
     # install our customized packages
     # don't link samtools from python3.6, use samtools from anaconda/bin
-    dont_link = ["samtools"]
+    # don't link tabix and bgzip
+    dont_link = ["samtools", "htslib"]
     if len(packages) > 0:
         for env_name, env_packages in _split_by_condaenv(packages):
             print("# Installing into conda environment %s: %s" % (env_name or "default", ", ".join(env_packages)))
