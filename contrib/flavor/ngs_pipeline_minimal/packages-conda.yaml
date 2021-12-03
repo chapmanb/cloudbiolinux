@@ -122,7 +122,7 @@ bio_nextgen:
   - simple_sv_annotation
   - singlecell-barcodes
   - snap-aligner=1.0dev.97
-  - snpeff=4.3.1t
+  - snpeff=5.0
   - solvebio
   # downgrades openmp
   - spades
