@@ -11,7 +11,7 @@ recipe:
     recipe_cmds:
       - |
         dir=validation/giab-NA24385
-        url=http://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
+        url=https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv3.3.2/GRCh37/
         calls=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_triophased.vcf.gz
         regions=HG002_GRCh37_GIAB_highconf_CG-IllFB-IllGATKHC-Ion-10X-SOLID_CHROM1-22_v.3.3.2_highconf_noinconsistent.bed
         mkdir -p $dir
@@ -24,8 +24,8 @@ recipe:
         cnvurl=https://s3.amazonaws.com/bcbio/giab/NA24385/NA24385-crowd-dels-GRCh37.bed.gz
         wget -c -O $dir/truth_DEL_crowd.bed.gz $cnvurl
         wget -c -O $dir/truth_DEL_crowd.bed.gz.tbi $cnvurl.tbi
-        svurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz
-        svbedurl=ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.bed
+        svurl=https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz
+        svbedurl=https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.bed
         wget -c -O $dir/truth_sv.vcf.gz $svurl
         wget -c -O $dir/truth_sv.vcf.gz.tbi $svurl.tbi
         wget -c -O $dir/truth_sv_regions.bed $svbedurl
