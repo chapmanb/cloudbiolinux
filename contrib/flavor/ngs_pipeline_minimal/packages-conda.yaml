@@ -252,7 +252,7 @@ r:
   - bioconductor-vsn
   #- r-optparse=1.7.1=r40hc72bb7e_0
   - r-optparse
-  - bioconductor-purecn
+  - bioconductor-purecn>=2.0.1
   - bioconductor-txdb.hsapiens.ucsc.hg38.knowngene
   - bioconductor-org.hs.eg.db
   - bioconductor-genomeinfodb
