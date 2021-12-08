@@ -11,7 +11,7 @@ recipe:
     recipe_cmds:
       - |
         baseurl=https://s3.amazonaws.com/biodata/annotation/GRCh37-rnaseq-2015-12-01.tar.xz
-        wget -c -N --no-check-certificate $baseurl
+        wget -c -N --random-wait --retry-connrefused --no-check-certificate $baseurl
         xz -dc *-rnaseq-*.tar.xz | tar --no-same-owner -xpf -
         mv */rnaseq-* rnaseq
     recipe_outfiles:
