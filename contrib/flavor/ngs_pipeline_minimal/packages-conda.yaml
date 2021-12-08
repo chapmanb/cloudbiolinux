@@ -243,8 +243,8 @@ r:
   - bioconductor-genomicranges
   - bioconductor-iranges
   - bioconductor-limma
-  # 2.38.0 breaks wasabi
-  - bioconductor-rhdf5=2.36.0
+  # 2.38.0 breaks wasabi!
+  - bioconductor-rhdf5
   - bioconductor-rtracklayer
   # no bioconductor-snpchip in bioconda anymore
   # bioconductor-snpchip needed for the TitanCNA wrapper but not listed as a depedency in the formula
