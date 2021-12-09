@@ -1,1 +1,18 @@
-../hg19/effects_transcripts.yaml
+# Custom transcripts for effects prediction
+# Tweaks canonical transcripts in effects predictors like snpEff.
+# the new table was created by extracted canonical trascripts from biomaRt:
+# https://github.com/naumenko-sa/bioscripts/blob/master/gene_panels/genes.R
+---
+attributes:
+  name: effects_transcript
+  version: 2021-12-08
+recipe:
+  full:
+    recipe_type: bash
+    recipe_cmds:
+      - |
+        mkdir -p snpeff/transcripts
+        cd snpeff/transcripts
+        wget --no-check-certificate -O canonical_cancer.txt https://raw.githubusercontent.com/chapmanb/cloudbiolinux/master/ggd-recipes/hg38/canonical_cancer_99.txt
+    recipe_outfiles:
+      - snpeff/transcripts/canonical_cancer.txt
