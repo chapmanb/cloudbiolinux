@@ -269,11 +269,12 @@ r35:
   - r-base=3.5.1;env=r35
   - arriba=1.2.0;env=r35
 # to isolate rbcbiornaseq
+# htslib1.14
 rbcbiornaseq:
   #- r>=4.1;env=rbcbiornaseq
   #- r-base>=4.1;env=rbcbiornaseq
-  - r-basejump=0.14.22;env=rbcbiornaseq
-  - r-bcbiornaseq=0.3.42;env=rbcbiornaseq
+  - r-basejump=0.14.23;env=rbcbiornaseq
+  - r-bcbiornaseq=0.3.44;env=rbcbiornaseq
   - r-tidyverse;env=rbcbiornaseq
   #- bioconductor-summarizedexperiment>=1.22.0;env=rbcbiornaseq
 # openjdk 8
