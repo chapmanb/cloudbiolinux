@@ -275,6 +275,7 @@ rbcbiornaseq:
   #- r-base>=4.1;env=rbcbiornaseq
   - r-basejump=0.14.23;env=rbcbiornaseq
   - r-bcbiornaseq=0.3.44;env=rbcbiornaseq
+  - r-acidmarkdown=0.1.5;env=rbcbiornaseq
   - r-tidyverse;env=rbcbiornaseq
   #- bioconductor-summarizedexperiment>=1.22.0;env=rbcbiornaseq
 # openjdk 8
