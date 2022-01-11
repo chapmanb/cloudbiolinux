@@ -279,6 +279,8 @@ rbcbiornaseq:
   - r-tidyverse;env=rbcbiornaseq
   - r-acidgenomes=0.2.20;env=rbcbiornaseq
   - r-acidsinglecell=0.1.9;env=rbcbiornaseq
+  - r-bcbiobase=0.6.22;env=rbcbiornaseq
+  - r-acidexperiment=0.2.2;env=rbcbiornaseq
   #- bioconductor-summarizedexperiment>=1.22.0;env=rbcbiornaseq
 # openjdk 8
 java:
