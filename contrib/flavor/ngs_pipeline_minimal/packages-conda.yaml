@@ -286,7 +286,8 @@ rbcbiornaseq:
 java:
   - fgbio;env=java
   - gatk;env=java
-  - gatk4;env=java
+  # fixes log4j
+  - gatk4>=4.2.5.0;env=java
   - picard;env=java
   # lots of dependencies
   - gridss;env=java
