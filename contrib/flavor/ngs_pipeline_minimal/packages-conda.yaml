@@ -351,6 +351,8 @@ python2:
   - bismark;env=python2
   - cpat;env=python2
   - cutadapt=1.16;env=python2
+  # by default 0.30.11 is installed - causes issues with blob gts fields in vcf2db.py/gemini
+  - cyvcf2=0.10.0;env=python2
   - dkfz-bias-filter;env=python2
   - gemini;env=python2
   - gvcf-regions;env=python2
