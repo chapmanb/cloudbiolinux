@@ -1,5 +1,5 @@
 fabric
-paramiko==2.0.9
+paramiko==2.10.1
 argparse
 pyyaml
 apache-libcloud==0.11.3
