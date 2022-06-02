@@ -14,7 +14,7 @@ recipe:
         wget -O - --no-check-certificate https://gist.githubusercontent.com/chapmanb/a973558c2ec67a57eb4592c709ec0d09/raw/81d398fd7f3c901f89753d4f9f39c5a87d05a7fa/sacCer3.chrom.sizes | cut -f 1 > sacCer3.chrom.sizes
         wget -c --no-check-certificate https://raw.githubusercontent.com/kwongj/sort-contigs/master/sort-contigs.py
         wget --no-check-certificate -O - $url | gunzip -c | python -c 'import sys; [sys.stdout.write(">chr%s\n" % (l[1:].split()[0].replace("Mito", "M")) if l.startswith(">") else l) for l in sys.stdin]' > seq/$BUILD.fa.orig
-        `bcbio_conda env list | grep python2 | awk '{print $2"/bin/python"}'` sort-contigs.py seq/$BUILD.fa.orig --out seq/$BUILD.fa --fmt fasta --order sacCer3.chrom.sizes
+        python2 sort-contigs.py seq/$BUILD.fa.orig --out seq/$BUILD.fa --fmt fasta --order sacCer3.chrom.sizes
         samtools faidx seq/$BUILD.fa
         picard -Xms1g -Xmx3g CreateSequenceDictionary REFERENCE=seq/$BUILD.fa OUTPUT=seq/$BUILD.dict SPECIES=$BUILD
     recipe_outfiles:
