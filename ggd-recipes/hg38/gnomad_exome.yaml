@@ -12,6 +12,7 @@
 # processing time: 87G to 4G in 7h
 # there are no native hg38 exome calls in gnomad.v3 - only for genomes, so exome variants are still lifted over from grch37,
 # and they need processing because liftover creates duplicated variants
+# receipe version is the same - the old installations won't be reinstalled
 ---
 attributes:
   name: gnomad_exome
@@ -21,6 +22,8 @@ recipe:
     recipe_type: bash
     recipe_cmds:
       - |
+        gsutil cp gs://gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz .
+        gsutil cp gs://gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz.tbi .
         vcf_prefix=https://storage.googleapis.com/gnomad-public/release/2.1.1/liftover_grch38/vcf/exomes/
         vcf_file=gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz
         mkdir -p variation

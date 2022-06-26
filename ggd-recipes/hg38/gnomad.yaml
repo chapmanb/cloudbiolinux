@@ -1,34 +1,42 @@
 # GnomAD VCF sites:
-# - https://gnomad.broadinstitute.org/downloads
-# - https://macarthurlab.org/2018/10/17/gnomad-v2-1/
-# Using one VCF from Gnomad, removing some fields to make it smaller
+# https://gnomad.broadinstitute.org/downloads
+# Using only PASS variants, removing some fields to make the vcf smaller
 # recipe test: https://github.com/chapmanb/cloudbiolinux/blob/master/doc/hacking.md#testing-a-ggd-recipe
-# gnomad v3. is native hg38 not a liftover
-# processes 241G vcf.gz to 132G vcf.gz in < 6 days
+# using gnomad v3 which has WGS only bug aligned to hg38
+# gnomad v2 is WES aligned to hg19 + liftover - not using it
+# download from google cloud with gsutil
+# processes 241G vcf.gz to 132G vcf.gz in < 6 days - old estimate
 ---
 attributes:
   name: gnomad
-  version: 3
+  version: 4
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        vcf_prefix=https://storage.googleapis.com/gnomad-public/release/3.0/vcf/genomes/
-        vcf_file=gnomad.genomes.r3.0.sites.vcf.bgz
+        vcf_prefix=gnomad.genomes.v3.1.sites
         mkdir -p variation
         export TMPDIR=`pwd`
         gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
-        wget --no-check-certificate -c $gnomad_fields_to_keep_url
-        vcf=${vcf_prefix}${vcf_file}
-        wget --no-check-certificate -c $vcf
-        wget --no-check-certificate -c $vcf.tbi
+        gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz .
+        gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz.tbi .
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
         ref=../seq/hg38.fa
-        bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/gnomad_genome.vcf.gz
+        for f in `seq 1 22` X Y M
+        do
+            vcf_file=${vcf_prefix}.chr${f}.vcf.gz
+            bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > gg.chr${f}.vcf.gz
+            tabix gg.chr${f}.vcf.gz
+            echo gg.chr${f}.vcf.gz >> gnomad_to_merge.txt
+        done
+        bcftools merge -l gnomad_to_merge.txt -Oz > variation/gnomad_genome.vcf.gz
         tabix -f -p vcf variation/gnomad_genome.vcf.gz
         tabix -f -p vcf --csi variation/gnomad_genome.vcf.gz
-        rm $vcf_file $vcf_file.tbi
+        rm ${vcf_prefix}*.vcf.bgz
+        rm ${vcf_prefix}*.vcf.bgz.tbi
+        rm gg.chr*.vcf.gz
+        rm gg.chr*.vcf.gz.tbi
     recipe_outfiles:
       - variation/gnomad_genome.vcf.gz
       - variation/gnomad_genome.vcf.gz.tbi

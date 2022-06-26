@@ -63,6 +63,7 @@ bio_nextgen:
   - goleft
   - grabix
   - gsort
+  - gsutil
   - gvcfgenotyper
   - h5py=3.3
   - hdf5=1.10
