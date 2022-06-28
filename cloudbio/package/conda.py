@@ -135,6 +135,10 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     for pkg in ["python", "conda", "pip"]:
         _link_bin(pkg, system_installdir, conda_info, conda_bin, conda_pkg_list, files=[pkg], prefix="bcbio_")
 
+    source_file = os.path.realpath(os.path.join(conda_envs.get(env_name),"bin", "python2"))
+    dest_file = os.path.realpath(os.path.join(system_installdir, "bin", "python2"))
+    _do_link(source_file, dest_file)
+
 def _initial_base_install(conda_bin, env_packages, check_channels):
     """Provide a faster initial installation of base packages, avoiding dependency issues.
 
