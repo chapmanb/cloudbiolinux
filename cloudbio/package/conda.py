@@ -134,10 +134,16 @@ def install_in(conda_bin, system_installdir, config_file=None, packages=None):
     conda_pkg_list = json.loads(subprocess.check_output("{conda_bin} list --json -q".format(**locals()), shell=True))
     for pkg in ["python", "conda", "pip"]:
         _link_bin(pkg, system_installdir, conda_info, conda_bin, conda_pkg_list, files=[pkg], prefix="bcbio_")
-
-    source_file = os.path.realpath(os.path.join(conda_envs.get("python2"), "bin", "python2"))
-    dest_file = os.path.realpath(os.path.join(system_installdir, "bin", "python2"))
-    _do_link(source_file, dest_file)
+        
+    # link packages which avoided _link_bin
+    exception_packages = {"python2": "python2",
+                          "vt": "python3.6"}
+    for package in exception_packages:
+        env_name = exception_packages[package]
+        source_file = os.path.realpath(os.path.join(conda_envs.get(env_name), "bin", package))
+        # not realpath, because realpath would go to the source_file if exists
+        dest_file = os.path.join(system_installdir, "bin", package)
+        _do_link(source_file, dest_file)
 
 def _initial_base_install(conda_bin, env_packages, check_channels):
     """Provide a faster initial installation of base packages, avoiding dependency issues.
