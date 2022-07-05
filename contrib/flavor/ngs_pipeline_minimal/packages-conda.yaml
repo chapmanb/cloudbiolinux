@@ -357,12 +357,14 @@ python2:
   - gemini;env=python2
   - gvcf-regions;env=python2
   - hap.py;env=python2
+  - htslib=1.10;env=python2
   - lumpy-sv;env=python2
   - manta;env=python2
   - metasv;env=python2
   - mirge;env=python2
   - phylowgs;env=python2
   - platypus-variant;env=python2
+  - samtools=1.10;env=python2
   - sentieon;env=python2
   - smcounter2;env=python2
   - smoove;env=python2
