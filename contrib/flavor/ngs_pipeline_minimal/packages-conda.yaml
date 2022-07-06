@@ -38,7 +38,8 @@ bio_nextgen:
   # 2.30.0 + pybedtools
   # - bedtools
   # installs boost, curl, libmaus
-  - biobambam
+  # see issue 3650
+  - biobambam=2.0.87
   - bowtie
   - break-point-inspector
   - bwa
