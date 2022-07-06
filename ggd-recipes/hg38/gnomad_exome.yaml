@@ -24,15 +24,11 @@ recipe:
       - |
         gsutil cp gs://gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz .
         gsutil cp gs://gcp-public-data--gnomad/release/2.1.1/liftover_grch38/vcf/exomes/gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz.tbi .
-        vcf_prefix=https://storage.googleapis.com/gnomad-public/release/2.1.1/liftover_grch38/vcf/exomes/
         vcf_file=gnomad.exomes.r2.1.1.sites.liftover_grch38.vcf.bgz
         mkdir -p variation
         export TMPDIR=`pwd`
-        gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
+        gnomad_fields_to_keep_url=https://raw.githubusercontent.com/chapmanb/cloudbiolinux/master/ggd-recipes/hg38/gnomad_fields_to_keep.txt
         wget --no-check-certificate -c $gnomad_fields_to_keep_url
-        vcf=${vcf_prefix}${vcf_file}
-        wget --no-check-certificate -c $vcf
-        wget --no-check-certificate -c $vcf.tbi
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
         ref=../seq/hg38.fa
         bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > variation/gnomad_exome.vcf.gz
