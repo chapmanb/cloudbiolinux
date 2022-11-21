@@ -270,7 +270,7 @@ r35:
   - r-base=3.5.1;env=r35
   - arriba=1.2.0;env=r35
 rbcbiornaseq:
-  - r-bcbiornaseq=0.4.0;env=rbcbiornaseq
+  - r-bcbiornaseq>=0.5.1;env=rbcbiornaseq
 # openjdk 8
 java:
   - fgbio;env=java
