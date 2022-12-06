@@ -177,7 +177,8 @@ perl:
   - perl-app-cpanminus
   - perl-archive-extract
   - perl-archive-zip
-  - perl-bio-db-sam
+  # perl-bio-db-sam is deprecated
+  - perl-bio-samtools
   - perl-cgi
   - perl-dbi
   - perl-encode-locale
@@ -187,7 +188,9 @@ perl:
   - perl-ipc-system-simple
   - perl-lwp-simple
   - perl-lwp-protocol-https
-  - perl-sanger-cgp-battenberg
+  # removed due to the perl upgrade
+  # needs to be upgraded from https://github.com/cancerit/cgpBattenberg
+  # perl-sanger-cgp-battenberg
   - perl-statistics-descriptive
   - perl-time-hires
   - perl-vcftools-vcf
