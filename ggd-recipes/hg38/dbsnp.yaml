@@ -32,6 +32,6 @@ recipe:
       - variation/dbsnp.vcf.gz
       - variation/dbsnp.vcf.gz.csi
       - variation/dbsnp.vcf.gz.tbi
-      - variation/dbsnp-154.vcf.gz
-      - variation/dbsnp-154.vcf.gz.csi
-      - variation/dbsnp-154.vcf.gz.tbi 
+      - variation/dbsnp-156.vcf.gz
+      - variation/dbsnp-156.vcf.gz.csi
+      - variation/dbsnp-156.vcf.gz.tbi 
