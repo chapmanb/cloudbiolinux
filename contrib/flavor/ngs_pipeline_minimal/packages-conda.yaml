@@ -282,10 +282,11 @@ java:
   - gatk4=4.2.5.0;env=java
   - picard=2.27.5;env=java
   # lots of dependencies
-  - gridss;env=java
-  - hmftools-amber;env=java
-  - hmftools-cobalt;env=java
-  - hmftools-purple;env=java
+  # try removing gridss and hmftools
+  # - gridss;env=java
+  # - hmftools-amber;env=java
+  # - hmftools-cobalt;env=java
+  # - hmftools-purple;env=java
   - qualimap;env=java
   - bcbio-prioritize;env=java
   - bcbio-variation;env=java
