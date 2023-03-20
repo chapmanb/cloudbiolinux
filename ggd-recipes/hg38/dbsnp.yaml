@@ -6,13 +6,13 @@
 ---
 attributes:
   name: dbsnp
-  version: 154-20210112
+  version: 156-20230320
 recipe:
   full:
     recipe_type: bash
     recipe_cmds:
       - |
-        build=154
+        build=156
         version=GCF_000001405.38
         url=http://ftp.ncbi.nih.gov/snp/archive/b$build/VCF/$version.gz
         remap_url=https://gist.githubusercontent.com/matthdsm/f833aedd2d67e28013ff1d171c70f4ee/raw/442a45ed3ddc6e85c66c5e58e0fa78e16a0821c8/refseq2ucsc.tsv
