@@ -274,13 +274,13 @@ r35:
   - arriba=1.2.0;env=r35
 rbcbiornaseq:
   - r-bcbiornaseq>=0.5.1;env=rbcbiornaseq
-# openjdk 8
+# openjdk 8 - waiting for gatk 4.4.0 release in conda to switch to java17
 java:
   - fgbio;env=java
   - gatk;env=java
   # fixes log4j
-  - gatk4>=4.2.5.0;env=java
-  - picard;env=java
+  - gatk4=4.2.5.0;env=java
+  - picard=2.27.5;env=java
   # lots of dependencies
   - gridss;env=java
   - hmftools-amber;env=java
