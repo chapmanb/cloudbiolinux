@@ -56,7 +56,8 @@ bio_nextgen:
   - deeptools
   - express
   - fastp
-  - fastqc
+  # tmp pin adapt the wrapper to the new version
+  - fastqc=0.11.9
   - geneimpacts
   # installs libgcc 7.20
   - genesplicer
