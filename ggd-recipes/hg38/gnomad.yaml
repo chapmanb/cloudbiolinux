@@ -6,6 +6,7 @@
 # gnomad v2 is WES aligned to hg19 + liftover - not using it
 # download from google cloud with gsutil
 # processes 241G vcf.gz to 132G vcf.gz in < 6 days - old estimate
+# gnomad fields changes in 2023 - no version update to avoid triggering gnomad reinstalls
 ---
 attributes:
   name: gnomad
@@ -17,8 +18,8 @@ recipe:
       - |
         vcf_prefix=gnomad.genomes.v3.1.sites
         mkdir -p variation
-        export TMPDIR=`pwd`
-        gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/d20db928b915a87bba4012ba1b89d924/raw/cf343b105cb3347e966cc95d049e364528c86880/gnomad_fields_to_keep.txt
+        export TMPDIR=`pwd`        
+        gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/7b83cb718ffeadb75ae61676f2158de9/raw/e6d4e39fa2744e1271d3fce0613808d167c158e4/gnomad_fields_to_keep_2023.txt
         gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz .
         gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz.tbi .
         fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
