@@ -20,13 +20,14 @@ recipe:
         mkdir -p variation
         export TMPDIR=`pwd`        
         gnomad_fields_to_keep_url=https://gist.githubusercontent.com/naumenko-sa/7b83cb718ffeadb75ae61676f2158de9/raw/e6d4e39fa2744e1271d3fce0613808d167c158e4/gnomad_fields_to_keep_2023.txt
+        wget $gnomad_fields_to_keep_url
         gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz .
         gsutil cp gs://gcp-public-data--gnomad/release/3.1/vcf/genomes/*sites.chr*.vcf.bgz.tbi .
-        fields_to_keep="INFO/"$(cat gnomad_fields_to_keep.txt | paste -s | sed s/"\t"/",INFO\/"/g)
+        fields_to_keep="INFO/"$(cat gnomad_fields_to_keep_2023.txt | paste -s | sed s/"\t"/",INFO\/"/g)
         ref=../seq/hg38.fa
         for f in `seq 1 22` X Y M
         do
-            vcf_file=${vcf_prefix}.chr${f}.vcf.gz
+            vcf_file=${vcf_prefix}.chr${f}.vcf.bgz
             bcftools view -f PASS $vcf_file | bcftools annotate -x "^$fields_to_keep" -Ov | vt decompose -s - | vt normalize -r $ref -n - | vt uniq - | bgzip -c > gg.chr${f}.vcf.gz
             tabix gg.chr${f}.vcf.gz
             echo gg.chr${f}.vcf.gz >> gnomad_to_merge.txt
