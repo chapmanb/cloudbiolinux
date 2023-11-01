@@ -19,7 +19,7 @@ recipe:
         cat mature.t.fa | awk '{if ($0~/>dme/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
         wget --random-wait --retry-connrefused -nv -c -O miRNA.t.str.gz ftp://mirbase.org/pub/mirbase/22/miRNA.str.gz && gunzip -f miRNA.t.str.gz
         cat miRNA.t.str | awk '{if ($0~/dme/)print $0}' > miRNA.str
-        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 ftp://mirbase.org/pub/mirbase/22/genomes/dme.gff3
+        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 https://mirbase.org/download/dme.gff3
         wget --no-check-certificate -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip -f Rfam_for_miRDeep.fa.gz
         # targetscan analysis
         wget  --random-wait --retry-connrefused --no-check-certificate -nv -c -O Summary_Counts.txt.zip http://www.targetscan.org/fly_72/fly_72_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
