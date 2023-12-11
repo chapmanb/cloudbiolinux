@@ -23,13 +23,16 @@ recipe:
         # wget --random-wait --retry-connrefused  -nv -c -O piR_hg19_v1.0.bed.gz http://www.regulatoryrna.org/database/piRNA/download/archive/v1.0/bed/piR_hg19_v1.0.bed.gz
         # zcat piR_hg19_v1.0.bed.gz | awk '{print $1"\t.\tpiRNA\t"$2"\t"$3"\t.\t"$6"\t.\tname "$4";"}' >> srna-transcripts.gtf
         # mirbase
-        wget  --random-wait --retry-connrefused  -nv -c -O hairpin.fa.gz https://www.mirbase.org/ftp/21/hairpin.fa.gz
-        zcat hairpin.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
-        wget  --random-wait --retry-connrefused  -nv -c -O mature.fa.gz https://www.mirbase.org/ftp/21/mature.fa.gz
-        zcat mature.fa.gz |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
-        wget  --random-wait --retry-connrefused  -nv -c -O miRNA.str.gz https://www.mirbase.org/ftp/21/miRNA.str.gz
-        zcat miRNA.str.gz | awk '{if ($0~/hsa/)print $0}' > miRNA.str
-        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 https://www.mirbase.org/ftp/21/genomes/hsa.gff3
+        wget  --random-wait --retry-connrefused  -nv -c -O hairpin.fa.raw https://mirbase.org/download/CURRENT/hairpin.fa
+        cat hairpin.fa.raw |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
+        rm hairpin.fa.raw
+        wget  --random-wait --retry-connrefused  -nv -c -O mature.fa.raw https://mirbase.org/download/CURRENT/mature.fa
+        cat mature.fa.raw |  awk '{if ($0~/>hsa/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
+        rm mature.fa.raw
+        wget  --random-wait --retry-connrefused  -nv -c -O miRNA.dat.raw https://mirbase.org/download/CURRENT/miRNA.dat
+        cat miRNA.dat.raw | awk '{if ($0~/hsa/)print $0}' > miRNA.str
+        rm miRNA.dat.raw
+        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 https://mirbase.org/download/hsa.gff3
         # tdrmapper
         wget   --random-wait --retry-connrefused  --no-check-certificate -nv -c -O trna_mature_pre.fa https://github.com/sararselitsky/tDRmapper/raw/master/hg19_mature_and_pre.fa
         # mintmap

@@ -18,13 +18,16 @@ recipe:
         zcat rmsk.txt.gz | awk '{print $6"\t.\trepeat\t"$7+1"\t"$8+1"\t.\t"$10"\t.\tname "$12";"}' >> srna-transcripts.gtf
         wget  --random-wait --retry-connrefused -q -N -c https://www.mirbase.org/ftp/20/genomes/mmu.gff3
         awk '$3=="miRNA"' mmu.gff3 | sed 's/=/ /g' >> srna-transcripts.gtf
-        wget  --random-wait --retry-connrefused -q -c -O hairpin.fa.gz https://www.mirbase.org/ftp/21/hairpin.fa.gz
-        zcat hairpin.fa.gz |  awk '{if ($0~/>mmu/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
-        wget  --random-wait --retry-connrefused -q -c -O mature.fa.gz https://www.mirbase.org/ftp/21/mature.fa.gz
-        zcat mature.fa.gz |  awk '{if ($0~/>mmu/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
-        wget --random-wait --retry-connrefused  -q -c -O miRNA.str.gz https://www.mirbase.org/ftp/21/miRNA.str.gz
-        zcat miRNA.str.gz | awk '{if ($0~/mmu/)print $0}' > miRNA.str
-        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 https://www.mirbase.org/ftp/21/genomes/mmu.gff3
+        wget  --random-wait --retry-connrefused -q -c -O hairpin.fa.raw https://mirbase.org/download/CURRENT/hairpin.fa
+        cat hairpin.fa.raw |  awk '{if ($0~/>mmu/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > hairpin.fa
+        rm hairpin.fa.raw
+        wget  --random-wait --retry-connrefused -q -c -O mature.fa.raw https://mirbase.org/download/CURRENT/mature.fa
+        cat mature.fa.raw |  awk '{if ($0~/>mmu/){name=$0; print name} else if ($0~/^>/){name=0};if (name!=0 && $0!~/^>/){print $0;}}' | sed 's/U/T/g'  > mature.fa
+        rm mature.fa.raw
+        wget --random-wait --retry-connrefused  -q -c -O miRNA.dat.raw https://mirbase.org/download/CURRENT/miRNA.dat
+        cat miRNA.dat.raw | awk '{if ($0~/mmu/)print $0}' > miRNA.str
+        rm miRNA.dat.raw
+        wget --random-wait --retry-connrefused -nv -c -O mirbase.gff3 https://mirbase.org/download/mmu.gff3
         wget --random-wait --retry-connrefused  --no-check-certificate -q -c -O Rfam_for_miRDeep.fa.gz https://github.com/lpantano/mirdeep2_core/raw/data/Rfam_for_miRDeep.fa.gz && gunzip Rfam_for_miRDeep.fa.gz
         # targetscan analysis
         # wget --no-check-certificate -q -c -O Summary_Counts.txt.zip http://www.targetscan.org/mmu_71/mmu_71_data_download/Summary_Counts.all_predictions.txt.zip && unzip Summary_Counts.txt.zip
